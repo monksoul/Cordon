@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Description>Furion 框架数据验证模块。</Description>
+        <PackageTags>Furion;ASP.NET;dotNET China;Cross Platform;百小僧;Monk;MonkSoul;Core;Limen;Validation;Fluent;FluentValidation;Validator</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Limen\src\Limen.csproj"/>
+    </ItemGroup>
+
+</Project>

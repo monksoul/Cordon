@@ -1,0 +1,7 @@
+﻿<Solution>
+    <Project Path="..\samples\Limen.Samples\Limen.Samples.csproj" Type="Classic C#"/>
+    <Project Path="Limen.AspNetCore\src\Limen.AspNetCore.csproj" Type="Classic C#"/>
+    <Project Path="Limen.AspNetCore\test\Limen.AspNetCore.Tests.csproj" Type="Classic C#"/>
+    <Project Path="Limen\src\Limen.csproj" Type="Classic C#"/>
+    <Project Path="Limen\test\Limen.Tests.csproj" Type="Classic C#"/>
+</Solution>
