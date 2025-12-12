@@ -1,0 +1,1211 @@
+﻿// 版权归百小僧及百签科技（广东）有限公司所有。
+// 
+// 此源代码遵循位于源代码树根目录中的 LICENSE 文件的许可证。
+
+namespace Limen.Tests;
+
+public class PropertyValidatorTests
+{
+    [Fact]
+    public void New_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => new PropertyValidator<ObjectModel, string?>(null!, null!));
+        Assert.Throws<ArgumentNullException>(() => new PropertyValidator<ObjectModel, string?>(u => u.Name, null!));
+    }
+
+    [Fact]
+    public void New_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Null(propertyValidator._serviceProvider);
+        Assert.NotNull(propertyValidator._objectValidator);
+        Assert.Equal(objectValidator, propertyValidator._objectValidator);
+        Assert.NotNull(propertyValidator._annotationValidator);
+        Assert.Null(propertyValidator._annotationValidator._serviceProvider);
+        Assert.Null(propertyValidator._annotationValidator._items);
+        Assert.NotNull(propertyValidator.Validators);
+        Assert.Null(propertyValidator._propertyValidator);
+        Assert.Null(propertyValidator._lastAddedValidator);
+        Assert.Empty(propertyValidator.Validators);
+        Assert.Equal(0, propertyValidator._highPriorityEndIndex);
+        Assert.Null(propertyValidator.RuleSets);
+        Assert.Null(propertyValidator.DisplayName);
+        Assert.Null(propertyValidator.MemberName);
+        Assert.Null(propertyValidator.SuppressAnnotationValidation);
+        Assert.Null(propertyValidator.WhenCondition);
+        Assert.Null(propertyValidator.UnlessCondition);
+        Assert.NotNull(propertyValidator.This);
+        Assert.Equal(propertyValidator.This, propertyValidator);
+
+        var services = new ServiceCollection();
+        using var serviceProvider = services.BuildServiceProvider();
+        using var objectValidator2 = new ObjectValidator<ObjectModel>(new ValidatorOptions(), serviceProvider,
+            new Dictionary<object, object?>());
+        var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator2);
+
+        Assert.Null(propertyValidator2._serviceProvider); // RuleFor 时同步
+        Assert.NotNull(propertyValidator2._objectValidator);
+        Assert.Equal(objectValidator2, propertyValidator2._objectValidator);
+        Assert.NotNull(propertyValidator2._annotationValidator);
+        Assert.Null(propertyValidator2._annotationValidator._serviceProvider); // RuleFor 时同步
+        Assert.NotNull(propertyValidator2._annotationValidator._items);
+    }
+
+    [Fact]
+    public void IsValid_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.IsValid(null!));
+    }
+
+    [Fact]
+    public void IsValid_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3));
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel()));
+        Assert.False(propertyValidator.IsValid(new ObjectModel { FirstName = "Fu" }));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { FirstName = "Furion" }));
+    }
+
+    [Fact]
+    public void IsValid_WithRuleSet_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator) { RuleSets = ["rule"] }
+                .AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3));
+
+        Assert.True(propertyValidator.IsValid(new ObjectModel()));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { FirstName = "Fu" }));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { FirstName = "Furion" }));
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel(), ["*"]));
+        Assert.False(propertyValidator.IsValid(new ObjectModel { FirstName = "Fu" }, ["*"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { FirstName = "Furion" }, ["*"]));
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel(), ["rule"]));
+        Assert.False(propertyValidator.IsValid(new ObjectModel { FirstName = "Fu" }, ["rule"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { FirstName = "Furion" }, ["rule"]));
+    }
+
+    [Fact]
+    public void IsValid_WithSuppressAnnotationValidation_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(2));
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel()));
+        Assert.False(propertyValidator.IsValid(new ObjectModel { Name = "Fu" }));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Furion" }));
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel(), ["*"]));
+        Assert.False(propertyValidator.IsValid(new ObjectModel { Name = "Fu" }, ["*"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Furion" }, ["*"]));
+
+        Assert.True(propertyValidator.IsValid(new ObjectModel(), ["rule"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Fu" }, ["rule"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Furion" }, ["rule"]));
+
+        propertyValidator.SkipAnnotationValidation();
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel()));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Fu" }));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Furion" }));
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel(), ["*"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Fu" }, ["*"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Furion" }, ["*"]));
+
+        Assert.True(propertyValidator.IsValid(new ObjectModel(), ["rule"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Fu" }, ["rule"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Furion" }, ["rule"]));
+    }
+
+    [Fact]
+    public void IsValid_WithPropertyValidator_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator).SetValidator(
+                new SubModelValidator());
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel() }));
+        Assert.False(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel { Id = 1 } }));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel { Id = 3 } }));
+    }
+
+    [Fact]
+    public void IsValid_WithPropertyValidator_WithRuleSet_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] }
+                .SetValidator(new SubModelValidator());
+
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel() }));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel { Id = 1 } }));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel { Id = 3 } }));
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel() }, ["login"]));
+        Assert.False(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel { Id = 1 } }, ["login"]));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel { Id = 3 } }, ["login"]));
+    }
+
+    [Fact]
+    public void GetValidationResults_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.GetValidationResults(null!));
+    }
+
+    [Fact]
+    public void GetValidationResults_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3));
+
+        var validationResults = propertyValidator.GetValidationResults(new ObjectModel());
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The FirstName field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 = propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Fu" });
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field FirstName must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Furion" }));
+    }
+
+    [Fact]
+    public void GetValidationResults_WithRuleSet_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator) { RuleSets = ["rule"] }
+                .AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel()));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Fu" }));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Furion" }));
+
+        var validationResults = propertyValidator.GetValidationResults(new ObjectModel(), ["*"]);
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The FirstName field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 = propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Fu" }, ["*"]);
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field FirstName must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Furion" }));
+
+        var validationResults3 = propertyValidator.GetValidationResults(new ObjectModel(), ["rule"]);
+        Assert.NotNull(validationResults3);
+        Assert.Single(validationResults3);
+        Assert.Equal(["The FirstName field is required."],
+            validationResults3.Select(u => u.ErrorMessage));
+
+        var validationResults4 = propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Fu" }, ["rule"]);
+        Assert.NotNull(validationResults4);
+        Assert.Single(validationResults4);
+        Assert.Equal(["The field FirstName must be a string or array type with a minimum length of '3'."],
+            validationResults4.Select(u => u.ErrorMessage));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Furion" }, ["rule"]));
+    }
+
+    [Fact]
+    public void GetValidationResults_WithSuppressAnnotationValidation_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(2));
+
+        var validationResults = propertyValidator.GetValidationResults(new ObjectModel());
+        Assert.NotNull(validationResults);
+        Assert.Equal(2, validationResults.Count);
+        Assert.Equal(["The Name field is required.", "The Name field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 = propertyValidator.GetValidationResults(new ObjectModel { Name = "Fu" });
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field Name must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Furion" }));
+
+        var validationResults3 = propertyValidator.GetValidationResults(new ObjectModel(), ["*"]);
+        Assert.NotNull(validationResults3);
+        Assert.Equal(2, validationResults3.Count);
+        Assert.Equal(["The Name field is required.", "The Name field is required."],
+            validationResults3.Select(u => u.ErrorMessage));
+
+        var validationResults4 = propertyValidator.GetValidationResults(new ObjectModel { Name = "Fu" }, ["*"]);
+        Assert.NotNull(validationResults4);
+        Assert.Single(validationResults4);
+        Assert.Equal(["The field Name must be a string or array type with a minimum length of '3'."],
+            validationResults4.Select(u => u.ErrorMessage));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Furion" }));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel(), ["rule"]));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Fu" }, ["rule"]));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Furion" }, ["rule"]));
+
+        propertyValidator.SkipAnnotationValidation();
+
+        var validationResult7 = propertyValidator.GetValidationResults(new ObjectModel());
+        Assert.NotNull(validationResult7);
+        Assert.Single(validationResult7);
+        Assert.Equal(["The Name field is required."],
+            validationResult7.Select(u => u.ErrorMessage));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Fu" }));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Furion" }));
+
+        var validationResults8 = propertyValidator.GetValidationResults(new ObjectModel(), ["*"]);
+        Assert.NotNull(validationResults8);
+        Assert.Single(validationResults8);
+        Assert.Equal(["The Name field is required."],
+            validationResults8.Select(u => u.ErrorMessage));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Fu" }, ["*"]));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Furion" }, ["*"]));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel(), ["rule"]));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Fu" }, ["rule"]));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Furion" }, ["rule"]));
+    }
+
+    [Fact]
+    public void GetValidationResults_WithDisplayName_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName");
+
+        var validationResults = propertyValidator.GetValidationResults(new ObjectModel());
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The MyFirstName field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+        Assert.Equal("FirstName", validationResults.First().MemberNames.First());
+
+        var validationResults2 = propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Fu" });
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field MyFirstName must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+        Assert.Equal("FirstName", validationResults2.First().MemberNames.First());
+    }
+
+    [Fact]
+    public void GetValidationResults_WithMemberName_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3)).WithMemberName("MyFirstName");
+
+        var validationResults = propertyValidator.GetValidationResults(new ObjectModel());
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The MyFirstName field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+        Assert.Equal("MyFirstName", validationResults.First().MemberNames.First());
+
+        var validationResults2 = propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Fu" });
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field MyFirstName must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+        Assert.Equal("MyFirstName", validationResults2.First().MemberNames.First());
+
+        var propertyValidator2 =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3)).WithMemberName("MyFirstName")
+                .WithDisplayName("DisplayFirstName");
+
+        var validationResults3 = propertyValidator2.GetValidationResults(new ObjectModel());
+        Assert.NotNull(validationResults3);
+        Assert.Single(validationResults3);
+        Assert.Equal(["The DisplayFirstName field is required."],
+            validationResults3.Select(u => u.ErrorMessage));
+        Assert.Equal("MyFirstName", validationResults3.First().MemberNames.First());
+
+        var validationResults4 = propertyValidator2.GetValidationResults(new ObjectModel { FirstName = "Fu" });
+        Assert.NotNull(validationResults4);
+        Assert.Single(validationResults4);
+        Assert.Equal(["The field DisplayFirstName must be a string or array type with a minimum length of '3'."],
+            validationResults4.Select(u => u.ErrorMessage));
+        Assert.Equal("MyFirstName", validationResults4.First().MemberNames.First());
+    }
+
+    [Fact]
+    public void GetValidationResults_WithPropertyValidator_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator).SetValidator(
+                new SubModelValidator());
+
+        var validationResults = propertyValidator.GetValidationResults(new ObjectModel { Sub = new SubModel() });
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The field Id must be greater than or equal to '3'."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 =
+            propertyValidator.GetValidationResults(new ObjectModel { Sub = new SubModel { Id = 1 } });
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field Id must be greater than or equal to '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Sub = new SubModel { Id = 3 } }));
+    }
+
+    [Fact]
+    public void GetValidationResults_WithPropertyValidator_WithRuleSet_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] }
+                .SetValidator(new SubModelValidator());
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Sub = new SubModel() }));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Sub = new SubModel { Id = 1 } }));
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Sub = new SubModel { Id = 3 } }));
+
+        var validationResults =
+            propertyValidator.GetValidationResults(new ObjectModel { Sub = new SubModel() }, ["login"]);
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The field Id must be greater than or equal to '3'."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 =
+            propertyValidator.GetValidationResults(new ObjectModel { Sub = new SubModel { Id = 1 } }, ["login"]);
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field Id must be greater than or equal to '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        Assert.Null(
+            propertyValidator.GetValidationResults(new ObjectModel { Sub = new SubModel { Id = 3 } }, ["login"]));
+    }
+
+    [Fact]
+    public void Validate_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.Validate(null!));
+    }
+
+    [Fact]
+    public void Validate_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3));
+
+        var exception = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel()));
+        Assert.Equal("The FirstName field is required.", exception.Message);
+        Assert.Equal("FirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel { FirstName = "Fu" }));
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.Validate(new ObjectModel { FirstName = "Furion" });
+    }
+
+    [Fact]
+    public void Validate_WithRuleSet_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator) { RuleSets = ["rule"] }
+                .AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3));
+
+        propertyValidator.Validate(new ObjectModel());
+        propertyValidator.Validate(new ObjectModel { FirstName = "Fu" });
+        propertyValidator.Validate(new ObjectModel { FirstName = "Furion" });
+
+        var exception = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel(), ["*"]));
+        Assert.Equal("The FirstName field is required.", exception.Message);
+        Assert.Equal("FirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.Validate(new ObjectModel { FirstName = "Fu" }, ["*"]));
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.Validate(new ObjectModel { FirstName = "Furion" });
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel(), ["rule"]));
+        Assert.Equal("The FirstName field is required.", exception3.Message);
+        Assert.Equal("FirstName", exception3.ValidationResult.MemberNames.First());
+
+        var exception4 = Assert.Throws<ValidationException>(() =>
+            propertyValidator.Validate(new ObjectModel { FirstName = "Fu" }, ["rule"]));
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception4.Message);
+        Assert.Equal("FirstName", exception4.ValidationResult.MemberNames.First());
+
+        propertyValidator.Validate(new ObjectModel { FirstName = "Furion" }, ["rule"]);
+    }
+
+    [Fact]
+    public void Validate_WithSuppressAnnotationValidation_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(2));
+
+        var exception = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel()));
+        Assert.Equal("The Name field is required.", exception.Message);
+        Assert.Equal("Name", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel { Name = "Fu" }));
+        Assert.Equal("The field Name must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("Name", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.Validate(new ObjectModel { Name = "Furion" });
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel(), ["*"]));
+        Assert.Equal("The Name field is required.", exception3.Message);
+        Assert.Equal("Name", exception3.ValidationResult.MemberNames.First());
+
+        var exception4 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.Validate(new ObjectModel { Name = "Fu" }, ["*"]));
+        Assert.Equal("The field Name must be a string or array type with a minimum length of '3'.",
+            exception4.Message);
+        Assert.Equal("Name", exception4.ValidationResult.MemberNames.First());
+
+        propertyValidator.Validate(new ObjectModel { Name = "Furion" });
+
+        propertyValidator.Validate(new ObjectModel(), ["rule"]);
+        propertyValidator.Validate(new ObjectModel { Name = "Fu" }, ["rule"]);
+        propertyValidator.Validate(new ObjectModel { Name = "Furion" }, ["rule"]);
+
+        propertyValidator.SkipAnnotationValidation();
+
+        var exception5 = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel()));
+        Assert.Equal("The Name field is required.", exception5.Message);
+        Assert.Equal("Name", exception5.ValidationResult.MemberNames.First());
+        propertyValidator.Validate(new ObjectModel { Name = "Fu" });
+        propertyValidator.Validate(new ObjectModel { Name = "Furion" });
+
+        var exception6 =
+            Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel(), ["*"]));
+        Assert.Equal("The Name field is required.", exception6.Message);
+        Assert.Equal("Name", exception6.ValidationResult.MemberNames.First());
+        propertyValidator.Validate(new ObjectModel { Name = "Fu" }, ["*"]);
+        propertyValidator.Validate(new ObjectModel { Name = "Furion" }, ["*"]);
+
+        propertyValidator.Validate(new ObjectModel(), ["rule"]);
+        propertyValidator.Validate(new ObjectModel { Name = "Fu" }, ["rule"]);
+        propertyValidator.Validate(new ObjectModel { Name = "Furion" }, ["rule"]);
+    }
+
+    [Fact]
+    public void Validate_WithDisplayName_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName");
+
+        var exception = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel()));
+        Assert.Equal("The MyFirstName field is required.", exception.Message);
+        Assert.Equal("FirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel { FirstName = "Fu" }));
+        Assert.Equal("The field MyFirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
+    }
+
+    [Fact]
+    public void Validate_WithMemberName_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3)).WithMemberName("MyFirstName");
+
+        var exception = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel()));
+        Assert.Equal("The MyFirstName field is required.", exception.Message);
+        Assert.Equal("MyFirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel { FirstName = "Fu" }));
+        Assert.Equal("The field MyFirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("MyFirstName", exception2.ValidationResult.MemberNames.First());
+
+        var propertyValidator2 =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3)).WithMemberName("MyFirstName")
+                .WithDisplayName("DisplayFirstName");
+
+        var exception3 = Assert.Throws<ValidationException>(() => propertyValidator2.Validate(new ObjectModel()));
+        Assert.Equal("The DisplayFirstName field is required.", exception3.Message);
+        Assert.Equal("MyFirstName", exception3.ValidationResult.MemberNames.First());
+
+        var exception4 =
+            Assert.Throws<ValidationException>(() => propertyValidator2.Validate(new ObjectModel { FirstName = "Fu" }));
+        Assert.Equal("The field DisplayFirstName must be a string or array type with a minimum length of '3'.",
+            exception4.Message);
+        Assert.Equal("MyFirstName", exception4.ValidationResult.MemberNames.First());
+    }
+
+    [Fact]
+    public void Validate_WithPropertyValidator_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator).SetValidator(
+                new SubModelValidator());
+
+        var exception =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.Validate(new ObjectModel { Sub = new SubModel() }));
+        Assert.Equal("The field Id must be greater than or equal to '3'.", exception.Message);
+        Assert.Equal("Sub.Id", exception.ValidationResult.MemberNames.First());
+
+        var exception2 = Assert.Throws<ValidationException>(() =>
+            propertyValidator.Validate(new ObjectModel { Sub = new SubModel { Id = 1 } }));
+        Assert.Equal("The field Id must be greater than or equal to '3'.", exception2.Message);
+        Assert.Equal("Sub.Id", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.Validate(new ObjectModel { Sub = new SubModel { Id = 3 } });
+    }
+
+    [Fact]
+    public void Validate_WithPropertyValidator_WithRuleSet_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] }
+                .SetValidator(new SubModelValidator());
+
+        propertyValidator.Validate(new ObjectModel { Sub = new SubModel() });
+        propertyValidator.Validate(new ObjectModel { Sub = new SubModel { Id = 1 } });
+        propertyValidator.Validate(new ObjectModel { Sub = new SubModel { Id = 3 } });
+
+        var exception =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.Validate(new ObjectModel { Sub = new SubModel() }, ["login"]));
+        Assert.Equal("The field Id must be greater than or equal to '3'.", exception.Message);
+        Assert.Equal("Sub.Id", exception.ValidationResult.MemberNames.First());
+
+        var exception2 = Assert.Throws<ValidationException>(() =>
+            propertyValidator.Validate(new ObjectModel { Sub = new SubModel { Id = 1 } }, ["login"]));
+        Assert.Equal("The field Id must be greater than or equal to '3'.", exception2.Message);
+        Assert.Equal("Sub.Id", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.Validate(new ObjectModel { Sub = new SubModel { Id = 3 } }, ["login"]);
+    }
+
+    [Fact]
+    public void AddValidators_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.AddValidators(null!));
+    }
+
+    [Fact]
+    public void AddValidators_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        propertyValidator.AddValidators(new AgeValidator(), new RequiredValidator(), new NotNullValidator(),
+            new EmailAddressValidator(), new NotNullValidator());
+        Assert.Equal(3, propertyValidator._highPriorityEndIndex);
+        Assert.Equal(
+        [
+            typeof(NotNullValidator), typeof(NotNullValidator), typeof(RequiredValidator), typeof(AgeValidator),
+            typeof(EmailAddressValidator)
+        ], propertyValidator.Validators.Select(u => u.GetType()));
+    }
+
+    [Fact]
+    public void AddValidator_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.AddValidator<ValidatorBase>(null!));
+    }
+
+    [Fact]
+    public void AddValidator_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        propertyValidator.AddValidator(new AgeValidator());
+        Assert.Single(propertyValidator.Validators);
+        Assert.Equal(0, propertyValidator._highPriorityEndIndex);
+        Assert.NotNull(propertyValidator._lastAddedValidator);
+        Assert.True(propertyValidator._lastAddedValidator is AgeValidator);
+
+        propertyValidator.AddValidator(new RequiredValidator());
+        Assert.Equal(2, propertyValidator.Validators.Count);
+        Assert.Equal(1, propertyValidator._highPriorityEndIndex);
+        Assert.True(propertyValidator.Validators.First() is RequiredValidator);
+        Assert.NotNull(propertyValidator._lastAddedValidator);
+        Assert.True(propertyValidator._lastAddedValidator is RequiredValidator);
+
+        propertyValidator.AddValidator(new NotNullValidator());
+        Assert.Equal(3, propertyValidator.Validators.Count);
+        Assert.Equal(2, propertyValidator._highPriorityEndIndex);
+        Assert.True(propertyValidator.Validators.First() is NotNullValidator);
+        Assert.NotNull(propertyValidator._lastAddedValidator);
+        Assert.True(propertyValidator._lastAddedValidator is NotNullValidator);
+
+        propertyValidator.AddValidator(new EmailAddressValidator());
+        Assert.Equal(4, propertyValidator.Validators.Count);
+        Assert.Equal(2, propertyValidator._highPriorityEndIndex);
+        Assert.True(propertyValidator.Validators.Last() is EmailAddressValidator);
+        Assert.NotNull(propertyValidator._lastAddedValidator);
+        Assert.True(propertyValidator._lastAddedValidator is EmailAddressValidator);
+
+        var newNullValidator = new NotNullValidator();
+        propertyValidator.AddValidator(newNullValidator);
+        Assert.Equal(5, propertyValidator.Validators.Count);
+        Assert.Equal(3, propertyValidator._highPriorityEndIndex);
+        Assert.Equal(newNullValidator, propertyValidator.Validators[1]);
+        Assert.NotNull(propertyValidator._lastAddedValidator);
+        Assert.True(propertyValidator._lastAddedValidator is NotNullValidator);
+    }
+
+    [Fact]
+    public void AddValidator_WithConfigure_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        propertyValidator.AddValidator(new AgeValidator(), validator =>
+        {
+            validator.IsAdultOnly = true;
+            validator.AllowStringValues = true;
+        });
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as AgeValidator;
+        Assert.NotNull(addedValidator);
+        Assert.True(addedValidator.IsAdultOnly);
+        Assert.True(addedValidator.AllowStringValues);
+    }
+
+    [Fact]
+    public void SetValidator_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator).SetValidator(
+                new SubModelValidator());
+
+        Assert.Throws<ArgumentNullException>(() =>
+            propertyValidator.SetValidator(
+                (Func<string?[]?, IDictionary<object, object?>?, ValidatorOptions, ObjectValidator<SubModel>?>)null!));
+
+        var exception =
+            Assert.Throws<InvalidOperationException>(() => propertyValidator.SetValidator(new SubModelValidator()));
+        Assert.Equal(
+            "An object validator has already been assigned to this property. Only one object validator is allowed per property. To define nested rules, use `ChildRules` within a single validator.",
+            exception.Message);
+    }
+
+    [Fact]
+    public void SetValidator_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator);
+
+        Assert.Null(propertyValidator._propertyValidator);
+        propertyValidator.SetValidator(new SubModelValidator());
+        Assert.NotNull(propertyValidator._propertyValidator);
+        Assert.Equal("Sub", propertyValidator._propertyValidator.MemberPath);
+        Assert.Null(propertyValidator._propertyValidator._inheritedRuleSets);
+        Assert.Throws<InvalidOperationException>(() =>
+            propertyValidator.SetValidator((ObjectValidator<SubModel>?)null));
+
+        var propertyValidator2 =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] };
+
+        Assert.Null(propertyValidator2._propertyValidator);
+        propertyValidator2.SetValidator((_, _, _) => new SubModelValidator());
+        Assert.NotNull(propertyValidator2._propertyValidator);
+        Assert.NotNull(propertyValidator2._propertyValidator._inheritedRuleSets);
+        Assert.Equal(["login"], (string[]?)propertyValidator2._propertyValidator._inheritedRuleSets!);
+    }
+
+    [Fact]
+    public void ChildRules_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator);
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.ChildRules(null!));
+
+        propertyValidator.SetValidator(new SubModelValidator());
+
+        var exception = Assert.Throws<InvalidOperationException>(() => propertyValidator.ChildRules(_ => { }));
+        Assert.Equal(
+            "An object validator has already been assigned to this property. `ChildRules` cannot be applied after `SetValidator` or another `ChildRules` call.",
+            exception.Message);
+    }
+
+    [Fact]
+    public void ChildRules_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator);
+        propertyValidator.ChildRules(o => o.RuleFor(u => u.Id).Min(1));
+        Assert.NotNull(propertyValidator._propertyValidator);
+        Assert.Null(propertyValidator._propertyValidator._inheritedRuleSets);
+
+        Assert.False(propertyValidator._propertyValidator.IsValid(new SubModel()));
+        Assert.True(propertyValidator._propertyValidator.IsValid(new SubModel { Id = 1 }));
+
+        var propertyValidator2 =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] };
+        propertyValidator2.ChildRules(o => o.RuleFor(u => u.Id).Min(1));
+        Assert.NotNull(propertyValidator2._propertyValidator);
+        Assert.NotNull(propertyValidator2._propertyValidator._inheritedRuleSets);
+        Assert.Equal(["login"], (string[]?)propertyValidator2._propertyValidator._inheritedRuleSets!);
+    }
+
+    [Fact]
+    public void When_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.When((Func<string?, bool>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            propertyValidator.When((Func<string?, ValidationContext<ObjectModel>, bool>)null!));
+    }
+
+    [Fact]
+    public void When_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        propertyValidator.When(u => u is not null);
+        Assert.NotNull(propertyValidator.WhenCondition);
+        Assert.False(propertyValidator.WhenCondition(null,
+            new ValidationContext<ObjectModel>(new ObjectModel(), null, null)));
+        Assert.True(propertyValidator.WhenCondition("Furion",
+            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, null, null)));
+
+        var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        propertyValidator2.When((_, ctx) => ctx.Instance.Name is not null);
+        Assert.NotNull(propertyValidator2.WhenCondition);
+        Assert.False(propertyValidator2.WhenCondition(null,
+            new ValidationContext<ObjectModel>(new ObjectModel(), null, null)));
+        Assert.True(propertyValidator2.WhenCondition("Furion",
+            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, null, null)));
+    }
+
+    [Fact]
+    public void Unless_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.Unless((Func<string?, bool>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            propertyValidator.Unless((Func<string?, ValidationContext<ObjectModel>, bool>)null!));
+    }
+
+    [Fact]
+    public void Unless_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        propertyValidator.Unless(u => u is null);
+        Assert.NotNull(propertyValidator.UnlessCondition);
+        Assert.True(propertyValidator.UnlessCondition(null,
+            new ValidationContext<ObjectModel>(new ObjectModel(), null, null)));
+        Assert.False(propertyValidator.UnlessCondition("Furion",
+            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, null, null)));
+
+        var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        propertyValidator2.Unless((_, ctx) => ctx.Instance.Name is null);
+        Assert.NotNull(propertyValidator2.UnlessCondition);
+        Assert.True(propertyValidator2.UnlessCondition(null,
+            new ValidationContext<ObjectModel>(new ObjectModel(), null, null)));
+        Assert.False(propertyValidator2.UnlessCondition("Furion",
+            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, null, null)));
+    }
+
+    [Fact]
+    public void ShouldValidate_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.ShouldValidate(null!));
+    }
+
+    [Fact]
+    public void ShouldValidate_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+        var model = new ObjectModel();
+
+        Assert.True(propertyValidator.ShouldValidate(model));
+        Assert.True(propertyValidator.ShouldValidate(model, ["*"]));
+
+        var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator)
+        {
+            RuleSets = ["login", "register"]
+        };
+        Assert.False(propertyValidator2.ShouldValidate(model));
+        Assert.True(propertyValidator2.ShouldValidate(model, ["*"]));
+        Assert.True(propertyValidator2.ShouldValidate(model, ["login"]));
+        Assert.True(propertyValidator2.ShouldValidate(model, ["register"]));
+        Assert.False(propertyValidator2.ShouldValidate(model, ["other"]));
+    }
+
+    [Fact]
+    public void ShouldValidate_WithCondition_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator)
+            .When(u => u is not null).Unless(u => u?.Equals("Fur") == true);
+        var model = new ObjectModel();
+
+        Assert.False(propertyValidator.ShouldValidate(model));
+
+        model.Name = "Furion";
+        Assert.True(propertyValidator.ShouldValidate(model));
+
+        model.Name = "Fur";
+        Assert.False(propertyValidator.ShouldValidate(model));
+    }
+
+    [Fact]
+    public void ShouldRunAnnotationValidation_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.True(propertyValidator.ShouldRunAnnotationValidation());
+
+        objectValidator.Options.SuppressAnnotationValidation = true;
+        Assert.False(propertyValidator.ShouldRunAnnotationValidation());
+
+        objectValidator.Options.SuppressAnnotationValidation = false;
+        propertyValidator.SkipAnnotationValidation();
+        Assert.False(propertyValidator.ShouldRunAnnotationValidation());
+    }
+
+    [Fact]
+    public void MatchesRuleSet_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.True(propertyValidator.MatchesRuleSet());
+        Assert.True(propertyValidator.MatchesRuleSet());
+        Assert.True(propertyValidator.MatchesRuleSet(["*"]));
+        Assert.False(propertyValidator.MatchesRuleSet(["login"]));
+
+        var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator)
+        {
+            RuleSets = ["login", "register"]
+        };
+        Assert.False(propertyValidator2.MatchesRuleSet());
+        Assert.False(propertyValidator2.MatchesRuleSet());
+        Assert.True(propertyValidator2.MatchesRuleSet(["*"]));
+        Assert.True(propertyValidator2.MatchesRuleSet(["login"]));
+        Assert.True(propertyValidator2.MatchesRuleSet(["register"]));
+        Assert.False(propertyValidator2.MatchesRuleSet(["other"]));
+        Assert.True(propertyValidator2.MatchesRuleSet(["other", "login"]));
+
+        var propertyValidator3 =
+            new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator) { RuleSets = [] };
+
+        Assert.True(propertyValidator3.MatchesRuleSet());
+        Assert.True(propertyValidator3.MatchesRuleSet());
+        Assert.True(propertyValidator3.MatchesRuleSet(["*"]));
+        Assert.False(propertyValidator3.MatchesRuleSet(["login"]));
+    }
+
+    [Fact]
+    public void GetValidationValue_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            PropertyValidator<ObjectModel, string?>.GetValidationValue(null!, null!, null));
+        Assert.Throws<ArgumentNullException>(() =>
+            PropertyValidator<ObjectModel, string?>.GetValidationValue(new ObjectModel(), null!, null));
+    }
+
+    [Fact]
+    public void GetValidationValue_ReturnOK()
+    {
+        var model = new ObjectModel { Name = "Furion" };
+
+        Assert.True(
+            PropertyValidator<ObjectModel, string?>.GetValidationValue(model, new AgeValidator(), model.Name) is not
+                ObjectModel);
+        Assert.True(PropertyValidator<ObjectModel, string?>.GetValidationValue(model,
+            new ValidatorProxy<ObjectModel, EqualToValidator>(u => u.Name, _ => ["Furion"]),
+            model.Name) is ObjectModel);
+    }
+
+    [Fact]
+    public void GetValue_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.GetValue(null!));
+    }
+
+    [Fact]
+    public void GetValue_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        var model = new ObjectModel { Name = "Furion" };
+        Assert.Equal("Furion", propertyValidator.GetValue(model));
+    }
+
+    [Fact]
+    public void GetDisplayName_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+        Assert.Equal("Name", propertyValidator.GetDisplayName());
+        propertyValidator.WithDisplayName("CustomName");
+        Assert.Equal("CustomName", propertyValidator.GetDisplayName());
+
+        var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.ChinaAddress, objectValidator);
+        Assert.Equal("Address", propertyValidator2.GetDisplayName());
+
+        var propertyValidator3 = new PropertyValidator<ObjectModel, int>(u => u.YourAge, objectValidator);
+        Assert.Equal("Age", propertyValidator3.GetDisplayName());
+
+        var propertyValidator4 =
+            new PropertyValidator<ObjectModel, int>(u => u.YourAge, objectValidator).WithMemberName("MyAge");
+        Assert.Equal("MyAge", propertyValidator4.GetDisplayName());
+
+        var propertyValidator5 = new PropertyValidator<ObjectModel, int>(u => u.YourAge, objectValidator)
+            .WithMemberName("MyAge").WithDisplayName("DisplayAge");
+        Assert.Equal("DisplayAge", propertyValidator5.GetDisplayName());
+    }
+
+    [Fact]
+    public void GetMemberPath_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+
+        var propertyValidator = new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator);
+        Assert.Equal("Sub", propertyValidator.GetMemberPath());
+
+        propertyValidator.SetValidator(new SubModelValidator());
+        var subPropertyValidator =
+            propertyValidator._propertyValidator!.Validators.Last() as PropertyValidator<SubModel, Nested>;
+        Assert.NotNull(subPropertyValidator);
+        Assert.Equal("Sub.Nest", subPropertyValidator.GetMemberPath());
+
+        var nestedPropertyValidator =
+            subPropertyValidator._propertyValidator!.Validators.First() as PropertyValidator<Nested, int>;
+        Assert.NotNull(nestedPropertyValidator);
+        Assert.Equal("Sub.Nest.Id", nestedPropertyValidator.GetMemberPath());
+    }
+
+    [Fact]
+    public void GetEffectiveMemberName_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator).WithName("xxx");
+        Assert.Equal("xxx", propertyValidator.GetEffectiveMemberName());
+
+        propertyValidator.SetValidator(new SubModelValidator());
+        var subPropertyValidator =
+            propertyValidator._propertyValidator!.Validators.Last() as PropertyValidator<SubModel, Nested>;
+        Assert.NotNull(subPropertyValidator);
+        Assert.Equal("xxx.Nest", subPropertyValidator.GetEffectiveMemberName());
+
+        var nestedPropertyValidator =
+            subPropertyValidator._propertyValidator!.Validators.First() as PropertyValidator<Nested, int>;
+        Assert.NotNull(nestedPropertyValidator);
+        Assert.Equal("xxx.Nest.Id", nestedPropertyValidator.GetEffectiveMemberName());
+    }
+
+    [Fact]
+    public void RepairMemberPaths_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string>(u => u.Name, objectValidator);
+        propertyValidator.RepairMemberPaths();
+        Assert.Null(propertyValidator._propertyValidator);
+    }
+
+    [Fact]
+    public void InitializeServiceProvider_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var subValidator = new SubModelValidator();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator)
+                .AddAnnotations(new RequiredAttribute()).SetValidator(subValidator);
+
+        Assert.Null(propertyValidator._serviceProvider);
+        Assert.Null(propertyValidator._annotationValidator._serviceProvider);
+        Assert.Null(subValidator._serviceProvider);
+        var valueValidator = propertyValidator.Validators[0] as ValueAnnotationValidator;
+        Assert.NotNull(valueValidator);
+        Assert.Null(valueValidator._serviceProvider);
+
+        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
+
+        Assert.NotNull(propertyValidator._serviceProvider);
+        Assert.NotNull(propertyValidator._annotationValidator._serviceProvider);
+        Assert.NotNull(subValidator._serviceProvider);
+        Assert.NotNull(valueValidator);
+        Assert.NotNull(valueValidator._serviceProvider);
+    }
+
+    [Fact]
+    public void CreateValidationContext_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+        var validationContext = propertyValidator.CreateValidationContext(new ObjectModel());
+
+        Assert.Null(propertyValidator._serviceProvider);
+        Assert.Null(validationContext._serviceProvider);
+
+        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
+        Assert.NotNull(propertyValidator._serviceProvider);
+
+        var validationContext2 = propertyValidator.CreateValidationContext(new ObjectModel());
+        Assert.NotNull(propertyValidator._serviceProvider);
+        Assert.NotNull(validationContext2._serviceProvider);
+    }
+
+    [Fact]
+    public void CreateValidationContext2_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+        FluentValidatorBuilder<string?, PropertyValidator<ObjectModel, string?>> fluentValidatorBuilder =
+            propertyValidator;
+        var validationContext = fluentValidatorBuilder.CreateValidationContext("Furion");
+
+        Assert.Null(propertyValidator._serviceProvider);
+        Assert.Null(validationContext._serviceProvider);
+
+        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
+        Assert.NotNull(propertyValidator._serviceProvider);
+
+        var validationContext2 = fluentValidatorBuilder.CreateValidationContext("百小僧");
+        Assert.NotNull(propertyValidator._serviceProvider);
+        Assert.NotNull(validationContext2._serviceProvider);
+    }
+
+    public class ObjectModel
+    {
+        [Required] [MinLength(3)] public string? Name { get; set; }
+
+        public string? FirstName { get; set; }
+
+        [Display(Name = "Address")] public string? ChinaAddress { get; set; }
+
+        [DisplayName("Age")] public int YourAge { get; set; }
+
+        public SubModel? Sub { get; set; }
+    }
+
+    public class SubModel
+    {
+        public int Id { get; set; }
+
+        public Nested? Nest { get; set; }
+    }
+
+    public class SubModelValidator : AbstractValidator<SubModel>
+    {
+        public SubModelValidator()
+        {
+            RuleFor(u => u.Id).GreaterThanOrEqualTo(3);
+
+            RuleSet("login", () =>
+            {
+                RuleFor(u => u.Id).GreaterThanOrEqualTo(3);
+            });
+
+            RuleFor(u => u.Nest).ChildRules(n =>
+            {
+                n.RuleFor(b => b.Id).Min(1);
+            });
+        }
+    }
+
+    public class Nested
+    {
+        public int Id { get; set; }
+    }
+}

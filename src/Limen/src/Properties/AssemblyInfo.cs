@@ -7,6 +7,7 @@
 [assembly: InternalsVisibleTo("Limen.AspNetCore")]
 
 // 配置测试友元程序集
-
 [assembly: InternalsVisibleTo("Limen.Tests")]
-[assembly: InternalsVisibleTo("Limen.AspNetCore.Tests")]
+
+// 配置资源默认区域性
+[assembly: NeutralResourcesLanguage("en-US")]
