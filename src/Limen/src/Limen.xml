@@ -3638,6 +3638,11 @@
         <member name="F:Limen.PropertyValidator`2._objectValidator">
             <inheritdoc cref="T:Limen.ObjectValidator`1" />
         </member>
+        <member name="F:Limen.PropertyValidator`2._selector">
+            <summary>
+                属性选择器
+            </summary>
+        </member>
         <member name="F:Limen.PropertyValidator`2._propertyValidator">
             <inheritdoc cref="T:Limen.IObjectValidator`1" />
             <remarks>属性级别对象验证器。</remarks>
@@ -3739,6 +3744,17 @@
             <param name="configure">自定义配置委托</param>
             <returns>
                 <see cref="T:Limen.PropertyValidator`2" />
+            </returns>
+            <exception cref="T:System.InvalidOperationException"></exception>
+        </member>
+        <member name="M:Limen.PropertyValidator`2.Each``1(System.Action{Limen.ObjectValidator{``0}})">
+            <summary>
+                为集合元素继续配置规则
+            </summary>
+            <param name="configure">自定义配置委托</param>
+            <typeparam name="TElement">元素类型</typeparam>
+            <returns>
+                <see cref="T:Limen.CollectionPropertyValidator`2" />
             </returns>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>

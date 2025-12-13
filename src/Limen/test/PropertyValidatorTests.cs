@@ -20,6 +20,7 @@ public class PropertyValidatorTests
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
 
         Assert.Null(propertyValidator._serviceProvider);
+        Assert.NotNull(propertyValidator._selector);
         Assert.NotNull(propertyValidator._objectValidator);
         Assert.Equal(objectValidator, propertyValidator._objectValidator);
         Assert.NotNull(propertyValidator._annotationValidator);

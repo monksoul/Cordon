@@ -19,6 +19,11 @@ public partial class PropertyValidator<T, TProperty> :
     /// <inheritdoc cref="ObjectValidator{T}" />
     internal readonly ObjectValidator<T> _objectValidator;
 
+    /// <summary>
+    ///     属性选择器
+    /// </summary>
+    internal readonly Expression<Func<T, TProperty?>> _selector;
+
     /// <inheritdoc cref="IObjectValidator{T}" />
     /// <remarks>属性级别对象验证器。</remarks>
     internal ObjectValidator<TProperty>? _propertyValidator;
@@ -37,6 +42,7 @@ public partial class PropertyValidator<T, TProperty> :
         ArgumentNullException.ThrowIfNull(selector);
         ArgumentNullException.ThrowIfNull(objectValidator);
 
+        _selector = selector;
         _objectValidator = objectValidator;
 
         // 初始化 PropertyAnnotationValidator 实例
@@ -303,6 +309,66 @@ public partial class PropertyValidator<T, TProperty> :
 
             return propertyValidator;
         });
+    }
+
+    /// <summary>
+    ///     为集合元素继续配置规则
+    /// </summary>
+    /// <param name="configure">自定义配置委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <see cref="CollectionPropertyValidator{T,TElement}" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public CollectionPropertyValidator<T, TElement> Each<TElement>(Action<ObjectValidator<TElement>> configure)
+        where TElement : class
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        // 检查属性类型是否兼容 IEnumerable<TElement>
+        if (!typeof(IEnumerable<TElement>).IsAssignableFrom(typeof(TProperty)))
+        {
+            throw new InvalidOperationException(
+                $"The property '{GetMemberPath()}' does not implement IEnumerable<{typeof(TElement).Name}>. " +
+                $"Use {nameof(ObjectValidator<T>.RuleForEach)} instead, or ensure the property type implements IEnumerable<{typeof(TElement).Name}>.");
+        }
+
+        // 强制 Each 方法必须在 ChildRules/SetValidator/When/Unless 方法前调用
+        if (_propertyValidator is not null || WhenCondition is not null || UnlessCondition is not null)
+        {
+            throw new InvalidOperationException(
+                $".{nameof(Each)}() must be called immediately after {nameof(ObjectValidator<T>.RuleFor)}(). " +
+                $"Do not call {nameof(ChildRules)}, {nameof(SetValidator)}, {nameof(When)}, or {nameof(Unless)} before {nameof(Each)}. " +
+                $"To validate the entire collection, use {nameof(ObjectValidator<T>.RuleForEach)}() instead.");
+        }
+
+        // 从父对象验证器中移除当前实例
+        _objectValidator.Validators.Remove(this);
+
+        // 重建属性选择器为 Expression<Func<T, IEnumerable<TElement>?>> 类型
+        var collectionSelector =
+            Expression.Lambda<Func<T, IEnumerable<TElement>?>>(_selector.Body, _selector.Parameters);
+
+        // 创建新的 CollectionPropertyValidator 实例
+        var collectionValidator = new CollectionPropertyValidator<T, TElement>(collectionSelector, _objectValidator)
+        {
+            RuleSets = RuleSets,
+            SuppressAnnotationValidation = SuppressAnnotationValidation,
+            DisplayName = DisplayName,
+            MemberName = MemberName
+        };
+
+        // 同步所有验证器
+        collectionValidator.AddValidators(Validators);
+
+        // 为集合元素继续配置规则
+        collectionValidator.ChildRules(configure);
+
+        // 将该实例添加到父对象验证器中
+        _objectValidator.Validators.Add(collectionValidator);
+
+        return collectionValidator;
     }
 
     /// <summary>

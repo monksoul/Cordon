@@ -6,6 +6,8 @@ public class User : IValidatableObject
 
     [Required] public string? Name { get; set; }
 
+    public List<Address>? Addresses { get; set; }
+
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -14,9 +16,22 @@ public class User : IValidatableObject
         return validationContext.ValidateUsing<User>(validator =>
         {
             validator.RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
-                .RuleFor(u => u.Id).Max(int.MaxValue);
+                .RuleFor(u => u.Id).Max(int.MaxValue)
+                .RuleForEach(u => u.Addresses).ChildRules(u =>
+                {
+                    u.RuleFor(c => c.Country).Required()
+                        .RuleFor(c => c.Province).Required()
+                        .RuleFor(c => c.City).Required();
+                });
         });
     }
+}
+
+public class Address
+{
+    public string? Country { get; set; }
+    public string? Province { get; set; }
+    public string? City { get; set; }
 }
 
 public class UserValidator : AbstractValidator<User>
@@ -26,5 +41,13 @@ public class UserValidator : AbstractValidator<User>
         RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名");
 
         RuleFor(u => u.Id).Max(int.MaxValue);
+
+        // 可使用 RuleForEach(u => u.Addresses).ChildRules() 替换
+        RuleFor(u => u.Addresses).Each<Address>(u =>
+        {
+            u.RuleFor(c => c.Country).Required()
+                .RuleFor(c => c.Province).Required()
+                .RuleFor(c => c.City).Required();
+        });
     }
 }
