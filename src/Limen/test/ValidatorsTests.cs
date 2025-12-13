@@ -118,7 +118,7 @@ public class ValidatorsTests
     public void Conditional_ReturnOK()
     {
         var validator = Validators.Conditional<int>(builder =>
-            builder.When(u => u > 10, b => b.Age()).Otherwise(b => b.Min(5)));
+            builder.When(u => u > 10).Then(b => b.Age()).Otherwise(b => b.Min(5)));
         Assert.NotNull(validator);
         Assert.Single(validator._conditions);
         Assert.NotNull(validator._defaultValidators);

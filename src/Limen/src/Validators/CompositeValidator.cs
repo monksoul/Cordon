@@ -27,7 +27,9 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     /// <summary>
     ///     <inheritdoc cref="CompositeValidator" />
     /// </summary>
-    /// <param name="validators">验证器列表</param>
+    /// <param name="validators">
+    ///     <see cref="ValidatorBase" /> 列表
+    /// </param>
     public CompositeValidator(params ValidatorBase[] validators)
     {
         // 空检查
@@ -37,7 +39,7 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
         _validators = [];
         foreach (var validator in validators)
         {
-            AddValidator(validator);
+            AddValidatorCore(validator);
         }
 
         Validators = _validators;
@@ -159,6 +161,45 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
         (string?)ErrorMessageString is null ? null : base.FormatErrorMessage(name);
 
     /// <summary>
+    ///     添加验证器
+    /// </summary>
+    /// <param name="validators">
+    ///     <see cref="ValidatorBase" /> 列表
+    /// </param>
+    /// <returns>
+    ///     <see cref="CompositeValidator" />
+    /// </returns>
+    public CompositeValidator Add(params ValidatorBase[] validators)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validators);
+
+        // 遍历验证器列表并添加
+        foreach (var validator in validators)
+        {
+            AddValidatorCore(validator);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    ///     设置验证模式
+    /// </summary>
+    /// <param name="mode">
+    ///     <see cref="ValidationMode" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="CompositeValidator" />
+    /// </returns>
+    public CompositeValidator UseMode(ValidationMode mode)
+    {
+        Mode = mode;
+
+        return this;
+    }
+
+    /// <summary>
     ///     抛出验证异常
     /// </summary>
     /// <param name="value">对象</param>
@@ -208,12 +249,12 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     }
 
     /// <summary>
-    ///     添加验证器
+    ///     添加验证器内部方法
     /// </summary>
     /// <param name="validator">
     ///     <see cref="ValidatorBase" />
     /// </param>
-    internal void AddValidator(ValidatorBase validator)
+    internal void AddValidatorCore(ValidatorBase validator)
     {
         // 空检查 
         ArgumentNullException.ThrowIfNull(validator);

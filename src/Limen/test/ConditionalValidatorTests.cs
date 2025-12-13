@@ -22,7 +22,7 @@ public class ConditionalValidatorTests
         Assert.Null(validator._errorMessageResourceAccessor());
 
         var validator2 = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
         Assert.NotNull(validator2._conditions);
         Assert.Single(validator2._conditions);
         Assert.NotNull(validator2._defaultValidators);
@@ -32,7 +32,7 @@ public class ConditionalValidatorTests
     public void IsValid_ReturnOK()
     {
         var validator = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
 
         Assert.True(validator.IsValid("monksoul@outlook.com"));
         Assert.False(validator.IsValid("monksoul@outlook"));
@@ -45,7 +45,7 @@ public class ConditionalValidatorTests
     {
         var validator =
             new ConditionalValidator<string>(builder =>
-                builder.When(u => u.Contains('@'), b => b.EmailAddress()));
+                builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()));
 
         Assert.True(validator.IsValid("monksoul@outlook.com"));
         Assert.False(validator.IsValid("monksoul@outlook"));
@@ -67,7 +67,7 @@ public class ConditionalValidatorTests
     public void GetValidationResults_ReturnOK()
     {
         var validator = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
 
         Assert.Null(validator.GetValidationResults("monksoul@outlook.com", "Value"));
 
@@ -93,7 +93,7 @@ public class ConditionalValidatorTests
         Assert.Null(validator.GetValidationResults("monksoul", "Value"));
 
         var validator2 = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
         var validationResults4 = validator2.GetValidationResults("monk__soul", "Value");
         Assert.NotNull(validationResults4);
         Assert.Single(validationResults4);
@@ -105,7 +105,7 @@ public class ConditionalValidatorTests
     {
         var validator =
             new ConditionalValidator<string>(builder =>
-                builder.When(u => u.Contains('@'), b => b.EmailAddress()));
+                builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()));
 
         Assert.Null(validator.GetValidationResults("monksoul@outlook.com", "Value"));
 
@@ -132,7 +132,7 @@ public class ConditionalValidatorTests
     public void Validate_ReturnOK()
     {
         var validator = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
 
         validator.Validate("monksoul@outlook.com", "Value");
 
@@ -152,7 +152,7 @@ public class ConditionalValidatorTests
         validator.Validate("monksoul", "Value");
 
         var validator2 = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
         var exception4 = Assert.Throws<ValidationException>(() => validator2.Validate("monk__soul", "Value"));
         Assert.Equal("The field Value is not a valid username.", exception4.Message);
     }
@@ -162,7 +162,7 @@ public class ConditionalValidatorTests
     {
         var validator =
             new ConditionalValidator<string>(builder =>
-                builder.When(u => u.Contains('@'), b => b.EmailAddress()));
+                builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()));
 
         validator.Validate("monksoul@outlook.com", "Value");
 
@@ -187,7 +187,7 @@ public class ConditionalValidatorTests
     public void FormatErrorMessage_ReturnOK()
     {
         var validator = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
         Assert.Null(validator.FormatErrorMessage(null!));
 
         validator.ErrorMessage = "自定义错误信息";
@@ -198,7 +198,7 @@ public class ConditionalValidatorTests
     public void ThrowValidationException_Invalid_Parameters()
     {
         var validator = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
         Assert.Throws<ArgumentNullException>(() => validator.ThrowValidationException(null, null!, null!));
     }
 
@@ -206,7 +206,7 @@ public class ConditionalValidatorTests
     public void ThrowValidationException_ReturnOK()
     {
         var validator = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
 
         var exception = Assert.Throws<ValidationException>(() =>
             validator.ThrowValidationException("monk__soul", "Value", validator._conditions.Last().Validators[0]));
@@ -221,7 +221,7 @@ public class ConditionalValidatorTests
     public void InitializeServiceProvider_ReturnOK()
     {
         var validator = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.AddAnnotations(new RequiredAttribute()))
+            builder.When(u => u.Contains('@')).Then(b => b.AddAnnotations(new RequiredAttribute()))
                 .Otherwise(b => b.AddAnnotations(new UserNameAttribute())));
 
         var conditionValueAnnotationValidator =
@@ -245,7 +245,7 @@ public class ConditionalValidatorTests
     public void GetMatchedValidators_ReturnOK()
     {
         var validator = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@'), b => b.EmailAddress()).Otherwise(b => b.UserName()));
+            builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
 
         var matchedValidators = validator.GetMatchedValidators("monksoul@outlook");
         Assert.NotNull(matchedValidators);

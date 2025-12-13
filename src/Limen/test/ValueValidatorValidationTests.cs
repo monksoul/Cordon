@@ -233,7 +233,7 @@ public class ValueValidatorValidationTests
     public void Conditional_ReturnOK()
     {
         var valueValidator = new ValueValidator<string>().Conditional(builder => builder
-            .When(u => u?.Contains('@') == true, b => b.EmailAddress())
+            .When(u => u?.Contains('@') == true).Then(b => b.EmailAddress())
             .Otherwise(b => b.UserName()));
 
         Assert.Single(valueValidator.Validators);

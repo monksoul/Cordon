@@ -297,35 +297,35 @@ public class CompositeValidatorTests
     }
 
     [Fact]
-    public void AddValidator_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new CompositeValidator().AddValidator(null!));
+    public void AddValidatorCore_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => new CompositeValidator().AddValidatorCore(null!));
 
     [Fact]
-    public void AddValidator_ReturnOK()
+    public void AddValidatorCore_ReturnOK()
     {
         using var validator = new CompositeValidator();
 
-        validator.AddValidator(new AgeValidator());
+        validator.AddValidatorCore(new AgeValidator());
         Assert.Single(validator.Validators);
         Assert.Equal(0, validator._highPriorityEndIndex);
 
-        validator.AddValidator(new RequiredValidator());
+        validator.AddValidatorCore(new RequiredValidator());
         Assert.Equal(2, validator.Validators.Count);
         Assert.Equal(1, validator._highPriorityEndIndex);
         Assert.True(validator.Validators.First() is RequiredValidator);
 
-        validator.AddValidator(new NotNullValidator());
+        validator.AddValidatorCore(new NotNullValidator());
         Assert.Equal(3, validator.Validators.Count);
         Assert.Equal(2, validator._highPriorityEndIndex);
         Assert.True(validator.Validators.First() is NotNullValidator);
 
-        validator.AddValidator(new EmailAddressValidator());
+        validator.AddValidatorCore(new EmailAddressValidator());
         Assert.Equal(4, validator.Validators.Count);
         Assert.Equal(2, validator._highPriorityEndIndex);
         Assert.True(validator.Validators.Last() is EmailAddressValidator);
 
         var newNullValidator = new NotNullValidator();
-        validator.AddValidator(newNullValidator);
+        validator.AddValidatorCore(newNullValidator);
         Assert.Equal(5, validator.Validators.Count);
         Assert.Equal(3, validator._highPriorityEndIndex);
         Assert.Equal(newNullValidator, validator.Validators[1]);

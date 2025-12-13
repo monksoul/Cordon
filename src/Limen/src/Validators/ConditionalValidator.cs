@@ -11,19 +11,20 @@ namespace Limen;
 public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, IDisposable
 {
     /// <summary>
-    ///     条件和对应的验证器列表
+    ///     最终的条件与默认验证器集合
     /// </summary>
     internal readonly List<(Func<T, bool> Condition, IReadOnlyList<ValidatorBase> Validators)> _conditions;
 
     /// <summary>
-    ///     缺省验证器集合
+    ///     默认验证器集合
     /// </summary>
+    /// <remarks>当无条件匹配时使用。</remarks>
     internal IReadOnlyList<ValidatorBase>? _defaultValidators;
 
     /// <summary>
     ///     <inheritdoc cref="ConditionalValidator{T}" />
     /// </summary>
-    /// <param name="buildConditions">条件构建器配置委托</param>
+    /// <param name="buildConditions">条件验证构建器配置委托</param>
     public ConditionalValidator(Action<ConditionBuilder<T>> buildConditions)
     {
         // 空检查
@@ -32,7 +33,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         // 初始化 ConditionBuilder<T> 实例
         var conditionBuilder = new ConditionBuilder<T>();
 
-        // 调用条件构建器配置委托
+        // 调用条件验证构建器配置委托
         buildConditions(conditionBuilder);
 
         // 构建条件和默认验证器集合

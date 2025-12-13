@@ -1697,67 +1697,85 @@
         </member>
         <member name="T:Limen.FluentConditionBuilder`1">
             <summary>
-                链式条件构建器
+                链式条件验证器构建器
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
+        <member name="T:Limen.ConditionThenBuilder`1">
+            <summary>
+                Then 条件中间构建器
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="F:Limen.ConditionThenBuilder`1._condition">
+            <summary>
+                条件委托
+            </summary>
+        </member>
+        <member name="F:Limen.ConditionThenBuilder`1._parent">
+            <inheritdoc cref="T:Limen.ConditionBuilder`1" />
+        </member>
+        <member name="M:Limen.ConditionThenBuilder`1.#ctor(Limen.ConditionBuilder{`0},System.Func{`0,System.Boolean})">
+            <summary>
+                构造函数
+            </summary>
+            <param name="parent">父条件构建器</param>
+            <param name="condition">条件委托</param>
+        </member>
+        <member name="M:Limen.ConditionThenBuilder`1.Then(System.Action{Limen.FluentConditionBuilder{`0}})">
+            <summary>
+                配置满足条件时执行的验证规则
+            </summary>
+            <param name="configure">验证器配置委托</param>
+            <returns>
+                <see cref="T:Limen.ConditionBuilder`1" />
+            </returns>
+        </member>
         <member name="T:Limen.ConditionBuilder`1">
             <summary>
-                条件构建器
+                条件验证构建器
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="F:Limen.ConditionBuilder`1._conditions">
             <summary>
-                条件和对应的验证器列表
+                条件与对应验证器列表
             </summary>
         </member>
         <member name="F:Limen.ConditionBuilder`1._defaultValidators">
             <summary>
-                缺省验证器集合
+                默认验证器集合
             </summary>
+            <remarks>当无条件匹配时使用。</remarks>
         </member>
         <member name="M:Limen.ConditionBuilder`1.#ctor">
             <summary>
                 <inheritdoc cref="T:Limen.ConditionBuilder`1" />
             </summary>
         </member>
-        <member name="M:Limen.ConditionBuilder`1.AddCondition(System.Func{`0,System.Boolean},System.Action{Limen.FluentConditionBuilder{`0}})">
+        <member name="M:Limen.ConditionBuilder`1.When(System.Func{`0,System.Boolean})">
             <summary>
-                添加条件和对应的验证器集合
+                定义满足指定条件时执行的验证规则
             </summary>
             <param name="condition">条件委托</param>
-            <param name="configure">自定义配置委托</param>
             <returns>
-                <see cref="T:Limen.ConditionBuilder`1" />
+                <see cref="T:Limen.ConditionThenBuilder`1" />
             </returns>
         </member>
-        <member name="M:Limen.ConditionBuilder`1.When(System.Func{`0,System.Boolean},System.Action{Limen.FluentConditionBuilder{`0}})">
+        <member name="M:Limen.ConditionBuilder`1.Unless(System.Func{`0,System.Boolean})">
             <summary>
-                添加条件成立时对应的验证器集合
+                定义不满足指定条件时执行的验证规则
             </summary>
             <param name="condition">条件委托</param>
-            <param name="configure">自定义配置委托</param>
             <returns>
-                <see cref="T:Limen.ConditionBuilder`1" />
-            </returns>
-        </member>
-        <member name="M:Limen.ConditionBuilder`1.Unless(System.Func{`0,System.Boolean},System.Action{Limen.FluentConditionBuilder{`0}})">
-            <summary>
-                添加条件不成立时对应的验证器集合
-            </summary>
-            <param name="condition">条件委托</param>
-            <param name="configure">自定义配置委托</param>
-            <returns>
-                <see cref="T:Limen.ConditionBuilder`1" />
+                <see cref="T:Limen.ConditionThenBuilder`1" />
             </returns>
         </member>
         <member name="M:Limen.ConditionBuilder`1.Otherwise(System.Action{Limen.FluentConditionBuilder{`0}})">
             <summary>
-                设置默认验证器集合
+                配置默认验证规则（当所有条件均不满足时使用）
             </summary>
-            <remarks>当没有条件匹配时使用。</remarks>
-            <param name="configure">自定义配置委托</param>
+            <param name="configure">验证器配置委托</param>
             <returns>
                 <see cref="T:Limen.ConditionBuilder`1" />
             </returns>
@@ -1766,14 +1784,14 @@
             <summary>
                 构建验证器集合
             </summary>
-            <param name="configure">自定义配置委托</param>
+            <param name="configure">验证器配置委托</param>
             <returns>
                 <see cref="T:System.Collections.Generic.IReadOnlyList`1" />
             </returns>
         </member>
         <member name="M:Limen.ConditionBuilder`1.Build">
             <summary>
-                构建条件和默认验证器集合
+                构建最终的条件与默认验证器集合
             </summary>
             <returns>
                 <see cref="T:System.Tuple`2" />
@@ -5914,7 +5932,9 @@
             <summary>
                 <inheritdoc cref="T:Limen.CompositeValidator" />
             </summary>
-            <param name="validators">验证器列表</param>
+            <param name="validators">
+                <see cref="T:Limen.ValidatorBase" /> 列表
+            </param>
         </member>
         <member name="P:Limen.CompositeValidator.Validators">
             <summary>
@@ -5945,6 +5965,28 @@
         <member name="M:Limen.CompositeValidator.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
+        <member name="M:Limen.CompositeValidator.Add(Limen.ValidatorBase[])">
+            <summary>
+                添加验证器
+            </summary>
+            <param name="validators">
+                <see cref="T:Limen.ValidatorBase" /> 列表
+            </param>
+            <returns>
+                <see cref="T:Limen.CompositeValidator" />
+            </returns>
+        </member>
+        <member name="M:Limen.CompositeValidator.UseMode(Limen.ValidationMode)">
+            <summary>
+                设置验证模式
+            </summary>
+            <param name="mode">
+                <see cref="T:Limen.ValidationMode" />
+            </param>
+            <returns>
+                <see cref="T:Limen.CompositeValidator" />
+            </returns>
+        </member>
         <member name="M:Limen.CompositeValidator.ThrowValidationException(System.Object,System.String,Limen.ValidatorBase,System.Collections.Generic.IEnumerable{System.String})">
             <summary>
                 抛出验证异常
@@ -5963,9 +6005,9 @@
             </summary>
             <param name="disposing">是否释放托管资源</param>
         </member>
-        <member name="M:Limen.CompositeValidator.AddValidator(Limen.ValidatorBase)">
+        <member name="M:Limen.CompositeValidator.AddValidatorCore(Limen.ValidatorBase)">
             <summary>
-                添加验证器
+                添加验证器内部方法
             </summary>
             <param name="validator">
                 <see cref="T:Limen.ValidatorBase" />
@@ -5982,19 +6024,20 @@
         </member>
         <member name="F:Limen.ConditionalValidator`1._conditions">
             <summary>
-                条件和对应的验证器列表
+                最终的条件与默认验证器集合
             </summary>
         </member>
         <member name="F:Limen.ConditionalValidator`1._defaultValidators">
             <summary>
-                缺省验证器集合
+                默认验证器集合
             </summary>
+            <remarks>当无条件匹配时使用。</remarks>
         </member>
         <member name="M:Limen.ConditionalValidator`1.#ctor(System.Action{Limen.ConditionBuilder{`0}})">
             <summary>
                 <inheritdoc cref="T:Limen.ConditionalValidator`1" />
             </summary>
-            <param name="buildConditions">条件构建器配置委托</param>
+            <param name="buildConditions">条件验证构建器配置委托</param>
         </member>
         <member name="M:Limen.ConditionalValidator`1.Dispose">
             <inheritdoc />
@@ -6427,18 +6470,18 @@
                                     ○ 7th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 8th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [12].<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 9th capture group.<br/>
@@ -6451,10 +6494,10 @@
                                     ○ 12th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ Match a sequence of expressions.<br/>
@@ -6468,13 +6511,13 @@
                                     ○ 15th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '2'.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 16th capture group.<br/>
                                     ○ 17th capture group.<br/>
@@ -6487,13 +6530,13 @@
                                                 ○ 20th capture group.<br/>
                                                     ○ Match with 3 alternative expressions.<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match a character in the set [13579].<br/>
                                                             ○ Match a character in the set [26].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match a character in the set [2468].<br/>
                                                             ○ Match a character in the set [048].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match '0'.<br/>
                                                             ○ Match a character in the set [48].<br/>
                                             ○ 21st capture group.<br/>
                                                 ○ Match the string "2000".<br/>
@@ -6508,18 +6551,18 @@
                                     ○ 26th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 27th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [12].<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 28th capture group.<br/>
@@ -6528,10 +6571,10 @@
                                     ○ 30th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ 31st capture group.<br/>
@@ -6541,25 +6584,25 @@
                                     ○ 33rd capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '2'.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 34th capture group.<br/>
                                     ○ 35th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [13579].<br/>
                                                 ○ Match a character in the set [26].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [2468].<br/>
                                                 ○ Match a character in the set [048].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                     ○ Match the string "0229".<br/>
                         ○ Match a Unicode digit exactly 2 times.<br/>
@@ -7115,25 +7158,25 @@
             ○ Match '1'.<br/>
             ○ Match with 7 alternative expressions.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '3'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '4'.<br/>
                     ○ Match a character in the set [579].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '5'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '6'.<br/>
                     ○ Match a character in the set [6-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '7'.<br/>
                     ○ Match a character in the set [0-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '8'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '9'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
             ○ Match a Unicode digit exactly 8 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -7163,31 +7206,31 @@
             ○ 1st capture group.<br/>
                 ○ Match with 9 alternative expressions.<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '0'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '1'.<br/>
                         ○ Match a character in the set [0-356].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '2'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '3'.<br/>
                         ○ Match a character in the set [0-6].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '4'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '5'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '6'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '7'.<br/>
                         ○ Match a character in the set [0-5].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '8'.<br/>
                         ○ Match a character in the set [013-6].<br/>
             ○ Match a Unicode digit exactly 4 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -8403,6 +8446,16 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Limen.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+      </param>
             <param name="validationBuilder">
                 <see cref="T:Limen.ValidationBuilder" />
             </param>

@@ -5,25 +5,77 @@
 namespace Limen;
 
 /// <summary>
-///     链式条件构建器
+///     链式条件验证器构建器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
 public class FluentConditionBuilder<T> : FluentValidatorBuilder<T, FluentConditionBuilder<T>>;
 
 /// <summary>
-///     条件构建器
+///     Then 条件中间构建器
+/// </summary>
+/// <typeparam name="T">对象类型</typeparam>
+public sealed class ConditionThenBuilder<T>
+{
+    /// <summary>
+    ///     条件委托
+    /// </summary>
+    internal readonly Func<T, bool> _condition;
+
+    /// <inheritdoc cref="ConditionBuilder{T}" />
+    internal readonly ConditionBuilder<T> _parent;
+
+    /// <summary>
+    ///     构造函数
+    /// </summary>
+    /// <param name="parent">父条件构建器</param>
+    /// <param name="condition">条件委托</param>
+    internal ConditionThenBuilder(ConditionBuilder<T> parent, Func<T, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(parent);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        _parent = parent;
+        _condition = condition;
+    }
+
+    /// <summary>
+    ///     配置满足条件时执行的验证规则
+    /// </summary>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <see cref="ConditionBuilder{T}" />
+    /// </returns>
+    public ConditionBuilder<T> Then(Action<FluentConditionBuilder<T>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        // 构建验证器集合
+        var validators = ConditionBuilder<T>.BuildValidators(configure);
+
+        // 将条件和验证器列表添加到父条件构建器
+        _parent._conditions.Add((_condition, validators));
+
+        return _parent;
+    }
+}
+
+/// <summary>
+///     条件验证构建器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
 public class ConditionBuilder<T>
 {
     /// <summary>
-    ///     条件和对应的验证器列表
+    ///     条件与对应验证器列表
     /// </summary>
     internal readonly List<(Func<T, bool> Condition, IReadOnlyList<ValidatorBase> Validators)> _conditions;
 
     /// <summary>
-    ///     缺省验证器集合
+    ///     默认验证器集合
     /// </summary>
+    /// <remarks>当无条件匹配时使用。</remarks>
     internal IReadOnlyList<ValidatorBase>? _defaultValidators;
 
     /// <summary>
@@ -32,60 +84,47 @@ public class ConditionBuilder<T>
     internal ConditionBuilder() => _conditions = [];
 
     /// <summary>
-    ///     添加条件和对应的验证器集合
+    ///     定义满足指定条件时执行的验证规则
     /// </summary>
     /// <param name="condition">条件委托</param>
-    /// <param name="configure">自定义配置委托</param>
     /// <returns>
-    ///     <see cref="ConditionBuilder{T}" />
+    ///     <see cref="ConditionThenBuilder{T}" />
     /// </returns>
-    public ConditionBuilder<T> AddCondition(Func<T, bool> condition, Action<FluentConditionBuilder<T>> configure)
+    public ConditionThenBuilder<T> When(Func<T, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
-        _conditions.Add((condition, BuildValidators(configure)));
-
-        return this;
+        return new ConditionThenBuilder<T>(this, condition);
     }
 
     /// <summary>
-    ///     添加条件成立时对应的验证器集合
+    ///     定义不满足指定条件时执行的验证规则
     /// </summary>
     /// <param name="condition">条件委托</param>
-    /// <param name="configure">自定义配置委托</param>
     /// <returns>
-    ///     <see cref="ConditionBuilder{T}" />
+    ///     <see cref="ConditionThenBuilder{T}" />
     /// </returns>
-    public ConditionBuilder<T> When(Func<T, bool> condition, Action<FluentConditionBuilder<T>> configure) =>
-        AddCondition(condition, configure);
-
-    /// <summary>
-    ///     添加条件不成立时对应的验证器集合
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <param name="configure">自定义配置委托</param>
-    /// <returns>
-    ///     <see cref="ConditionBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> Unless(Func<T, bool> condition, Action<FluentConditionBuilder<T>> configure)
+    public ConditionThenBuilder<T> Unless(Func<T, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
-        return AddCondition(u => !condition(u), configure);
+        return new ConditionThenBuilder<T>(this, u => !condition(u));
     }
 
     /// <summary>
-    ///     设置默认验证器集合
+    ///     配置默认验证规则（当所有条件均不满足时使用）
     /// </summary>
-    /// <remarks>当没有条件匹配时使用。</remarks>
-    /// <param name="configure">自定义配置委托</param>
+    /// <param name="configure">验证器配置委托</param>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
     public ConditionBuilder<T> Otherwise(Action<FluentConditionBuilder<T>> configure)
     {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
         _defaultValidators = BuildValidators(configure);
 
         return this;
@@ -94,7 +133,7 @@ public class ConditionBuilder<T>
     /// <summary>
     ///     构建验证器集合
     /// </summary>
-    /// <param name="configure">自定义配置委托</param>
+    /// <param name="configure">验证器配置委托</param>
     /// <returns>
     ///     <see cref="IReadOnlyList{T}" />
     /// </returns>
@@ -113,7 +152,7 @@ public class ConditionBuilder<T>
     }
 
     /// <summary>
-    ///     构建条件和默认验证器集合
+    ///     构建最终的条件与默认验证器集合
     /// </summary>
     /// <returns>
     ///     <see cref="Tuple{T1,T2}" />

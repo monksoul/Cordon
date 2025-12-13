@@ -316,7 +316,7 @@ public class PropertyValidatorValidationTests
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
-            .Conditional(builder => builder.When(u => u?.Contains('@') == true, b => b.EmailAddress())
+            .Conditional(builder => builder.When(u => u?.Contains('@') == true).Then(b => b.EmailAddress())
                 .Otherwise(b => b.UserName()));
 
         Assert.Single(propertyValidator.Validators);
@@ -329,7 +329,7 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator2 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
-            .Conditional((builder, _) => builder.When(u => u?.Contains('@') == true, b => b.EmailAddress())
+            .Conditional((builder, _) => builder.When(u => u?.Contains('@') == true).Then(b => b.EmailAddress())
                 .Otherwise(b => b.UserName()));
 
         Assert.Single(propertyValidator2.Validators);

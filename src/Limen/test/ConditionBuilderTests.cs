@@ -16,40 +16,21 @@ public class ConditionBuilderTests
     }
 
     [Fact]
-    public void AddCondition_Invalid_Parameters()
-    {
-        var conditionBuilder = new ConditionBuilder<int>();
-        Assert.Throws<ArgumentNullException>(() => conditionBuilder.AddCondition(null!, null!));
-        Assert.Throws<ArgumentNullException>(() => conditionBuilder.AddCondition(u => u > 10, null!));
-    }
-
-    [Fact]
-    public void AddCondition_ReturnOK()
-    {
-        var conditionBuilder = new ConditionBuilder<int>();
-        conditionBuilder.AddCondition(u => u > 10, b => b.Min(10));
-        Assert.Single(conditionBuilder._conditions);
-
-        conditionBuilder.AddCondition(u => u > 100, b => b.Min(50));
-        Assert.Equal(2, conditionBuilder._conditions.Count);
-    }
-
-    [Fact]
     public void When_Invalid_Parameters()
     {
         var conditionBuilder = new ConditionBuilder<int>();
-        Assert.Throws<ArgumentNullException>(() => conditionBuilder.When(null!, null!));
-        Assert.Throws<ArgumentNullException>(() => conditionBuilder.When(u => u > 10, null!));
+        Assert.Throws<ArgumentNullException>(() => conditionBuilder.When(null!).Then(null!));
+        Assert.Throws<ArgumentNullException>(() => conditionBuilder.When(u => u > 10).Then(null!));
     }
 
     [Fact]
     public void When_ReturnOK()
     {
         var conditionBuilder = new ConditionBuilder<int>();
-        conditionBuilder.When(u => u > 10, b => b.Min(10));
+        conditionBuilder.When(u => u > 10).Then(b => b.Min(10));
         Assert.Single(conditionBuilder._conditions);
 
-        conditionBuilder.When(u => u > 100, b => b.Min(50));
+        conditionBuilder.When(u => u > 100).Then(b => b.Min(50));
         Assert.Equal(2, conditionBuilder._conditions.Count);
     }
 
@@ -57,18 +38,18 @@ public class ConditionBuilderTests
     public void Unless_Invalid_Parameters()
     {
         var conditionBuilder = new ConditionBuilder<int>();
-        Assert.Throws<ArgumentNullException>(() => conditionBuilder.Unless(null!, null!));
-        Assert.Throws<ArgumentNullException>(() => conditionBuilder.Unless(u => u > 10, null!));
+        Assert.Throws<ArgumentNullException>(() => conditionBuilder.Unless(null!).Then(null!));
+        Assert.Throws<ArgumentNullException>(() => conditionBuilder.Unless(u => u > 10).Then(null!));
     }
 
     [Fact]
     public void Unless_ReturnOK()
     {
         var conditionBuilder = new ConditionBuilder<int>();
-        conditionBuilder.Unless(u => u <= 10, b => b.Min(10));
+        conditionBuilder.Unless(u => u <= 10).Then(b => b.Min(10));
         Assert.Single(conditionBuilder._conditions);
 
-        conditionBuilder.Unless(u => u <= 100, b => b.Min(50));
+        conditionBuilder.Unless(u => u <= 100).Then(b => b.Min(50));
         Assert.Equal(2, conditionBuilder._conditions.Count);
     }
 
@@ -83,7 +64,7 @@ public class ConditionBuilderTests
     public void Otherwise_ReturnOK()
     {
         var conditionBuilder = new ConditionBuilder<int>();
-        conditionBuilder.When(u => u > 10, b => b.Min(10)).Otherwise(b => b.Min(50));
+        conditionBuilder.When(u => u > 10).Then(b => b.Min(10)).Otherwise(b => b.Min(50));
         Assert.NotNull(conditionBuilder._defaultValidators);
     }
 
@@ -103,7 +84,7 @@ public class ConditionBuilderTests
     public void Build_ReturnOK()
     {
         var conditionBuilder = new ConditionBuilder<int>();
-        conditionBuilder.When(u => u > 10, b => b.Min(10)).Otherwise(b => b.Min(50));
+        conditionBuilder.When(u => u > 10).Then(b => b.Min(10)).Otherwise(b => b.Min(50));
 
         var result = conditionBuilder.Build();
         Assert.NotNull(result.Conditions);
