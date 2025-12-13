@@ -33,7 +33,7 @@ dotnet add package Limen
 ```cs
 public class User : IValidatableObject
 {
-    [Min(1)]
+    [Min(1, ErrorMessage = "{0} 最小值不能小于 1")]
     public int Id { get; set; }
 
     [Required]

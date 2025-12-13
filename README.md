@@ -35,7 +35,7 @@ We have many examples on our [homepage](https://furion.net/docs/limen/). Here's 
 ```cs
 public class User : IValidatableObject
 {
-    [Min(1)]
+    [Min(1, ErrorMessage = "{0} must not be less than 1")]
     public int Id { get; set; }
 
     [Required]
