@@ -7,6 +7,7 @@ API 输入、表单提交，还是清洗异构数据流，Limen 都能以极简�
 
 ## 特性
 
+- **无侵入集成**：无需配置，可直接与现有项目集成。
 - **流畅的验证语法**：链式、声明式 API，让验证逻辑清晰易读。
 - **全场景覆盖**：支持字段、对象、嵌套结构与集合的完整验证。
 - **按场景启用规则**：可针对不同业务需求动态组合验证逻辑。
@@ -38,7 +39,6 @@ public class User : IValidatableObject
     [Required]
     public string? Name { get; set; }
 
-    /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         return validationContext.ValidateUsing<User>(validator =>

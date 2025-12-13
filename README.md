@@ -2,32 +2,35 @@
 
 [![license](https://img.shields.io/badge/license-MIT-orange?cacheSeconds=10800)](https://gitee.com/dotnetchina/Limen/blob/master/LICENSE) [![nuget](https://img.shields.io/nuget/v/Limen.svg?cacheSeconds=10800)](https://www.nuget.org/packages/Limen) [![dotNET China](https://img.shields.io/badge/organization-dotNET%20China-yellow?cacheSeconds=10800)](https://gitee.com/dotnetchina)
 
-Limen 是一个为 .NET 开发者打造的高表现力数据校验库，通过链式语法与可扩展规则引擎，为数据流动设置精准的“警戒线”。无论是验证
-API 输入、表单提交，还是清洗异构数据流，Limen 都能以极简代码实现企业级校验强度。
+Limen is a highly expressive data validation library built for .NET developers. With its fluent syntax and extensible
+rule engine, it establishes precise "guardrails" for data flows. Whether validating API inputs, form submissions, or
+cleansing heterogeneous data streams, Limen enables enterprise-grade validation with minimal code.
 
-## 特性
+## Features
 
-- **流畅的验证语法**：链式、声明式 API，让验证逻辑清晰易读。
-- **全场景覆盖**：支持字段、对象、嵌套结构与集合的完整验证。
-- **按场景启用规则**：可针对不同业务需求动态组合验证逻辑。
-- **多语言支持**：内置国际化机制，错误消息支持多语言切换。
-- **高度可定制**：允许定义专属验证逻辑与验证特性，适配任意业务规则。
-- **依赖注入友好**：可直接注册到 .NET 服务容器。
-- **支持异步验证**：验证逻辑可异步执行，同步与异步场景均受支持。
-- **架构设计**：架构设计灵活，易于使用与扩展。
-- **跨平台无依赖**：支持跨平台运行，无需外部依赖。
-- **高质量代码保障**：遵循高标准编码规范，拥有高达 `98%` 的单元测试与集成测试覆盖率。
-- **`.NET 8+` 兼容性**：可在 `.NET 8` 及更高版本环境中部署使用。
+- **Non-intrusive Integration**: No configuration required—integrate directly into existing projects.
+- **Fluent Validation Syntax**: Chainable, declarative APIs that make validation logic clear and readable.
+- **Comprehensive Coverage**: Full validation support for fields, objects, nested structures, and collections.
+- **Scenario-based Rule Activation**: Dynamically compose validation logic based on business requirements.
+- **Multilingual Support**: Built-in internationalization with error messages available in multiple languages.
+- **Highly Customizable**: Define custom validation logic and validation attributes to fit any business rule.
+- **Dependency Injection Friendly**: Register directly into the .NET service container.
+- **Asynchronous Validation Support**: Validation logic can be executed asynchronously; both sync and async scenarios
+  are fully supported.
+- **Flexible Architecture**: Designed for ease of use, extension, and maintainability.
+- **Cross-platform and Dependency-free**: Runs on all major platforms with zero external dependencies.
+- **High-Quality Code Assurance**: Built under strict coding standards, with 98% unit and integration test coverage.
+- **.NET 8+ Compatibility**: Fully compatible with .NET 8 and later versions.
 
-## 安装
+## Installation
 
 ```powershell
 dotnet add package Limen
 ```
 
-## 快速入门
+## Getting Started
 
-我们在[主页](https://furion.net/docs/limen/)上有不少例子，这是让您入门的第一个：
+We have many examples on our [homepage](https://furion.net/docs/limen/). Here's your first one to get you started:
 
 ```cs
 public class User : IValidatableObject
@@ -38,7 +41,6 @@ public class User : IValidatableObject
     [Required]
     public string? Name { get; set; }
 
-    /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         return validationContext.ValidateUsing<User>(validator =>
@@ -50,19 +52,20 @@ public class User : IValidatableObject
 }
 ```
 
-[更多文档](https://furion.net/docs/limen/)
+[More Documentation](https://furion.net/docs/limen/)
 
-## 文档
+## Documentation
 
-您可以在[主页](https://furion.net/docs/limen/)找到 Limen 文档。
+You can find the Limen documentation on our [homepage](https://furion.net/docs/limen/).
 
-## 贡献
+## Contributing
 
-该存储库的主要目的是继续发展 Limen 核心，使其更快、更易于使用。Limen
-的开发在 [Gitee](https://gitee.com/dotnetchina/Limen) 上公开进行，我们感谢社区贡献错误修复和改进。
+The main purpose of this repository is to continue developing the core of Limen, making it faster and easier to use.
+The development of Limen is publicly hosted on [Gitee](https://gitee.com/dotnetchina/Limen), and we appreciate
+community contributions for bug fixes and improvements.
 
-## 许可证
+## License
 
-Limen 采用 [MIT](./LICENSE) 开源许可证。
+Limen is released under the [MIT](./LICENSE) open source license.
 
 [![](./assets/baiqian.svg)](https://baiqian.com)
