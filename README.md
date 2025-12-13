@@ -40,13 +40,17 @@ public class User : IValidatableObject
 
     [Required]
     public string? Name { get; set; }
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    
+    public IEnumerable<ValidationResult> Validate(ValidationContext context)
     {
-        return validationContext.ValidateUsing<User>(validator =>
+        return context.ValidateUsing<User>(validator =>
         {
-            validator.RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
-                     .RuleFor(u => u.Id).Max(int.MaxValue);
+            validator.RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("{0} is not a valid internet username")
+                     .RuleFor(u => u.Id).Max(int.MaxValue)
+                     .RuleSet("rule", () => 
+                     {
+                         validator.RuleFor(u => u.Name).EmailAddress().WithMessage("{0} is not a valid email address format");
+                     });
         });
     }
 }
