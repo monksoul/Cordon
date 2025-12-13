@@ -15,6 +15,7 @@ public class ValidatorBaseTests
         Assert.Equal("单元测试{0}错误信息", validator._errorMessageResourceAccessor());
         Assert.Null(validator._errorMessageResourceName);
         Assert.Null(validator._errorMessageResourceType);
+        Assert.False(validator.SupportsAsync);
 
         Assert.Null(validator.ErrorMessage);
         Assert.Null(validator.ErrorMessageResourceName);

@@ -137,8 +137,13 @@ public abstract class ValidatorBase
     ///     <inheritdoc cref="ValidatorBase" />
     /// </summary>
     /// <param name="errorMessageResourceAccessor">错误信息资源访问器</param>
-    protected ValidatorBase(Func<string> errorMessageResourceAccessor) =>
+    protected ValidatorBase(Func<string> errorMessageResourceAccessor)
+    {
         _errorMessageResourceAccessor = errorMessageResourceAccessor;
+
+        // ReSharper disable once SuspiciousTypeConversion.Global
+        SupportsAsync = this is IAsyncValidator;
+    }
 
     /// <summary>
     ///     错误信息
@@ -219,6 +224,12 @@ public abstract class ValidatorBase
     ///     是否设置了错误信息
     /// </summary>
     internal bool CustomErrorMessageSet { get; private set; }
+
+    /// <summary>
+    ///     是否支持异步操作
+    /// </summary>
+    /// <remarks>实现 <see cref="IAsyncValidator" /> 接口。</remarks>
+    internal bool SupportsAsync { get; }
 
     /// <summary>
     ///     属性变更事件
