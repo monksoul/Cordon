@@ -2,6 +2,7 @@
 //
 // 此源代码遵循位于源代码树根目录中的 LICENSE 文件的许可证。
 
+global using System.ComponentModel.DataAnnotations;
 global using System.Data;
 global using System.Diagnostics;
 global using System.Text.Encodings.Web;
@@ -9,5 +10,6 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Xml;
 global using System.Xml.Linq;
+global using Limen.Samples.Models;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Extensions.Options;

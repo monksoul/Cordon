@@ -32,13 +32,13 @@ internal sealed class ValidationOptionsModelValidator : IModelValidator
         }
 
         // 提取验证选项
-        var validationOptions = ExtractFromAction(actionDescriptor) ?? ExtractFromController(actionDescriptor);
+        var validationOptionsMetadata = ExtractFromAction(actionDescriptor) ?? ExtractFromController(actionDescriptor);
 
         // 空检查
-        if (validationOptions is not null)
+        if (validationOptionsMetadata is not null)
         {
             // 设置当前验证选项
-            validationDataContext.SetValidationOptions(validationOptions);
+            validationDataContext.SetValidationOptions(validationOptionsMetadata);
         }
     }
 

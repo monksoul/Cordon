@@ -57,15 +57,15 @@ public class ValidationExtensionsTests
     }
 
     [Fact]
-    public void ValidateObject_Invalid_Parameters()
+    public void ValidateUsing_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => ValidationExtensions.ValidateObject<ObjectModel>(null!));
+        Assert.Throws<ArgumentNullException>(() => ValidationExtensions.ValidateUsing<ObjectModel>(null!));
         Assert.Throws<InvalidCastException>(() =>
-            new ValidationContext(new object(), null, null).ValidateObject<ObjectModel>());
+            new ValidationContext(new object(), null, null).ValidateUsing<ObjectModel>());
     }
 
     [Fact]
-    public void ValidateObject_ReturnOK()
+    public void ValidateUsing_ReturnOK()
     {
         var model1 = new ObjectModel();
         var exception = Assert.Throws<ValidationException>(() =>
@@ -119,7 +119,7 @@ public class ValidationExtensionsTests
         Assert.Throws<ArgumentNullException>(() =>
             new ValidationContext(new ObjectModel(), null, null).ValidateWith<ObjectModel>(null!));
         Assert.Throws<InvalidCastException>(() =>
-            new ValidationContext(new object(), null, null).ValidateObject<ObjectModel>());
+            new ValidationContext(new object(), null, null).ValidateUsing<ObjectModel>());
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public class ValidationExtensionsTests
 
         /// <inheritdoc />
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
-            validationContext.ValidateObject<ObjectModel>(validator =>
+            validationContext.ValidateUsing<ObjectModel>(validator =>
             {
                 validator.RuleFor(u => u.Name).MinLength(3).UserName()
                     .RuleSet("email", () => validator.RuleFor(u => u.Name).EmailAddress());

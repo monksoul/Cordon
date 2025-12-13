@@ -60,7 +60,7 @@ public static class ValidationExtensions
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
-    public static IEnumerable<ValidationResult> ValidateObject<T>(this ValidationContext validationContext,
+    public static IEnumerable<ValidationResult> ValidateUsing<T>(this ValidationContext validationContext,
         Action<ObjectValidator<T>>? configure = null)
         where T : class
     {

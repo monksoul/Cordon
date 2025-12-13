@@ -5,18 +5,18 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="TestValidationMessages.resx">
-        <Generator>ResXFileCodeGenerator</Generator>
-        <LastGenOutput>TestValidationMessages.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
+        <EmbeddedResource Update="TestValidationMessages.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>TestValidationMessages.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="TestValidationMessages.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>TestValidationMessages.resx</DependentUpon>
-      </Compile>
+        <Compile Update="TestValidationMessages.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>TestValidationMessages.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>
