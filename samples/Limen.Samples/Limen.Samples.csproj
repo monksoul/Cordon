@@ -14,4 +14,20 @@
         <ProjectReference Include="..\..\src\Limen.AspNetCore\src\Limen.AspNetCore.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Update="Resources\ValidationMessages.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
+            <CustomToolNamespace>Limen.Resources.Overrides</CustomToolNamespace>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Resources\ValidationMessages.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>ValidationMessages.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
 </Project>
