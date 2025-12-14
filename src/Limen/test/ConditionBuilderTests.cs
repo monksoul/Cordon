@@ -69,6 +69,36 @@ public class ConditionBuilderTests
     }
 
     [Fact]
+    public void OtherwiseMessage_ReturnOK()
+    {
+        var conditionBuilder = new ConditionBuilder<int>();
+        conditionBuilder.When(u => u > 10).ThenErrorMessage("错误消息").OtherwiseMessage("默认错误消息");
+        Assert.NotNull(conditionBuilder._defaultValidators);
+        Assert.Equal(typeof(FailureValidator), conditionBuilder._defaultValidators[0].GetType());
+
+        var conditionBuilder2 = new ConditionBuilder<int>();
+        conditionBuilder2.When(u => u > 10).ThenErrorMessage("错误消息")
+            .OtherwiseMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
+        Assert.NotNull(conditionBuilder2._defaultValidators);
+        Assert.Equal(typeof(FailureValidator), conditionBuilder2._defaultValidators[0].GetType());
+    }
+
+    [Fact]
+    public void OtherwiseErrorMessage_ReturnOK()
+    {
+        var conditionBuilder = new ConditionBuilder<int>();
+        conditionBuilder.When(u => u > 10).ThenErrorMessage("错误消息").OtherwiseErrorMessage("默认错误消息");
+        Assert.NotNull(conditionBuilder._defaultValidators);
+        Assert.Equal(typeof(FailureValidator), conditionBuilder._defaultValidators[0].GetType());
+
+        var conditionBuilder2 = new ConditionBuilder<int>();
+        conditionBuilder2.When(u => u > 10).ThenErrorMessage("错误消息")
+            .OtherwiseErrorMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
+        Assert.NotNull(conditionBuilder2._defaultValidators);
+        Assert.Equal(typeof(FailureValidator), conditionBuilder2._defaultValidators[0].GetType());
+    }
+
+    [Fact]
     public void BuildValidators_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() => ConditionBuilder<int>.BuildValidators(null!));
 
