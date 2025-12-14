@@ -262,6 +262,40 @@ public class CompositeValidatorTests
     }
 
     [Fact]
+    public void Add_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => new CompositeValidator().Add(null!));
+
+    [Fact]
+    public void Add_ReturnOK()
+    {
+        var validator = new CompositeValidator(new ChineseValidator());
+        validator.Add(new RequiredValidator());
+        validator.Add(new NotNullValidator(), new ChineseNameValidator());
+
+        Assert.Equal(4, validator.Validators.Count);
+        Assert.Equal(
+        [
+            typeof(NotNullValidator), typeof(RequiredValidator), typeof(ChineseValidator), typeof(ChineseNameValidator)
+        ], validator.Validators.Select(c => c.GetType()));
+    }
+
+    [Fact]
+    public void UseMode_ReturnOK()
+    {
+        var validator = new CompositeValidator(new ChineseValidator());
+        Assert.Equal(ValidationMode.ValidateAll, validator.Mode);
+        validator.UseMode(ValidationMode.BreakOnFirstError);
+        Assert.Equal(ValidationMode.BreakOnFirstError, validator.Mode);
+    }
+
+    [Fact]
+    public void Dispose_ReturnOK()
+    {
+        var validator = new CompositeValidator(new ChineseValidator());
+        validator.Dispose();
+    }
+
+    [Fact]
     public void ThrowValidationException_Invalid_Parameters()
     {
         var validator = new CompositeValidator(new ChineseValidator(), new RequiredValidator());

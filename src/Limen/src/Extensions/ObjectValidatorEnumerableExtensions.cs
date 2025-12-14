@@ -24,7 +24,7 @@ public static class ObjectValidatorEnumerableExtensions
         // 空检查
         ArgumentNullException.ThrowIfNull(validators);
 
-        return validators.All(validator => validator.IsValid(instance, ruleSets));
+        return validators.All(u => u.IsValid(instance, ruleSets));
     }
 
     /// <summary>

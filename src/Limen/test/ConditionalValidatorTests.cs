@@ -195,6 +195,13 @@ public class ConditionalValidatorTests
     }
 
     [Fact]
+    public void Dispose_ReturnOK()
+    {
+        var validator = new ConditionalValidator<string>(_ => { });
+        validator.Dispose();
+    }
+
+    [Fact]
     public void ThrowValidationException_Invalid_Parameters()
     {
         var validator = new ConditionalValidator<string>(builder =>

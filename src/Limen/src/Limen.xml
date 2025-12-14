@@ -2041,7 +2041,7 @@
         </member>
         <member name="T:Limen.FluentConditionBuilder`1">
             <summary>
-                链式条件验证器构建器
+                链式条件验�条件验证器构建器
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
@@ -2229,6 +2229,7 @@
             </returns>
         </member>
         <member name="M:Limen.FluentValidatorBuilder`2.AddValidator``1(``0,System.Action{``0})">
+            on{``0})">
             <summary>
                 添加验证器
             </summary>
@@ -6358,9 +6359,9 @@
                     <br/>
                     ○ Loop greedily at least 1 and at most 2 times.
                     <br/>
-                    ○ Match a hexadecimal digit exactly 3 times.
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.
                     <br/>
-                    ○ Match a hexadecimal digit exactly 8 times.
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.
                     <br/>
                     ○ Match a sequence of expressions.
                     <br/>
@@ -6404,7 +6405,7 @@
                     <br/>
                     ○ Match a character in the set [.0-9] greedily at least once.
                     <br/>
-                    ○ Match a whitespace character atomically any number of times.
+                    ○ Match a whitespace character greedily any number of times.
                     <br/>
                     ○ Match ')'.
                     <br/>
@@ -6454,7 +6455,7 @@
                     <br/>
                     ○ Match a character in the set [.0-9] greedily at least once.
                     <br/>
-                    ○ Match a whitespace character atomically any number of times.
+                    ○ Match a whitespace character greedily any number of times.
                     <br/>
                     ○ Match ')'.
                     <br/>
@@ -6576,7 +6577,7 @@
                     <br/>
                     ○ Match a whitespace character atomically any number of times.
                     <br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.
+                    ○ Match a character in the set [+-] atomically, optionally.
                     <br/>
                     ○ Match a Unicode digit atomically at least once.
                     <br/>
@@ -6588,7 +6589,7 @@
                     <br/>
                     ○ Match a whitespace character atomically any number of times.
                     <br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.
+                    ○ Match a character in the set [+-] atomically, optionally.
                     <br/>
                     ○ Match a Unicode digit atomically at least once.
                     <br/>
@@ -6616,7 +6617,7 @@
                     <br/>
                     ○ Match a whitespace character atomically any number of times.
                     <br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.
+                    ○ Match a character in the set [+-] atomically, optionally.
                     <br/>
                     ○ Match a Unicode digit atomically at least once.
                     <br/>
@@ -6628,7 +6629,7 @@
                     <br/>
                     ○ Match a whitespace character atomically any number of times.
                     <br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.
+                    ○ Match a character in the set [+-] atomically, optionally.
                     <br/>
                     ○ Match a Unicode digit atomically at least once.
                     <br/>
@@ -6668,7 +6669,7 @@
                     <br/>
                     ○ Loop greedily at least 1 and at most 2 times.
                     <br/>
-                    ○ Match a hexadecimal digit exactly 3 times.
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.
                     <br/>
                     ○ Match a sequence of expressions.
                     <br/>
@@ -6718,13 +6719,13 @@
                     <br/>
                     ○ Match '.'.
                     <br/>
-                    ○ Match a Unicode digit atomically at least once.
+                    ○ Match a Unicode digit greedily at least once.
                     <br/>
                     ○ Match a sequence of expressions.
                     <br/>
                     ○ Match '.'.
                     <br/>
-                    ○ Match a Unicode digit atomically at least once.
+                    ○ Match a Unicode digit greedily at least once.
                     <br/>
                     ○ Match ')'.
                     <br/>
@@ -6897,8 +6898,7 @@
             </param>
         </member>
         <member name="M:Limen.CompositeValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc
-                    cref="M:Limen.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})"/>
+            <inheritdoc cref="M:Limen.IValidatorInitializer.IType,System.Object})"/>
         </member>
         <member name="T:Limen.ConditionalValidator`1">
             <summary>
@@ -9822,3 +9822,19 @@
         </member>
     </members>
 </doc>
+<returns>
+<see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>
+</returns>
+        </member>
+        </members>
+        </doc>
+        </param>
+<param name="validationBuilder">
+<see cref="T:Limen.ValidationBuilder"/>
+</param>
+<returns>
+<see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>
+</returns>
+        </member>
+        </members>
+        </doc>

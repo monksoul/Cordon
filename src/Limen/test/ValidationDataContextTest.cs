@@ -87,4 +87,14 @@ public class ValidationDataContextTest
         Assert.NotNull(metadata);
         Assert.Equal(["email"], (string[]?)metadata.RuleSets!);
     }
+
+    [Fact]
+    public void HasValidationOptions_ReturnOK()
+    {
+        var context = new ValidationDataContext();
+        Assert.False(context.HasValidationOptions());
+
+        context.SetValidationOptions(new ValidationOptionsMetadata(["email"]));
+        Assert.True(context.HasValidationOptions());
+    }
 }
