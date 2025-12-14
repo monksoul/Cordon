@@ -83,6 +83,14 @@ public class AgeAttributeTests
         Assert.Equal(2, validationResults4.Count);
         Assert.Equal("The field Data is not a valid age.", validationResults4[0].ErrorMessage);
         Assert.Equal("The field Data2 must be at least 18 years old.", validationResults4[1].ErrorMessage);
+
+        var model5 = new TestModel { Data = -1, Data2 = 16, Data3 = -1 };
+        var validationResults5 = new List<ValidationResult>();
+        Assert.False(Validator.TryValidateObject(model5, new ValidationContext(model5), validationResults5, true));
+        Assert.Equal(3, validationResults5.Count);
+        Assert.Equal("The field Data is not a valid age.", validationResults5[0].ErrorMessage);
+        Assert.Equal("The field Data2 must be at least 18 years old.", validationResults5[1].ErrorMessage);
+        Assert.Equal("数据无效", validationResults5[2].ErrorMessage);
     }
 
     [Fact]
@@ -135,5 +143,7 @@ public class AgeAttributeTests
         [Age] public int Data { get; set; }
 
         [Age(IsAdultOnly = true)] public int Data2 { get; set; }
+
+        [Age(ErrorMessage = "数据无效")] public int Data3 { get; set; }
     }
 }

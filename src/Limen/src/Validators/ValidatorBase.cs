@@ -94,8 +94,11 @@ public abstract class ValidatorBase<T> : ValidatorBase
 /// </summary>
 public abstract class ValidatorBase
 {
-    // 资源类型全名常量
-    internal const string ValidationMessagesFullTypeName = "Limen.Resources.ValidationMessages";
+    /// <summary>
+    ///     外部程序集用于覆盖默认验证消息的【强制约定类型全名】
+    /// </summary>
+    /// <remarks>TODO: 未来可考虑使用 <see cref="AppContext" /> 配置。</remarks>
+    internal const string ExternalValidationMessagesFullTypeName = "Limen.Resources.Overrides.ValidationMessages";
 
     /// <summary>
     ///     错误信息
@@ -287,7 +290,7 @@ public abstract class ValidatorBase
     /// <summary>
     ///     使用指定资源键设置验证错误消息
     /// </summary>
-    /// <remarks>支持入口程序集覆盖。</remarks>
+    /// <remarks>支持入口程序集覆盖框架内部资源，若未找到则返回占位符。</remarks>
     /// <param name="resourceKeyResolver">返回 <see cref="ValidationMessages" /> 中属性名的委托</param>
     protected void UseResourceKey(Func<string> resourceKeyResolver)
     {
@@ -306,32 +309,19 @@ public abstract class ValidatorBase
     /// <summary>
     ///     获取支持外部覆盖的资源字符串
     /// </summary>
+    /// <remarks>支持入口程序集覆盖框架内部资源，若未找到则返回占位符。</remarks>
     /// <param name="resourceKey">资源属性名</param>
-    /// <returns>资源字符串，若未找到则返回占位符</returns>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
     internal static string? GetResourceString(string resourceKey)
     {
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(resourceKey);
 
-        // 获取入口程序集和内部程序集
-        var entryAssembly = Assembly.GetEntryAssembly();
-        var internalAssembly = typeof(ValidationMessages).Assembly; // 固定为内部资源程序集
+        // 获取 ValidationMessages 静态属性
+        var property = GetValidationMessagesProperty(resourceKey);
 
-        // 初始化属性对象
-        PropertyInfo? property;
-
-        // 先查询入口程序集（命名空间必须为 Limen.Resources）
-        if (entryAssembly is not null && entryAssembly != internalAssembly)
-        {
-            property = TryGetPropertyFromAssembly(entryAssembly, ValidationMessagesFullTypeName, resourceKey);
-            if (property?.GetValue(null, null) is string errorMessageResourceName)
-            {
-                return errorMessageResourceName;
-            }
-        }
-
-        // 回退到框架内置资源
-        property = TryGetPropertyFromAssembly(internalAssembly, ValidationMessagesFullTypeName, resourceKey);
         return property?.GetValue(null, null) as string;
     }
 
@@ -403,23 +393,22 @@ public abstract class ValidatorBase
         ArgumentNullException.ThrowIfNull(_errorMessageResourceType);
         ArgumentException.ThrowIfNullOrWhiteSpace(_errorMessageResourceName);
 
-        // 获取入口程序集和资源所在程序集
-        var entryAssembly = Assembly.GetEntryAssembly();
-        var resourceTypeAssembly = _errorMessageResourceType.Assembly;
-
         // 初始化属性对象
         PropertyInfo? property = null;
         var propertyName = _errorMessageResourceName;
 
-        // 尝试从入口程序集加载（命名空间必须为 Limen.Resources）
-        if (entryAssembly is not null && entryAssembly != resourceTypeAssembly)
+        // 判断是否使用的是默认的 ValidationMessages 类型
+        if (_errorMessageResourceType == typeof(ValidationMessages))
         {
-            property = TryGetPropertyFromAssembly(entryAssembly, ValidationMessagesFullTypeName, propertyName);
+            // 获取 ValidationMessages 静态属性
+            property = GetValidationMessagesProperty(propertyName);
         }
-
-        // 回退到框架内置资源
-        property ??=
-            TryGetPropertyFromAssembly(resourceTypeAssembly, _errorMessageResourceType.FullName!, propertyName);
+        else
+        {
+            // 查找用户自定义资源类型
+            property = TryGetPropertyFromAssembly(_errorMessageResourceType.Assembly,
+                _errorMessageResourceType.FullName!, propertyName);
+        }
 
         // 检查属性是否只对同一程序集中的其他类型可见，而对该程序集以外的派生类型则不可见（顾名思义，使用 internal 声明的属性）
         // https://learn.microsoft.com/zh-cn/dotnet/api/system.reflection.methodbase.isassembly?view=net-9.0
@@ -446,16 +435,58 @@ public abstract class ValidatorBase
     }
 
     /// <summary>
+    ///     获取 <see cref="ValidationMessages" /> 静态属性
+    /// </summary>
+    /// <remarks>支持入口程序集覆盖框架内部资源。</remarks>
+    /// <param name="resourceKey">资源属性名</param>
+    /// <returns>
+    ///     <see cref="PropertyInfo" />
+    /// </returns>
+    internal static PropertyInfo? GetValidationMessagesProperty(string resourceKey)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(resourceKey);
+
+        // 初始化属性对象
+        PropertyInfo? property = null;
+
+        // 获取入口程序集和内部程序集
+        var entryAssembly = Assembly.GetEntryAssembly();
+        var internalAssembly = typeof(ValidationMessages).Assembly; // 固定为内部资源程序集
+
+        // 先查询入口程序集（命名空间必须为 Limen.Resources.Overrides）
+        if (entryAssembly is not null && entryAssembly != internalAssembly)
+        {
+            property = TryGetPropertyFromAssembly(entryAssembly, ExternalValidationMessagesFullTypeName, resourceKey);
+        }
+
+        // 回退到框架内置资源
+        property ??= TryGetPropertyFromAssembly(internalAssembly, typeof(ValidationMessages).FullName!, resourceKey);
+
+        return property;
+    }
+
+    /// <summary>
     ///     尝试从指定程序集中获取资源类型的静态字符串属性
     /// </summary>
     /// <param name="assembly">目标程序集</param>
-    /// <param name="fullTypeName">完整类型名（如 <c>Limen.Resources.ValidationMessages</c>）</param>
+    /// <param name="fullTypeName">
+    ///     完整类型名（如 <c>Limen.Resources.ValidationMessages</c> 或
+    ///     <c>Limen.Resources.Overrides.ValidationMessages</c>）
+    /// </param>
     /// <param name="propertyName">属性名</param>
     /// <returns>
     ///     <see cref="PropertyInfo" />
     /// </returns>
-    internal static PropertyInfo?
-        TryGetPropertyFromAssembly(Assembly assembly, string fullTypeName, string propertyName) => assembly
-        .GetType(fullTypeName)?.GetProperty(propertyName,
+    internal static PropertyInfo? TryGetPropertyFromAssembly(Assembly assembly, string fullTypeName,
+        string propertyName)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(assembly);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fullTypeName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        return assembly.GetType(fullTypeName)?.GetProperty(propertyName,
             BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+    }
 }

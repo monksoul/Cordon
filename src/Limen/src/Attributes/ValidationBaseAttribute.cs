@@ -38,7 +38,7 @@ public abstract class ValidationBaseAttribute : ValidationAttribute
     /// <summary>
     ///     使用指定资源键设置验证错误消息
     /// </summary>
-    /// <remarks>支持入口程序集覆盖。</remarks>
+    /// <remarks>支持入口程序集覆盖框架内部资源，若未找到则返回占位符。</remarks>
     /// <param name="resourceKeyResolver">返回 <see cref="ValidationMessages" /> 中属性名的委托</param>
     protected void UseResourceKey(Func<string> resourceKeyResolver)
     {

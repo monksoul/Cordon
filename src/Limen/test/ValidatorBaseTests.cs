@@ -22,7 +22,8 @@ public class ValidatorBaseTests
         Assert.Null(validator.ErrorMessageResourceType);
         Assert.False(validator.CustomErrorMessageSet);
 
-        Assert.Equal("Limen.Resources.ValidationMessages", ValidatorBase.ValidationMessagesFullTypeName);
+        Assert.Equal("Limen.Resources.Overrides.ValidationMessages",
+            ValidatorBase.ExternalValidationMessagesFullTypeName);
 
         var validatorType = typeof(TestValidator);
 
@@ -157,6 +158,51 @@ public class ValidatorBaseTests
             ErrorMessageResourceName = "TestValidator_ValidationError2"
         };
         Assert.Equal("单元测试{0}错误信息2", errorMessageStringProperty?.GetValue(validator2));
+    }
+
+    [Fact]
+    public void UseResourceKey_Invalid_Parameters()
+    {
+        var validator = new TestValidator();
+
+        var userResourceMethod =
+            typeof(ValidatorBase).GetMethod("UseResourceKey", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.CreateDelegate<Action<Func<string>>>(validator);
+        Assert.NotNull(userResourceMethod);
+
+        Assert.Throws<ArgumentNullException>(() => userResourceMethod(null!));
+    }
+
+    [Fact]
+    public void UseResourceKey_ReturnOK()
+    {
+        var validator = new TestValidator();
+
+        var userResourceMethod =
+            typeof(ValidatorBase).GetMethod("UseResourceKey", BindingFlags.Instance | BindingFlags.NonPublic)
+                ?.CreateDelegate<Action<Func<string>>>(validator);
+        Assert.NotNull(userResourceMethod);
+
+        userResourceMethod(() => "TestValidator_Error");
+        Assert.Equal("[TestValidator_Error]", validator._errorMessageResourceAccessor!());
+    }
+
+    [Fact]
+    public void GetResourceString_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => ValidatorBase.GetResourceString(null!));
+        Assert.Throws<ArgumentException>(() => ValidatorBase.GetResourceString(string.Empty));
+        Assert.Throws<ArgumentException>(() => ValidatorBase.GetResourceString(" "));
+    }
+
+    [Fact]
+    public void GetResourceString_ReturnOK()
+    {
+        Assert.Null(ValidatorBase.GetResourceString("Test_Property"));
+
+        var errorMessage = ValidatorBase.GetResourceString("AgeValidator_ValidationError");
+        Assert.NotNull(errorMessage);
+        Assert.Equal("The field {0} is not a valid age.", errorMessage);
     }
 
     [Fact]
@@ -295,6 +341,57 @@ public class ValidatorBaseTests
         validator.SetResourceAccessorByPropertyLookup();
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("单元测试{0}错误信息2", validator._errorMessageResourceAccessor());
+    }
+
+    [Fact]
+    public void GetValidationMessagesProperty_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => ValidatorBase.GetValidationMessagesProperty(null!));
+        Assert.Throws<ArgumentException>(() => ValidatorBase.GetValidationMessagesProperty(string.Empty));
+        Assert.Throws<ArgumentException>(() => ValidatorBase.GetValidationMessagesProperty(" "));
+    }
+
+    [Fact]
+    public void GetValidationMessagesProperty_ReturnOK()
+    {
+        Assert.Null(ValidatorBase.GetValidationMessagesProperty("Test_Property"));
+
+        var property = ValidatorBase.GetValidationMessagesProperty("AgeValidator_ValidationError");
+        Assert.NotNull(property);
+        Assert.Equal("The field {0} is not a valid age.", property.GetValue(null, null));
+    }
+
+    [Fact]
+    public void TryGetPropertyFromAssembly_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => ValidatorBase.TryGetPropertyFromAssembly(null!, null!, null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            ValidatorBase.TryGetPropertyFromAssembly(Assembly.GetEntryAssembly()!, null!, null!));
+        Assert.Throws<ArgumentException>(() =>
+            ValidatorBase.TryGetPropertyFromAssembly(Assembly.GetEntryAssembly()!, string.Empty, null!));
+        Assert.Throws<ArgumentException>(() =>
+            ValidatorBase.TryGetPropertyFromAssembly(Assembly.GetEntryAssembly()!, " ", null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            ValidatorBase.TryGetPropertyFromAssembly(Assembly.GetEntryAssembly()!, "Tests.ValidationMessages", null!));
+        Assert.Throws<ArgumentException>(() =>
+            ValidatorBase.TryGetPropertyFromAssembly(Assembly.GetEntryAssembly()!, "Tests.ValidationMessages",
+                string.Empty));
+        Assert.Throws<ArgumentException>(() =>
+            ValidatorBase.TryGetPropertyFromAssembly(Assembly.GetEntryAssembly()!, "Tests.ValidationMessages", " "));
+    }
+
+    [Fact]
+    public void TryGetPropertyFromAssembly_ReturnOK()
+    {
+        Assert.Null(ValidatorBase.TryGetPropertyFromAssembly(Assembly.GetEntryAssembly()!, "Tests.ValidationMessages",
+            "Test_Property"));
+
+        var property = ValidatorBase.TryGetPropertyFromAssembly(typeof(TestValidationMessages).Assembly,
+            "Limen.Tests.TestValidationMessages", "TestValidator_ValidationError");
+        Assert.NotNull(property);
+        Assert.Equal("单元测试{0}错误信息", property.GetValue(null, null));
     }
 
     [Fact]
