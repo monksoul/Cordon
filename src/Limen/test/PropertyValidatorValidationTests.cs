@@ -306,6 +306,78 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void ValidateAll_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.Data1).ValidateAll(null!));
+
+    [Fact]
+    public void ValidateAll_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .ValidateAll(u => u.NotNull().MinLength(3));
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as CompositeValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(ValidationMode.ValidateAll, addedValidator.Mode);
+        Assert.Equal(2, addedValidator.Validators.Count);
+
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "Fu" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "百小僧" }));
+    }
+
+    [Fact]
+    public void BreakOnFirstSuccess_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.Data1).BreakOnFirstSuccess(null!));
+
+    [Fact]
+    public void BreakOnFirstSuccess_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .BreakOnFirstSuccess(u => u.EmailAddress().UserName());
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as CompositeValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(ValidationMode.BreakOnFirstSuccess, addedValidator.Mode);
+        Assert.Equal(2, addedValidator.Validators.Count);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "monksoul@outlook.com" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "monksoul" }));
+    }
+
+    [Fact]
+    public void BreakOnFirstError_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.Data1).BreakOnFirstError(null!));
+
+    [Fact]
+    public void BreakOnFirstError_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .BreakOnFirstError(u => u.NotNull().MinLength(3));
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as CompositeValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(ValidationMode.BreakOnFirstError, addedValidator.Mode);
+        Assert.Equal(2, addedValidator.Validators.Count);
+
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "Fu" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "百小僧" }));
+    }
+
+    [Fact]
     public void Conditional_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() =>
             new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)

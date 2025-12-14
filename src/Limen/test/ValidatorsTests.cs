@@ -115,6 +115,42 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void ValidateAll_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => Validators.ValidateAll(null!));
+
+    [Fact]
+    public void ValidateAll_ReturnOK()
+    {
+        var validator = Validators.ValidateAll(u => u.ChineseName().AllowedValues("百签", "百小僧"));
+        Assert.Equal(2, validator.Validators.Count);
+        Assert.Equal(ValidationMode.ValidateAll, validator.Mode);
+    }
+
+    [Fact]
+    public void BreakOnFirstSuccess_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => Validators.BreakOnFirstSuccess(null!));
+
+    [Fact]
+    public void BreakOnFirstSuccess_ReturnOK()
+    {
+        var validator = Validators.BreakOnFirstSuccess(u => u.ChineseName().AllowedValues("百签", "百小僧"));
+        Assert.Equal(2, validator.Validators.Count);
+        Assert.Equal(ValidationMode.BreakOnFirstSuccess, validator.Mode);
+    }
+
+    [Fact]
+    public void BreakOnFirstError_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => Validators.BreakOnFirstError(null!));
+
+    [Fact]
+    public void BreakOnFirstError_ReturnOK()
+    {
+        var validator = Validators.BreakOnFirstError(u => u.ChineseName().AllowedValues("百签", "百小僧"));
+        Assert.Equal(2, validator.Validators.Count);
+        Assert.Equal(ValidationMode.BreakOnFirstError, validator.Mode);
+    }
+
+    [Fact]
     public void Conditional_ReturnOK()
     {
         var validator = Validators.Conditional<int>(builder =>

@@ -225,6 +225,71 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void ValidateAll_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => new ValueValidator<object>().ValidateAll(null!));
+
+    [Fact]
+    public void ValidateAll_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().ValidateAll(u => u.NotNull().MinLength(3));
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(ValidationMode.ValidateAll, addedValidator.Mode);
+        Assert.Equal(2, addedValidator.Validators.Count);
+
+        Assert.False(valueValidator.IsValid(null));
+        Assert.False(valueValidator.IsValid("Fu"));
+        Assert.True(valueValidator.IsValid("百小僧"));
+    }
+
+    [Fact]
+    public void BreakOnFirstSuccess_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<object>().BreakOnFirstSuccess(null!));
+
+    [Fact]
+    public void BreakOnFirstSuccess_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().BreakOnFirstSuccess(u => u.EmailAddress().UserName());
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(ValidationMode.BreakOnFirstSuccess, addedValidator.Mode);
+        Assert.Equal(2, addedValidator.Validators.Count);
+
+        Assert.True(valueValidator.IsValid(null));
+        Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
+        Assert.True(valueValidator.IsValid("monksoul"));
+    }
+
+    [Fact]
+    public void BreakOnFirstError_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<object>().BreakOnFirstError(null!));
+
+    [Fact]
+    public void BreakOnFirstError_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().BreakOnFirstError(u => u.NotNull().MinLength(3));
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(ValidationMode.BreakOnFirstError, addedValidator.Mode);
+        Assert.Equal(2, addedValidator.Validators.Count);
+
+        Assert.False(valueValidator.IsValid(null));
+        Assert.False(valueValidator.IsValid("Fu"));
+        Assert.True(valueValidator.IsValid("百小僧"));
+    }
+
+    [Fact]
     public void Conditional_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() =>
             new ValueValidator<object>().Conditional(null!));

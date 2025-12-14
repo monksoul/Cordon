@@ -99,18 +99,6 @@ public class ConditionBuilderTests
     }
 
     [Fact]
-    public void BuildValidators_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => ConditionBuilder<int>.BuildValidators(null!));
-
-    [Fact]
-    public void BuildValidators_ReturnOK()
-    {
-        var validators = ConditionBuilder<string>.BuildValidators(b => b.Required().MinLength(30));
-        Assert.NotNull(validators);
-        Assert.Equal(2, validators.Count);
-    }
-
-    [Fact]
     public void Build_ReturnOK()
     {
         var conditionBuilder = new ConditionBuilder<int>();

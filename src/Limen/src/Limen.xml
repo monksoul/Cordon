@@ -1695,84 +1695,6 @@
             <remarks>支持入口程序集覆盖框架内部资源，若未找到则返回占位符。</remarks>
             <param name="resourceKeyResolver">返回 <see cref="T:Limen.Resources.ValidationMessages" /> 中属性名的委托</param>
         </member>
-        <member name="T:Limen.FluentConditionBuilder`1">
-            <summary>
-                链式条件验证器构建器
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-        </member>
-        <member name="T:Limen.ConditionThenBuilder`1">
-            <summary>
-                Then 条件中间构建器
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-        </member>
-        <member name="F:Limen.ConditionThenBuilder`1._condition">
-            <summary>
-                条件委托
-            </summary>
-        </member>
-        <member name="F:Limen.ConditionThenBuilder`1._parent">
-            <inheritdoc cref="T:Limen.ConditionBuilder`1" />
-        </member>
-        <member name="M:Limen.ConditionThenBuilder`1.#ctor(Limen.ConditionBuilder{`0},System.Func{`0,System.Boolean})">
-            <summary>
-                构造函数
-            </summary>
-            <param name="parent">父条件构建器</param>
-            <param name="condition">条件委托</param>
-        </member>
-        <member name="M:Limen.ConditionThenBuilder`1.Then(System.Action{Limen.FluentConditionBuilder{`0}})">
-            <summary>
-                配置满足条件时执行的验证规则
-            </summary>
-            <param name="configure">验证器配置委托</param>
-            <returns>
-                <see cref="T:Limen.ConditionBuilder`1" />
-            </returns>
-        </member>
-        <member name="M:Limen.ConditionThenBuilder`1.ThenMessage(System.String)">
-            <summary>
-                配置满足条件时直接返回指定的错误消息
-            </summary>
-            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
-            <param name="errorMessage">错误消息</param>
-            <returns>
-                <see cref="T:Limen.ConditionBuilder`1" />
-            </returns>
-        </member>
-        <member name="M:Limen.ConditionThenBuilder`1.ThenErrorMessage(System.String)">
-            <summary>
-                配置满足条件时直接返回指定的错误消息
-            </summary>
-            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
-            <param name="errorMessage">错误消息</param>
-            <returns>
-                <see cref="T:Limen.ConditionBuilder`1" />
-            </returns>
-        </member>
-        <member name="M:Limen.ConditionThenBuilder`1.ThenMessage(System.Type,System.String)">
-            <summary>
-                配置满足条件时直接返回指定的错误消息
-            </summary>
-            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
-            <param name="resourceType">错误信息资源类型</param>
-            <param name="resourceName">错误信息资源名称</param>
-            <returns>
-                <see cref="T:Limen.ConditionBuilder`1" />
-            </returns>
-        </member>
-        <member name="M:Limen.ConditionThenBuilder`1.ThenErrorMessage(System.Type,System.String)">
-            <summary>
-                配置满足条件时直接返回指定的错误消息
-            </summary>
-            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
-            <param name="resourceType">错误信息资源类型</param>
-            <param name="resourceName">错误信息资源名称</param>
-            <returns>
-                <see cref="T:Limen.ConditionBuilder`1" />
-            </returns>
-        </member>
         <member name="T:Limen.ConditionBuilder`1">
             <summary>
                 条件验证构建器
@@ -1813,7 +1735,7 @@
                 <see cref="T:Limen.ConditionThenBuilder`1" />
             </returns>
         </member>
-        <member name="M:Limen.ConditionBuilder`1.Otherwise(System.Action{Limen.FluentConditionBuilder{`0}})">
+        <member name="M:Limen.ConditionBuilder`1.Otherwise(System.Action{Limen.FluentValidatorBuilder{`0}})">
             <summary>
                 配置默认验证规则
             </summary>
@@ -1865,15 +1787,6 @@
                 <see cref="T:Limen.ConditionBuilder`1" />
             </returns>
         </member>
-        <member name="M:Limen.ConditionBuilder`1.BuildValidators(System.Action{Limen.FluentConditionBuilder{`0}})">
-            <summary>
-                构建验证器集合
-            </summary>
-            <param name="configure">验证器配置委托</param>
-            <returns>
-                <see cref="T:System.Collections.Generic.IReadOnlyList`1" />
-            </returns>
-        </member>
         <member name="M:Limen.ConditionBuilder`1.Build">
             <summary>
                 构建最终的条件与默认验证器集合
@@ -1881,6 +1794,84 @@
             <returns>
                 <see cref="T:System.Tuple`2" />
             </returns>
+        </member>
+        <member name="T:Limen.ConditionThenBuilder`1">
+            <summary>
+                Then 条件中间构建器
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="F:Limen.ConditionThenBuilder`1._condition">
+            <summary>
+                条件委托
+            </summary>
+        </member>
+        <member name="F:Limen.ConditionThenBuilder`1._parent">
+            <inheritdoc cref="T:Limen.ConditionBuilder`1" />
+        </member>
+        <member name="M:Limen.ConditionThenBuilder`1.#ctor(Limen.ConditionBuilder{`0},System.Func{`0,System.Boolean})">
+            <summary>
+                构造函数
+            </summary>
+            <param name="parent">父条件构建器</param>
+            <param name="condition">条件委托</param>
+        </member>
+        <member name="M:Limen.ConditionThenBuilder`1.Then(System.Action{Limen.FluentValidatorBuilder{`0}})">
+            <summary>
+                配置满足条件时执行的验证规则
+            </summary>
+            <param name="configure">验证器配置委托</param>
+            <returns>
+                <see cref="T:Limen.ConditionBuilder`1" />
+            </returns>
+        </member>
+        <member name="M:Limen.ConditionThenBuilder`1.ThenMessage(System.String)">
+            <summary>
+                配置满足条件时直接返回指定的错误消息
+            </summary>
+            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
+            <param name="errorMessage">错误消息</param>
+            <returns>
+                <see cref="T:Limen.ConditionBuilder`1" />
+            </returns>
+        </member>
+        <member name="M:Limen.ConditionThenBuilder`1.ThenErrorMessage(System.String)">
+            <summary>
+                配置满足条件时直接返回指定的错误消息
+            </summary>
+            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
+            <param name="errorMessage">错误消息</param>
+            <returns>
+                <see cref="T:Limen.ConditionBuilder`1" />
+            </returns>
+        </member>
+        <member name="M:Limen.ConditionThenBuilder`1.ThenMessage(System.Type,System.String)">
+            <summary>
+                配置满足条件时直接返回指定的错误消息
+            </summary>
+            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
+            <param name="resourceType">错误信息资源类型</param>
+            <param name="resourceName">错误信息资源名称</param>
+            <returns>
+                <see cref="T:Limen.ConditionBuilder`1" />
+            </returns>
+        </member>
+        <member name="M:Limen.ConditionThenBuilder`1.ThenErrorMessage(System.Type,System.String)">
+            <summary>
+                配置满足条件时直接返回指定的错误消息
+            </summary>
+            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
+            <param name="resourceType">错误信息资源类型</param>
+            <param name="resourceName">错误信息资源名称</param>
+            <returns>
+                <see cref="T:Limen.ConditionBuilder`1" />
+            </returns>
+        </member>
+        <member name="T:Limen.FluentValidatorBuilder`1">
+            <summary>
+                链式验证器构建器
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="T:Limen.FluentValidatorBuilder`2">
             <summary>
@@ -2093,6 +2084,36 @@
             <param name="mode">
                 <see cref="T:Limen.ValidationMode" />
             </param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Limen.FluentValidatorBuilder`2.ValidateAll(System.Action{Limen.FluentValidatorBuilder{`0}})">
+            <summary>
+                添加组合验证器
+            </summary>
+            <remarks>验证所有。</remarks>
+            <param name="configure">验证器配置委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Limen.FluentValidatorBuilder`2.BreakOnFirstSuccess(System.Action{Limen.FluentValidatorBuilder{`0}})">
+            <summary>
+                添加组合验证器
+            </summary>
+            <remarks>首个验证成功则视为通过。</remarks>
+            <param name="configure">验证器配置委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Limen.FluentValidatorBuilder`2.BreakOnFirstError(System.Action{Limen.FluentValidatorBuilder{`0}})">
+            <summary>
+                添加组合验证器
+            </summary>
+            <remarks>首个验证失败则停止验证。</remarks>
+            <param name="configure">验证器配置委托</param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -2648,10 +2669,11 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Limen.FluentValidatorBuilder`2.Build">
+        <member name="M:Limen.FluentValidatorBuilder`2.Build(System.Action{`1})">
             <summary>
                 构建验证器集合
             </summary>
+            <param name="configure">验证器配置委托</param>
             <returns>
                 <see cref="T:System.Collections.Generic.IReadOnlyList`1" />
             </returns>
@@ -4913,6 +4935,36 @@
             <param name="mode">
                 <see cref="T:Limen.ValidationMode" />
             </param>
+            <returns>
+                <see cref="T:Limen.CompositeValidator" />
+            </returns>
+        </member>
+        <member name="M:Limen.Validators.ValidateAll(System.Action{Limen.FluentValidatorBuilder{System.Object}})">
+            <summary>
+                创建组合验证器
+            </summary>
+            <remarks>验证所有。</remarks>
+            <param name="configure">验证器配置委托</param>
+            <returns>
+                <see cref="T:Limen.CompositeValidator" />
+            </returns>
+        </member>
+        <member name="M:Limen.Validators.BreakOnFirstSuccess(System.Action{Limen.FluentValidatorBuilder{System.Object}})">
+            <summary>
+                创建组合验证器
+            </summary>
+            <remarks>首个验证成功则视为通过。</remarks>
+            <param name="configure">验证器配置委托</param>
+            <returns>
+                <see cref="T:Limen.CompositeValidator" />
+            </returns>
+        </member>
+        <member name="M:Limen.Validators.BreakOnFirstError(System.Action{Limen.FluentValidatorBuilder{System.Object}})">
+            <summary>
+                创建组合验证器
+            </summary>
+            <remarks>首个验证失败则停止验证。</remarks>
+            <param name="configure">验证器配置委托</param>
             <returns>
                 <see cref="T:Limen.CompositeValidator" />
             </returns>

@@ -170,6 +170,54 @@ public static class Validators
         new(validators) { Mode = mode };
 
     /// <summary>
+    ///     创建组合验证器
+    /// </summary>
+    /// <remarks>验证所有。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <see cref="CompositeValidator" />
+    /// </returns>
+    public static CompositeValidator ValidateAll(Action<FluentValidatorBuilder<object>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], ValidationMode.ValidateAll);
+    }
+
+    /// <summary>
+    ///     创建组合验证器
+    /// </summary>
+    /// <remarks>首个验证成功则视为通过。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <see cref="CompositeValidator" />
+    /// </returns>
+    public static CompositeValidator BreakOnFirstSuccess(Action<FluentValidatorBuilder<object>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], ValidationMode.BreakOnFirstSuccess);
+    }
+
+    /// <summary>
+    ///     创建组合验证器
+    /// </summary>
+    /// <remarks>首个验证失败则停止验证。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <see cref="CompositeValidator" />
+    /// </returns>
+    public static CompositeValidator BreakOnFirstError(Action<FluentValidatorBuilder<object>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], ValidationMode.BreakOnFirstError);
+    }
+
+    /// <summary>
     ///     创建条件验证器
     /// </summary>
     /// <param name="buildConditions">条件构建器配置委托</param>

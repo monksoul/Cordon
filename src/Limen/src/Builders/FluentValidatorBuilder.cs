@@ -8,6 +8,12 @@ namespace Limen;
 ///     链式验证器构建器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
+public class FluentValidatorBuilder<T> : FluentValidatorBuilder<T, FluentValidatorBuilder<T>>;
+
+/// <summary>
+///     链式验证器构建器
+/// </summary>
+/// <typeparam name="T">对象类型</typeparam>
 /// <typeparam name="TSelf">派生类型自身类型</typeparam>
 public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     where TSelf : FluentValidatorBuilder<T, TSelf>
@@ -335,6 +341,54 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// </returns>
     public virtual TSelf Composite(ValidatorBase[] validators, ValidationMode mode) =>
         AddValidator(new CompositeValidator(validators) { Mode = mode });
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
+    /// <remarks>验证所有。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf ValidateAll(Action<FluentValidatorBuilder<T>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], ValidationMode.ValidateAll);
+    }
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
+    /// <remarks>首个验证成功则视为通过。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf BreakOnFirstSuccess(Action<FluentValidatorBuilder<T>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], ValidationMode.BreakOnFirstSuccess);
+    }
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
+    /// <remarks>首个验证失败则停止验证。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf BreakOnFirstError(Action<FluentValidatorBuilder<T>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], ValidationMode.BreakOnFirstError);
+    }
 
     /// <summary>
     ///     添加条件验证器
@@ -956,10 +1010,17 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     构建验证器集合
     /// </summary>
+    /// <param name="configure">验证器配置委托</param>
     /// <returns>
     ///     <see cref="IReadOnlyList{T}" />
     /// </returns>
-    internal IReadOnlyList<ValidatorBase> Build() => Validators;
+    internal IReadOnlyList<ValidatorBase> Build(Action<TSelf>? configure = null)
+    {
+        // 调用验证器配置委托
+        configure?.Invoke((TSelf)this);
+
+        return Validators;
+    }
 
     /// <summary>
     ///     创建 <see cref="ValidationContext{T}" /> 实例

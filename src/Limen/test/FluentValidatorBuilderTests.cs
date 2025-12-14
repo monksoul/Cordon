@@ -17,6 +17,18 @@ public class FluentValidatorBuilderTests
         Assert.NotNull(builder2);
         Assert.NotNull(builder2._items);
         Assert.Empty(builder2._items);
+
+        var builder3 = new FluentValidatorBuilder<int>();
+        Assert.NotNull(builder3);
+    }
+
+    [Fact]
+    public void Build_ReturnOK()
+    {
+        var builder = new FluentValidatorBuilder<int>();
+        var validators = builder.Build(c => c.Min(1).Max(20));
+        Assert.Equal(2, validators.Count);
+        Assert.Equal(2, builder.Validators.Count);
     }
 
     public class TestValidatorBuilder<T> : FluentValidatorBuilder<T, TestValidatorBuilder<T>>
