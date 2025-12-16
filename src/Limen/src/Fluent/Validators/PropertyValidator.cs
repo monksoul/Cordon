@@ -472,6 +472,37 @@ public partial class PropertyValidator<T, TProperty> :
     /// <summary>
     ///     设置成员名称
     /// </summary>
+    /// <param name="jsonNamingPolicy">
+    ///     <see cref="JsonNamingPolicy" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> WithMemberName(JsonNamingPolicy jsonNamingPolicy)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(jsonNamingPolicy);
+
+        MemberName = jsonNamingPolicy.ConvertName(_annotationValidator.GetMemberName());
+
+        return this;
+    }
+
+    /// <summary>
+    ///     设置成员名称
+    /// </summary>
+    /// <param name="jsonNamingPolicy">
+    ///     <see cref="JsonNamingPolicy" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> WithName(JsonNamingPolicy jsonNamingPolicy) =>
+        WithMemberName(jsonNamingPolicy);
+
+    /// <summary>
+    ///     设置成员名称
+    /// </summary>
     /// <param name="memberName">成员名称</param>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />

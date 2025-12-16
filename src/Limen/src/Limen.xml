@@ -1651,9 +1651,6 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
-        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1663,8 +1660,11 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -3945,6 +3945,28 @@
                 <see cref="T:Limen.PropertyValidator`2" />
             </returns>
         </member>
+        <member name="M:Limen.PropertyValidator`2.WithMemberName(System.Text.Json.JsonNamingPolicy)">
+            <summary>
+                设置成员名称
+            </summary>
+            <param name="jsonNamingPolicy">
+                <see cref="T:System.Text.Json.JsonNamingPolicy" />
+            </param>
+            <returns>
+                <see cref="T:Limen.PropertyValidator`2" />
+            </returns>
+        </member>
+        <member name="M:Limen.PropertyValidator`2.WithName(System.Text.Json.JsonNamingPolicy)">
+            <summary>
+                设置成员名称
+            </summary>
+            <param name="jsonNamingPolicy">
+                <see cref="T:System.Text.Json.JsonNamingPolicy" />
+            </param>
+            <returns>
+                <see cref="T:Limen.PropertyValidator`2" />
+            </returns>
+        </member>
         <member name="M:Limen.PropertyValidator`2.WithName(System.String)">
             <summary>
                 设置成员名称
@@ -5898,8 +5920,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a hexadecimal digit exactly 3 times.<br/>
-                        ○ Match a hexadecimal digit exactly 8 times.<br/>
+                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -5921,7 +5943,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character atomically any number of times.<br/>
+                            ○ Match a whitespace character greedily any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -5946,7 +5968,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character atomically any number of times.<br/>
+                                    ○ Match a whitespace character greedily any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -6007,13 +6029,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -6027,13 +6049,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -6055,7 +6077,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -6080,10 +6102,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit atomically at least once.<br/>
+                                    ○ Match a Unicode digit greedily at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit atomically at least once.<br/>
+                                ○ Match a Unicode digit greedily at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -6515,12 +6537,12 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Loop greedily at least once.<br/>
                 ○ 1st capture group.<br/>
-                    ○ Match an ASCII letter or digit.<br/>
+                    ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Optional (greedy).<br/>
-                        ○ Match a character in the set [\-0-9A-Za-z] greedily at most 61 times.<br/>
-                        ○ Match an ASCII letter or digit.<br/>
+                        ○ Match a character in the set [-0-9A-Za-z] greedily at most 61 times.<br/>
+                        ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Match '.'.<br/>
-            ○ Match an ASCII letter atomically at least twice.<br/>
+            ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -6573,9 +6595,9 @@
                     ○ 7th capture group.<br/>
                         ○ Loop greedily at least once.<br/>
                             ○ 8th capture group.<br/>
-                                ○ Match a character in the set [\-0-9A-Za-z] atomically at least once.<br/>
+                                ○ Match a character in the set [-0-9A-Za-z] atomically at least once.<br/>
                                 ○ Match '.'.<br/>
-                        ○ Match an ASCII letter atomically at least twice.<br/>
+                        ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -6900,6 +6922,8 @@
                 ○ Match '.'.<br/>
             ○ Match a Unicode digit atomically at least 1 and at most 3 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>and at most 3 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
         </member>
@@ -7052,7 +7076,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a hexadecimal digit exactly 32 times.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -7066,8 +7090,8 @@
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
-                    ○ Match a hexadecimal digit exactly 16 times.<br/>
-                    ○ Match a hexadecimal digit exactly 32 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 16 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -7335,7 +7359,7 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match an ASCII letter.<br/>
+                ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
                 ○ Match a Unicode digit.<br/>
@@ -7397,25 +7421,25 @@
             ○ Match '1'.<br/>
             ○ Match with 7 alternative expressions.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '3'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '4'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [579].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '5'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '6'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [6-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '7'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '8'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '9'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
             ○ Match a Unicode digit exactly 8 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -7445,31 +7469,31 @@
             ○ 1st capture group.<br/>
                 ○ Match with 9 alternative expressions.<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '0'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '1'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-356].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '2'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '3'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-6].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '4'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '5'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '6'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '7'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-5].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '8'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [013-6].<br/>
             ○ Match a Unicode digit exactly 4 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -8166,12 +8190,12 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match an ASCII letter.<br/>
+            ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [\-_] exactly 2 times.<br/>
-            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match an ASCII letter or digit.<br/>
+                ○ Match a character in the set [-_] exactly 2 times.<br/>
+            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match a character in the set [0-9A-Za-z].<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8717,20 +8741,6 @@
         <member name="M:Microsoft.Extensions.DependencyInjection.ValidationServiceCollectionExtensions.AddObjectValidation(Microsoft.Extensions.DependencyInjection.IServiceCollection,Limen.ValidationBuilder)">
             <summary>
                 添加数据验证服务
-            </summary>
-            <param name="services">
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </param>
-            <param name="validationBuilder">
-                <see cref="T:Limen.ValidationBuilder" />
-            </param>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-�据验证服务
             </summary>
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />

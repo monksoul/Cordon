@@ -2,6 +2,8 @@
 // 
 // 此源代码遵循位于源代码树根目录中的 LICENSE 文件的许可证。
 
+using System.Text.Json;
+
 namespace Limen.Tests;
 
 public class PropertyValidatorValidationTests
@@ -76,6 +78,15 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void WithMemberName_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ValidationModel>();
+        var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.WithMemberName((JsonNamingPolicy)null!));
+    }
+
+    [Fact]
     public void WithMemberName_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ValidationModel>();
@@ -84,8 +95,20 @@ public class PropertyValidatorValidationTests
 
         propertyValidator.WithMemberName("MyName");
         Assert.Equal("MyName", propertyValidator.MemberName);
-        propertyValidator.WithMemberName(null);
+        propertyValidator.WithMemberName((string?)null);
         Assert.Null(propertyValidator.MemberName);
+
+        propertyValidator.WithMemberName(JsonNamingPolicy.CamelCase);
+        Assert.Equal("data1", propertyValidator.MemberName);
+    }
+
+    [Fact]
+    public void WithName_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ValidationModel>();
+        var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.WithName((JsonNamingPolicy)null!));
     }
 
     [Fact]
@@ -97,8 +120,11 @@ public class PropertyValidatorValidationTests
 
         propertyValidator.WithName("MyName");
         Assert.Equal("MyName", propertyValidator.MemberName);
-        propertyValidator.WithName(null);
+        propertyValidator.WithName((string?)null);
         Assert.Null(propertyValidator.MemberName);
+
+        propertyValidator.WithName(JsonNamingPolicy.CamelCase);
+        Assert.Equal("data1", propertyValidator.MemberName);
     }
 
     [Fact]
