@@ -50,7 +50,7 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
         // 调用基类 GetValidationResults 方法
         validationResults.AddRange(base.GetValidationResults(instance, ruleSets) ?? []);
 
-        // 获取集合并遍历待验证的元素
+        // 获取集合并遍历用于验证的元素
         ForEachValidatedElement(instance, element =>
         {
             validationResults.AddRange(_elementValidator!.GetValidationResults(element, ruleSets) ?? []);
@@ -69,7 +69,7 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
         // 调用基类 Validate 方法
         base.Validate(instance, ruleSets);
 
-        // 获取集合并遍历待验证的元素
+        // 获取集合并遍历用于验证的元素
         ForEachValidatedElement(instance, element =>
         {
             _elementValidator!.Validate(element, ruleSets);
@@ -78,7 +78,7 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
     }
 
     /// <summary>
-    ///     筛选待验证的集合元素
+    ///     筛选用于验证的集合元素
     /// </summary>
     /// <param name="filter">过滤委托</param>
     /// <returns>
@@ -95,7 +95,7 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
     }
 
     /// <summary>
-    ///     筛选待验证的集合元素
+    ///     筛选用于验证的集合元素
     /// </summary>
     /// <param name="filter">过滤委托</param>
     /// <returns>
@@ -214,7 +214,7 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
     }
 
     /// <summary>
-    ///     筛选待验证的集合元素
+    ///     筛选用于验证的集合元素
     /// </summary>
     /// <param name="elements">
     ///     <see cref="IEnumerable{T}" />
@@ -238,7 +238,7 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
     }
 
     /// <summary>
-    ///     获取集合并遍历待验证的元素
+    ///     获取集合并遍历用于验证的元素
     /// </summary>
     /// <remarks>内部为每个元素设置带索引的成员路径（如 "Addresses[0]"），然后执行验证操作。支持短路退出：若操作返回 <c>false</c>，则立即终止遍历。</remarks>
     /// <param name="instance">对象</param>
@@ -271,7 +271,7 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
 
         try
         {
-            // 遍历待验证的集合元素
+            // 遍历用于验证的集合元素
             var index = 0;
             foreach (var element in GetValidatedElements(propertyValue, instance))
             {

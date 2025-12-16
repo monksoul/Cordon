@@ -776,6 +776,7 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator._propertyValidator._inheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             propertyValidator.SetValidator((ObjectValidator<SubModel>?)null));
+        Assert.Equal("Sub", propertyValidator._propertyValidator.MemberPath);
 
         var propertyValidator2 =
             new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] };
@@ -820,6 +821,50 @@ public class PropertyValidatorTests
         Assert.NotNull(propertyValidator2._propertyValidator);
         Assert.NotNull(propertyValidator2._propertyValidator._inheritedRuleSets);
         Assert.Equal(["login"], (string[]?)propertyValidator2._propertyValidator._inheritedRuleSets!);
+    }
+
+    [Fact]
+    public void Each_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, List<Child>>(u => u.Children, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.Each<Child>(null!));
+
+        var propertyValidator2 = new PropertyValidator<ObjectModel, List<Child>>(u => u.Children, objectValidator);
+        var exception = Assert.Throws<InvalidOperationException>(() => propertyValidator2.Each<Nested>(_ => { }));
+        Assert.Equal(
+            "The property 'Children' does not implement IEnumerable<Nested>. Use RuleForEach instead, or ensure the property type implements IEnumerable<Nested>.",
+            exception.Message);
+
+        var exception2 =
+            Assert.Throws<InvalidOperationException>(() =>
+                propertyValidator.When(u => u.Count > 0).Each<Child>(_ => { }));
+        Assert.Equal(
+            ".Each() must be called immediately after RuleFor(). Do not call ChildRules, SetValidator, When, or Unless before Each. To validate the entire collection, use RuleForEach() instead.",
+            exception2.Message);
+    }
+
+    [Fact]
+    public void Each_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        _ = new PropertyValidator<ObjectModel, List<Child>>(u => u.Children, objectValidator) { RuleSets = ["email"] }
+            .NotNull().NotEmpty().WithDisplayName("DisChildren").WithMemberName("MbChildren").CustomOnly()
+            .Each<Child>(u =>
+            {
+                u.RuleFor(c => c.Id).Min(10);
+            }).Must(d => d?.Any() == true);
+
+        Assert.Single(objectValidator.Validators);
+        var collectionPropertyValidator =
+            objectValidator.Validators[0] as CollectionPropertyValidator<ObjectModel, Child>;
+        Assert.NotNull(collectionPropertyValidator);
+        Assert.Equal(3, collectionPropertyValidator.Validators.Count);
+        Assert.True(collectionPropertyValidator.SuppressAnnotationValidation);
+        Assert.Equal("DisChildren", collectionPropertyValidator.DisplayName);
+        Assert.Equal("MbChildren", collectionPropertyValidator.MemberName);
+        Assert.NotNull(collectionPropertyValidator._elementValidator);
     }
 
     [Fact]
@@ -1096,9 +1141,18 @@ public class PropertyValidatorTests
     public void RepairMemberPaths_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = new PropertyValidator<ObjectModel, string>(u => u.Name, objectValidator);
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator).ChildRules(c =>
+            {
+                c.RuleFor(u => u.Id).Min(3);
+            });
         propertyValidator.RepairMemberPaths();
-        Assert.Null(propertyValidator._propertyValidator);
+        Assert.NotNull(propertyValidator._propertyValidator);
+        Assert.Equal("Sub", propertyValidator._propertyValidator.MemberPath);
+        var subPropertyValidator =
+            propertyValidator._propertyValidator.Validators[0] as PropertyValidator<SubModel, int>;
+        Assert.NotNull(subPropertyValidator);
+        Assert.Equal("Sub.Id", subPropertyValidator.GetMemberPath());
     }
 
     [Fact]
@@ -1178,6 +1232,8 @@ public class PropertyValidatorTests
         [DisplayName("Age")] public int YourAge { get; set; }
 
         public SubModel? Sub { get; set; }
+
+        public List<Child>? Children { get; set; }
     }
 
     public class SubModel
@@ -1206,6 +1262,11 @@ public class PropertyValidatorTests
     }
 
     public class Nested
+    {
+        public int Id { get; set; }
+    }
+
+    public class Child
     {
         public int Id { get; set; }
     }

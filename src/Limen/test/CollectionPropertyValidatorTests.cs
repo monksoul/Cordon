@@ -273,6 +273,7 @@ public class CollectionPropertyValidatorTests
         Assert.Null(propertyValidator._elementValidator._inheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             propertyValidator.SetValidator((ObjectValidator<Child>?)null));
+        Assert.Equal("Children", propertyValidator._elementValidator.MemberPath);
 
         var propertyValidator2 =
             new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator)
@@ -403,9 +404,16 @@ public class CollectionPropertyValidatorTests
     public void RepairMemberPaths_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator);
+        var propertyValidator =
+            new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator).ChildRules(c =>
+                c.RuleFor(b => b.Name));
         propertyValidator.RepairMemberPaths();
-        Assert.Null(propertyValidator._elementValidator);
+        Assert.NotNull(propertyValidator._elementValidator);
+        Assert.Equal("Children", propertyValidator._elementValidator.MemberPath);
+        var subPropertyValidator =
+            propertyValidator._elementValidator.Validators[0] as PropertyValidator<Child, string>;
+        Assert.NotNull(subPropertyValidator);
+        Assert.Equal("Children.Name", subPropertyValidator.GetMemberPath());
     }
 
     public class ObjectModel

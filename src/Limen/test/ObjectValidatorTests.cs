@@ -859,6 +859,24 @@ public class ObjectValidatorTests
         Assert.Equal(["rule"], (string[]?)validator._inheritedRuleSets!);
     }
 
+    [Fact]
+    public void ResolveValidationRuleSets_ReturnOK()
+    {
+        var validator = new ObjectValidator<ObjectModel>();
+        Assert.Null(validator.ResolveValidationRuleSets(null));
+        Assert.Equal(["login"], (string[]?)validator.ResolveValidationRuleSets(["login"])!);
+
+        var services = new ServiceCollection();
+        services.AddScoped<IValidationDataContext, ValidationDataContext>();
+        using var serviceProvider = services.BuildServiceProvider();
+        var dataContext = serviceProvider.GetRequiredService<IValidationDataContext>();
+        dataContext.SetValidationOptions(new ValidationOptionsMetadata(["login", "email"]));
+
+        validator.InitializeServiceProvider(serviceProvider.GetService);
+        Assert.Equal(["login", "email"], (string[]?)validator.ResolveValidationRuleSets(null)!);
+        Assert.Equal(["login"], (string[]?)validator.ResolveValidationRuleSets(["login"])!);
+    }
+
     public class ObjectModel
     {
         [Range(1, int.MaxValue)] public int Id { get; set; }
