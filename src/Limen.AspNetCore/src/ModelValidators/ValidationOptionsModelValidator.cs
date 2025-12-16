@@ -12,12 +12,6 @@ internal sealed class ValidationOptionsModelValidator : IModelValidator
     /// <inheritdoc />
     public IEnumerable<ModelValidationResult> Validate(ModelValidationContext context)
     {
-        // 检查是否是 ControllerActionDescriptor 实例
-        if (context.ActionContext.ActionDescriptor is not ControllerActionDescriptor actionDescriptor)
-        {
-            yield break;
-        }
-
         // 尝试获取验证数据上下文服务
         if (context.ActionContext.HttpContext.RequestServices.GetService<IValidationDataContext>() is not
             ValidationDataContext validationDataContext)
@@ -32,7 +26,16 @@ internal sealed class ValidationOptionsModelValidator : IModelValidator
         }
 
         // 提取验证选项
-        var validationOptionsMetadata = ExtractFromAction(actionDescriptor) ?? ExtractFromController(actionDescriptor);
+        var validationOptionsMetadata = context.ActionContext.ActionDescriptor switch
+        {
+            // 检查是否是 ControllerActionDescriptor 实例（MVC）项目
+            ControllerActionDescriptor actionDescriptor => ExtractFromAction(actionDescriptor.MethodInfo) ??
+                                                           ExtractFromController(actionDescriptor.ControllerTypeInfo),
+            // 检查是否是 CompiledPageActionDescriptor 实例（Razor Pages）项目
+            // TODO: 无法解析出具体的 HandleMethod 方法
+            CompiledPageActionDescriptor actionDescriptor => ExtractFromController(actionDescriptor.ModelTypeInfo!),
+            _ => null
+        };
 
         // 空检查
         if (validationOptionsMetadata is not null)
@@ -45,26 +48,26 @@ internal sealed class ValidationOptionsModelValidator : IModelValidator
     /// <summary>
     ///     从 Action 方法提取验证选项
     /// </summary>
-    /// <param name="actionDescriptor">
-    ///     <see cref="ControllerActionDescriptor" />
+    /// <param name="methodInfo">
+    ///     <see cref="MethodInfo" />
     /// </param>
     /// <returns>
     ///     <see cref="ValidationOptionsMetadata" />
     /// </returns>
-    internal static ValidationOptionsMetadata? ExtractFromAction(ControllerActionDescriptor actionDescriptor) =>
-        CreateMetadata(actionDescriptor.MethodInfo.GetCustomAttribute<ValidationOptionsAttribute>(true));
+    internal static ValidationOptionsMetadata? ExtractFromAction(MethodInfo methodInfo) =>
+        CreateMetadata(methodInfo.GetCustomAttribute<ValidationOptionsAttribute>(true));
 
     /// <summary>
     ///     从 Controller 类提取验证选项
     /// </summary>
-    /// <param name="actionDescriptor">
-    ///     <see cref="ControllerActionDescriptor" />
+    /// <param name="declaredTypeInfo">
+    ///     <see cref="TypeInfo" />
     /// </param>
     /// <returns>
     ///     <see cref="ValidationOptionsMetadata" />
     /// </returns>
-    internal static ValidationOptionsMetadata? ExtractFromController(ControllerActionDescriptor actionDescriptor) =>
-        CreateMetadata(actionDescriptor.ControllerTypeInfo.GetCustomAttribute<ValidationOptionsAttribute>(true));
+    internal static ValidationOptionsMetadata? ExtractFromController(TypeInfo declaredTypeInfo) =>
+        CreateMetadata(declaredTypeInfo.GetCustomAttribute<ValidationOptionsAttribute>(true));
 
     /// <summary>
     ///     从 <see cref="ValidationOptionsAttribute" /> 中创建 <see cref="ValidationOptionsMetadata" /> 实例

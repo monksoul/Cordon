@@ -29,23 +29,23 @@
         <member name="M:Limen.ValidationOptionsModelValidator.Validate(Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ModelValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Limen.ValidationOptionsModelValidator.ExtractFromAction(Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)">
+        <member name="M:Limen.ValidationOptionsModelValidator.ExtractFromAction(System.Reflection.MethodInfo)">
             <summary>
                 从 Action 方法提取验证选项
             </summary>
-            <param name="actionDescriptor">
-                <see cref="T:Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor" />
+            <param name="methodInfo">
+                <see cref="T:System.Reflection.MethodInfo" />
             </param>
             <returns>
                 <see cref="T:Limen.ValidationOptionsMetadata" />
             </returns>
         </member>
-        <member name="M:Limen.ValidationOptionsModelValidator.ExtractFromController(Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor)">
+        <member name="M:Limen.ValidationOptionsModelValidator.ExtractFromController(System.Reflection.TypeInfo)">
             <summary>
                 从 Controller 类提取验证选项
             </summary>
-            <param name="actionDescriptor">
-                <see cref="T:Microsoft.AspNetCore.Mvc.Controllers.ControllerActionDescriptor" />
+            <param name="declaredTypeInfo">
+                <see cref="T:System.Reflection.TypeInfo" />
             </param>
             <returns>
                 <see cref="T:Limen.ValidationOptionsMetadata" />

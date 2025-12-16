@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Limen.AspNetCore", "Limen.A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Limen.AspNetCore.Tests", "Limen.AspNetCore\test\Limen.AspNetCore.Tests.csproj", "{ADBABE9F-8035-4151-B9A6-4FFCE16C5AC7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Limen.RazorPages.Samples", "..\samples\Limen.RazorPages.Samples\Limen.RazorPages.Samples.csproj", "{643B320B-D81E-4E00-9924-11747E816230}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{ADBABE9F-8035-4151-B9A6-4FFCE16C5AC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADBABE9F-8035-4151-B9A6-4FFCE16C5AC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADBABE9F-8035-4151-B9A6-4FFCE16C5AC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{643B320B-D81E-4E00-9924-11747E816230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{643B320B-D81E-4E00-9924-11747E816230}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{643B320B-D81E-4E00-9924-11747E816230}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{643B320B-D81E-4E00-9924-11747E816230}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
