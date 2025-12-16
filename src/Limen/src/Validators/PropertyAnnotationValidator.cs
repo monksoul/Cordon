@@ -238,7 +238,15 @@ public class PropertyAnnotationValidator<T> : ValidatorBase<T>, IValidatorInitia
     /// </returns>
     public string GetDisplayName(string? name) =>
         name ?? Property.GetCustomAttribute<DisplayAttribute>(false)?.GetName() ??
-        Property.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName ?? Property.Name;
+        Property.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName ?? GetMemberName();
+
+    /// <summary>
+    ///     获取成员名称
+    /// </summary>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    public string GetMemberName() => Property.Name;
 
     /// <summary>
     ///     创建 <see cref="ValidationContext" /> 实例

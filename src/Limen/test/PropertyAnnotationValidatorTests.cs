@@ -210,6 +210,13 @@ public class PropertyAnnotationValidatorTests
     }
 
     [Fact]
+    public void GetMemberName_ReturnOK()
+    {
+        var validator = new PropertyAnnotationValidator<PropertyClassTest2>(u => u.Name);
+        Assert.Equal("Name", validator.GetMemberName());
+    }
+
+    [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
         var validator = new PropertyAnnotationValidator<PropertyClassTest2>(u => u.Name);

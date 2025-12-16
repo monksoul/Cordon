@@ -12,4 +12,5 @@ global using System.Xml;
 global using System.Xml.Linq;
 global using Limen.Samples.Models;
 global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 global using Microsoft.Extensions.Options;

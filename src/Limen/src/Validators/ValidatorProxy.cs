@@ -352,7 +352,7 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IVal
     /// </param>
     internal void OnPropertyChanged(object? sender, ValidationPropertyChangedEventArgs eventArgs)
     {
-        _propertyChanges.AddOrUpdate(eventArgs.PropertyName!, eventArgs.PropertyValue);
+        _propertyChanges[eventArgs.PropertyName!] = eventArgs.PropertyValue;
 
         // 清除缓存以确保新实例获取最新属性
         _validatorCache.Clear();

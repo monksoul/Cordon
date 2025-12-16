@@ -616,11 +616,11 @@ public partial class PropertyValidator<T, TProperty> :
     /// </returns>
     internal string GetMemberPath()
     {
-        // 获取属性名称和父级属性路径
-        var propertyName = _annotationValidator.Property.Name;
+        // 获取属性（成员）名称和父级属性路径
+        var memberName = _annotationValidator.GetMemberName();
         var parentPath = _objectValidator.MemberPath;
 
-        return string.IsNullOrWhiteSpace(parentPath) ? propertyName : $"{parentPath}.{propertyName}";
+        return string.IsNullOrWhiteSpace(parentPath) ? memberName : $"{parentPath}.{memberName}";
     }
 
     /// <summary>

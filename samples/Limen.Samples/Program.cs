@@ -1,6 +1,9 @@
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddValidationOptions();
+builder.Services.AddControllers(options =>
+{
+    // options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
+}).AddValidationOptions();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
