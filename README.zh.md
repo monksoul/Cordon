@@ -41,15 +41,13 @@ public class User : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext context)
     {
-        return context.ValidateUsing<User>(validator =>
-        {
-            validator.RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("{0} 不是有效的互联网用户名")
-                     .RuleFor(u => u.Id).Max(int.MaxValue)
-                     .RuleSet("rule", () => 
-                     {
-                         validator.RuleFor(u => u.Name).EmailAddress().WithMessage("{0} 不是有效的电子邮箱格式");
-                     });
-        });
+        return context.ContinueWith<User>()
+            .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("{0} 不是有效的互联网用户名")
+            .RuleFor(u => u.Id).Max(int.MaxValue)
+            .RuleSet("rule", validator => 
+            {
+                validator.RuleFor(u => u.Name).EmailAddress().WithMessage("{0} 不是有效的电子邮箱格式");
+            }).ToResults();
     }
 }
 ```

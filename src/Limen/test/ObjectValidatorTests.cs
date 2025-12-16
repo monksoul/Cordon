@@ -31,6 +31,7 @@ public class ObjectValidatorTests
         Assert.Null(validator.WhenCondition);
         Assert.Null(validator.UnlessCondition);
         Assert.Null(validator.MemberPath);
+        Assert.NotNull(ObjectValidator<Tests.ObjectModel>.ValidationContextsKey);
 
         using var validator2 =
             new ObjectValidator<ObjectModel>(new ValidatorOptions { SuppressAnnotationValidation = true }, null);
@@ -793,11 +794,48 @@ public class ObjectValidatorTests
     [Fact]
     public void Dispose_ReturnOK()
     {
-        var validator = new ObjectValidator<ObjectModel>();
+        var validator = new ObjectValidator<ObjectModel>(new ValidatorOptions(),
+            new Dictionary<object, object?> { { "name", "Furion" } });
+        Assert.NotNull(validator._items);
+        Assert.Single(validator._items);
+
         validator.Dispose();
 
         validator.Options.ValidateAllProperties = false;
         Assert.True(validator._annotationValidator.ValidateAllProperties);
+        Assert.Empty(validator._items);
+    }
+
+    [Fact]
+    public void ToResults_Invalid_Parameters()
+    {
+        var validator = new ObjectValidator<ObjectModel>();
+        Assert.Throws<ArgumentNullException>(() => validator.ToResults(null!));
+
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.ToResults());
+        Assert.Equal(
+            "The parameterless 'ToResults()' method can only be used when the validator is created via 'ValidationContext.ContinueWith<T>()'. Ensure you are calling it inside 'IValidatableObject.Validate' and have used 'ContinueWith' to configure inline validation rules.",
+            exception.Message);
+    }
+
+    [Fact]
+    public void ToResults_ReturnOK()
+    {
+        var validationContext = new ValidationContext(new ObjectModel());
+        var validator = new ObjectValidator<ObjectModel>(new ValidatorOptions(),
+            new Dictionary<object, object?>
+            {
+                { ObjectValidator<ObjectModel>.ValidationContextsKey, validationContext }
+            });
+
+        Assert.Equal(["The field Id must be between 1 and 2147483647.", "The Name field is required."],
+            validator.ToResults().Select(u => u.ErrorMessage!).ToArray());
+
+        Assert.Equal(["The field Id must be between 1 and 2147483647.", "The Name field is required."],
+            validator.ToResults(validationContext).Select(u => u.ErrorMessage!).ToArray());
+
+        Assert.NotNull(validator._items);
+        Assert.Empty(validator._items);
     }
 
     [Fact]

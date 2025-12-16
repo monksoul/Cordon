@@ -1751,6 +1751,38 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void ToResults_Invalid_Parameters()
+    {
+        var validator = new ObjectValidator<ObjectModel>();
+        Assert.Throws<ArgumentNullException>(() => validator.RuleFor(u => u.Name).ToResults(null!));
+
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.RuleFor(u => u.Name).ToResults());
+        Assert.Equal(
+            "The parameterless 'ToResults()' method can only be used when the validator is created via 'ValidationContext.ContinueWith<T>()'. Ensure you are calling it inside 'IValidatableObject.Validate' and have used 'ContinueWith' to configure inline validation rules.",
+            exception.Message);
+    }
+
+    [Fact]
+    public void ToResults_ReturnOK()
+    {
+        var validationContext = new ValidationContext(new ObjectModel());
+        var validator = new ObjectValidator<ObjectModel>(new ValidatorOptions(),
+            new Dictionary<object, object?>
+            {
+                { ObjectValidator<ObjectModel>.ValidationContextsKey, validationContext }
+            }).RuleFor(u => u.Name).Required();
+
+        Assert.Equal(["The Name field is required.", "The Name field is required.", "The Name field is required."],
+            validator.ToResults().Select(u => u.ErrorMessage!).ToArray());
+
+        Assert.Equal(["The Name field is required.", "The Name field is required.", "The Name field is required."],
+            validator.ToResults(validationContext).Select(u => u.ErrorMessage!).ToArray());
+
+        Assert.NotNull(validator._items);
+        Assert.Empty(validator._items);
+    }
+
+    [Fact]
     public void Build_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ValidationModel>();

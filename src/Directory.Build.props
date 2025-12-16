@@ -9,7 +9,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageOutputPath>$(SolutionDir)nupkgs</PackageOutputPath>
-        <Version>0.0.7</Version>
+        <Version>0.0.8</Version>
         <PackageVersion>$(Version)</PackageVersion>
         <Authors>百小僧</Authors>
         <Description>Limen 是一个为 .NET 开发者打造的高表现力数据校验库，通过链式语法与可扩展规则引擎，为数据流动设置精准的“警戒线”。无论是验证 API 输入、表单提交，还是清洗异构数据流，Limen 都能以极简代码实现企业级校验强度。</Description>

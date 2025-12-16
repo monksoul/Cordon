@@ -11,19 +11,29 @@ public class User : IValidatableObject
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
+        return validationContext.ContinueWith<User>()
+            .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
+            .RuleFor(u => u.Id).Max(int.MaxValue)
+            .RuleForEach(u => u.Addresses).ChildRules(u =>
+            {
+                u.RuleFor(c => c.Country).Required()
+                    .RuleFor(c => c.Province).Required()
+                    .RuleFor(c => c.City).Required();
+            }).ToResults();
+
         // return validationContext.ValidateWith(new UserValidator());
 
-        return validationContext.ValidateUsing<User>(validator =>
-        {
-            validator.RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
-                .RuleFor(u => u.Id).Max(int.MaxValue)
-                .RuleForEach(u => u.Addresses).ChildRules(u =>
-                {
-                    u.RuleFor(c => c.Country).Required()
-                        .RuleFor(c => c.Province).Required()
-                        .RuleFor(c => c.City).Required();
-                });
-        });
+        // return validationContext.ValidateUsing<User>(validator =>
+        // {
+        //     validator.RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
+        //         .RuleFor(u => u.Id).Max(int.MaxValue)
+        //         .RuleForEach(u => u.Addresses).ChildRules(u =>
+        //         {
+        //             u.RuleFor(c => c.Country).Required()
+        //                 .RuleFor(c => c.Province).Required()
+        //                 .RuleFor(c => c.City).Required();
+        //         });
+        // });
     }
 }
 

@@ -36,6 +36,22 @@ public class ValidationExtensionsTests
         Assert.Throws<ArgumentNullException>(() => ValidationExtensions.WithRuleSets(null!));
 
     [Fact]
+    public void ContinueWith_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => ValidationExtensions.ContinueWith<ObjectModel>(null!));
+
+    [Fact]
+    public void ContinueWith_ReturnOK()
+    {
+        var validationContext = new ValidationContext(new ObjectModel(), null, null);
+        var objectValidator = validationContext.ContinueWith<Tests.ObjectModel>();
+        Assert.NotNull(objectValidator);
+        Assert.NotNull(objectValidator._items);
+        Assert.Single(objectValidator._items);
+        Assert.Equal(validationContext,
+            objectValidator._items[ObjectValidator<Tests.ObjectModel>.ValidationContextsKey]);
+    }
+
+    [Fact]
     public void WithRuleSets_ReturnOK()
     {
         var validationContext = new ValidationContext(new object(), null, null);

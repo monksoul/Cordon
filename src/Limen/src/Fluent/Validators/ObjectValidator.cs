@@ -10,6 +10,14 @@ namespace Limen;
 /// <typeparam name="T">对象类型</typeparam>
 public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
 {
+    /// <summary>
+    ///     验证上下文键
+    /// </summary>
+    /// <remarks>
+    ///     用于使用 <![CDATA[ValidationContext.ContinueWith<T>()]]> 时设置。
+    /// </remarks>
+    internal static readonly object ValidationContextsKey = new();
+
     /// <inheritdoc cref="ObjectAnnotationValidator" />
     internal readonly ObjectAnnotationValidator _annotationValidator;
 
@@ -478,6 +486,67 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     public ObjectValidator<T> CustomOnly() => UseAnnotationValidation(false);
 
     /// <summary>
+    ///     获取对象验证结果集合
+    /// </summary>
+    /// <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>
+    /// <returns>
+    ///     <see cref="List{T}" />
+    /// </returns>
+    public List<ValidationResult> ToResults(bool disposeAfterValidation = true)
+    {
+        // 查找验证上下文数据中是否包含 ValidationContextsKey 键数据
+        if (_items?.TryGetValue(ValidationContextsKey, out var validationContextObject) == true &&
+            validationContextObject is ValidationContext validationContext)
+        {
+            return ToResults(validationContext, disposeAfterValidation);
+        }
+
+        throw new InvalidOperationException(
+            "The parameterless 'ToResults()' method can only be used when the validator is created via 'ValidationContext.ContinueWith<T>()'. Ensure you are calling it inside 'IValidatableObject.Validate' and have used 'ContinueWith' to configure inline validation rules.");
+    }
+
+    /// <summary>
+    ///     获取对象验证结果集合
+    /// </summary>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext" />
+    /// </param>
+    /// <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>
+    /// <returns>
+    ///     <see cref="List{T}" />
+    /// </returns>
+    public List<ValidationResult> ToResults(ValidationContext validationContext, bool disposeAfterValidation = true)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validationContext);
+
+        // 同步 IServiceProvider 委托
+        InitializeServiceProvider(validationContext.GetService);
+
+        // 尝试从 ValidationContext.Items 中解析验证选项中的规则集
+        string?[]? ruleSets = null;
+        if (validationContext.Items.TryGetValue(ValidationDataContext.ValidationOptionsKey, out var metadataObj) &&
+            metadataObj is ValidationOptionsMetadata metadata)
+        {
+            ruleSets = metadata.RuleSets;
+        }
+
+        try
+        {
+            // 获取对象验证结果集合
+            return GetValidationResults((T)validationContext.ObjectInstance, ruleSets) ?? [];
+        }
+        finally
+        {
+            // 自动释放资源
+            if (disposeAfterValidation)
+            {
+                Dispose();
+            }
+        }
+    }
+
+    /// <summary>
     ///     释放资源
     /// </summary>
     /// <param name="disposing">是否释放托管资源</param>
@@ -490,6 +559,9 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
 
         // 移除 ValidatorOptions 属性变更事件
         Options.PropertyChanged -= OptionsOnPropertyChanged;
+
+        // 清空验证上下文数据
+        _items?.Clear();
 
         // 释放所有属性验证器资源
         foreach (var propertyValidator in Validators)
