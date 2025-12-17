@@ -20,6 +20,11 @@ public class ValidationMvcBuilderExtensionsTests
         Assert.Equal(3, mvcOptions.ModelValidatorProviders.Count);
         Assert.Equal(typeof(ValidationOptionsModelValidatorProvider),
             mvcOptions.ModelValidatorProviders.First().GetType());
+        
+        Assert.NotNull(mvcOptions.Filters);
+        Assert.Equal(2, mvcOptions.Filters.Count);
+        Assert.Equal(typeof(ValidationOptionsAsyncPageFilter),
+            mvcOptions.Filters.Last().GetType());
     }
 
     [Fact]
@@ -36,5 +41,10 @@ public class ValidationMvcBuilderExtensionsTests
         Assert.Equal(3, mvcOptions.ModelValidatorProviders.Count);
         Assert.Equal(typeof(ValidationOptionsModelValidatorProvider),
             mvcOptions.ModelValidatorProviders.First().GetType());
+        
+        Assert.NotNull(mvcOptions.Filters);
+        Assert.Equal(2, mvcOptions.Filters.Count);
+        Assert.Equal(typeof(ValidationOptionsAsyncPageFilter),
+            mvcOptions.Filters.Last().GetType());
     }
 }

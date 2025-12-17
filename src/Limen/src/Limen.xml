@@ -1651,6 +1651,9 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1660,11 +1663,8 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
-        </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -2981,7 +2981,7 @@
                 <see cref="T:System.Object" />
             </param>
             <param name="count">数量</param>
-            <returns>
+            <re        <returns>
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
@@ -3080,8 +3080,7 @@
             <summary>
                 获取对象验证结果集合
             </summary>
-            <param name="validators"><see cref="T:Limen.IObjectValidator`1" /> 集合</param>
-            <param name="instance">对象</param>
+            <param name="validators"><see cref="T:Limen.IObjectValidator`1" /> 集合</pa       <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.Collections.Generic.List`1" />
@@ -3691,6 +3690,7 @@
                 获取对象验证结果集合
             </summary>
             <param name="validationContext">
+ ontext">
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
             </param>
             <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>
