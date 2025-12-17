@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// <summary>
 ///     数据验证模块 <see cref="IServiceCollection" /> 拓展类
 /// </summary>
-public static class ValidationServiceCollectionExtensions
+public static class ObjectValidationServiceCollectionExtensions
 {
     /// <summary>
     ///     添加数据验证服务

@@ -32,6 +32,11 @@ public static class ValidationMvcBuilderExtensions
             {
                 options.ModelValidatorProviders.Insert(0, new ValidationOptionsModelValidatorProvider());
             }
+
+            if (!options.Filters.OfType<ValidationOptionsAsyncPageFilter>().Any())
+            {
+                options.Filters.Add(new ValidationOptionsAsyncPageFilter());
+            }
         });
 
         return mvcBuilder;

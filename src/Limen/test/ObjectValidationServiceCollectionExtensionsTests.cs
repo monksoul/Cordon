@@ -4,7 +4,7 @@
 
 namespace Limen.Tests;
 
-public class ValidationServiceCollectionExtensionsTests
+public class ObjectValidationServiceCollectionExtensionsTests
 {
     [Fact]
     public void AddObjectValidation_Invalid_Parameters()

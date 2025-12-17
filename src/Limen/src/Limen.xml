@@ -3945,6 +3945,15 @@
                 <see cref="T:Limen.PropertyValidator`2" />
             </returns>
         </member>
+        <member name="M:Limen.PropertyValidator`2.WithName(System.String)">
+            <summary>
+                设置成员名称
+            </summary>
+            <param name="memberName">成员名称</param>
+            <returns>
+                <see cref="T:Limen.PropertyValidator`2" />
+            </returns>
+        </member>
         <member name="M:Limen.PropertyValidator`2.WithMemberName(System.Text.Json.JsonNamingPolicy)">
             <summary>
                 设置成员名称
@@ -3967,11 +3976,20 @@
                 <see cref="T:Limen.PropertyValidator`2" />
             </returns>
         </member>
-        <member name="M:Limen.PropertyValidator`2.WithName(System.String)">
+        <member name="M:Limen.PropertyValidator`2.WithMemberName(System.Func{System.Reflection.PropertyInfo,System.String})">
             <summary>
                 设置成员名称
             </summary>
-            <param name="memberName">成员名称</param>
+            <param name="memberNameProvider">成员名称获取委托</param>
+            <returns>
+                <see cref="T:Limen.PropertyValidator`2" />
+            </returns>
+        </member>
+        <member name="M:Limen.PropertyValidator`2.WithName(System.Func{System.Reflection.PropertyInfo,System.String})">
+            <summary>
+                设置成员名称
+            </summary>
+            <param name="memberNameProvider">成员名称获取委托</param>
             <returns>
                 <see cref="T:Limen.PropertyValidator`2" />
             </returns>
@@ -6922,8 +6940,6 @@
                 ○ Match '.'.<br/>
             ○ Match a Unicode digit atomically at least 1 and at most 3 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
-            </code>and at most 3 times.<br/>
-            ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
         </member>
@@ -7421,25 +7437,25 @@
             ○ Match '1'.<br/>
             ○ Match with 7 alternative expressions.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '3'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '4'.<br/>
                     ○ Match a character in the set [579].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '5'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '6'.<br/>
                     ○ Match a character in the set [6-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '7'.<br/>
                     ○ Match a character in the set [0-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '8'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '9'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
             ○ Match a Unicode digit exactly 8 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -7469,31 +7485,31 @@
             ○ 1st capture group.<br/>
                 ○ Match with 9 alternative expressions.<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '0'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '1'.<br/>
                         ○ Match a character in the set [0-356].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '2'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '3'.<br/>
                         ○ Match a character in the set [0-6].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '4'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '5'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '6'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '7'.<br/>
                         ○ Match a character in the set [0-5].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '8'.<br/>
                         ○ Match a character in the set [013-6].<br/>
             ○ Match a Unicode digit exactly 4 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -8721,12 +8737,12 @@
         <member name="M:Limen.ValueAnnotationValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc cref="M:Limen.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
-        <member name="T:Microsoft.Extensions.DependencyInjection.ValidationServiceCollectionExtensions">
+        <member name="T:Microsoft.Extensions.DependencyInjection.ObjectValidationServiceCollectionExtensions">
             <summary>
                 数据验证模块 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> 拓展类
             </summary>
         </member>
-        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationServiceCollectionExtensions.AddObjectValidation(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Limen.ValidationBuilder})">
+        <member name="M:Microsoft.Extensions.DependencyInjection.ObjectValidationServiceCollectionExtensions.AddObjectValidation(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Limen.ValidationBuilder})">
             <summary>
                 添加数据验证服务
             </summary>
@@ -8738,13 +8754,23 @@
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </returns>
         </member>
-        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationServiceCollectionExtensions.AddObjectValidation(Microsoft.Extensions.DependencyInjection.IServiceCollection,Limen.ValidationBuilder)">
+        <member name="M:Microsoft.Extensions.DependencyInjection.ObjectValidationServiceCollectionExtensions.AddObjectValidation(Microsoft.Extensions.DependencyInjection.IServiceCollection,Limen.ValidationBuilder)">
             <summary>
                 添加数据验证服务
             </summary>
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Limen.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+      </param>
             <param name="validationBuilder">
                 <see cref="T:Limen.ValidationBuilder" />
             </param>

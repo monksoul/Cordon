@@ -4,6 +4,7 @@
 
 global using Limen;
 global using Microsoft.AspNetCore.Mvc.Controllers;
+global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 global using Microsoft.AspNetCore.Mvc.RazorPages;
 global using Microsoft.Extensions.DependencyInjection;

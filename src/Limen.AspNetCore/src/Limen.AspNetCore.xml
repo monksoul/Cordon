@@ -21,6 +21,17 @@
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" />
             </returns>
         </member>
+        <member name="T:Limen.ValidationOptionsAsyncPageFilter">
+            <summary>
+                验证选项元数据提取验证器
+            </summary>
+        </member>
+        <member name="M:Limen.ValidationOptionsAsyncPageFilter.OnPageHandlerSelectionAsync(Microsoft.AspNetCore.Mvc.Filters.PageHandlerSelectedContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Limen.ValidationOptionsAsyncPageFilter.OnPageHandlerExecutionAsync(Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutingContext,Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutionDelegate)">
+            <inheritdoc />
+        </member>
         <member name="T:Limen.ValidationOptionsModelValidator">
             <summary>
                 验证选项元数据提取验证器

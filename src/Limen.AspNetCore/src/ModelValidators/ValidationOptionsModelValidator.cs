@@ -12,6 +12,12 @@ internal sealed class ValidationOptionsModelValidator : IModelValidator
     /// <inheritdoc />
     public IEnumerable<ModelValidationResult> Validate(ModelValidationContext context)
     {
+        // 检查 context.ActionContext.ActionDescriptor 是否是 ControllerActionDescriptor（MVC）
+        if (context.ActionContext.ActionDescriptor is not ControllerActionDescriptor actionDescriptor)
+        {
+            yield break;
+        }
+
         // 尝试获取验证数据上下文服务
         if (context.ActionContext.HttpContext.RequestServices.GetService<IValidationDataContext>() is not
             ValidationDataContext validationDataContext)
@@ -26,16 +32,8 @@ internal sealed class ValidationOptionsModelValidator : IModelValidator
         }
 
         // 提取验证选项
-        var validationOptionsMetadata = context.ActionContext.ActionDescriptor switch
-        {
-            // 检查是否是 ControllerActionDescriptor 实例（MVC）项目
-            ControllerActionDescriptor actionDescriptor => ExtractFromAction(actionDescriptor.MethodInfo) ??
-                                                           ExtractFromController(actionDescriptor.ControllerTypeInfo),
-            // 检查是否是 CompiledPageActionDescriptor 实例（Razor Pages）项目
-            // TODO: 无法解析出具体的 HandleMethod 方法
-            CompiledPageActionDescriptor actionDescriptor => ExtractFromController(actionDescriptor.ModelTypeInfo!),
-            _ => null
-        };
+        var validationOptionsMetadata = ExtractFromAction(actionDescriptor.MethodInfo) ??
+                                        ExtractFromController(actionDescriptor.ControllerTypeInfo);
 
         // 空检查
         if (validationOptionsMetadata is not null)

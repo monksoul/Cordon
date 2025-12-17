@@ -1,6 +1,5 @@
 ﻿namespace Limen.RazorPages.Samples.Pages;
 
-[ValidationOptions(["create"])]
 public class CreateModel : PageModel
 {
     [BindProperty] public Customer? Customer { get; set; }
@@ -10,9 +9,11 @@ public class CreateModel : PageModel
         return Page();
     }
 
+    // [ValidationOptions(["create"])]
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid) return Page();
+        ;
 
         await Task.Delay(100);
 

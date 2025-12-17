@@ -2,8 +2,6 @@
 // 
 // 此源代码遵循位于源代码树根目录中的 LICENSE 文件的许可证。
 
-using System.Text.Json;
-
 namespace Limen.Tests;
 
 public class PropertyValidatorValidationTests
@@ -84,6 +82,8 @@ public class PropertyValidatorValidationTests
         var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
 
         Assert.Throws<ArgumentNullException>(() => propertyValidator.WithMemberName((JsonNamingPolicy)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            propertyValidator.WithMemberName((Func<PropertyInfo, string?>)null!));
     }
 
     [Fact]
@@ -100,6 +100,9 @@ public class PropertyValidatorValidationTests
 
         propertyValidator.WithMemberName(JsonNamingPolicy.CamelCase);
         Assert.Equal("data1", propertyValidator.MemberName);
+
+        propertyValidator.WithMemberName(p => p.Name);
+        Assert.Equal("Data1", propertyValidator.MemberName);
     }
 
     [Fact]
@@ -109,6 +112,7 @@ public class PropertyValidatorValidationTests
         var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
 
         Assert.Throws<ArgumentNullException>(() => propertyValidator.WithName((JsonNamingPolicy)null!));
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.WithName((Func<PropertyInfo, string?>)null!));
     }
 
     [Fact]
@@ -125,6 +129,9 @@ public class PropertyValidatorValidationTests
 
         propertyValidator.WithName(JsonNamingPolicy.CamelCase);
         Assert.Equal("data1", propertyValidator.MemberName);
+
+        propertyValidator.WithName(p => p.Name);
+        Assert.Equal("Data1", propertyValidator.MemberName);
     }
 
     [Fact]

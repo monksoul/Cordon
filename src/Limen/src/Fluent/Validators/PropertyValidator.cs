@@ -472,6 +472,15 @@ public partial class PropertyValidator<T, TProperty> :
     /// <summary>
     ///     设置成员名称
     /// </summary>
+    /// <param name="memberName">成员名称</param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> WithName(string? memberName) => WithMemberName(memberName);
+
+    /// <summary>
+    ///     设置成员名称
+    /// </summary>
     /// <param name="jsonNamingPolicy">
     ///     <see cref="JsonNamingPolicy" />
     /// </param>
@@ -503,11 +512,29 @@ public partial class PropertyValidator<T, TProperty> :
     /// <summary>
     ///     设置成员名称
     /// </summary>
-    /// <param name="memberName">成员名称</param>
+    /// <param name="memberNameProvider">成员名称获取委托</param>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> WithName(string? memberName) => WithMemberName(memberName);
+    public PropertyValidator<T, TProperty> WithMemberName(Func<PropertyInfo, string?> memberNameProvider)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(memberNameProvider);
+
+        MemberName = memberNameProvider(_annotationValidator.Property);
+
+        return this;
+    }
+
+    /// <summary>
+    ///     设置成员名称
+    /// </summary>
+    /// <param name="memberNameProvider">成员名称获取委托</param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> WithName(Func<PropertyInfo, string?> memberNameProvider) =>
+        WithMemberName(memberNameProvider);
 
     /// <summary>
     ///     检查是否应该对该属性执行验证
