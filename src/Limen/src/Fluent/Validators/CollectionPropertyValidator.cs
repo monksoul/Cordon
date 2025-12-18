@@ -258,8 +258,8 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
             return true;
         }
 
-        // 获取属性值
-        var propertyValue = GetValue(instance);
+        // 获取用于验证的属性值
+        var propertyValue = GetValueForValidation(instance);
         if (propertyValue is null)
         {
             return true;

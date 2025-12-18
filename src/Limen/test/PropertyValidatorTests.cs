@@ -31,6 +31,7 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator._lastAddedValidator);
         Assert.Empty(propertyValidator.Validators);
         Assert.Equal(0, propertyValidator._highPriorityEndIndex);
+        Assert.Null(propertyValidator._preProcessor);
         Assert.Null(propertyValidator.RuleSets);
         Assert.Null(propertyValidator.DisplayName);
         Assert.Null(propertyValidator.MemberName);
@@ -936,6 +937,19 @@ public class PropertyValidatorTests
     }
 
     [Fact]
+    public void PreProcess_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        propertyValidator.PreProcess(p => p?.Trim());
+        Assert.NotNull(propertyValidator._preProcessor);
+
+        propertyValidator.PreProcess(null);
+        Assert.Null(propertyValidator._preProcessor);
+    }
+
+    [Fact]
     public void ShouldValidate_Invalid_Parameters()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
@@ -1031,23 +1045,23 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void GetValidationValue_Invalid_Parameters()
+    public void GetValidatedObject_Invalid_Parameters()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            PropertyValidator<ObjectModel, string?>.GetValidationValue(null!, null!, null));
+            PropertyValidator<ObjectModel, string?>.GetValidatedObject(null!, null!, null));
         Assert.Throws<ArgumentNullException>(() =>
-            PropertyValidator<ObjectModel, string?>.GetValidationValue(new ObjectModel(), null!, null));
+            PropertyValidator<ObjectModel, string?>.GetValidatedObject(new ObjectModel(), null!, null));
     }
 
     [Fact]
-    public void GetValidationValue_ReturnOK()
+    public void GetValidatedObject_ReturnOK()
     {
         var model = new ObjectModel { Name = "Furion" };
 
         Assert.True(
-            PropertyValidator<ObjectModel, string?>.GetValidationValue(model, new AgeValidator(), model.Name) is not
+            PropertyValidator<ObjectModel, string?>.GetValidatedObject(model, new AgeValidator(), model.Name) is not
                 ObjectModel);
-        Assert.True(PropertyValidator<ObjectModel, string?>.GetValidationValue(model,
+        Assert.True(PropertyValidator<ObjectModel, string?>.GetValidatedObject(model,
             new ValidatorProxy<ObjectModel, EqualToValidator>(u => u.Name, _ => ["Furion"]),
             model.Name) is ObjectModel);
     }
@@ -1069,6 +1083,28 @@ public class PropertyValidatorTests
 
         var model = new ObjectModel { Name = "Furion" };
         Assert.Equal("Furion", propertyValidator.GetValue(model));
+    }
+
+    [Fact]
+    public void GetValueForValidation_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.GetValueForValidation(null!));
+    }
+
+    [Fact]
+    public void GetValueForValidation_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        var model = new ObjectModel { Name = " Furion " };
+        Assert.Equal(" Furion ", propertyValidator.GetValueForValidation(model));
+
+        propertyValidator.PreProcess(u => u?.Trim());
+        Assert.Equal("Furion", propertyValidator.GetValueForValidation(model));
     }
 
     [Fact]

@@ -11,6 +11,12 @@ namespace Limen;
 public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
 {
     /// <summary>
+    ///     值验证前的预处理器
+    /// </summary>
+    /// <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
+    internal Func<T, T>? _preProcessor;
+
+    /// <summary>
     ///     <inheritdoc cref="ValueValidator{T}" />
     /// </summary>
     public ValueValidator()
@@ -63,7 +69,13 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    public bool IsValid(T? value) => !ShouldValidate(value) || Validators.All(u => u.IsValid(value));
+    public bool IsValid(T? value)
+    {
+        // 获取用于验证的值
+        var resolvedValue = GetValueForValidation(value!);
+
+        return !ShouldValidate(resolvedValue) || Validators.All(u => u.IsValid(resolvedValue));
+    }
 
     /// <summary>
     ///     获取对象验证结果集合
@@ -74,8 +86,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
     /// </returns>
     public List<ValidationResult>? GetValidationResults(T? value)
     {
+        // 获取用于验证的值
+        var resolvedValue = GetValueForValidation(value!);
+
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(value))
+        if (!ShouldValidate(resolvedValue))
         {
             return null;
         }
@@ -84,7 +99,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
         var displayName = GetDisplayName();
 
         // 获取所有验证器验证结果集合
-        return Validators.SelectMany(u => u.GetValidationResults(value, displayName) ?? []).ToResults();
+        return Validators.SelectMany(u => u.GetValidationResults(resolvedValue, displayName) ?? []).ToResults();
     }
 
     /// <summary>
@@ -93,8 +108,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
     /// <param name="value">对象</param>
     public void Validate(T? value)
     {
+        // 获取用于验证的值
+        var resolvedValue = GetValueForValidation(value!);
+
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(value))
+        if (!ShouldValidate(resolvedValue))
         {
             return;
         }
@@ -105,7 +123,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
         // 遍历验证器集合
         foreach (var validator in Validators)
         {
-            validator.Validate(value, displayName);
+            validator.Validate(resolvedValue, displayName);
         }
     }
 
@@ -141,6 +159,21 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
         ArgumentNullException.ThrowIfNull(condition);
 
         UnlessCondition = condition;
+
+        return this;
+    }
+
+    /// <summary>
+    ///     设置值验证前的预处理器
+    /// </summary>
+    /// <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
+    /// <param name="preProcess">预处理器（函数）</param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public ValueValidator<T> PreProcess(Func<T, T>? preProcess)
+    {
+        _preProcessor = preProcess;
 
         return this;
     }
@@ -183,6 +216,15 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
 
         return true;
     }
+
+    /// <summary>
+    ///     获取用于验证的值
+    /// </summary>
+    /// <param name="value">对象</param>
+    /// <returns>
+    ///     <typeparamref name="T" />
+    /// </returns>
+    internal T GetValueForValidation(T value) => _preProcessor is not null ? _preProcessor(value) : value;
 
     /// <summary>
     ///     获取显示名称

@@ -152,6 +152,11 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IVal
     internal readonly ConcurrentDictionary<string, object?> _propertyChanges = new();
 
     /// <summary>
+    ///     被验证对象的提供器
+    /// </summary>
+    internal readonly Func<T, object?> _validatedObjectProvider;
+
+    /// <summary>
     ///     验证器实例缓存字典
     /// </summary>
     internal readonly ConcurrentDictionary<int, TValidator> _validatorCache = new();
@@ -162,21 +167,16 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IVal
     internal readonly List<Action<TValidator>> _validatorConfigurations = [];
 
     /// <summary>
-    ///     验证前值转换器
-    /// </summary>
-    internal readonly Func<T, object?> _valueTransformer;
-
-    /// <summary>
     ///     <inheritdoc cref="ValidatorProxy{TValidator}" />
     /// </summary>
-    /// <param name="valueTransformer">验证前值转换器</param>
+    /// <param name="validatedObjectProvider">被验证对象的提供器</param>
     /// <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
-    public ValidatorProxy(Func<T, object?> valueTransformer, Func<T, object?[]?>? constructorArgsFactory = null)
+    public ValidatorProxy(Func<T, object?> validatedObjectProvider, Func<T, object?[]?>? constructorArgsFactory = null)
     {
         // 空检查
-        ArgumentNullException.ThrowIfNull(valueTransformer);
+        ArgumentNullException.ThrowIfNull(validatedObjectProvider);
 
-        _valueTransformer = valueTransformer;
+        _validatedObjectProvider = validatedObjectProvider;
         _constructorArgsFactory = constructorArgsFactory;
 
         // 订阅属性变更事件
@@ -217,16 +217,16 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IVal
     }
 
     /// <inheritdoc />
-    public override bool IsValid(T? instance) => GetValidator(instance).IsValid(GetValidationValue(instance));
+    public override bool IsValid(T? instance) => GetValidator(instance).IsValid(GetValidatedObject(instance));
 
     /// <inheritdoc />
     public override List<ValidationResult>? GetValidationResults(T? instance, string name,
         IEnumerable<string>? memberNames = null) =>
-        GetValidator(instance).GetValidationResults(GetValidationValue(instance), name, memberNames);
+        GetValidator(instance).GetValidationResults(GetValidatedObject(instance), name, memberNames);
 
     /// <inheritdoc />
     public override void Validate(T? instance, string name, IEnumerable<string>? memberNames = null) =>
-        GetValidator(instance).Validate(GetValidationValue(instance), name, memberNames);
+        GetValidator(instance).Validate(GetValidatedObject(instance), name, memberNames);
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException"></exception>
@@ -277,18 +277,19 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IVal
     }
 
     /// <summary>
-    ///     获取用于验证的值
+    ///     获取用于验证的对象
     /// </summary>
+    /// <remarks>用于确定在 <see cref="ValidatorBase" /> 中实际被验证的对象（即验证的主体）。</remarks>
     /// <param name="instance">对象</param>
     /// <returns>
     ///     <see cref="object" />
     /// </returns>
-    protected object? GetValidationValue(T? instance)
+    protected object? GetValidatedObject(T? instance)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
 
-        return _valueTransformer.Invoke(instance);
+        return _validatedObjectProvider.Invoke(instance);
     }
 
     /// <summary>

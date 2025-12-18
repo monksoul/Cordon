@@ -24,6 +24,12 @@ public partial class PropertyValidator<T, TProperty> :
     /// </summary>
     internal readonly Expression<Func<T, TProperty?>> _selector;
 
+    /// <summary>
+    ///     属性验证前的预处理器
+    /// </summary>
+    /// <remarks>该预处理器仅用于验证，不会修改原始属性的值。</remarks>
+    internal Func<TProperty, TProperty>? _preProcessor;
+
     /// <inheritdoc cref="IObjectValidator{T}" />
     /// <remarks>属性级别对象验证器。</remarks>
     internal ObjectValidator<TProperty>? _propertyValidator;
@@ -116,8 +122,8 @@ public partial class PropertyValidator<T, TProperty> :
             return false;
         }
 
-        // 获取属性值
-        var propertyValue = GetValue(instance);
+        // 获取用于验证的属性值
+        var propertyValue = GetValueForValidation(instance);
 
         // 检查是否设置了属性级别对象验证器
         if (propertyValue is not null && _propertyValidator is not null &&
@@ -126,7 +132,7 @@ public partial class PropertyValidator<T, TProperty> :
             return false;
         }
 
-        return Validators.All(u => u.IsValid(GetValidationValue(instance, u, propertyValue)));
+        return Validators.All(u => u.IsValid(GetValidatedObject(instance, u, propertyValue)));
     }
 
     /// <inheritdoc />
@@ -152,8 +158,8 @@ public partial class PropertyValidator<T, TProperty> :
                                        []);
         }
 
-        // 获取属性值
-        var propertyValue = GetValue(instance);
+        // 获取用于验证的属性值
+        var propertyValue = GetValueForValidation(instance);
 
         // 检查是否设置了属性级别对象验证器
         if (propertyValue is not null && _propertyValidator is not null)
@@ -163,7 +169,7 @@ public partial class PropertyValidator<T, TProperty> :
 
         // 获取所有验证器验证结果集合
         validationResults.AddRange(Validators.SelectMany(u =>
-            u.GetValidationResults(GetValidationValue(instance, u, propertyValue), displayName, [memberPath]) ?? []));
+            u.GetValidationResults(GetValidatedObject(instance, u, propertyValue), displayName, [memberPath]) ?? []));
 
         return validationResults.ToResults();
     }
@@ -189,8 +195,8 @@ public partial class PropertyValidator<T, TProperty> :
             _annotationValidator.Validate(instance, displayName, [memberPath]);
         }
 
-        // 获取属性值
-        var propertyValue = GetValue(instance);
+        // 获取用于验证的属性值
+        var propertyValue = GetValueForValidation(instance);
 
         // 检查是否设置了属性级别对象验证器
         if (propertyValue is not null && _propertyValidator is not null)
@@ -201,7 +207,7 @@ public partial class PropertyValidator<T, TProperty> :
         // 遍历验证器集合
         foreach (var validator in Validators)
         {
-            validator.Validate(GetValidationValue(instance, validator, propertyValue), displayName, [memberPath]);
+            validator.Validate(GetValidatedObject(instance, validator, propertyValue), displayName, [memberPath]);
         }
     }
 
@@ -442,6 +448,21 @@ public partial class PropertyValidator<T, TProperty> :
     }
 
     /// <summary>
+    ///     设置属性验证前的预处理器
+    /// </summary>
+    /// <remarks>该预处理器仅用于验证，不会修改原始属性的值。</remarks>
+    /// <param name="preProcess">预处理器（函数）</param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T, TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> PreProcess(Func<TProperty, TProperty>? preProcess)
+    {
+        _preProcessor = preProcess;
+
+        return this;
+    }
+
+    /// <summary>
     ///     设置显示名称
     /// </summary>
     /// <param name="displayName">显示名称</param>
@@ -556,14 +577,16 @@ public partial class PropertyValidator<T, TProperty> :
         }
 
         // 检查正向条件（When）
-        if (WhenCondition is not null && !WhenCondition(GetValue(instance), CreateValidationContext(instance)))
+        if (WhenCondition is not null &&
+            !WhenCondition(GetValueForValidation(instance), CreateValidationContext(instance)))
         {
             return false;
         }
 
         // 检查逆向条件（Unless）
         // ReSharper disable once ConvertIfStatementToReturnStatement
-        if (UnlessCondition is not null && UnlessCondition(GetValue(instance), CreateValidationContext(instance)))
+        if (UnlessCondition is not null &&
+            UnlessCondition(GetValueForValidation(instance), CreateValidationContext(instance)))
         {
             return false;
         }
@@ -621,8 +644,9 @@ public partial class PropertyValidator<T, TProperty> :
     }
 
     /// <summary>
-    ///     获取用于验证的值
+    ///     获取用于验证的对象
     /// </summary>
+    /// <remarks>用于确定在 <see cref="ValidatorBase" /> 中实际被验证的对象（即验证的主体）。</remarks>
     /// <param name="instance">对象</param>
     /// <param name="validator">
     ///     <see cref="ValidatorBase" />
@@ -631,7 +655,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="object" />
     /// </returns>
-    internal static object? GetValidationValue(T instance, ValidatorBase validator, TProperty propertyValue)
+    internal static object? GetValidatedObject(T instance, ValidatorBase validator, TProperty propertyValue)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
@@ -657,6 +681,21 @@ public partial class PropertyValidator<T, TProperty> :
     ///     <typeparamref name="TProperty" />
     /// </returns>
     internal TProperty GetValue(T instance) => _annotationValidator.GetValue(instance)!;
+
+    /// <summary>
+    ///     获取用于验证的属性值
+    /// </summary>
+    /// <param name="instance">对象</param>
+    /// <returns>
+    ///     <typeparamref name="TProperty" />
+    /// </returns>
+    internal TProperty GetValueForValidation(T instance)
+    {
+        // 获取属性值
+        var propertyValue = GetValue(instance);
+
+        return _preProcessor is not null ? _preProcessor(propertyValue) : propertyValue;
+    }
 
     /// <summary>
     ///     获取显示名称

@@ -1651,9 +1651,6 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
-        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1663,8 +1660,11 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -1697,7 +1697,7 @@
         </member>
         <member name="T:Limen.ConditionBuilder`1">
             <summary>
-                条件验证构建器�构建器
+                条件验证构建器
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
@@ -3417,7 +3417,7 @@
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
-        <member na.IObjectValidator`1.IsValid(`0,System.String[])">
+        <member name="M:Limen.IObjectValidator`1.IsValid(`0,System.String[])">
             <summary>
                 检查对象合法性
             </summary>
@@ -3771,6 +3771,12 @@
                 属性选择器
             </summary>
         </member>
+        <member name="F:Limen.PropertyValidator`2._preProcessor">
+            <summary>
+                属性验证前的预处理器
+            </summary>
+            <remarks>该预处理器仅用于验证，不会修改原始属性的值。</remarks>
+        </member>
         <member name="F:Limen.PropertyValidator`2._propertyValidator">
             <inheritdoc cref="T:Limen.IObjectValidator`1" />
             <remarks>属性级别对象验证器。</remarks>
@@ -3927,6 +3933,16 @@
                 <see cref="T:Limen.PropertyValidator`2" />
             </returns>
         </member>
+        <member name="M:Limen.PropertyValidator`2.PreProcess(System.Func{`1,`1})">
+            <summary>
+                设置属性验证前的预处理器
+            </summary>
+            <remarks>该预处理器仅用于验证，不会修改原始属性的值。</remarks>
+            <param name="preProcess">预处理器（函数）</param>
+            <returns>
+                <see cref="T:Limen.PropertyValidator`2" />
+            </returns>
+        </member>
         <member name="M:Limen.PropertyValidator`2.WithDisplayName(System.String)">
             <summary>
                 设置显示名称
@@ -4021,10 +4037,11 @@
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Limen.PropertyValidator`2.GetValidationValue(`0,Limen.ValidatorBase,`1)">
+        <member name="M:Limen.PropertyValidator`2.GetValidatedObject(`0,Limen.ValidatorBase,`1)">
             <summary>
-                获取用于验证的值
+                获取用于验证的对象
             </summary>
+            <remarks>用于确定在 <see cref="T:Limen.ValidatorBase" /> 中实际被验证的对象（即验证的主体）。</remarks>
             <param name="instance">对象</param>
             <param name="validator">
                 <see cref="T:Limen.ValidatorBase" />
@@ -4037,6 +4054,15 @@
         <member name="M:Limen.PropertyValidator`2.GetValue(`0)">
             <summary>
                 获取属性值
+            </summary>
+            <param name="instance">对象</param>
+            <returns>
+                <typeparamref name="TProperty" />
+            </returns>
+        </member>
+        <member name="M:Limen.PropertyValidator`2.GetValueForValidation(`0)">
+            <summary>
+                获取用于验证的属性值
             </summary>
             <param name="instance">对象</param>
             <returns>
@@ -4059,7 +4085,7 @@
                 <see cref="T:System.String" />
             </returns>
         </member>
-        <member name="M:Limen.PropertyValidator`yValidator`2.GetEffectiveMemberName">
+        <member name="M:Limen.PropertyValidator`2.GetEffectiveMemberName">
             <summary>
                 获取用于 <see cref="P:System.ComponentModel.DataAnnotations.ValidationResult.MemberNames" /> 的最终成员名称
             </summary>
@@ -4153,7 +4179,7 @@
             <param name="compareValueAccessor">比较的值访问器</param>
             <returns>
                 <see cref="T:Limen.PropertyValidator`2" />
- </returns>
+            </returns>
         </member>
         <member name="M:Limen.PropertyValidator`2.GreaterThanOrEqualTo(System.Func{Limen.ValidationContext{`0},System.IComparable})">
             <summary>
@@ -4232,7 +4258,7 @@
                 添加验证器代理
             </summary>
             <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
-            <param name="valueTransformer">验证前值转换器</param>
+            <param name="validatedObjectProvider">被验证对象的提供器</param>
             <param name="configure">配置验证器实例</param>
             <typeparam name="TValidator">
                 <see cref="T:Limen.ValidatorBase" />
@@ -4354,6 +4380,12 @@
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
+        <member name="F:Limen.ValueValidator`1._preProcessor">
+            <summary>
+                值验证前的预处理器
+            </summary>
+            <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
+        </member>
         <member name="M:Limen.ValueValidator`1.#ctor">
             <summary>
                 <inheritdoc cref="T:Limen.ValueValidator`1" />
@@ -4435,6 +4467,16 @@
                 <see cref="T:Limen.ValueValidator`1" />
             </returns>
         </member>
+        <member name="M:Limen.ValueValidator`1.PreProcess(System.Func{`0,`0})">
+            <summary>
+                设置值验证前的预处理器
+            </summary>
+            <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
+            <param name="preProcess">预处理器（函数）</param>
+            <returns>
+                <see cref="T:Limen.ValueValidator`1" />
+            </returns>
+        </member>
         <member name="M:Limen.ValueValidator`1.WithDisplayName(System.String)">
             <summary>
                 设置显示名称
@@ -4451,6 +4493,15 @@
             <param name="value">对象</param>
             <returns>
                 <see cref="T:System.Boolean" />
+            </returns>
+        </member>
+        <member name="M:Limen.ValueValidator`1.GetValueForValidation(`0)">
+            <summary>
+                获取用于验证的值
+            </summary>
+            <param name="value">对象</param>
+            <returns>
+                <typeparamref name="T" />
             </returns>
         </member>
         <member name="M:Limen.ValueValidator`1.GetDisplayName">
@@ -5090,7 +5141,7 @@
             <summary>
                 创建 <see cref="T:System.DateOnly" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-�如 "yyyy-MM-dd"）</param>
+            <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
             <returns>
                 <see cref="T:Limen.DateOnlyValidator" />
             </returns>
@@ -5703,7 +5754,7 @@
             <summary>
                 创建验证器代理
             </summary>
-            <param name="valueTransformer">验证前值转换器</param>
+            <param name="validatedObjectProvider">被验证对象的提供器</param>
             <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
             <typeparam name="T">对象类型</typeparam>
             <typeparam name="TValidator">
@@ -5806,7 +5857,7 @@
             <summary>
                 银行卡号验证器（Luhn 算法）
             </summary>
-     arks>
+            <remarks>
                 <see href="https://baike.baidu.com/item/Luhn算法/22799984">Luhn 算法</see>
                 <see href="https://www.ee.unb.ca/cgi-bin/tervo/luhn.pl">Luhn 算法在线测试</see>
             </remarks>
@@ -5962,8 +6013,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a hexadecimal digit exactly 3 times.<br/>
-                        ○ Match a hexadecimal digit exactly 8 times.<br/>
+                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -5985,7 +6036,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character atomically any number of times.<br/>
+                            ○ Match a whitespace character greedily any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -6010,7 +6061,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character atomically any number of times.<br/>
+                                    ○ Match a whitespace character greedily any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -6071,13 +6122,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -6091,13 +6142,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -6119,7 +6170,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -6141,7 +6192,6 @@
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match with 2 alternative expressions.<br/>
                             ○ Match a sequence of expressions.<br/>
-                 sequence of expressions.<br/>
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
@@ -8648,6 +8698,11 @@
                 属性变更字典
             </summary>
         </member>
+        <member name="F:Limen.ValidatorProxy`2._validatedObjectProvider">
+            <summary>
+                被验证对象的提供器
+            </summary>
+        </member>
         <member name="F:Limen.ValidatorProxy`2._validatorCache">
             <summary>
                 验证器实例缓存字典
@@ -8658,16 +8713,11 @@
                 验证器实例配置委托集合
             </summary>
         </member>
-        <member name="F:Limen.ValidatorProxy`2._valueTransformer">
-            <summary>
-                验证前值转换器
-            </summary>
-        </member>
         <member name="M:Limen.ValidatorProxy`2.#ctor(System.Func{`0,System.Object},System.Func{`0,System.Object[]})">
             <summary>
                 <inheritdoc cref="T:Limen.ValidatorProxy`1" />
             </summary>
-            <param name="valueTransformer">验证前值转换器</param>
+            <param name="validatedObjectProvider">被验证对象的提供器</param>
             <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
         </member>
         <member name="M:Limen.ValidatorProxy`2.Dispose">
@@ -8717,10 +8767,11 @@
                 <typeparamref name="TValidator" />
             </returns>
         </member>
-        <member name="M:Limen.ValidatorProxy`2.GetValidationValue(`0)">
+        <member name="M:Limen.ValidatorProxy`2.GetValidatedObject(`0)">
             <summary>
-                获取用于验证的值
+                获取用于验证的对象
             </summary>
+            <remarks>用于确定在 <see cref="T:Limen.ValidatorBase" /> 中实际被验证的对象（即验证的主体）。</remarks>
             <param name="instance">对象</param>
             <returns>
                 <see cref="T:System.Object" />

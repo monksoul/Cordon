@@ -16,6 +16,7 @@ public class ValueValidatorTests
         Assert.Null(valueValidator._lastAddedValidator);
         Assert.Empty(valueValidator.Validators);
         Assert.Equal(0, valueValidator._highPriorityEndIndex);
+        Assert.Null(valueValidator._preProcessor);
         Assert.Null(valueValidator.DisplayName);
         Assert.Null(valueValidator.WhenCondition);
         Assert.Null(valueValidator.UnlessCondition);
@@ -222,6 +223,18 @@ public class ValueValidatorTests
     }
 
     [Fact]
+    public void PreProcess_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+
+        valueValidator.PreProcess(p => p.Trim());
+        Assert.NotNull(valueValidator._preProcessor);
+
+        valueValidator.PreProcess(null);
+        Assert.Null(valueValidator._preProcessor);
+    }
+
+    [Fact]
     public void ShouldValidate_ReturnOK()
     {
         var valueValidator = new ValueValidator<string>();
@@ -297,5 +310,16 @@ public class ValueValidatorTests
         var validationContext2 = valueValidator.CreateValidationContext("百小僧");
         Assert.NotNull(valueValidator._serviceProvider);
         Assert.NotNull(validationContext2._serviceProvider);
+    }
+
+    [Fact]
+    public void GetValueForValidation_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+
+        Assert.Equal(" Furion ", valueValidator.GetValueForValidation(" Furion "));
+
+        valueValidator.PreProcess(u => u.Trim());
+        Assert.Equal("Furion", valueValidator.GetValueForValidation(" Furion "));
     }
 }

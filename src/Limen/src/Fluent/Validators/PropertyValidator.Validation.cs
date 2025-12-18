@@ -237,7 +237,7 @@ public partial class PropertyValidator<T, TProperty>
     ///     添加验证器代理
     /// </summary>
     /// <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
-    /// <param name="valueTransformer">验证前值转换器</param>
+    /// <param name="validatedObjectProvider">被验证对象的提供器</param>
     /// <param name="configure">配置验证器实例</param>
     /// <typeparam name="TValidator">
     ///     <see cref="ValidatorBase" />
@@ -247,11 +247,12 @@ public partial class PropertyValidator<T, TProperty>
     /// </returns>
     public PropertyValidator<T, TProperty> ValidatorProxy<TValidator>(
         Func<ValidationContext<T>, object?[]?>? constructorArgsFactory = null,
-        Func<T, object?>? valueTransformer = null, Action<TValidator>? configure = null)
+        Func<T, object?>? validatedObjectProvider = null, Action<TValidator>? configure = null)
         where TValidator : ValidatorBase
     {
         // 初始化 ValidatorProxy<T, TValidator> 实例
-        var validatorProxy = new ValidatorProxy<T, TValidator>(valueTransformer ?? (instance => GetValue(instance)),
+        var validatorProxy = new ValidatorProxy<T, TValidator>(
+            validatedObjectProvider ?? (instance => GetValueForValidation(instance)),
             constructorArgsFactory is null
                 ? null
                 : instance => constructorArgsFactory(CreateValidationContext(instance)));
