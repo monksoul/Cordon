@@ -21,7 +21,7 @@ internal static class LinqExpressionExtensions
     ///     <see cref="PropertyInfo" />
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
-    internal static PropertyInfo GetProperty<T, TProperty>(this Expression<Func<T, TProperty?>> propertySelector) =>
+    internal static PropertyInfo GetProperty<T, TProperty>(this Expression<Func<T, TProperty>> propertySelector) =>
         propertySelector.Body switch
         {
             // 检查 Lambda 表达式的主体是否是 MemberExpression 类型

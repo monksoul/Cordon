@@ -4,9 +4,15 @@ public class User : IValidatableObject
 {
     [Min(1)] public int Id { get; set; }
 
-    [Required] public string? Name { get; set; }
+    [Required] [MinLength(2)] public string? Name { get; set; }
+
+    [GreaterThanOrEqualTo(18)] public int Age { get; set; }
 
     public List<Address>? Addresses { get; set; }
+
+    [Compare(nameof(ConfirmPassword))] public string? Password { get; set; }
+
+    public string? ConfirmPassword { get; set; }
 
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

@@ -10,19 +10,19 @@
             <LastGenOutput>TestValidationMessages.Designer.cs</LastGenOutput>
         </EmbeddedResource>
 
-        <EmbeddedResource Update="ValidationMessages.resx">
-            <Generator>ResXFileCodeGenerator</Generator>
-            <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
-            <CustomToolNamespace>Limen.Resources.Overrides</CustomToolNamespace>
-        </EmbeddedResource>
-    </ItemGroup>
-
-    <ItemGroup>
         <Compile Update="TestValidationMessages.Designer.cs">
             <DesignTime>True</DesignTime>
             <AutoGen>True</AutoGen>
             <DependentUpon>TestValidationMessages.resx</DependentUpon>
         </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Update="ValidationMessages.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
+            <CustomToolNamespace>Limen.Resources.Overrides</CustomToolNamespace>
+        </EmbeddedResource>
 
         <Compile Update="ValidationMessages.Designer.cs">
             <DesignTime>True</DesignTime>

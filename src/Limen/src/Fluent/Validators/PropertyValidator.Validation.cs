@@ -64,6 +64,36 @@ public partial class PropertyValidator<T, TProperty>
     }
 
     /// <summary>
+    ///     添加比较两个属性验证器
+    /// </summary>
+    /// <param name="selector">属性选择器</param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> Compare(Expression<Func<T, object?>> selector)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(selector);
+
+        return ValidatorProxy<CompareValidator<T, TProperty>>(_ => [_selector, selector], instance => instance);
+    }
+
+    /// <summary>
+    ///     添加比较两个属性验证器
+    /// </summary>
+    /// <param name="propertyName">其他属性的名称</param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> Compare(string propertyName)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        return ValidatorProxy<CompareValidator<T, TProperty>>(_ => [_selector, propertyName], instance => instance);
+    }
+
+    /// <summary>
     ///     添加相等验证器
     /// </summary>
     /// <param name="compareValueAccessor">比较的值访问器</param>
@@ -207,6 +237,7 @@ public partial class PropertyValidator<T, TProperty>
     ///     添加验证器代理
     /// </summary>
     /// <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
+    /// <param name="valueTransformer">验证前值转换器</param>
     /// <param name="configure">配置验证器实例</param>
     /// <typeparam name="TValidator">
     ///     <see cref="ValidatorBase" />
@@ -215,11 +246,12 @@ public partial class PropertyValidator<T, TProperty>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
     public PropertyValidator<T, TProperty> ValidatorProxy<TValidator>(
-        Func<ValidationContext<T>, object?[]?>? constructorArgsFactory, Action<TValidator>? configure = null)
+        Func<ValidationContext<T>, object?[]?>? constructorArgsFactory = null,
+        Func<T, object?>? valueTransformer = null, Action<TValidator>? configure = null)
         where TValidator : ValidatorBase
     {
         // 初始化 ValidatorProxy<T, TValidator> 实例
-        var validatorProxy = new ValidatorProxy<T, TValidator>(instance => GetValue(instance),
+        var validatorProxy = new ValidatorProxy<T, TValidator>(valueTransformer ?? (instance => GetValue(instance)),
             constructorArgsFactory is null
                 ? null
                 : instance => constructorArgsFactory(CreateValidationContext(instance)));

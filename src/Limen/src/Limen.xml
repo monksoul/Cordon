@@ -1697,7 +1697,7 @@
         </member>
         <member name="T:Limen.ConditionBuilder`1">
             <summary>
-                条件验证构建器
+                条件验证构建器�构建器
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
@@ -2981,7 +2981,7 @@
                 <see cref="T:System.Object" />
             </param>
             <param name="count">数量</param>
-            <re        <returns>
+            <returns>
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
@@ -3080,7 +3080,8 @@
             <summary>
                 获取对象验证结果集合
             </summary>
-            <param name="validators"><see cref="T:Limen.IObjectValidator`1" /> 集合</pa       <param name="instance">对象</param>
+            <param name="validators"><see cref="T:Limen.IObjectValidator`1" /> 集合</param>
+            <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.Collections.Generic.List`1" />
@@ -3416,7 +3417,7 @@
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
-        <member name="M:Limen.IObjectValidator`1.IsValid(`0,System.String[])">
+        <member na.IObjectValidator`1.IsValid(`0,System.String[])">
             <summary>
                 检查对象合法性
             </summary>
@@ -3690,7 +3691,6 @@
                 获取对象验证结果集合
             </summary>
             <param name="validationContext">
- ontext">
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
             </param>
             <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>
@@ -4059,7 +4059,7 @@
                 <see cref="T:System.String" />
             </returns>
         </member>
-        <member name="M:Limen.PropertyValidator`2.GetEffectiveMemberName">
+        <member name="M:Limen.PropertyValidator`yValidator`2.GetEffectiveMemberName">
             <summary>
                 获取用于 <see cref="P:System.ComponentModel.DataAnnotations.ValidationResult.MemberNames" /> 的最终成员名称
             </summary>
@@ -4128,6 +4128,24 @@
                 <see cref="T:Limen.PropertyValidator`2" />
             </returns>
         </member>
+        <member name="M:Limen.PropertyValidator`2.Compare(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+                添加比较两个属性验证器
+            </summary>
+            <param name="selector">属性选择器</param>
+            <returns>
+                <see cref="T:Limen.PropertyValidator`2" />
+            </returns>
+        </member>
+        <member name="M:Limen.PropertyValidator`2.Compare(System.String)">
+            <summary>
+                添加比较两个属性验证器
+            </summary>
+            <param name="propertyName">其他属性的名称</param>
+            <returns>
+                <see cref="T:Limen.PropertyValidator`2" />
+            </returns>
+        </member>
         <member name="M:Limen.PropertyValidator`2.EqualTo(System.Func{Limen.ValidationContext{`0},System.Object})">
             <summary>
                 添加相等验证器
@@ -4135,7 +4153,7 @@
             <param name="compareValueAccessor">比较的值访问器</param>
             <returns>
                 <see cref="T:Limen.PropertyValidator`2" />
-            </returns>
+ </returns>
         </member>
         <member name="M:Limen.PropertyValidator`2.GreaterThanOrEqualTo(System.Func{Limen.ValidationContext{`0},System.IComparable})">
             <summary>
@@ -4209,11 +4227,12 @@
                 <see cref="T:Limen.PropertyValidator`2" />
             </returns>
         </member>
-        <member name="M:Limen.PropertyValidator`2.ValidatorProxy``1(System.Func{Limen.ValidationContext{`0},System.Object[]},System.Action{``0})">
+        <member name="M:Limen.PropertyValidator`2.ValidatorProxy``1(System.Func{Limen.ValidationContext{`0},System.Object[]},System.Func{`0,System.Object},System.Action{``0})">
             <summary>
                 添加验证器代理
             </summary>
             <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
+            <param name="valueTransformer">验证前值转换器</param>
             <param name="configure">配置验证器实例</param>
             <typeparam name="TValidator">
                 <see cref="T:Limen.ValidatorBase" />
@@ -4560,308 +4579,313 @@
         </member>
         <member name="T:Limen.Resources.ValidationMessages">
             <summary>
-              A strongly-typed resource class, for looking up localized strings, etc.
+              一个强类型的资源类，用于查找本地化的字符串等。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.ResourceManager">
             <summary>
-              Returns the cached ResourceManager instance used by this class.
+              返回此类使用的缓存的 ResourceManager 实例。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.Culture">
             <summary>
-              Overrides the current thread's CurrentUICulture property for all
-              resource lookups using this strongly typed resource class.
+              重写当前线程的 CurrentUICulture 属性，对
+              使用此强类型资源类的所有资源查找执行重写。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.AgeValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid age..
+              查找类似 The field {0} is not a valid age. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.AgeValidator_ValidationError_IsAdultOnly">
             <summary>
-              Looks up a localized string similar to The field {0} must be at least 18 years old..
+              查找类似 The field {0} must be at least 18 years old. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.AllowedValuesValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The {0} field does not equal any of the values specified in AllowedValuesValidator..
+              查找类似 The {0} field does not equal any of the values specified in AllowedValuesValidator. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.BankCardValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid bank card number..
+              查找类似 The field {0} is not a valid bank card number. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.Base64StringValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The {0} field is not a valid Base64 encoding..
+              查找类似 The {0} field is not a valid Base64 encoding. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.ChineseNameValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid Chinese name..
+              查找类似 The field {0} is not a valid Chinese name. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.ChineseValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} contains invalid Chinese characters..
+              查找类似 The field {0} contains invalid Chinese characters. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.ColorValueValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid color value..
+              查找类似 The field {0} is not a valid color value. 的本地化字符串。
+            </summary>
+        </member>
+        <member name="P:Limen.Resources.ValidationMessages.CompareValidator_ValidationError">
+            <summary>
+              查找类似 &apos;{0}&apos; and &apos;{1}&apos; do not match. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.DateOnlyValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be a valid date..
+              查找类似 The field {0} must be a valid date. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.DateOnlyValidator_ValidationError_Formats">
             <summary>
-              Looks up a localized string similar to The field {0} must be a valid date in the following format(s): {1}..
+              查找类似 The field {0} must be a valid date in the following format(s): {1}. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.DateTimeValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be a valid datetime..
+              查找类似 The field {0} must be a valid datetime. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.DateTimeValidator_ValidationError_Formats">
             <summary>
-              Looks up a localized string similar to The field {0} must be a valid datetime in the following format(s): {1}..
+              查找类似 The field {0} must be a valid datetime in the following format(s): {1}. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.DecimalPlacesValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must not have more than &apos;{1}&apos; decimal places..
+              查找类似 The field {0} must not have more than &apos;{1}&apos; decimal places. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.DeniedValuesValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The {0} field equals one of the values specified in DeniedValuesValidator..
+              查找类似 The {0} field equals one of the values specified in DeniedValuesValidator. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.DomainValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid domain name..
+              查找类似 The field {0} is not a valid domain name. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.EmailAddressValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The {0} field is not a valid e-mail address..
+              查找类似 The {0} field is not a valid e-mail address. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.EndsWithValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} does not end with the string &apos;{1}&apos;..
+              查找类似 The field {0} does not end with the string &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.EqualToValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be equal to &apos;{1}&apos;..
+              查找类似 The field {0} must be equal to &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.GreaterThanOrEqualToValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be greater than or equal to &apos;{1}&apos;..
+              查找类似 The field {0} must be greater than or equal to &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.GreaterThanValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be greater than &apos;{1}&apos;..
+              查找类似 The field {0} must be greater than &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.IDCardValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid Id card number format..
+              查找类似 The field {0} is not a valid Id card number format. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.IpAddressValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid IPv4 address..
+              查找类似 The field {0} is not a valid IPv4 address. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.IpAddressValidator_ValidationError_AllowIPv6">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid IP address (IPv4 or IPv6)..
+              查找类似 The field {0} is not a valid IP address (IPv4 or IPv6). 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.JsonValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The {0} field must be a valid JSON object or array..
+              查找类似 The {0} field must be a valid JSON object or array. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.LengthValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be a string or collection type with a minimum length of &apos;{1}&apos; and maximum length of &apos;{2}&apos;..
+              查找类似 The field {0} must be a string or collection type with a minimum length of &apos;{1}&apos; and maximum length of &apos;{2}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.LessThanOrEqualToValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be less than or equal to &apos;{1}&apos;..
+              查找类似 The field {0} must be less than or equal to &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.LessThanValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be less than &apos;{1}&apos;..
+              查找类似 The field {0} must be less than &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.MaxLengthValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be a string or array type with a maximum length of &apos;{1}&apos;..
+              查找类似 The field {0} must be a string or array type with a maximum length of &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.MaxValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be less than or equal to &apos;{1}&apos;..
+              查找类似 The field {0} must be less than or equal to &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.MD5StringValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid MD5 string..
+              查找类似 The field {0} is not a valid MD5 string. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.MinLengthValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be a string or array type with a minimum length of &apos;{1}&apos;..
+              查找类似 The field {0} must be a string or array type with a minimum length of &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.MinValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be greater than or equal to &apos;{1}&apos;..
+              查找类似 The field {0} must be greater than or equal to &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.NotBlankValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} cannot be empty or whitespace..
+              查找类似 The field {0} cannot be empty or whitespace. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.NotEmptyValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} does not allow empty values..
+              查找类似 The field {0} does not allow empty values. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.NotEqualToValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} cannot be equal to &apos;{1}&apos;..
+              查找类似 The field {0} cannot be equal to &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.NotNullValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} does not allow null values..
+              查找类似 The field {0} does not allow null values. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.PasswordValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} has an invalid password format. It must be 8 to 64 characters long and contain at least one letter and one number..
+              查找类似 The field {0} has an invalid password format. It must be 8 to 64 characters long and contain at least one letter and one number. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.PasswordValidator_ValidationError_Strong">
             <summary>
-              Looks up a localized string similar to The field {0} has an invalid password format. It must be 12 to 64 characters long and contain uppercase letters, lowercase letters, numbers, and special characters..
+              查找类似 The field {0} has an invalid password format. It must be 12 to 64 characters long and contain uppercase letters, lowercase letters, numbers, and special characters. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.PhoneNumberValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid phone number..
+              查找类似 The field {0} is not a valid phone number. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.PostalCodeValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid postal code..
+              查找类似 The field {0} is not a valid postal code. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.RangeValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be between &apos;{1}&apos; and &apos;{2}&apos;..
+              查找类似 The field {0} must be between &apos;{1}&apos; and &apos;{2}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.RangeValidator_ValidationError_MaxExclusive">
             <summary>
-              Looks up a localized string similar to The field {0} must be between &apos;{1}&apos; and &apos;{2}&apos; exclusive..
+              查找类似 The field {0} must be between &apos;{1}&apos; and &apos;{2}&apos; exclusive. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.RangeValidator_ValidationError_MinExclusive">
             <summary>
-              Looks up a localized string similar to The field {0} must be between &apos;{1}&apos; exclusive and &apos;{2}&apos;..
+              查找类似 The field {0} must be between &apos;{1}&apos; exclusive and &apos;{2}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.RangeValidator_ValidationError_MinExclusive_MaxExclusive">
             <summary>
-              Looks up a localized string similar to The field {0} must be between &apos;{1}&apos; exclusive and &apos;{2}&apos; exclusive..
+              查找类似 The field {0} must be between &apos;{1}&apos; exclusive and &apos;{2}&apos; exclusive. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.RegularExpressionValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must match the regular expression &apos;{1}&apos;..
+              查找类似 The field {0} must match the regular expression &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.RequiredValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The {0} field is required..
+              查找类似 The {0} field is required. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.SingleValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} only allows a single item..
+              查找类似 The field {0} only allows a single item. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.StartsWithValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} does not start with the string &apos;{1}&apos;..
+              查找类似 The field {0} does not start with the string &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.StringContainsValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} does not contain the string &apos;{1}&apos;..
+              查找类似 The field {0} does not contain the string &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.StringLengthValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be a string with a maximum length of &apos;{1}&apos;..
+              查找类似 The field {0} must be a string with a maximum length of &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.StringLengthValidator_ValidationError_MinimumLength">
             <summary>
-              Looks up a localized string similar to The field {0} must be a string with a minimum length of &apos;{2}&apos; and a maximum length of &apos;{1}&apos;..
+              查找类似 The field {0} must be a string with a minimum length of &apos;{2}&apos; and a maximum length of &apos;{1}&apos;. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.TelephoneValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid telephone..
+              查找类似 The field {0} is not a valid telephone. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.TimeOnlyValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be a valid time..
+              查找类似 The field {0} must be a valid time. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.TimeOnlyValidator_ValidationError_Formats">
             <summary>
-              Looks up a localized string similar to The field {0} must be a valid time in the following format(s): {1}..
+              查找类似 The field {0} must be a valid time in the following format(s): {1}. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.UrlValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The {0} field is not a valid fully-qualified http, https URL..
+              查找类似 The {0} field is not a valid fully-qualified http, https URL. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.UrlValidator_ValidationError_SupportsFtp">
             <summary>
-              Looks up a localized string similar to The {0} field is not a valid fully-qualified http, https, or ftp URL..
+              查找类似 The {0} field is not a valid fully-qualified http, https, or ftp URL. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.UserNameValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid username..
+              查找类似 The field {0} is not a valid username. 的本地化字符串。
             </summary>
         </member>
         <member name="P:Limen.Resources.ValidationMessages.ValidatorBase_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is invalid..
+              查找类似 The field {0} is invalid. 的本地化字符串。
             </summary>
         </member>
         <member name="T:Limen.Validators">
@@ -5066,7 +5090,7 @@
             <summary>
                 创建 <see cref="T:System.DateOnly" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+            <param name="formats">允许的日期格式（如 "yyyy-�如 "yyyy-MM-dd"）</param>
             <returns>
                 <see cref="T:Limen.DateOnlyValidator" />
             </returns>
@@ -5782,7 +5806,7 @@
             <summary>
                 银行卡号验证器（Luhn 算法）
             </summary>
-            <remarks>
+     arks>
                 <see href="https://baike.baidu.com/item/Luhn算法/22799984">Luhn 算法</see>
                 <see href="https://www.ee.unb.ca/cgi-bin/tervo/luhn.pl">Luhn 算法在线测试</see>
             </remarks>
@@ -5938,8 +5962,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
+                            ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -5961,7 +5985,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character greedily any number of times.<br/>
+                            ○ Match a whitespace character atomically any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -5986,7 +6010,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character greedily any number of times.<br/>
+                                    ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -6047,13 +6071,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -6067,13 +6091,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -6095,7 +6119,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -6117,6 +6141,7 @@
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match with 2 alternative expressions.<br/>
                             ○ Match a sequence of expressions.<br/>
+                 sequence of expressions.<br/>
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
@@ -6128,6 +6153,73 @@
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
+        </member>
+        <member name="T:Limen.CompareValidator`2">
+            <summary>
+                比较两个属性验证器
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+            <typeparam name="TProperty">属性类型</typeparam>
+        </member>
+        <member name="F:Limen.CompareValidator`2._otherPropertyGetter">
+            <summary>
+                属性值访问器
+            </summary>
+        </member>
+        <member name="F:Limen.CompareValidator`2._propertyGetter">
+            <summary>
+                其他属性值访问器
+            </summary>
+        </member>
+        <member name="M:Limen.CompareValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},System.String)">
+            <summary>
+                <inheritdoc cref="T:Limen.CompareValidator`2" />
+            </summary>
+            <param name="propertySelector">属性选择器</param>
+            <param name="otherPropertyName">其他属性的名称</param>
+        </member>
+        <member name="M:Limen.CompareValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+                <inheritdoc cref="T:Limen.CompareValidator`2" />
+            </summary>
+            <param name="propertySelector">属性选择器</param>
+            <param name="otherPropertySelector">其他属性选择器</param>
+        </member>
+        <member name="P:Limen.CompareValidator`2.Property">
+            <summary>
+                <inheritdoc cref="T:System.Reflection.PropertyInfo" />
+            </summary>
+        </member>
+        <member name="P:Limen.CompareValidator`2.OtherProperty">
+            <summary>
+                <inheritdoc cref="T:System.Reflection.PropertyInfo" />
+            </summary>
+        </member>
+        <member name="M:Limen.CompareValidator`2.IsValid(`0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Limen.CompareValidator`2.FormatErrorMessage(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Limen.CompareValidator`2.GetDisplayNameForProperty(System.Reflection.PropertyInfo)">
+            <summary>
+                获取属性显示名称
+            </summary>
+            <param name="property">
+                <see cref="T:System.Reflection.PropertyInfo" />
+            </param>
+            <returns>
+                <see cref="T:System.String" />
+            </returns>
+        </member>
+        <member name="M:Limen.CompareValidator`2.CreatePropertySelector(System.String)">
+            <summary>
+                根据属性名创建 <![CDATA[Expression<Func<T, object?>>]]> 表达式
+            </summary>
+            <param name="propertyName">属性名</param>
+            <returns>
+                <see cref="T:System.Linq.Expressions.Expression`1" />
+            </returns>
         </member>
         <member name="T:Limen.ComparisonValidator">
             <summary>

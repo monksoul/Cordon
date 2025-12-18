@@ -448,6 +448,53 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void Compare_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1).Compare((string)null!));
+        Assert.Throws<ArgumentException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1).Compare(string.Empty));
+        Assert.Throws<ArgumentException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1).Compare(" "));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
+                .Compare((Expression<Func<ValidationModel, object?>>)null!));
+    }
+
+    [Fact]
+    public void Compare_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .Compare(u => u.String2);
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator =
+            propertyValidator._lastAddedValidator as
+                ValidatorProxy<ValidationModel, CompareValidator<ValidationModel, string?>>;
+        Assert.NotNull(addedValidator);
+
+        Assert.False(propertyValidator.IsValid(new ValidationModel { String1 = "password", String2 = "password1" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { String1 = "password", String2 = "password" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .Compare(nameof(ValidationModel.String2));
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator2 =
+            propertyValidator2._lastAddedValidator as
+                ValidatorProxy<ValidationModel, CompareValidator<ValidationModel, string?>>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { String1 = "password", String2 = "password1" }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { String1 = "password", String2 = "password" }));
+    }
+
+    [Fact]
     public void DateOnly_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
@@ -1844,6 +1891,7 @@ public class PropertyValidatorValidationTests
         public int Number2 { get; set; }
 
         public string? String1 { get; set; }
+        public string? String2 { get; set; }
     }
 
     public class Child

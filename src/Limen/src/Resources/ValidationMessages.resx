@@ -297,4 +297,7 @@
     <data name="IpAddressValidator_ValidationError_AllowIPv6" xml:space="preserve">
         <value>The field {0} is not a valid IP address (IPv4 or IPv6).</value>
     </data>
+    <data name="CompareValidator_ValidationError" xml:space="preserve">
+        <value>'{0}' and '{1}' do not match.</value>
+    </data>
 </root>
