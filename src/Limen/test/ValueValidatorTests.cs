@@ -373,14 +373,16 @@ public class ValueValidatorTests
     [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
+        var subValidator = new StringValueValidator();
         var valueValidator = new ValueValidator<string>();
         valueValidator.AddAnnotations(new RequiredAttribute())
-            .Composite(new MinLengthValidator(3));
+            .Composite(new MinLengthValidator(3)).SetValidator(subValidator);
 
         Assert.Null(valueValidator._serviceProvider);
         var valueAnnotationValidator = valueValidator.Validators[0] as ValueAnnotationValidator;
         Assert.NotNull(valueAnnotationValidator);
         Assert.Null(valueAnnotationValidator._serviceProvider);
+        Assert.Null(subValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         valueValidator.InitializeServiceProvider(serviceProvider.GetService);
@@ -389,6 +391,7 @@ public class ValueValidatorTests
         var valueAnnotationValidator2 = valueValidator.Validators[0] as ValueAnnotationValidator;
         Assert.NotNull(valueAnnotationValidator2);
         Assert.NotNull(valueAnnotationValidator2._serviceProvider);
+        Assert.NotNull(subValidator._serviceProvider);
 
         valueValidator.AddAnnotations(new UserNameAttribute());
         var valueAnnotationValidator3 = valueValidator.Validators[2] as ValueAnnotationValidator;
