@@ -270,7 +270,7 @@ public class CollectionPropertyValidatorTests
         Assert.Null(propertyValidator._elementValidator);
         propertyValidator.SetValidator(new ChildValidator());
         Assert.NotNull(propertyValidator._elementValidator);
-        Assert.Null(propertyValidator._elementValidator._inheritedRuleSets);
+        Assert.Null(propertyValidator._elementValidator.InheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             propertyValidator.SetValidator((ObjectValidator<Child>?)null));
         Assert.Equal("Children", propertyValidator._elementValidator.MemberPath);
@@ -284,8 +284,8 @@ public class CollectionPropertyValidatorTests
         Assert.Null(propertyValidator2._elementValidator);
         propertyValidator2.SetValidator((_, _, _) => new ChildValidator());
         Assert.NotNull(propertyValidator2._elementValidator);
-        Assert.NotNull(propertyValidator2._elementValidator._inheritedRuleSets);
-        Assert.Equal(["login"], (string[]?)propertyValidator2._elementValidator._inheritedRuleSets!);
+        Assert.NotNull(propertyValidator2._elementValidator.InheritedRuleSets);
+        Assert.Equal(["login"], (string[]?)propertyValidator2._elementValidator.InheritedRuleSets!);
     }
 
     [Fact]
@@ -310,7 +310,7 @@ public class CollectionPropertyValidatorTests
         var propertyValidator = new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator);
         propertyValidator.ChildRules(o => o.RuleFor(u => u.Name).Required());
         Assert.NotNull(propertyValidator._elementValidator);
-        Assert.Null(propertyValidator._elementValidator._inheritedRuleSets);
+        Assert.Null(propertyValidator._elementValidator.InheritedRuleSets);
 
         Assert.False(propertyValidator._elementValidator.IsValid(new Child()));
         Assert.True(propertyValidator._elementValidator.IsValid(new Child { Name = "Furion" }));
@@ -322,8 +322,8 @@ public class CollectionPropertyValidatorTests
             };
         propertyValidator2.ChildRules(_ => { });
         Assert.NotNull(propertyValidator2._elementValidator);
-        Assert.NotNull(propertyValidator2._elementValidator._inheritedRuleSets);
-        Assert.Equal(["login"], (string[]?)propertyValidator2._elementValidator._inheritedRuleSets!);
+        Assert.NotNull(propertyValidator2._elementValidator.InheritedRuleSets);
+        Assert.Equal(["login"], (string[]?)propertyValidator2._elementValidator.InheritedRuleSets!);
     }
 
     [Fact]

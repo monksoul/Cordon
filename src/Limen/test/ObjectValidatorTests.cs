@@ -21,7 +21,7 @@ public class ObjectValidatorTests
         Assert.NotNull(validator.Validators);
         Assert.Null(validator._serviceProvider);
         Assert.Null(validator._items);
-        Assert.Null(validator._inheritedRuleSets);
+        Assert.Null(validator.InheritedRuleSets);
         Assert.Empty(validator.Validators);
         Assert.NotNull(validator._annotationValidator);
         Assert.True(validator._annotationValidator.ValidateAllProperties);
@@ -889,12 +889,12 @@ public class ObjectValidatorTests
     {
         var validator = new ObjectValidator<ObjectModel>();
         validator.SetInheritedRuleSetsIfNotSet(["rule"]);
-        Assert.NotNull(validator._inheritedRuleSets);
-        Assert.Equal(["rule"], (string[]?)validator._inheritedRuleSets!);
+        Assert.NotNull(validator.InheritedRuleSets);
+        Assert.Equal(["rule"], (string[]?)validator.InheritedRuleSets!);
 
         validator.SetInheritedRuleSetsIfNotSet(["login"]);
-        Assert.NotNull(validator._inheritedRuleSets);
-        Assert.Equal(["rule"], (string[]?)validator._inheritedRuleSets!);
+        Assert.NotNull(validator.InheritedRuleSets);
+        Assert.Equal(["rule"], (string[]?)validator.InheritedRuleSets!);
     }
 
     [Fact]

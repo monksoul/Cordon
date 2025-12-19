@@ -308,7 +308,8 @@ public partial class PropertyValidator<T, TProperty> :
         return SetValidator((ruleSets, items, options) =>
         {
             // 初始化属性级别对象验证器实例
-            var propertyValidator = new ObjectValidator<TProperty>(options, null, items, ruleSets);
+            var propertyValidator =
+                new ObjectValidator<TProperty>(options, null, items) { InheritedRuleSets = ruleSets };
 
             // 调用自定义配置委托
             configure(propertyValidator);

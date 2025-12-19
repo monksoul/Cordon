@@ -32,12 +32,6 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     internal readonly Stack<string?> _ruleSetStack;
 
     /// <summary>
-    ///     从父级继承的规则集
-    /// </summary>
-    /// <remarks>用于 <see cref="PropertyValidator{T,TProperty}.ChildRules" /> 场景。</remarks>
-    internal string?[]? _inheritedRuleSets;
-
-    /// <summary>
     ///     <see cref="IServiceProvider" /> 委托
     /// </summary>
     internal Func<Type, object?>? _serviceProvider;
@@ -45,9 +39,8 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     /// <summary>
     ///     <inheritdoc cref="ObjectValidator{T}" />
     /// </summary>
-    /// <param name="inheritedRuleSets">从父级继承的规则集</param>
-    public ObjectValidator(string?[]? inheritedRuleSets = null)
-        : this(new ValidatorOptions(), null, null, inheritedRuleSets)
+    public ObjectValidator()
+        : this(new ValidatorOptions(), null, null)
     {
     }
 
@@ -58,10 +51,8 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     ///     <see cref="ValidatorOptions" />
     /// </param>
     /// <param name="items">验证上下文数据</param>
-    /// <param name="inheritedRuleSets">从父级继承的规则集</param>
-    public ObjectValidator(ValidatorOptions options, IDictionary<object, object?>? items,
-        string?[]? inheritedRuleSets = null)
-        : this(options, null, items, inheritedRuleSets)
+    public ObjectValidator(ValidatorOptions options, IDictionary<object, object?>? items)
+        : this(options, null, items)
     {
     }
 
@@ -75,9 +66,8 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     ///     <see cref="IServiceProvider" />
     /// </param>
     /// <param name="items">验证上下文数据</param>
-    /// <param name="inheritedRuleSets">从父级继承的规则集</param>
     public ObjectValidator(ValidatorOptions options, IServiceProvider? serviceProvider,
-        IDictionary<object, object?>? items, string?[]? inheritedRuleSets = null)
+        IDictionary<object, object?>? items)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(options);
@@ -91,7 +81,6 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
         }
 
         _items = items;
-        _inheritedRuleSets = inheritedRuleSets?.Select(u => u?.Trim()).ToArray();
 
         // 初始化 ObjectAnnotationValidator 实例
         _annotationValidator = new ObjectAnnotationValidator(serviceProvider, items)
@@ -131,6 +120,12 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     /// </summary>
     /// <remarks>仅在作为嵌套验证器时由父验证器设置。</remarks>
     internal string? MemberPath { get; set; }
+
+    /// <summary>
+    ///     从父级继承的规则集
+    /// </summary>
+    /// <remarks>用于 <see cref="PropertyValidator{T,TProperty}.ChildRules" /> 场景。</remarks>
+    internal string?[]? InheritedRuleSets { get; set => field = value?.Select(u => u?.Trim()).ToArray(); }
 
     /// <inheritdoc />
     public void Dispose()
@@ -615,11 +610,11 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     /// <summary>
     ///     解析验证时使用的规则集
     /// </summary>
-    /// <param name="explicitRuleSets">规则集</param>
+    /// <param name="ruleSets">规则集</param>
     /// <returns><see cref="string" />列表</returns>
-    internal string?[]? ResolveValidationRuleSets(string?[]? explicitRuleSets) =>
+    internal string?[]? ResolveValidationRuleSets(string?[]? ruleSets) =>
         // 优先使用显式传入的规则集，否则从验证数据上下文中解析
-        explicitRuleSets ?? (_serviceProvider?.Invoke(typeof(IValidationDataContext)) as IValidationDataContext)
+        ruleSets ?? (_serviceProvider?.Invoke(typeof(IValidationDataContext)) as IValidationDataContext)
         ?.GetValidationOptions()?.RuleSets;
 
     /// <summary>
@@ -649,13 +644,12 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
             ? [_ruleSetStack.Peek()]
             : ruleSets is not null && ruleSets.Length > 0
                 ? ruleSets.Select(u => u?.Trim()).ToArray()
-                : _inheritedRuleSets;
+                : InheritedRuleSets;
 
     /// <summary>
     ///     设置从父级继承的规则集
     /// </summary>
     /// <remarks>仅当尚未设置时。</remarks>
     /// <param name="inheritedRuleSets">从父级继承的规则集</param>
-    internal void SetInheritedRuleSetsIfNotSet(string?[]? inheritedRuleSets) =>
-        _inheritedRuleSets ??= inheritedRuleSets?.Select(u => u?.Trim()).ToArray();
+    internal void SetInheritedRuleSetsIfNotSet(string?[]? inheritedRuleSets) => InheritedRuleSets ??= inheritedRuleSets;
 }

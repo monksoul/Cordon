@@ -774,7 +774,7 @@ public class PropertyValidatorTests
         propertyValidator.SetValidator(new SubModelValidator());
         Assert.NotNull(propertyValidator._propertyValidator);
         Assert.Equal("Sub", propertyValidator._propertyValidator.MemberPath);
-        Assert.Null(propertyValidator._propertyValidator._inheritedRuleSets);
+        Assert.Null(propertyValidator._propertyValidator.InheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             propertyValidator.SetValidator((ObjectValidator<SubModel>?)null));
         Assert.Equal("Sub", propertyValidator._propertyValidator.MemberPath);
@@ -785,8 +785,8 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator2._propertyValidator);
         propertyValidator2.SetValidator((_, _, _) => new SubModelValidator());
         Assert.NotNull(propertyValidator2._propertyValidator);
-        Assert.NotNull(propertyValidator2._propertyValidator._inheritedRuleSets);
-        Assert.Equal(["login"], (string[]?)propertyValidator2._propertyValidator._inheritedRuleSets!);
+        Assert.NotNull(propertyValidator2._propertyValidator.InheritedRuleSets);
+        Assert.Equal(["login"], (string[]?)propertyValidator2._propertyValidator.InheritedRuleSets!);
     }
 
     [Fact]
@@ -811,7 +811,7 @@ public class PropertyValidatorTests
         var propertyValidator = new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator);
         propertyValidator.ChildRules(o => o.RuleFor(u => u.Id).Min(1));
         Assert.NotNull(propertyValidator._propertyValidator);
-        Assert.Null(propertyValidator._propertyValidator._inheritedRuleSets);
+        Assert.Null(propertyValidator._propertyValidator.InheritedRuleSets);
 
         Assert.False(propertyValidator._propertyValidator.IsValid(new SubModel()));
         Assert.True(propertyValidator._propertyValidator.IsValid(new SubModel { Id = 1 }));
@@ -820,8 +820,8 @@ public class PropertyValidatorTests
             new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] };
         propertyValidator2.ChildRules(o => o.RuleFor(u => u.Id).Min(1));
         Assert.NotNull(propertyValidator2._propertyValidator);
-        Assert.NotNull(propertyValidator2._propertyValidator._inheritedRuleSets);
-        Assert.Equal(["login"], (string[]?)propertyValidator2._propertyValidator._inheritedRuleSets!);
+        Assert.NotNull(propertyValidator2._propertyValidator.InheritedRuleSets);
+        Assert.Equal(["login"], (string[]?)propertyValidator2._propertyValidator.InheritedRuleSets!);
     }
 
     [Fact]

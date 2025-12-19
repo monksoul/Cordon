@@ -8,7 +8,7 @@ namespace Limen;
 ///     单个值验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, IValueValidator<T>, IDisposable
+public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, IObjectValidator<T>, IDisposable
 {
     /// <summary>
     ///     值验证前的预处理器
@@ -73,13 +73,13 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <inheritdoc />
-    public bool IsValid(T? value)
+    public virtual bool IsValid(T? value, string?[]? ruleSets = null)
     {
         // 获取用于验证的值
         var resolvedValue = GetValueForValidation(value!);
 
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(resolvedValue))
+        if (!ShouldValidate(resolvedValue, ruleSets))
         {
             return true;
         }
@@ -94,13 +94,13 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <inheritdoc />
-    public List<ValidationResult>? GetValidationResults(T? value)
+    public virtual List<ValidationResult>? GetValidationResults(T? value, string?[]? ruleSets = null)
     {
         // 获取用于验证的值
         var resolvedValue = GetValueForValidation(value!);
 
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(resolvedValue))
+        if (!ShouldValidate(resolvedValue, ruleSets))
         {
             return null;
         }
@@ -123,13 +123,13 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <inheritdoc />
-    public void Validate(T? value)
+    public virtual void Validate(T? value, string?[]? ruleSets = null)
     {
         // 获取用于验证的值
         var resolvedValue = GetValueForValidation(value!);
 
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(resolvedValue))
+        if (!ShouldValidate(resolvedValue, ruleSets))
         {
             return;
         }
@@ -305,10 +305,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     ///     检查是否应该对该对象执行验证
     /// </summary>
     /// <param name="value">对象</param>
+    /// <param name="ruleSets">规则集</param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    internal bool ShouldValidate(T? value)
+    internal bool ShouldValidate(T? value, string?[]? ruleSets = null)
     {
         // 检查正向条件（When）
         if (WhenCondition is not null && !WhenCondition(value!))
