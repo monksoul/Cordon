@@ -14,6 +14,7 @@ public class ValueValidatorTests
         Assert.Null(valueValidator._items);
         Assert.NotNull(valueValidator.Validators);
         Assert.Null(valueValidator._lastAddedValidator);
+        Assert.Null(valueValidator._valueValidator);
         Assert.Empty(valueValidator.Validators);
         Assert.Equal(0, valueValidator._highPriorityEndIndex);
         Assert.Null(valueValidator._preProcessor);
@@ -42,6 +43,19 @@ public class ValueValidatorTests
 
         Assert.False(valueValidator.IsValid(null));
         Assert.False(valueValidator.IsValid("Fu"));
+        Assert.True(valueValidator.IsValid("Fur"));
+        Assert.True(valueValidator.IsValid("Furion"));
+    }
+
+    [Fact]
+    public void IsValid_WithValueValidator_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().Required().MinLength(3)
+            .SetValidator(new StringValueValidator());
+
+        Assert.False(valueValidator.IsValid(null));
+        Assert.False(valueValidator.IsValid("Fu"));
+        Assert.False(valueValidator.IsValid("Fur"));
         Assert.True(valueValidator.IsValid("Furion"));
     }
 
@@ -63,6 +77,7 @@ public class ValueValidatorTests
         Assert.Equal(["The field Value must be a string or array type with a minimum length of '3'."],
             validationResults2.Select(u => u.ErrorMessage));
 
+        Assert.Null(valueValidator.GetValidationResults("Fur"));
         Assert.Null(valueValidator.GetValidationResults("Furion"));
     }
 
@@ -86,6 +101,33 @@ public class ValueValidatorTests
     }
 
     [Fact]
+    public void GetValidationResults_WithValueValidator_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().Required().MinLength(3)
+            .SetValidator(new StringValueValidator());
+
+        var validationResults = valueValidator.GetValidationResults(null);
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The Value field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 = valueValidator.GetValidationResults("Fu");
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field Value must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        var validationResults3 = valueValidator.GetValidationResults("Fur");
+        Assert.NotNull(validationResults3);
+        Assert.Single(validationResults3);
+        Assert.Equal(["The field Value cannot be equal to 'Fur'."],
+            validationResults3.Select(u => u.ErrorMessage));
+
+        Assert.Null(valueValidator.GetValidationResults("Furion"));
+    }
+
+    [Fact]
     public void Validate_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().AddValidators(
@@ -101,6 +143,7 @@ public class ValueValidatorTests
             exception2.Message);
         Assert.Empty(exception2.ValidationResult.MemberNames);
 
+        valueValidator.Validate("Fur");
         valueValidator.Validate("Furion");
     }
 
@@ -119,6 +162,30 @@ public class ValueValidatorTests
         Assert.Equal("The field MyFirstName must be a string or array type with a minimum length of '3'.",
             exception2.Message);
         Assert.Empty(exception2.ValidationResult.MemberNames);
+    }
+
+    [Fact]
+    public void Validate_WithValueValidator_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().Required().MinLength(3)
+            .SetValidator(new StringValueValidator());
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.Validate(null));
+        Assert.Equal("The Value field is required.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.Validate("Fu"));
+        Assert.Equal("The field Value must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Empty(exception2.ValidationResult.MemberNames);
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() => valueValidator.Validate("Fur"));
+        Assert.Equal("The field Value cannot be equal to 'Fur'.", exception3.Message);
+        Assert.Empty(exception3.ValidationResult.MemberNames);
+
+        valueValidator.Validate("Furion");
     }
 
     [Fact]
@@ -189,6 +256,14 @@ public class ValueValidatorTests
     }
 
     [Fact]
+    public void Rule_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+        valueValidator.Rule().MinLength(10);
+        Assert.Single(valueValidator.Validators);
+    }
+
+    [Fact]
     public void When_Invalid_Parameters()
     {
         var valueValidator = new ValueValidator<string>();
@@ -232,6 +307,33 @@ public class ValueValidatorTests
 
         valueValidator.PreProcess(null);
         Assert.Null(valueValidator._preProcessor);
+    }
+
+    [Fact]
+    public void SetValidator_Invalid_Parameters()
+    {
+        var valueValidator = new ValueValidator<string>().SetValidator(new StringValueValidator());
+
+        Assert.Throws<ArgumentNullException>(() =>
+            valueValidator.SetValidator((Func<IDictionary<object, object?>?, ValueValidator<string>?>)null!));
+
+        var exception =
+            Assert.Throws<InvalidOperationException>(() => valueValidator.SetValidator(new StringValueValidator()));
+        Assert.Equal(
+            "An value validator has already been assigned to this value. Only one value validator is allowed per value.",
+            exception.Message);
+    }
+
+    [Fact]
+    public void SetValidator_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+
+        Assert.Null(valueValidator._valueValidator);
+        valueValidator.SetValidator(new StringValueValidator());
+        Assert.NotNull(valueValidator._valueValidator);
+        Assert.Throws<InvalidOperationException>(() =>
+            valueValidator.SetValidator((ValueValidator<string>?)null));
     }
 
     [Fact]
@@ -321,5 +423,10 @@ public class ValueValidatorTests
 
         valueValidator.PreProcess(u => u.Trim());
         Assert.Equal("Furion", valueValidator.GetValueForValidation(" Furion "));
+    }
+
+    public class StringValueValidator : AbstractValueValidator<string>
+    {
+        public StringValueValidator() => Rule().MaxLength(10).NotEqualTo("Fur");
     }
 }

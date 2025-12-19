@@ -12,7 +12,7 @@ namespace Limen;
 public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator<T, IEnumerable<TElement>?>
     where TElement : class
 {
-    /// <inheritdoc cref="IObjectValidator{T}" />
+    /// <inheritdoc cref="ObjectValidator{T}" />
     /// <remarks>集合元素对象验证器。</remarks>
     internal ObjectValidator<TElement>? _elementValidator;
 

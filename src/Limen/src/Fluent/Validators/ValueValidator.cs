@@ -8,13 +8,16 @@ namespace Limen;
 ///     单个值验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
+public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, IValueValidator<T>, IDisposable
 {
     /// <summary>
     ///     值验证前的预处理器
     /// </summary>
     /// <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
     internal Func<T, T>? _preProcessor;
+
+    /// <inheritdoc cref="ValueValidator{T}" />
+    internal ValueValidator<T>? _valueValidator;
 
     /// <summary>
     ///     <inheritdoc cref="ValueValidator{T}" />
@@ -62,28 +65,35 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
     /// <remarks>当条件不满足时才进行验证。</remarks>
     internal Func<T, bool>? UnlessCondition { get; private set; }
 
-    /// <summary>
-    ///     检查对象合法性
-    /// </summary>
-    /// <param name="value">对象</param>
-    /// <returns>
-    ///     <see cref="bool" />
-    /// </returns>
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <inheritdoc />
     public bool IsValid(T? value)
     {
         // 获取用于验证的值
         var resolvedValue = GetValueForValidation(value!);
 
-        return !ShouldValidate(resolvedValue) || Validators.All(u => u.IsValid(resolvedValue));
+        // 检查是否应该对该对象执行验证
+        if (!ShouldValidate(resolvedValue))
+        {
+            return true;
+        }
+
+        // 检查是否设置单个值验证器
+        if (_valueValidator is not null && !_valueValidator.IsValid(resolvedValue))
+        {
+            return false;
+        }
+
+        return Validators.All(u => u.IsValid(resolvedValue));
     }
 
-    /// <summary>
-    ///     获取对象验证结果集合
-    /// </summary>
-    /// <param name="value">对象</param>
-    /// <returns>
-    ///     <see cref="List{T}" />
-    /// </returns>
+    /// <inheritdoc />
     public List<ValidationResult>? GetValidationResults(T? value)
     {
         // 获取用于验证的值
@@ -95,17 +105,24 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
             return null;
         }
 
-        // 获取显示名称
+        // 获取显示名称和初始化验证结果集合
         var displayName = GetDisplayName();
+        var validationResults = new List<ValidationResult>();
+
+        // 检查是否设置单个值验证器
+        if (_valueValidator is not null)
+        {
+            validationResults.AddRange(_valueValidator.GetValidationResults(resolvedValue) ?? []);
+        }
 
         // 获取所有验证器验证结果集合
-        return Validators.SelectMany(u => u.GetValidationResults(resolvedValue, displayName) ?? []).ToResults();
+        validationResults.AddRange(Validators.SelectMany(u =>
+            u.GetValidationResults(resolvedValue, displayName) ?? []));
+
+        return validationResults.ToResults();
     }
 
-    /// <summary>
-    ///     验证指定的对象
-    /// </summary>
-    /// <param name="value">对象</param>
+    /// <inheritdoc />
     public void Validate(T? value)
     {
         // 获取用于验证的值
@@ -120,12 +137,27 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
         // 获取显示名称
         var displayName = GetDisplayName();
 
+        // 检查是否设置单个值验证器
+        // ReSharper disable once UseNullPropagation
+        if (_valueValidator is not null)
+        {
+            _valueValidator.Validate(resolvedValue);
+        }
+
         // 遍历验证器集合
         foreach (var validator in Validators)
         {
             validator.Validate(resolvedValue, displayName);
         }
     }
+
+    /// <summary>
+    ///     为当前值自身配置验证规则
+    /// </summary>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public ValueValidator<T> Rule() => this;
 
     /// <summary>
     ///     设置验证条件
@@ -179,6 +211,56 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
     }
 
     /// <summary>
+    ///     设置单个值验证器
+    /// </summary>
+    /// <param name="validatorFactory">
+    ///     <see cref="ValueValidator{T}" /> 工厂委托
+    /// </param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public ValueValidator<T> SetValidator(Func<IDictionary<object, object?>?, ValueValidator<T>?> validatorFactory)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validatorFactory);
+
+        // 空检查
+        if (_valueValidator is not null)
+        {
+            throw new InvalidOperationException(
+                "An value validator has already been assigned to this value. Only one value validator is allowed per value.");
+        }
+
+        // 调用工厂方法，传入当前 _items
+        _valueValidator = validatorFactory(_items);
+
+        // 空检查
+        if (_valueValidator is null)
+        {
+            return this;
+        }
+
+        // 同步 IServiceProvider 委托
+        _valueValidator.InitializeServiceProvider(_serviceProvider);
+
+        return this;
+    }
+
+    /// <summary>
+    ///     设置单个值验证器
+    /// </summary>
+    /// <param name="validator">
+    ///     <see cref="ValueValidator{T}" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public ValueValidator<T> SetValidator(ValueValidator<T>? validator) =>
+        SetValidator(_ => validator);
+
+    /// <summary>
     ///     设置显示名称
     /// </summary>
     /// <param name="displayName">显示名称</param>
@@ -190,6 +272,33 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>
         DisplayName = displayName;
 
         return this;
+    }
+
+    /// <summary>
+    ///     释放资源
+    /// </summary>
+    /// <param name="disposing">是否释放托管资源</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing)
+        {
+            return;
+        }
+
+        // 释放所有验证器资源
+        foreach (var validator in Validators)
+        {
+            if (validator is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        // 释放单个值验证器资源
+        if (_valueValidator is IDisposable valueValidatorDisposable)
+        {
+            valueValidatorDisposable.Dispose();
+        }
     }
 
     /// <summary>

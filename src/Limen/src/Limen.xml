@@ -3294,6 +3294,12 @@
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
+        <member name="T:Limen.AbstractValueValidator`1">
+            <summary>
+                单个值验证器抽象基类
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
         <member name="T:Limen.CollectionPropertyValidator`2">
             <summary>
                 集合类型属性验证器
@@ -3302,7 +3308,7 @@
             <typeparam name="TElement">元素类型</typeparam>
         </member>
         <member name="F:Limen.CollectionPropertyValidator`2._elementValidator">
-            <inheritdoc cref="T:Limen.IObjectValidator`1" />
+            <inheritdoc cref="T:Limen.ObjectValidator`1" />
             <remarks>集合元素对象验证器。</remarks>
         </member>
         <member name="M:Limen.CollectionPropertyValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{`1}}},Limen.ObjectValidator{`0})">
@@ -3443,6 +3449,41 @@
             </summary>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
+        </member>
+        <member name="T:Limen.IValueValidator">
+            <summary>
+                单个值验证器服务
+            </summary>
+        </member>
+        <member name="T:Limen.IValueValidator`1">
+            <summary>
+                <inheritdoc cref="T:Limen.IValueValidator" />
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="M:Limen.IValueValidator`1.IsValid(`0)">
+            <summary>
+                检查对象合法性
+            </summary>
+            <param name="value">对象</param>
+            <returns>
+                <see cref="T:System.Boolean" />
+            </returns>
+        </member>
+        <member name="M:Limen.IValueValidator`1.GetValidationResults(`0)">
+            <summary>
+                获取对象验证结果集合
+            </summary>
+            <param name="value">对象</param>
+            <returns>
+                <see cref="T:System.Collections.Generic.List`1" />
+            </returns>
+        </member>
+        <member name="M:Limen.IValueValidator`1.Validate(`0)">
+            <summary>
+                验证指定的对象
+            </summary>
+            <param name="value">对象</param>
         </member>
         <member name="T:Limen.ObjectValidator`1">
             <summary>
@@ -3778,7 +3819,7 @@
             <remarks>该预处理器仅用于验证，不会修改原始属性的值。</remarks>
         </member>
         <member name="F:Limen.PropertyValidator`2._propertyValidator">
-            <inheritdoc cref="T:Limen.IObjectValidator`1" />
+            <inheritdoc cref="T:Limen.ObjectValidator`1" />
             <remarks>属性级别对象验证器。</remarks>
         </member>
         <member name="M:Limen.PropertyValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},Limen.ObjectValidator{`0})">
@@ -4386,6 +4427,9 @@
             </summary>
             <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
         </member>
+        <member name="F:Limen.ValueValidator`1._valueValidator">
+            <inheritdoc cref="T:Limen.ValueValidator`1" />
+        </member>
         <member name="M:Limen.ValueValidator`1.#ctor">
             <summary>
                 <inheritdoc cref="T:Limen.ValueValidator`1" />
@@ -4423,29 +4467,25 @@
             </summary>
             <remarks>当条件不满足时才进行验证。</remarks>
         </member>
+        <member name="M:Limen.ValueValidator`1.Dispose">
+            <inheritdoc />
+        </member>
         <member name="M:Limen.ValueValidator`1.IsValid(`0)">
-            <summary>
-                检查对象合法性
-            </summary>
-            <param name="value">对象</param>
-            <returns>
-                <see cref="T:System.Boolean" />
-            </returns>
+            <inheritdoc />
         </member>
         <member name="M:Limen.ValueValidator`1.GetValidationResults(`0)">
-            <summary>
-                获取对象验证结果集合
-            </summary>
-            <param name="value">对象</param>
-            <returns>
-                <see cref="T:System.Collections.Generic.List`1" />
-            </returns>
+            <inheritdoc />
         </member>
         <member name="M:Limen.ValueValidator`1.Validate(`0)">
+            <inheritdoc />
+        </member>
+        <member name="M:Limen.ValueValidator`1.Rule">
             <summary>
-                验证指定的对象
+                为当前值自身配置验证规则
             </summary>
-            <param name="value">对象</param>
+            <returns>
+                <see cref="T:Limen.ValueValidator`1" />
+            </returns>
         </member>
         <member name="M:Limen.ValueValidator`1.When(System.Func{`0,System.Boolean})">
             <summary>
@@ -4477,6 +4517,30 @@
                 <see cref="T:Limen.ValueValidator`1" />
             </returns>
         </member>
+        <member name="M:Limen.ValueValidator`1.SetValidator(System.Func{System.Collections.Generic.IDictionary{System.Object,System.Object},Limen.ValueValidator{`0}})">
+            <summary>
+                设置单个值验证器
+            </summary>
+            <param name="validatorFactory">
+                <see cref="T:Limen.ValueValidator`1" /> 工厂委托
+            </param>
+            <returns>
+                <see cref="T:Limen.ValueValidator`1" />
+            </returns>
+            <exception cref="T:System.InvalidOperationException"></exception>
+        </member>
+        <member name="M:Limen.ValueValidator`1.SetValidator(Limen.ValueValidator{`0})">
+            <summary>
+                设置单个值验证器
+            </summary>
+            <param name="validator">
+                <see cref="T:Limen.ValueValidator`1" />
+            </param>
+            <returns>
+                <see cref="T:Limen.ValueValidator`1" />
+            </returns>
+            <exception cref="T:System.InvalidOperationException"></exception>
+        </member>
         <member name="M:Limen.ValueValidator`1.WithDisplayName(System.String)">
             <summary>
                 设置显示名称
@@ -4485,6 +4549,12 @@
             <returns>
                 <see cref="T:Limen.ValueValidator`1" />
             </returns>
+        </member>
+        <member name="M:Limen.ValueValidator`1.Dispose(System.Boolean)">
+            <summary>
+                释放资源
+            </summary>
+            <param name="disposing">是否释放托管资源</param>
         </member>
         <member name="M:Limen.ValueValidator`1.ShouldValidate(`0)">
             <summary>

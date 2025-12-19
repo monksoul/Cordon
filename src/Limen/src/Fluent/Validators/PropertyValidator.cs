@@ -30,7 +30,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <remarks>该预处理器仅用于验证，不会修改原始属性的值。</remarks>
     internal Func<TProperty, TProperty>? _preProcessor;
 
-    /// <inheritdoc cref="IObjectValidator{T}" />
+    /// <inheritdoc cref="ObjectValidator{T}" />
     /// <remarks>属性级别对象验证器。</remarks>
     internal ObjectValidator<TProperty>? _propertyValidator;
 

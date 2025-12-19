@@ -24,7 +24,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapPost("/miniapi", (User user) => { });
+app.MapPost("/miniapi", (Custom custom) => { });
 
 app.MapControllers();
 

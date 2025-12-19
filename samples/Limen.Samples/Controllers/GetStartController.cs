@@ -5,8 +5,8 @@
 public class GetStartController
 {
     [HttpPost /*ValidationOptions(["create"])*/]
-    public Task<User> Post(User user)
+    public Task<Custom> Post(Custom custom)
     {
-        return Task.FromResult(user);
+        return Task.FromResult(custom);
     }
 }
