@@ -90,13 +90,13 @@ public class ValueValidatorTests
         var validationResults = valueValidator.GetValidationResults(null);
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
-        Assert.Equal(["The Value field is required."],
+        Assert.Equal(["The Object field is required."],
             validationResults.Select(u => u.ErrorMessage));
 
         var validationResults2 = valueValidator.GetValidationResults("Fu");
         Assert.NotNull(validationResults2);
         Assert.Single(validationResults2);
-        Assert.Equal(["The field Value must be a string or array type with a minimum length of '3'."],
+        Assert.Equal(["The field Object must be a string or array type with a minimum length of '3'."],
             validationResults2.Select(u => u.ErrorMessage));
 
         Assert.Null(valueValidator.GetValidationResults("Fur"));
@@ -115,13 +115,13 @@ public class ValueValidatorTests
         var validationResults = valueValidator.GetValidationResults(null);
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
-        Assert.Equal(["The Value field is required."],
+        Assert.Equal(["The Object field is required."],
             validationResults.Select(u => u.ErrorMessage));
 
         var validationResults2 = valueValidator.GetValidationResults("Fu");
         Assert.NotNull(validationResults2);
         Assert.Single(validationResults2);
-        Assert.Equal(["The field Value must be a string or array type with a minimum length of '3'."],
+        Assert.Equal(["The field Object must be a string or array type with a minimum length of '3'."],
             validationResults2.Select(u => u.ErrorMessage));
 
         Assert.Null(valueValidator.GetValidationResults("Fur"));
@@ -130,19 +130,19 @@ public class ValueValidatorTests
         var validationResults3 = valueValidator.GetValidationResults(null, ["new"]);
         Assert.NotNull(validationResults3);
         Assert.Single(validationResults3);
-        Assert.Equal(["The Value field is required."],
+        Assert.Equal(["The Object field is required."],
             validationResults3.Select(u => u.ErrorMessage));
 
         var validationResults4 = valueValidator.GetValidationResults("Fu", ["new"]);
         Assert.NotNull(validationResults4);
         Assert.Single(validationResults4);
-        Assert.Equal(["The field Value must be a string or array type with a minimum length of '5'."],
+        Assert.Equal(["The field Object must be a string or array type with a minimum length of '5'."],
             validationResults4.Select(u => u.ErrorMessage));
 
         var validationResults5 = valueValidator.GetValidationResults("Fur", ["new"]);
         Assert.NotNull(validationResults5);
         Assert.Single(validationResults5);
-        Assert.Equal(["The field Value must be a string or array type with a minimum length of '5'."],
+        Assert.Equal(["The field Object must be a string or array type with a minimum length of '5'."],
             validationResults5.Select(u => u.ErrorMessage));
 
         Assert.Null(valueValidator.GetValidationResults("Furion", ["new"]));
@@ -176,19 +176,19 @@ public class ValueValidatorTests
         var validationResults = valueValidator.GetValidationResults(null);
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
-        Assert.Equal(["The Value field is required."],
+        Assert.Equal(["The String field is required."],
             validationResults.Select(u => u.ErrorMessage));
 
         var validationResults2 = valueValidator.GetValidationResults("Fu");
         Assert.NotNull(validationResults2);
         Assert.Single(validationResults2);
-        Assert.Equal(["The field Value must be a string or array type with a minimum length of '3'."],
+        Assert.Equal(["The field String must be a string or array type with a minimum length of '3'."],
             validationResults2.Select(u => u.ErrorMessage));
 
         var validationResults3 = valueValidator.GetValidationResults("Fur");
         Assert.NotNull(validationResults3);
         Assert.Single(validationResults3);
-        Assert.Equal(["The field Value cannot be equal to 'Fur'."],
+        Assert.Equal(["The field String cannot be equal to 'Fur'."],
             validationResults3.Select(u => u.ErrorMessage));
 
         Assert.Null(valueValidator.GetValidationResults("Furion"));
@@ -201,12 +201,12 @@ public class ValueValidatorTests
             new RequiredValidator(), new MinLengthValidator(3));
 
         var exception = Assert.Throws<ValidationException>(() => valueValidator.Validate(null));
-        Assert.Equal("The Value field is required.", exception.Message);
+        Assert.Equal("The Object field is required.", exception.Message);
         Assert.Empty(exception.ValidationResult.MemberNames);
 
         var exception2 =
             Assert.Throws<ValidationException>(() => valueValidator.Validate("Fu"));
-        Assert.Equal("The field Value must be a string or array type with a minimum length of '3'.",
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '3'.",
             exception2.Message);
         Assert.Empty(exception2.ValidationResult.MemberNames);
 
@@ -224,12 +224,12 @@ public class ValueValidatorTests
         });
 
         var exception = Assert.Throws<ValidationException>(() => valueValidator.Validate(null));
-        Assert.Equal("The Value field is required.", exception.Message);
+        Assert.Equal("The Object field is required.", exception.Message);
         Assert.Empty(exception.ValidationResult.MemberNames);
 
         var exception2 =
             Assert.Throws<ValidationException>(() => valueValidator.Validate("Fu"));
-        Assert.Equal("The field Value must be a string or array type with a minimum length of '3'.",
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '3'.",
             exception2.Message);
         Assert.Empty(exception2.ValidationResult.MemberNames);
 
@@ -237,18 +237,18 @@ public class ValueValidatorTests
         valueValidator.Validate("Furion");
 
         var exception3 = Assert.Throws<ValidationException>(() => valueValidator.Validate(null, ["new"]));
-        Assert.Equal("The Value field is required.", exception3.Message);
+        Assert.Equal("The Object field is required.", exception3.Message);
         Assert.Empty(exception3.ValidationResult.MemberNames);
 
         var exception4 =
             Assert.Throws<ValidationException>(() => valueValidator.Validate("Fu", ["new"]));
-        Assert.Equal("The field Value must be a string or array type with a minimum length of '5'.",
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '5'.",
             exception4.Message);
         Assert.Empty(exception4.ValidationResult.MemberNames);
 
         var exception5 =
             Assert.Throws<ValidationException>(() => valueValidator.Validate("Fur", ["new"]));
-        Assert.Equal("The field Value must be a string or array type with a minimum length of '5'.",
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '5'.",
             exception5.Message);
         Assert.Empty(exception5.ValidationResult.MemberNames);
 
@@ -279,18 +279,18 @@ public class ValueValidatorTests
             .SetValidator(new StringValueValidator());
 
         var exception = Assert.Throws<ValidationException>(() => valueValidator.Validate(null));
-        Assert.Equal("The Value field is required.", exception.Message);
+        Assert.Equal("The String field is required.", exception.Message);
         Assert.Empty(exception.ValidationResult.MemberNames);
 
         var exception2 =
             Assert.Throws<ValidationException>(() => valueValidator.Validate("Fu"));
-        Assert.Equal("The field Value must be a string or array type with a minimum length of '3'.",
+        Assert.Equal("The field String must be a string or array type with a minimum length of '3'.",
             exception2.Message);
         Assert.Empty(exception2.ValidationResult.MemberNames);
 
         var exception3 =
             Assert.Throws<ValidationException>(() => valueValidator.Validate("Fur"));
-        Assert.Equal("The field Value cannot be equal to 'Fur'.", exception3.Message);
+        Assert.Equal("The field String cannot be equal to 'Fur'.", exception3.Message);
         Assert.Empty(exception3.ValidationResult.MemberNames);
 
         valueValidator.Validate("Furion");
@@ -559,7 +559,7 @@ public class ValueValidatorTests
     public void GetDisplayName_ReturnOK()
     {
         var valueValidator = new ValueValidator<string>();
-        Assert.Equal("Value", valueValidator.GetDisplayName());
+        Assert.Equal("String", valueValidator.GetDisplayName());
 
         var valueValidator2 = new ValueValidator<string>().WithDisplayName("Field");
         Assert.Equal("Field", valueValidator2.GetDisplayName());
@@ -669,10 +669,10 @@ public class ValueValidatorTests
         Assert.Equal(["The field String cannot be equal to 'Fur'."],
             valueValidator.ToResults(validationContext).Select(u => u.ErrorMessage!).ToArray());
 
-        var validationContext2 = new ValidationContext(new object());
+        var validationContext2 = new ValidationContext(new object()) { DisplayName = "Name" };
         var valueValidator2 = new ValueValidator<string>().Required().NotEqualTo("Fur");
 
-        Assert.Equal(["The Object field is required."],
+        Assert.Equal(["The Name field is required."],
             valueValidator2.ToResults(validationContext2).Select(u => u.ErrorMessage!).ToArray());
     }
 

@@ -498,7 +498,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <returns>
     ///     <see cref="string" />
     /// </returns>
-    internal string GetDisplayName() => DisplayName ?? "Value";
+    internal string GetDisplayName() => DisplayName ?? typeof(T).Name;
 
     /// <summary>
     ///     解析验证时使用的规则集
