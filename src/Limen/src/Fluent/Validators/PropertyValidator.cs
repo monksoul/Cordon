@@ -716,7 +716,7 @@ public partial class PropertyValidator<T, TProperty> :
     internal ValidationContext<T> CreateValidationContext(T value)
     {
         // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext<T>(value, null, _items?.AsReadOnly());
+        var validationContext = new ValidationContext<T>(value, null, _items);
 
         // 同步 IServiceProvider 委托
         validationContext.InitializeServiceProvider(_serviceProvider);

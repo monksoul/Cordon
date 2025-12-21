@@ -1,7 +1,9 @@
 ﻿namespace Limen.Samples.Models;
 
-public class User
+public class User /*: IValidatableObject*/
 {
+    private readonly string[] _allowedDomains = ["@outlook.com", "@qq.com", "@163.com"];
+
     [Required(ErrorMessage = "名字不能为空")]
     [MinLength(2, ErrorMessage = "名字不能少于 2 个字符")]
     public string? Name { get; set; }
@@ -14,4 +16,38 @@ public class User
     public string? Password { get; set; }
 
     public string? ConfirmPassword { get; set; }
+
+    [Required]
+    [EmailAddress]
+    [AllowedEmailDomains]
+    public string? EmailAddress { get; set; }
+
+    /// <inheritdoc />
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (EmailAddress is not null &&
+            !_allowedDomains.Any(domain => EmailAddress.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
+            yield return new ValidationResult("仅支持 outlook、qq 和 163 邮箱格式。", [nameof(EmailAddress)]);
+    }
+}
+
+public class AllowedEmailDomainsAttribute : ValidationAttribute
+{
+    private readonly string[] _allowedDomains = ["@outlook.com", "@qq.com", "@163.com"];
+
+    public string GetErrorMessage()
+    {
+        return "仅支持 outlook、qq 和 163 邮箱格式。";
+    }
+
+    /// <inheritdoc />
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    {
+        if (value is not string email) return ValidationResult.Success;
+
+        if (!_allowedDomains.Any(domain => email.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
+            return new ValidationResult(GetErrorMessage());
+
+        return base.IsValid(value, validationContext);
+    }
 }

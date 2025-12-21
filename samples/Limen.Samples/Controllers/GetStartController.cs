@@ -21,6 +21,12 @@ public class GetStartController
     // {
     //     return Task.FromResult(custom);
     // }
+
+    [HttpPost]
+    public Task<User> Post3(User user)
+    {
+        return Task.FromResult(user);
+    }
 }
 
 public class NameValidator : AbstractValueValidator<string>

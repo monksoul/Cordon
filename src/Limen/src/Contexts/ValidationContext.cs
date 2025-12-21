@@ -23,8 +23,7 @@ public sealed class ValidationContext<T> : IValidatorInitializer, IServiceProvid
     ///     <see cref="IServiceProvider" />
     /// </param>
     /// <param name="items">验证上下文数据</param>
-    internal ValidationContext(T instance, IServiceProvider? serviceProvider,
-        IReadOnlyDictionary<object, object?>? items)
+    internal ValidationContext(T instance, IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
