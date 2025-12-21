@@ -3543,6 +3543,9 @@
         <member name="M:Limen.ObjectValidator`1.Dispose">
             <inheritdoc />
         </member>
+        <member name="M:Limen.ObjectValidator`1.Limen#IMemberPathRepairable#RepairMemberPaths">
+            <inheritdoc />
+        </member>
         <member name="M:Limen.ObjectValidator`1.IsValid(`0,System.String[])">
             <inheritdoc />
         </member>
@@ -3555,23 +3558,21 @@
         <member name="M:Limen.ObjectValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
-        <member name="M:Limen.ObjectValidator`1.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String[])">
+        <member name="M:Limen.ObjectValidator`1.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
                 为指定属性配置验证规则
             </summary>
             <param name="selector">属性选择器</param>
-            <param name="ruleSets">规则集</param>
             <typeparam name="TProperty">属性类型</typeparam>
             <returns>
                 <see cref="T:Limen.PropertyValidator`2" />
             </returns>
         </member>
-        <member name="M:Limen.ObjectValidator`1.RuleForEach``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}},System.String[])">
+        <member name="M:Limen.ObjectValidator`1.RuleForEach``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}})">
             <summary>
                 为集合类型属性中的每一个元素配置验证规则
             </summary>
             <param name="selector">属性选择器</param>
-            <param name="ruleSets">规则集</param>
             <typeparam name="TElement">元素类型</typeparam>
             <returns>
                 <see cref="T:Limen.CollectionPropertyValidator`2" />
@@ -3741,11 +3742,10 @@
                 <see cref="T:System.ComponentModel.PropertyChangedEventArgs" />
             </param>
         </member>
-        <member name="M:Limen.ObjectValidator`1.GetCurrentRuleSetScope(System.String[])">
+        <member name="M:Limen.ObjectValidator`1.GetCurrentRuleSetScope">
             <summary>
                 获取当前规则集作用域中的规则集
             </summary>
-            <param name="ruleSets">规则集</param>
             <returns><see cref="T:System.String" />列表</returns>
         </member>
         <member name="M:Limen.ObjectValidator`1.SetInheritedRuleSetsIfNotSet(System.String[])">
@@ -3754,6 +3754,9 @@
             </summary>
             <remarks>仅当尚未设置时。</remarks>
             <param name="inheritedRuleSets">从父级继承的规则集</param>
+        </member>
+        <member name="M:Limen.ObjectValidator`1.RepairMemberPaths">
+            <inheritdoc cref="M:Limen.IMemberPathRepairable.RepairMemberPaths" />
         </member>
         <member name="T:Limen.PropertyValidator`2">
             <summary>
@@ -3888,7 +3891,7 @@
             <summary>
                 为集合元素继续配置规则
             </summary>
-            <remarks>建议优先使用 <see cref="M:Limen.ObjectValidator`1.RuleForEach``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}},System.String[])" />。</remarks>
+            <remarks>建议优先使用 <see cref="M:Limen.ObjectValidator`1.RuleForEach``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}})" />。</remarks>
             <param name="configure">自定义配置委托</param>
             <typeparam name="TElement">元素类型</typeparam>
             <returns>
@@ -4294,18 +4297,17 @@
                 <see cref="T:Limen.ObjectValidator`1" />
             </returns>
         </member>
-        <member name="M:Limen.PropertyValidator`2.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.String[])">
+        <member name="M:Limen.PropertyValidator`2.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
                 为指定属性配置验证规则
             </summary>
             <param name="selector">属性选择器</param>
-            <param name="ruleSets">规则集</param>
             <typeparam name="TOtherProperty">属性类型</typeparam>
             <returns>
                 <see cref="T:Limen.PropertyValidator`2" />
             </returns>
         </member>
-        <member name="M:Limen.PropertyValidator`2.RuleForEach``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}},System.String[])">
+        <member name="M:Limen.PropertyValidator`2.RuleForEach``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}})">
             <summary>
                 为集合类型属性中的每一个元素配置验证规则
             </summary>

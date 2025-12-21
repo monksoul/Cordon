@@ -318,15 +318,11 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
         // 设置元素验证器的基础路径
         _elementValidator.MemberPath = GetEffectiveMemberName();
 
-        // 递归修复元素验证器内部的所有子验证器
-        foreach (var childValidator in _elementValidator.Validators)
+        // 检查集合元素对象验证器是否实现 IMemberPathRepairable 接口
+        if (_elementValidator is IMemberPathRepairable repairable)
         {
-            // 检查验证器是否实现 IMemberPathRepairable 接口
-            if (childValidator is IMemberPathRepairable repairable)
-            {
-                // 修复验证器及其子验证器的成员路径
-                repairable.RepairMemberPaths();
-            }
+            // 修复验证器及其子验证器的成员路径
+            repairable.RepairMemberPaths();
         }
     }
 }

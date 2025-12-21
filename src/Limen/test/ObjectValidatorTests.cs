@@ -368,27 +368,6 @@ public class ObjectValidatorTests
         var propertyValidator = validator.Validators.LastOrDefault() as PropertyValidator<ObjectModel, string?>;
         Assert.NotNull(propertyValidator);
         Assert.Null(propertyValidator.RuleSets);
-
-        validator.RuleFor(u => u.Name, ["login"]);
-        Assert.Equal(2, validator.Validators.Count);
-        var propertyValidator2 = validator.Validators.LastOrDefault() as PropertyValidator<ObjectModel, string>;
-        Assert.NotNull(propertyValidator2);
-        Assert.NotNull(propertyValidator2.RuleSets);
-        Assert.NotStrictEqual(["login"], propertyValidator2.RuleSets);
-
-        validator.RuleFor(u => u.Id, ["login", "register"]);
-        Assert.Equal(3, validator.Validators.Count);
-        var propertyValidator3 = validator.Validators.LastOrDefault() as PropertyValidator<ObjectModel, int>;
-        Assert.NotNull(propertyValidator3);
-        Assert.NotNull(propertyValidator3.RuleSets);
-        Assert.NotStrictEqual(["login", "register"], propertyValidator3.RuleSets);
-
-        validator.RuleFor(u => u.Name, ["login; register"]);
-        Assert.Equal(4, validator.Validators.Count);
-        var propertyValidator4 = validator.Validators.LastOrDefault() as PropertyValidator<ObjectModel, string>;
-        Assert.NotNull(propertyValidator4);
-        Assert.NotNull(propertyValidator4.RuleSets);
-        Assert.NotStrictEqual(["login", "register"], propertyValidator4.RuleSets);
     }
 
     [Fact]
@@ -398,18 +377,18 @@ public class ObjectValidatorTests
 
         validator.RuleSet([], () =>
         {
-            validator.RuleFor(u => u.Address, ["login"]);
+            validator.RuleFor(u => u.Address);
         });
         Assert.Single(validator.Validators);
         var propertyValidator = validator.Validators.LastOrDefault() as PropertyValidator<ObjectModel, string?>;
         Assert.NotNull(propertyValidator);
-        Assert.NotNull(propertyValidator.RuleSets);
+        Assert.Null(propertyValidator.RuleSets);
         Assert.NotStrictEqual(["login"], propertyValidator.RuleSets);
 
         validator.Validators.Clear();
         validator.RuleSet(["login", "register"], () =>
         {
-            validator.RuleFor(u => u.Address, ["owner"]);
+            validator.RuleFor(u => u.Address);
         });
         Assert.Equal(2, validator.Validators.Count);
 
@@ -428,7 +407,7 @@ public class ObjectValidatorTests
         validator.Validators.Clear();
         validator.RuleSet(["login", "register"], chain =>
         {
-            chain.RuleFor(u => u.Address, ["owner"]);
+            chain.RuleFor(u => u.Address);
         });
         Assert.Equal(2, validator.Validators.Count);
 
@@ -494,30 +473,6 @@ public class ObjectValidatorTests
             validator.Validators.LastOrDefault() as CollectionPropertyValidator<ObjectModel, Child>;
         Assert.NotNull(propertyValidator);
         Assert.Null(propertyValidator.RuleSets);
-
-        validator.RuleForEach(u => u.Children, ["login"]);
-        Assert.Equal(2, validator.Validators.Count);
-        var propertyValidator2 =
-            validator.Validators.LastOrDefault() as CollectionPropertyValidator<ObjectModel, Child>;
-        Assert.NotNull(propertyValidator2);
-        Assert.NotNull(propertyValidator2.RuleSets);
-        Assert.NotStrictEqual(["login"], propertyValidator2.RuleSets);
-
-        validator.RuleForEach(u => u.Children, ["login", "register"]);
-        Assert.Equal(3, validator.Validators.Count);
-        var propertyValidator3 =
-            validator.Validators.LastOrDefault() as CollectionPropertyValidator<ObjectModel, Child>;
-        Assert.NotNull(propertyValidator3);
-        Assert.NotNull(propertyValidator3.RuleSets);
-        Assert.NotStrictEqual(["login", "register"], propertyValidator3.RuleSets);
-
-        validator.RuleForEach(u => u.Children, ["login; register"]);
-        Assert.Equal(4, validator.Validators.Count);
-        var propertyValidator4 =
-            validator.Validators.LastOrDefault() as CollectionPropertyValidator<ObjectModel, Child>;
-        Assert.NotNull(propertyValidator4);
-        Assert.NotNull(propertyValidator4.RuleSets);
-        Assert.NotStrictEqual(["login", "register"], propertyValidator4.RuleSets);
     }
 
     [Fact]
@@ -527,19 +482,19 @@ public class ObjectValidatorTests
 
         validator.RuleSet([], () =>
         {
-            validator.RuleForEach(u => u.Children, ["login"]);
+            validator.RuleForEach(u => u.Children);
         });
         Assert.Single(validator.Validators);
         var propertyValidator =
             validator.Validators.LastOrDefault() as CollectionPropertyValidator<ObjectModel, Child>;
         Assert.NotNull(propertyValidator);
-        Assert.NotNull(propertyValidator.RuleSets);
+        Assert.Null(propertyValidator.RuleSets);
         Assert.NotStrictEqual(["login"], propertyValidator.RuleSets);
 
         validator.Validators.Clear();
         validator.RuleSet(["login", "register"], () =>
         {
-            validator.RuleForEach(u => u.Children, ["owner"]);
+            validator.RuleForEach(u => u.Children);
         });
         Assert.Equal(2, validator.Validators.Count);
 
@@ -558,7 +513,7 @@ public class ObjectValidatorTests
         validator.Validators.Clear();
         validator.RuleSet(["login", "register"], chain =>
         {
-            chain.RuleForEach(u => u.Children, ["owner"]);
+            chain.RuleForEach(u => u.Children);
         });
         Assert.Equal(2, validator.Validators.Count);
 
@@ -874,12 +829,12 @@ public class ObjectValidatorTests
     {
         var validator = new ObjectValidator<ObjectModel>();
         Assert.Null(validator.GetCurrentRuleSetScope());
+
         validator._ruleSetStack.Push("rule");
         Assert.Equal(["rule"], (string[]?)validator.GetCurrentRuleSetScope()!);
         validator._ruleSetStack.Pop();
         Assert.Null(validator.GetCurrentRuleSetScope());
 
-        Assert.Equal(["login"], (string[]?)validator.GetCurrentRuleSetScope(["login"])!);
         validator.SetInheritedRuleSetsIfNotSet(["email"]);
         Assert.Equal(["email"], (string[]?)validator.GetCurrentRuleSetScope()!);
     }
@@ -913,6 +868,23 @@ public class ObjectValidatorTests
         validator.InitializeServiceProvider(serviceProvider.GetService);
         Assert.Equal(["login", "email"], (string[]?)validator.ResolveValidationRuleSets(null)!);
         Assert.Equal(["login"], (string[]?)validator.ResolveValidationRuleSets(["login"])!);
+    }
+
+    [Fact]
+    public void RepairMemberPaths_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).Required()
+            .RuleFor(u => u.Id).Min(1).End();
+        objectValidator.MemberPath = "Sub";
+        objectValidator.RepairMemberPaths();
+
+        var propertyValidator1 = objectValidator.Validators[0] as PropertyValidator<ObjectModel, string?>;
+        Assert.NotNull(propertyValidator1);
+        Assert.Equal("Sub.Name", propertyValidator1.GetEffectiveMemberName());
+
+        var propertyValidator2 = objectValidator.Validators[1] as PropertyValidator<ObjectModel, int>;
+        Assert.NotNull(propertyValidator2);
+        Assert.Equal("Sub.Id", propertyValidator2.GetEffectiveMemberName());
     }
 
     public class ObjectModel

@@ -786,15 +786,11 @@ public partial class PropertyValidator<T, TProperty> :
         // 设置当前子验证器的完整成员路径
         _propertyValidator.MemberPath = GetEffectiveMemberName();
 
-        // 递归修复所有子属性验证器
-        foreach (var childValidator in _propertyValidator.Validators)
+        // 检查属性级别对象验证器是否实现 IMemberPathRepairable 接口
+        if (_propertyValidator is IMemberPathRepairable repairable)
         {
-            // 检查验证器是否实现 IMemberPathRepairable 接口
-            if (childValidator is IMemberPathRepairable repairable)
-            {
-                // 修复验证器及其子验证器的成员路径
-                repairable.RepairMemberPaths();
-            }
+            // 修复验证器及其子验证器的成员路径
+            repairable.RepairMemberPaths();
         }
     }
 }

@@ -294,13 +294,12 @@ public partial class PropertyValidator<T, TProperty>
     ///     为指定属性配置验证规则
     /// </summary>
     /// <param name="selector">属性选择器</param>
-    /// <param name="ruleSets">规则集</param>
     /// <typeparam name="TOtherProperty">属性类型</typeparam>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TOtherProperty> RuleFor<TOtherProperty>(Expression<Func<T, TOtherProperty?>> selector,
-        string?[]? ruleSets = null) => _objectValidator.RuleFor(selector, ruleSets);
+    public PropertyValidator<T, TOtherProperty>
+        RuleFor<TOtherProperty>(Expression<Func<T, TOtherProperty?>> selector) => _objectValidator.RuleFor(selector);
 
     /// <summary>
     ///     为集合类型属性中的每一个元素配置验证规则
@@ -312,9 +311,8 @@ public partial class PropertyValidator<T, TProperty>
     ///     <see cref="CollectionPropertyValidator{T,TElement}" />
     /// </returns>
     public CollectionPropertyValidator<T, TOtherElement> RuleForEach<TOtherElement>(
-        Expression<Func<T, IEnumerable<TOtherElement>?>> selector, string?[]? ruleSets = null)
-        where TOtherElement : class =>
-        _objectValidator.RuleForEach(selector, ruleSets);
+        Expression<Func<T, IEnumerable<TOtherElement>?>> selector) where TOtherElement : class =>
+        _objectValidator.RuleForEach(selector);
 
     /// <summary>
     ///     在指定规则集上下文中为指定属性配置验证规则

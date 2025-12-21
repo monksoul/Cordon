@@ -8,7 +8,7 @@ namespace Limen;
 ///     对象验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
+public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IDisposable
 {
     /// <summary>
     ///     验证上下文键
@@ -135,6 +135,9 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     }
 
     /// <inheritdoc />
+    void IMemberPathRepairable.RepairMemberPaths() => RepairMemberPaths();
+
+    /// <inheritdoc />
     public virtual bool IsValid(T? instance, string?[]? ruleSets = null)
     {
         // 空检查
@@ -240,19 +243,17 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     ///     为指定属性配置验证规则
     /// </summary>
     /// <param name="selector">属性选择器</param>
-    /// <param name="ruleSets">规则集</param>
     /// <typeparam name="TProperty">属性类型</typeparam>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> RuleFor<TProperty>(Expression<Func<T, TProperty?>> selector,
-        string?[]? ruleSets = null)
+    public PropertyValidator<T, TProperty> RuleFor<TProperty>(Expression<Func<T, TProperty?>> selector)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(selector);
 
         // 获取当前规则集作用域中的规则集
-        var effectiveRuleSets = GetCurrentRuleSetScope(ruleSets);
+        var effectiveRuleSets = GetCurrentRuleSetScope();
 
         // 初始化 PropertyValidator 实例
         var propertyValidator = new PropertyValidator<T, TProperty>(selector, this) { RuleSets = effectiveRuleSets };
@@ -270,20 +271,19 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     ///     为集合类型属性中的每一个元素配置验证规则
     /// </summary>
     /// <param name="selector">属性选择器</param>
-    /// <param name="ruleSets">规则集</param>
     /// <typeparam name="TElement">元素类型</typeparam>
     /// <returns>
     ///     <see cref="CollectionPropertyValidator{T,TElement}" />
     /// </returns>
     public CollectionPropertyValidator<T, TElement> RuleForEach<TElement>(
-        Expression<Func<T, IEnumerable<TElement>?>> selector, string?[]? ruleSets = null)
+        Expression<Func<T, IEnumerable<TElement>?>> selector)
         where TElement : class
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(selector);
 
         // 获取当前规则集作用域中的规则集
-        var effectiveRuleSets = GetCurrentRuleSetScope(ruleSets);
+        var effectiveRuleSets = GetCurrentRuleSetScope();
 
         // 初始化 CollectionPropertyValidator 实例
         var propertyValidator =
@@ -636,15 +636,10 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     /// <summary>
     ///     获取当前规则集作用域中的规则集
     /// </summary>
-    /// <param name="ruleSets">规则集</param>
     /// <returns><see cref="string" />列表</returns>
-    internal string?[]? GetCurrentRuleSetScope(string?[]? ruleSets = null) =>
+    internal string?[]? GetCurrentRuleSetScope() =>
         // 优先使用规则集上下文栈顶的规则集（即当前 RuleSet() 作用域）
-        _ruleSetStack is { Count: > 0 }
-            ? [_ruleSetStack.Peek()]
-            : ruleSets is not null && ruleSets.Length > 0
-                ? ruleSets.Select(u => u?.Trim()).ToArray()
-                : InheritedRuleSets;
+        _ruleSetStack is { Count: > 0 } ? [_ruleSetStack.Peek()] : InheritedRuleSets;
 
     /// <summary>
     ///     设置从父级继承的规则集
@@ -652,4 +647,19 @@ public class ObjectValidator<T> : IObjectValidator<T>, IDisposable
     /// <remarks>仅当尚未设置时。</remarks>
     /// <param name="inheritedRuleSets">从父级继承的规则集</param>
     internal void SetInheritedRuleSetsIfNotSet(string?[]? inheritedRuleSets) => InheritedRuleSets ??= inheritedRuleSets;
+
+    /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
+    internal void RepairMemberPaths()
+    {
+        // 递归修复所有子属性验证器
+        foreach (var childValidator in Validators)
+        {
+            // 检查验证器是否实现 IMemberPathRepairable 接口
+            if (childValidator is IMemberPathRepairable repairable)
+            {
+                // 修复验证器及其子验证器的成员路径
+                repairable.RepairMemberPaths();
+            }
+        }
+    }
 }
