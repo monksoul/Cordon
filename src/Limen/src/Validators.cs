@@ -460,6 +460,26 @@ public static class Validators
     public static MustValidator<T> Must<T>(Func<T, bool> condition) => new(condition);
 
     /// <summary>
+    ///     创建自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <see cref="MustValidator{T}" />
+    /// </returns>
+    public static MustValidator<T> MustAny<T, TElement>(IEnumerable<TElement> enumerable,
+        Func<T, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return new MustValidator<T>(u => enumerable.Any(x => condition(u, x)));
+    }
+
+    /// <summary>
     ///     创建非空白字符串验证器
     /// </summary>
     /// <returns>

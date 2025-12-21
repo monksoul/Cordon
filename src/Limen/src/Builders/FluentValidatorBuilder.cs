@@ -680,6 +680,44 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     }
 
     /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustAny<TElement>(IEnumerable<TElement> enumerable, Func<T, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u => enumerable.Any(x => condition(u, x))));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustAny<TElement>(IEnumerable<TElement> enumerable,
+        Func<T, ValidationContext<T>, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u =>
+            enumerable.Any(x => condition(u, CreateValidationContext(u), x))));
+    }
+
+    /// <summary>
     ///     添加非空白字符串验证器
     /// </summary>
     /// <returns>

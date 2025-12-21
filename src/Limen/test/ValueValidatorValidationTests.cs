@@ -784,6 +784,55 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void MustAny_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<string>()
+                .MustAny(null!, (Func<string, string, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<string>()
+                .MustAny([], (Func<string, string, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<string>()
+                .MustAny(null!, (Func<string, ValidationContext<string>, string, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<string>()
+                .MustAny([], (Func<string, ValidationContext<string>, string, bool>)null!));
+    }
+
+    [Fact]
+    public void MustAny_ReturnOK()
+    {
+        string[] allowedDomains = ["@outlook.com", "@qq.com", "@163.com"];
+
+        var valueValidator = new ValueValidator<string>()
+            .MustAny(allowedDomains, (u, x) => u.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
+        Assert.False(valueValidator.IsValid("monksoul@gmail.com"));
+
+        var valueValidator2 = new ValueValidator<string>().MustAny(allowedDomains,
+            (_, ctx, x) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator2 =
+            valueValidator2._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.True(valueValidator2.IsValid("monksoul@outlook.com"));
+        Assert.False(valueValidator2.IsValid("monksoul@gmail.com"));
+    }
+
+    [Fact]
     public void NotBlank_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().NotBlank();

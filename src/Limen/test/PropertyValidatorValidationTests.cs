@@ -1076,6 +1076,19 @@ public class PropertyValidatorValidationTests
 
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Number1 = 11 }));
         Assert.False(propertyValidator2.IsValid(new ValidationModel { Number1 = 9 }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Number1)
+            .MustUnless_((_, ctx) => ctx.Instance.Number1 <= 10);
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 =
+            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustUnlessValidator<int>>;
+        Assert.NotNull(addedValidator3);
+
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { Number1 = 11 }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Number1 = 9 }));
     }
 
     [Fact]
@@ -1117,6 +1130,85 @@ public class PropertyValidatorValidationTests
 
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Number1 = 11 }));
         Assert.False(propertyValidator2.IsValid(new ValidationModel { Number1 = 9 }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Number1)
+            .Must_((_, ctx) => ctx.Instance.Number1 > 10);
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 =
+            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<int>>;
+        Assert.NotNull(addedValidator3);
+
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { Number1 = 11 }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Number1 = 9 }));
+    }
+
+    [Fact]
+    public void MustAny_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
+                .MustAny(null!, (Func<string, string, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
+                .MustAny([], (Func<string, string, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
+                .MustAny(null!, (Func<string, ValidationContext<string>, string, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
+                .MustAny([], (Func<string, ValidationContext<string>, string, bool>)null!));
+    }
+
+    [Fact]
+    public void MustAny_ReturnOK()
+    {
+        string[] allowedDomains = ["@outlook.com", "@qq.com", "@163.com"];
+
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .MustAny(allowedDomains, (u, x) => u.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { String1 = "monksoul@gmail.com" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .MustAny(allowedDomains,
+                (_, ctx, x) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator2 =
+            propertyValidator2._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { String1 = "monksoul@gmail.com" }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .MustAny_(allowedDomains,
+                (_, ctx, x) => ctx.Instance.String1!.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 =
+            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<string>>;
+        Assert.NotNull(addedValidator3);
+
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { String1 = "monksoul@gmail.com" }));
     }
 
     [Fact]
@@ -1302,6 +1394,19 @@ public class PropertyValidatorValidationTests
 
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Number1 = 11 }));
         Assert.False(propertyValidator2.IsValid(new ValidationModel { Number1 = 9 }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Number1)
+            .Predicate_((_, ctx) => ctx.Instance.Number1 > 10);
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 =
+            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, PredicateValidator<int>>;
+        Assert.NotNull(addedValidator3);
+
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { Number1 = 11 }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Number1 = 9 }));
     }
 
     [Fact]

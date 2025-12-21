@@ -191,6 +191,16 @@ public partial class PropertyValidator<T, TProperty>
     }
 
     /// <summary>
+    ///     添加自定义条件不成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> MustUnless_(Func<TProperty, ValidationContext<T>, bool> condition) =>
+        MustUnless(condition);
+
+    /// <summary>
     ///     添加自定义条件成立时委托验证器
     /// </summary>
     /// <param name="condition">条件委托</param>
@@ -205,6 +215,49 @@ public partial class PropertyValidator<T, TProperty>
         return ValidatorProxy<MustValidator<TProperty>>(context =>
             [new Func<TProperty, bool>(u => condition(u, context))]);
     }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> Must_(Func<TProperty, ValidationContext<T>, bool> condition) =>
+        Must(condition);
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> MustAny<TElement>(IEnumerable<TElement> enumerable,
+        Func<TProperty, ValidationContext<T>, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return ValidatorProxy<MustValidator<TProperty>>(context =>
+            [new Func<TProperty, bool>(u => enumerable.Any(x => condition(u, context, x)))]);
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> MustAny_<TElement>(IEnumerable<TElement> enumerable,
+        Func<TProperty, ValidationContext<T>, TElement, bool> condition) =>
+        MustAny(enumerable, condition);
 
     /// <summary>
     ///     添加不相等验证器
@@ -236,6 +289,16 @@ public partial class PropertyValidator<T, TProperty>
         return ValidatorProxy<PredicateValidator<TProperty>>(context =>
             [new Func<TProperty, bool>(u => condition(u, context))]);
     }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <see cref="PropertyValidator{T,TProperty}" />
+    /// </returns>
+    public PropertyValidator<T, TProperty> Predicate_(Func<TProperty, ValidationContext<T>, bool> condition) =>
+        Predicate(condition);
 
     /// <summary>
     ///     添加验证器代理

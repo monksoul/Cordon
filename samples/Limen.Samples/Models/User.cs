@@ -1,9 +1,7 @@
 ﻿namespace Limen.Samples.Models;
 
-public class User /*: IValidatableObject*/
+public class User : IValidatableObject
 {
-    private readonly string[] _allowedDomains = ["@outlook.com", "@qq.com", "@163.com"];
-
     [Required(ErrorMessage = "名字不能为空")]
     [MinLength(2, ErrorMessage = "名字不能少于 2 个字符")]
     public string? Name { get; set; }
@@ -19,15 +17,22 @@ public class User /*: IValidatableObject*/
 
     [Required]
     [EmailAddress]
-    [AllowedEmailDomains]
+    // [AllowedEmailDomains]
     public string? EmailAddress { get; set; }
 
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (EmailAddress is not null &&
-            !_allowedDomains.Any(domain => EmailAddress.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
-            yield return new ValidationResult("仅支持 outlook、qq 和 163 邮箱格式。", [nameof(EmailAddress)]);
+        // if (EmailAddress is not null &&
+        //     !_allowedDomains.Any(domain => EmailAddress.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
+        //     yield return new ValidationResult("仅支持 outlook、qq 和 163 邮箱格式。", [nameof(EmailAddress)]);
+
+        return validationContext.ContinueWith<User>()
+            .RuleFor(u => u.EmailAddress)
+            .MustAny(["@outlook.com", "@qq.com", "@163.com"],
+                (email, domain) => email.EndsWith(domain, StringComparison.OrdinalIgnoreCase))
+            .WithMessage("仅支持 outlook、qq 和 163 邮箱格式。")
+            .ToResults();
     }
 }
 
