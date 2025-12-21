@@ -305,7 +305,6 @@ public partial class PropertyValidator<T, TProperty>
     ///     为集合类型属性中的每一个元素配置验证规则
     /// </summary>
     /// <param name="selector">属性选择器</param>
-    /// <param name="ruleSets">规则集</param>
     /// <typeparam name="TOtherElement">元素类型</typeparam>
     /// <returns>
     ///     <see cref="CollectionPropertyValidator{T,TElement}" />

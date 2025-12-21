@@ -21,6 +21,7 @@ public class ValidatorBaseTests
         Assert.Null(validator.ErrorMessageResourceName);
         Assert.Null(validator.ErrorMessageResourceType);
         Assert.False(validator.CustomErrorMessageSet);
+        Assert.Null(validator.RuleSets);
 
         Assert.Equal("Limen.Resources.Overrides.ValidationMessages",
             ValidatorBase.ExternalValidationMessagesFullTypeName);

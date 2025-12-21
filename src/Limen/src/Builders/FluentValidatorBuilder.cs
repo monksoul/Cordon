@@ -138,6 +138,13 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         // 空检查 
         ArgumentNullException.ThrowIfNull(validator);
 
+        // 检查派生类型是否实现 IRuleSetContextProvider 接口
+        if (this is IRuleSetContextProvider ruleSetProvider)
+        {
+            // 获取当前上下文中的规则集并设置
+            validator.RuleSets = ruleSetProvider.GetCurrentRuleSets();
+        }
+
         // 检查是否是高优先级验证器
         if (validator is IHighPriorityValidator highPriorityValidator)
         {

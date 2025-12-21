@@ -700,10 +700,10 @@ public class ObjectValidatorTests
         var model = new ObjectModel();
 
         Assert.True(validator.ShouldValidate(model));
-        Assert.True(validator.ShouldValidate(model, ["*"]));
-        Assert.True(validator.ShouldValidate(model, ["login"]));
-        Assert.True(validator.ShouldValidate(model, ["register"]));
-        Assert.True(validator.ShouldValidate(model, ["other"]));
+        Assert.True(validator.ShouldValidate(model));
+        Assert.True(validator.ShouldValidate(model));
+        Assert.True(validator.ShouldValidate(model));
+        Assert.True(validator.ShouldValidate(model));
     }
 
     [Fact]
@@ -825,18 +825,18 @@ public class ObjectValidatorTests
     }
 
     [Fact]
-    public void GetCurrentRuleSetScope_ReturnOK()
+    public void GetCurrentRuleSets_ReturnOK()
     {
         var validator = new ObjectValidator<ObjectModel>();
-        Assert.Null(validator.GetCurrentRuleSetScope());
+        Assert.Null(validator.GetCurrentRuleSets());
 
         validator._ruleSetStack.Push("rule");
-        Assert.Equal(["rule"], (string[]?)validator.GetCurrentRuleSetScope()!);
+        Assert.Equal(["rule"], (string[]?)validator.GetCurrentRuleSets()!);
         validator._ruleSetStack.Pop();
-        Assert.Null(validator.GetCurrentRuleSetScope());
+        Assert.Null(validator.GetCurrentRuleSets());
 
         validator.SetInheritedRuleSetsIfNotSet(["email"]);
-        Assert.Equal(["email"], (string[]?)validator.GetCurrentRuleSetScope()!);
+        Assert.Equal(["email"], (string[]?)validator.GetCurrentRuleSets()!);
     }
 
     [Fact]

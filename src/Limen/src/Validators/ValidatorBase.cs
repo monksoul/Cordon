@@ -149,6 +149,22 @@ public abstract class ValidatorBase
     }
 
     /// <summary>
+    ///     规则集
+    /// </summary>
+    /// <remarks>实现内部规则集功能。</remarks>
+    internal string?[]? RuleSets
+    {
+        get;
+        set
+        {
+            field = value;
+
+            // 触发属性变更事件
+            OnPropertyChanged(value);
+        }
+    }
+
+    /// <summary>
     ///     错误信息
     /// </summary>
     public string? ErrorMessage

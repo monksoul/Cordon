@@ -1013,38 +1013,6 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void MatchesRuleSet_ReturnOK()
-    {
-        using var objectValidator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
-
-        Assert.True(propertyValidator.MatchesRuleSet());
-        Assert.True(propertyValidator.MatchesRuleSet());
-        Assert.True(propertyValidator.MatchesRuleSet(["*"]));
-        Assert.False(propertyValidator.MatchesRuleSet(["login"]));
-
-        var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator)
-        {
-            RuleSets = ["login", "register"]
-        };
-        Assert.False(propertyValidator2.MatchesRuleSet());
-        Assert.False(propertyValidator2.MatchesRuleSet());
-        Assert.True(propertyValidator2.MatchesRuleSet(["*"]));
-        Assert.True(propertyValidator2.MatchesRuleSet(["login"]));
-        Assert.True(propertyValidator2.MatchesRuleSet(["register"]));
-        Assert.False(propertyValidator2.MatchesRuleSet(["other"]));
-        Assert.True(propertyValidator2.MatchesRuleSet(["other", "login"]));
-
-        var propertyValidator3 =
-            new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator) { RuleSets = [] };
-
-        Assert.True(propertyValidator3.MatchesRuleSet());
-        Assert.True(propertyValidator3.MatchesRuleSet());
-        Assert.True(propertyValidator3.MatchesRuleSet(["*"]));
-        Assert.False(propertyValidator3.MatchesRuleSet(["login"]));
-    }
-
-    [Fact]
     public void GetValidatedObject_Invalid_Parameters()
     {
         Assert.Throws<ArgumentNullException>(() =>

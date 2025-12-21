@@ -8,8 +8,14 @@ namespace Limen;
 ///     单个值验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, IObjectValidator<T>, IDisposable
+public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, IObjectValidator<T>,
+    IRuleSetContextProvider, IDisposable
 {
+    /// <summary>
+    ///     当前规则集上下文栈
+    /// </summary>
+    internal readonly Stack<string?> _ruleSetStack;
+
     /// <summary>
     ///     值验证前的预处理器
     /// </summary>
@@ -44,9 +50,8 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// </param>
     /// <param name="items">验证上下文数据</param>
     public ValueValidator(IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
-        : base(serviceProvider, items)
-    {
-    }
+        : base(serviceProvider, items) =>
+        _ruleSetStack = new Stack<string?>();
 
     /// <summary>
     ///     显示名称
@@ -79,18 +84,18 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         var resolvedValue = GetValueForValidation(value!);
 
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(resolvedValue, ruleSets))
+        if (!ShouldValidate(resolvedValue))
         {
             return true;
         }
 
         // 检查是否设置单个值验证器
-        if (_valueValidator is not null && !_valueValidator.IsValid(resolvedValue))
+        if (_valueValidator is not null && !_valueValidator.IsValid(resolvedValue, ruleSets))
         {
             return false;
         }
 
-        return Validators.All(u => u.IsValid(resolvedValue));
+        return Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, ruleSets)).All(u => u.IsValid(resolvedValue));
     }
 
     /// <inheritdoc />
@@ -100,7 +105,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         var resolvedValue = GetValueForValidation(value!);
 
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(resolvedValue, ruleSets))
+        if (!ShouldValidate(resolvedValue))
         {
             return null;
         }
@@ -112,12 +117,12 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 检查是否设置单个值验证器
         if (_valueValidator is not null)
         {
-            validationResults.AddRange(_valueValidator.GetValidationResults(resolvedValue) ?? []);
+            validationResults.AddRange(_valueValidator.GetValidationResults(resolvedValue, ruleSets) ?? []);
         }
 
         // 获取所有验证器验证结果集合
-        validationResults.AddRange(Validators.SelectMany(u =>
-            u.GetValidationResults(resolvedValue, displayName) ?? []));
+        validationResults.AddRange(Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, ruleSets))
+            .SelectMany(u => u.GetValidationResults(resolvedValue, displayName) ?? []));
 
         return validationResults.ToResults();
     }
@@ -129,7 +134,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         var resolvedValue = GetValueForValidation(value!);
 
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(resolvedValue, ruleSets))
+        if (!ShouldValidate(resolvedValue))
         {
             return;
         }
@@ -141,11 +146,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // ReSharper disable once UseNullPropagation
         if (_valueValidator is not null)
         {
-            _valueValidator.Validate(resolvedValue);
+            _valueValidator.Validate(resolvedValue, ruleSets);
         }
 
         // 遍历验证器集合
-        foreach (var validator in Validators)
+        foreach (var validator in Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, ruleSets)))
         {
             validator.Validate(resolvedValue, displayName);
         }
@@ -155,6 +160,9 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
         InitializeServiceProvider(serviceProvider);
 
+    /// <inheritdoc />
+    string?[]? IRuleSetContextProvider.GetCurrentRuleSets() => GetCurrentRuleSets();
+
     /// <summary>
     ///     为当前值自身配置验证规则
     /// </summary>
@@ -162,6 +170,95 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     ///     <see cref="ValueValidator{T}" />
     /// </returns>
     public ValueValidator<T> Rule() => this;
+
+    /// <summary>
+    ///     在指定规则集上下文中配置验证规则
+    /// </summary>
+    /// <param name="ruleSet">规则集</param>
+    /// <param name="setAction">自定义配置委托</param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public ValueValidator<T> RuleSet(string? ruleSet, Action setAction)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(setAction);
+
+        return RuleSet(ruleSet, _ => setAction());
+    }
+
+    /// <summary>
+    ///     在指定规则集上下文中配置验证规则
+    /// </summary>
+    /// <param name="ruleSets">规则集</param>
+    /// <param name="setAction">自定义配置委托</param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public ValueValidator<T> RuleSet(string?[]? ruleSets, Action setAction)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(setAction);
+
+        return RuleSet(ruleSets, _ => setAction());
+    }
+
+    /// <summary>
+    ///     在指定规则集上下文中配置验证规则
+    /// </summary>
+    /// <param name="ruleSet">规则集</param>
+    /// <param name="setAction">自定义配置委托</param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public ValueValidator<T> RuleSet(string? ruleSet, Action<ValueValidator<T>> setAction) =>
+        RuleSet(ruleSet is null ? null : [ruleSet], setAction);
+
+    /// <summary>
+    ///     在指定规则集上下文中配置验证规则
+    /// </summary>
+    /// <param name="ruleSets">规则集</param>
+    /// <param name="setAction">自定义配置委托</param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public ValueValidator<T> RuleSet(string?[]? ruleSets, Action<ValueValidator<T>> setAction)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(setAction);
+
+        // 规范化规则集：去除前后空格
+        var normalizeRuleSet = (ruleSets ?? []).Select(u => u?.Trim()).ToArray();
+
+        // 空检查
+        if (normalizeRuleSet is { Length: 0 })
+        {
+            // 调用自定义配置委托
+            setAction(this);
+
+            return this;
+        }
+
+        // 为每个规则集创建独立作用域
+        foreach (var ruleSet in normalizeRuleSet)
+        {
+            // 将当前规则集压入上下文栈，使后续的 Rule() 调用能感知到该规则集
+            _ruleSetStack.Push(ruleSet);
+
+            try
+            {
+                // 调用自定义配置委托
+                setAction(this);
+            }
+            // 确保即使发生异常，也能正确退出当前规则集作用域
+            finally
+            {
+                _ruleSetStack.Pop();
+            }
+        }
+
+        return this;
+    }
 
     /// <summary>
     ///     设置验证条件
@@ -309,11 +406,10 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     ///     检查是否应该对该对象执行验证
     /// </summary>
     /// <param name="value">对象</param>
-    /// <param name="ruleSets">规则集</param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    internal bool ShouldValidate(T? value, string?[]? ruleSets = null)
+    internal bool ShouldValidate(T? value)
     {
         // 检查正向条件（When）
         if (WhenCondition is not null && !WhenCondition(value!))
@@ -357,4 +453,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 同步 _valueValidator 实例 IServiceProvider 委托
         _valueValidator?.InitializeServiceProvider(serviceProvider);
     }
+
+    /// <inheritdoc cref="IRuleSetContextProvider.GetCurrentRuleSets" />
+    internal string?[]? GetCurrentRuleSets() => _ruleSetStack is { Count: > 0 } ? [_ruleSetStack.Peek()] : null;
 }

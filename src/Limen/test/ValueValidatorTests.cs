@@ -12,6 +12,8 @@ public class ValueValidatorTests
         var valueValidator = new ValueValidator<string>();
         Assert.Null(valueValidator._serviceProvider);
         Assert.Null(valueValidator._items);
+        Assert.NotNull(valueValidator._ruleSetStack);
+        Assert.Empty(valueValidator._ruleSetStack);
         Assert.NotNull(valueValidator.Validators);
         Assert.Null(valueValidator._lastAddedValidator);
         Assert.Null(valueValidator._valueValidator);
@@ -48,6 +50,26 @@ public class ValueValidatorTests
     }
 
     [Fact]
+    public void IsValid_WithRuleSet_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3)).RuleSet("new", v =>
+        {
+            v.Required().MinLength(5);
+        });
+
+        Assert.False(valueValidator.IsValid(null));
+        Assert.False(valueValidator.IsValid("Fu"));
+        Assert.True(valueValidator.IsValid("Fur"));
+        Assert.True(valueValidator.IsValid("Furion"));
+
+        Assert.False(valueValidator.IsValid(null, ["new"]));
+        Assert.False(valueValidator.IsValid("Fu", ["new"]));
+        Assert.False(valueValidator.IsValid("Fur", ["new"]));
+        Assert.True(valueValidator.IsValid("Furion", ["new"]));
+    }
+
+    [Fact]
     public void IsValid_WithValueValidator_ReturnOK()
     {
         var valueValidator = new ValueValidator<string>().Required().MinLength(3)
@@ -79,6 +101,51 @@ public class ValueValidatorTests
 
         Assert.Null(valueValidator.GetValidationResults("Fur"));
         Assert.Null(valueValidator.GetValidationResults("Furion"));
+    }
+
+    [Fact]
+    public void GetValidationResults_WithRuleSet_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3)).RuleSet("new", v =>
+        {
+            v.Required().MinLength(5);
+        });
+
+        var validationResults = valueValidator.GetValidationResults(null);
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The Value field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 = valueValidator.GetValidationResults("Fu");
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field Value must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        Assert.Null(valueValidator.GetValidationResults("Fur"));
+        Assert.Null(valueValidator.GetValidationResults("Furion"));
+
+        var validationResults3 = valueValidator.GetValidationResults(null, ["new"]);
+        Assert.NotNull(validationResults3);
+        Assert.Single(validationResults3);
+        Assert.Equal(["The Value field is required."],
+            validationResults3.Select(u => u.ErrorMessage));
+
+        var validationResults4 = valueValidator.GetValidationResults("Fu", ["new"]);
+        Assert.NotNull(validationResults4);
+        Assert.Single(validationResults4);
+        Assert.Equal(["The field Value must be a string or array type with a minimum length of '5'."],
+            validationResults4.Select(u => u.ErrorMessage));
+
+        var validationResults5 = valueValidator.GetValidationResults("Fur", ["new"]);
+        Assert.NotNull(validationResults5);
+        Assert.Single(validationResults5);
+        Assert.Equal(["The field Value must be a string or array type with a minimum length of '5'."],
+            validationResults5.Select(u => u.ErrorMessage));
+
+        Assert.Null(valueValidator.GetValidationResults("Furion", ["new"]));
     }
 
     [Fact]
@@ -145,6 +212,47 @@ public class ValueValidatorTests
 
         valueValidator.Validate("Fur");
         valueValidator.Validate("Furion");
+    }
+
+    [Fact]
+    public void Validate_WithRuleSet_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3)).RuleSet("new", v =>
+        {
+            v.Required().MinLength(5);
+        });
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.Validate(null));
+        Assert.Equal("The Value field is required.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.Validate("Fu"));
+        Assert.Equal("The field Value must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Empty(exception2.ValidationResult.MemberNames);
+
+        valueValidator.Validate("Fur");
+        valueValidator.Validate("Furion");
+
+        var exception3 = Assert.Throws<ValidationException>(() => valueValidator.Validate(null, ["new"]));
+        Assert.Equal("The Value field is required.", exception3.Message);
+        Assert.Empty(exception3.ValidationResult.MemberNames);
+
+        var exception4 =
+            Assert.Throws<ValidationException>(() => valueValidator.Validate("Fu", ["new"]));
+        Assert.Equal("The field Value must be a string or array type with a minimum length of '5'.",
+            exception4.Message);
+        Assert.Empty(exception4.ValidationResult.MemberNames);
+
+        var exception5 =
+            Assert.Throws<ValidationException>(() => valueValidator.Validate("Fur", ["new"]));
+        Assert.Equal("The field Value must be a string or array type with a minimum length of '5'.",
+            exception5.Message);
+        Assert.Empty(exception5.ValidationResult.MemberNames);
+
+        valueValidator.Validate("Furion", ["new"]);
     }
 
     [Fact]
@@ -261,6 +369,93 @@ public class ValueValidatorTests
         var valueValidator = new ValueValidator<string>();
         valueValidator.Rule().MinLength(10);
         Assert.Single(valueValidator.Validators);
+    }
+
+    [Fact]
+    public void RuleSet_Invalid_Parameters()
+    {
+        var valueValidator = new ValueValidator<string>();
+        Assert.Throws<ArgumentNullException>(() => valueValidator.RuleSet((string?)null, (Action)null!));
+        Assert.Throws<ArgumentNullException>(() => valueValidator.RuleSet((string?[]?)null, (Action)null!));
+        Assert.Throws<ArgumentNullException>(() => valueValidator.RuleSet("login", (Action)null!));
+        Assert.Throws<ArgumentNullException>(() => valueValidator.RuleSet(["login"], (Action)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            valueValidator.RuleSet((string?)null, (Action<ValueValidator<string>>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            valueValidator.RuleSet((string?[]?)null, (Action<ValueValidator<string>>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            valueValidator.RuleSet("login", (Action<ValueValidator<string>>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            valueValidator.RuleSet(["login"], (Action<ValueValidator<string>>)null!));
+    }
+
+    [Fact]
+    public void RuleSet_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+
+        var ruleSets = new List<string?>();
+        valueValidator.RuleSet([], () =>
+        {
+            if (valueValidator._ruleSetStack.Count > 0)
+            {
+                ruleSets.Add(valueValidator._ruleSetStack.Peek());
+            }
+        });
+        Assert.Empty(ruleSets);
+        Assert.Empty(valueValidator._ruleSetStack);
+
+        ruleSets.Clear();
+        valueValidator.RuleSet(["login"], () => ruleSets.Add(valueValidator._ruleSetStack.Peek()));
+        Assert.Equal(["login"], ruleSets);
+        Assert.Empty(valueValidator._ruleSetStack);
+
+        ruleSets.Clear();
+        valueValidator.RuleSet(["login", "register"], () => ruleSets.Add(valueValidator._ruleSetStack.Peek()));
+        Assert.Equal(["login", "register"], ruleSets);
+        Assert.Empty(valueValidator._ruleSetStack);
+
+        ruleSets.Clear();
+        valueValidator.RuleSet([" login ", " register "], () => ruleSets.Add(valueValidator._ruleSetStack.Peek()));
+        Assert.Equal(["login", "register"], ruleSets);
+        Assert.Empty(valueValidator._ruleSetStack);
+
+        ruleSets.Clear();
+        Assert.Throws<Exception>(() =>
+        {
+            valueValidator.RuleSet([" login ", " register "], () =>
+            {
+                if (ruleSets.Count == 1)
+                {
+                    throw new Exception("出错了");
+                }
+
+                ruleSets.Add(valueValidator._ruleSetStack.Peek());
+            });
+        });
+        Assert.Equal(["login"], ruleSets);
+        Assert.Empty(valueValidator._ruleSetStack);
+
+        ruleSets.Clear();
+        valueValidator.RuleSet("login", () => ruleSets.Add(valueValidator._ruleSetStack.Peek()));
+        Assert.Equal(["login"], ruleSets);
+        Assert.Empty(valueValidator._ruleSetStack);
+
+        ruleSets.Clear();
+        valueValidator.RuleSet("login,register", () => ruleSets.Add(valueValidator._ruleSetStack.Peek()));
+        Assert.Equal(["login,register"], ruleSets);
+        Assert.Empty(valueValidator._ruleSetStack);
+
+        ruleSets.Clear();
+        valueValidator.RuleSet("login;register", () => ruleSets.Add(valueValidator._ruleSetStack.Peek()));
+        Assert.Equal(["login;register"], ruleSets);
+        Assert.Empty(valueValidator._ruleSetStack);
+
+        ruleSets.Clear();
+        valueValidator.RuleSet(" login , register ", () => ruleSets.Add(valueValidator._ruleSetStack.Peek()));
+        Assert.Equal(["login , register"], ruleSets);
+        Assert.Empty(valueValidator._ruleSetStack);
     }
 
     [Fact]
@@ -426,6 +621,18 @@ public class ValueValidatorTests
 
         valueValidator.PreProcess(u => u.Trim());
         Assert.Equal("Furion", valueValidator.GetValueForValidation(" Furion "));
+    }
+
+    [Fact]
+    public void GetCurrentRuleSets_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+        Assert.Null(valueValidator.GetCurrentRuleSets());
+
+        valueValidator._ruleSetStack.Push("rule");
+        Assert.Equal(["rule"], (string[]?)valueValidator.GetCurrentRuleSets()!);
+        valueValidator._ruleSetStack.Pop();
+        Assert.Null(valueValidator.GetCurrentRuleSets());
     }
 
     public class StringValueValidator : AbstractValueValidator<string>

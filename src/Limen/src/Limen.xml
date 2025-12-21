@@ -3271,6 +3271,17 @@
                 修复验证器及其子验证器的成员路径
             </summary>
         </member>
+        <member name="T:Limen.IRuleSetContextProvider">
+            <summary>
+                规则集上下文提供器
+            </summary>
+        </member>
+        <member name="M:Limen.IRuleSetContextProvider.GetCurrentRuleSets">
+            <summary>
+                获取当前上下文中的规则集
+            </summary>
+            <returns><see cref="T:System.String" />[]</returns>
+        </member>
         <member name="T:Limen.ValidationOptionsMetadata">
             <summary>
                 验证选项元数据
@@ -3558,6 +3569,9 @@
         <member name="M:Limen.ObjectValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
+        <member name="M:Limen.ObjectValidator`1.Limen#IRuleSetContextProvider#GetCurrentRuleSets">
+            <inheritdoc />
+        </member>
         <member name="M:Limen.ObjectValidator`1.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
                 为指定属性配置验证规则
@@ -3708,12 +3722,11 @@
             </summary>
             <param name="disposing">是否释放托管资源</param>
         </member>
-        <member name="M:Limen.ObjectValidator`1.ShouldValidate(`0,System.String[])">
+        <member name="M:Limen.ObjectValidator`1.ShouldValidate(`0)">
             <summary>
                 检查是否应该对该对象执行验证
             </summary>
             <param name="instance">对象</param>
-            <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
@@ -3742,11 +3755,8 @@
                 <see cref="T:System.ComponentModel.PropertyChangedEventArgs" />
             </param>
         </member>
-        <member name="M:Limen.ObjectValidator`1.GetCurrentRuleSetScope">
-            <summary>
-                获取当前规则集作用域中的规则集
-            </summary>
-            <returns><see cref="T:System.String" />列表</returns>
+        <member name="M:Limen.ObjectValidator`1.GetCurrentRuleSets">
+            <inheritdoc cref="M:Limen.IRuleSetContextProvider.GetCurrentRuleSets" />
         </member>
         <member name="M:Limen.ObjectValidator`1.SetInheritedRuleSetsIfNotSet(System.String[])">
             <summary>
@@ -4034,15 +4044,6 @@
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Limen.PropertyValidator`2.MatchesRuleSet(System.String[])">
-            <summary>
-                检查传入的规则集是否与指定的规则集匹配
-            </summary>
-            <param name="ruleSets">规则集</param>
-            <returns>
-                <see cref="T:System.Boolean" />
-            </returns>
-        </member>
         <member name="M:Limen.PropertyValidator`2.GetValidatedObject(`0,Limen.ValidatorBase,`1)">
             <summary>
                 获取用于验证的对象
@@ -4312,7 +4313,6 @@
                 为集合类型属性中的每一个元素配置验证规则
             </summary>
             <param name="selector">属性选择器</param>
-            <param name="ruleSets">规则集</param>
             <typeparam name="TOtherElement">元素类型</typeparam>
             <returns>
                 <see cref="T:Limen.CollectionPropertyValidator`2" />
@@ -4385,6 +4385,11 @@
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
+        <member name="F:Limen.ValueValidator`1._ruleSetStack">
+            <summary>
+                当前规则集上下文栈
+            </summary>
+        </member>
         <member name="F:Limen.ValueValidator`1._preProcessor">
             <summary>
                 值验证前的预处理器
@@ -4446,10 +4451,53 @@
         <member name="M:Limen.ValueValidator`1.Limen#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
+        <member name="M:Limen.ValueValidator`1.Limen#IRuleSetContextProvider#GetCurrentRuleSets">
+            <inheritdoc />
+        </member>
         <member name="M:Limen.ValueValidator`1.Rule">
             <summary>
                 为当前值自身配置验证规则
             </summary>
+            <returns>
+                <see cref="T:Limen.ValueValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Limen.ValueValidator`1.RuleSet(System.String,System.Action)">
+            <summary>
+                在指定规则集上下文中配置验证规则
+            </summary>
+            <param name="ruleSet">规则集</param>
+            <param name="setAction">自定义配置委托</param>
+            <returns>
+                <see cref="T:Limen.ValueValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Limen.ValueValidator`1.RuleSet(System.String[],System.Action)">
+            <summary>
+                在指定规则集上下文中配置验证规则
+            </summary>
+            <param name="ruleSets">规则集</param>
+            <param name="setAction">自定义配置委托</param>
+            <returns>
+                <see cref="T:Limen.ValueValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Limen.ValueValidator`1.RuleSet(System.String,System.Action{Limen.ValueValidator{`0}})">
+            <summary>
+                在指定规则集上下文中配置验证规则
+            </summary>
+            <param name="ruleSet">规则集</param>
+            <param name="setAction">自定义配置委托</param>
+            <returns>
+                <see cref="T:Limen.ValueValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Limen.ValueValidator`1.RuleSet(System.String[],System.Action{Limen.ValueValidator{`0}})">
+            <summary>
+                在指定规则集上下文中配置验证规则
+            </summary>
+            <param name="ruleSets">规则集</param>
+            <param name="setAction">自定义配置委托</param>
             <returns>
                 <see cref="T:Limen.ValueValidator`1" />
             </returns>
@@ -4523,12 +4571,11 @@
             </summary>
             <param name="disposing">是否释放托管资源</param>
         </member>
-        <member name="M:Limen.ValueValidator`1.ShouldValidate(`0,System.String[])">
+        <member name="M:Limen.ValueValidator`1.ShouldValidate(`0)">
             <summary>
                 检查是否应该对该对象执行验证
             </summary>
             <param name="value">对象</param>
-            <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
@@ -4552,6 +4599,9 @@
         </member>
         <member name="M:Limen.ValueValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc cref="M:Limen.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
+        </member>
+        <member name="M:Limen.ValueValidator`1.GetCurrentRuleSets">
+            <inheritdoc cref="M:Limen.IRuleSetContextProvider.GetCurrentRuleSets" />
         </member>
         <member name="T:Limen.IAsyncValidator">
             <summary>
@@ -4609,6 +4659,21 @@
                 同步 <see cref="T:System.IServiceProvider" /> 委托
             </summary>
             <param name="serviceProvider"><see cref="T:System.IServiceProvider" /> 委托</param>
+        </member>
+        <member name="T:Limen.RuleSetMatcher">
+            <summary>
+                规则集匹配器
+            </summary>
+        </member>
+        <member name="M:Limen.RuleSetMatcher.Matches(System.String[],System.String[])">
+            <summary>
+                检查传入的规则集是否与指定的规则集匹配
+            </summary>
+            <param name="ruleSets">预设规则集</param>
+            <param name="activeRuleSets">传入的激活规则集</param>
+            <returns>
+                <see cref="T:System.Boolean" />
+            </returns>
         </member>
         <member name="T:Limen.ValidationPropertyChangedEventArgs">
             <summary>
@@ -8516,6 +8581,12 @@
                 <inheritdoc cref="T:Limen.ValidatorBase" />
             </summary>
             <param name="errorMessageResourceAccessor">错误信息资源访问器</param>
+        </member>
+        <member name="P:Limen.ValidatorBase.RuleSets">
+            <summary>
+                规则集
+            </summary>
+            <remarks>实现内部规则集功能。</remarks>
         </member>
         <member name="P:Limen.ValidatorBase.ErrorMessage">
             <summary>
