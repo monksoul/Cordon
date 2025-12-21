@@ -1878,7 +1878,7 @@ public class PropertyValidatorValidationTests
     public void ToResults_ReturnOK()
     {
         var validationContext = new ValidationContext(new ObjectModel());
-        var validator = new ObjectValidator<ObjectModel>(new ValidatorOptions(),
+        var validator = new ObjectValidator<ObjectModel>(
             new Dictionary<object, object?>
             {
                 { ObjectValidator<ObjectModel>.ValidationContextsKey, validationContext }

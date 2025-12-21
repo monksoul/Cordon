@@ -7,6 +7,10 @@ namespace Limen;
 /// <inheritdoc cref="PropertyValidator{T,TProperty}" />
 public partial class PropertyValidator<T, TProperty>
 {
+    /// <inheritdoc />
+    public List<ValidationResult> ToResults(ValidationContext validationContext, bool disposeAfterValidation = true) =>
+        _objectValidator.ToResults(validationContext, disposeAfterValidation);
+
     /// <summary>
     ///     配置是否启用该属性上的验证特性验证
     /// </summary>
@@ -366,17 +370,4 @@ public partial class PropertyValidator<T, TProperty>
     /// </returns>
     public List<ValidationResult> ToResults(bool disposeAfterValidation = true) =>
         _objectValidator.ToResults(disposeAfterValidation);
-
-    /// <summary>
-    ///     获取对象验证结果集合
-    /// </summary>
-    /// <param name="validationContext">
-    ///     <see cref="ValidationContext" />
-    /// </param>
-    /// <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>
-    /// <returns>
-    ///     <see cref="List{T}" />
-    /// </returns>
-    public List<ValidationResult> ToResults(ValidationContext validationContext, bool disposeAfterValidation = true) =>
-        _objectValidator.ToResults(validationContext, disposeAfterValidation);
 }

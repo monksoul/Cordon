@@ -43,7 +43,7 @@ public class PropertyValidatorTests
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
-        using var objectValidator2 = new ObjectValidator<ObjectModel>(new ValidatorOptions(), serviceProvider,
+        using var objectValidator2 = new ObjectValidator<ObjectModel>(serviceProvider,
             new Dictionary<object, object?>());
         var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator2);
 

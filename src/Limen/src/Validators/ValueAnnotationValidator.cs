@@ -89,7 +89,7 @@ public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
 
     /// <inheritdoc />
     public override bool IsValid(object? value) =>
-        Validator.TryValidateValue(value, CreateValidationContext(_sentinel, null), null, Attributes);
+        Validator.TryValidateValue(value, CreateValidationContext(value, null), null, Attributes);
 
     /// <inheritdoc />
     public override List<ValidationResult>? GetValidationResults(object? value, string name,
@@ -98,7 +98,7 @@ public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
         // 初始化验证结果集合和成员名称列表
         var validationResults = new List<ValidationResult>();
 
-        Validator.TryValidateValue(value, CreateValidationContext(_sentinel, name), validationResults, Attributes);
+        Validator.TryValidateValue(value, CreateValidationContext(value, name), validationResults, Attributes);
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
@@ -114,7 +114,7 @@ public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
     {
         try
         {
-            Validator.ValidateValue(value, CreateValidationContext(_sentinel, name), Attributes);
+            Validator.ValidateValue(value, CreateValidationContext(value, name), Attributes);
         }
         // 如果验证未通过且配置了自定义错误信息，则重新抛出异常
         catch (ValidationException e) when (ErrorMessageString is not null)
@@ -136,10 +136,10 @@ public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
     /// <returns>
     ///     <see cref="ValidationContext" />
     /// </returns>
-    internal ValidationContext CreateValidationContext(object value, string? name)
+    internal ValidationContext CreateValidationContext(object? value, string? name)
     {
         // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext(value, null, _items);
+        var validationContext = new ValidationContext(value ?? _sentinel, _items);
 
         // 空检查
         if (name is not null)

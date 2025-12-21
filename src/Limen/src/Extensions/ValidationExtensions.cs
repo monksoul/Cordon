@@ -72,9 +72,8 @@ public static class ValidationExtensions
             [ObjectValidator<T>.ValidationContextsKey] = validationContext
         };
 
-        // 初始化 ObjectValidator<T> 实例并禁用属性验证特性验证，避免死循环
-        var objectValidator =
-            new ObjectValidator<T>(new ValidatorOptions { SuppressAnnotationValidation = true }, null, items);
+        // 初始化 ObjectValidator<T> 实例并跳过属性验证特性验证，避免死循环
+        var objectValidator = new ObjectValidator<T>(items).SkipAnnotationValidation();
 
         // 同步 IServiceProvider 委托
         objectValidator.InitializeServiceProvider(validationContext.GetService);
@@ -100,9 +99,9 @@ public static class ValidationExtensions
         // 空检查
         ArgumentNullException.ThrowIfNull(validationContext);
 
-        // 初始化 ObjectValidator<T> 实例并禁用属性验证特性验证，避免死循环
-        var objectValidator = new ObjectValidator<T>(new ValidatorOptions { SuppressAnnotationValidation = true }, null,
-            new Dictionary<object, object?>(validationContext.Items));
+        // 初始化 ObjectValidator<T> 实例并跳过属性验证特性验证，避免死循环
+        var objectValidator = new ObjectValidator<T>(new Dictionary<object, object?>(validationContext.Items))
+            .SkipAnnotationValidation();
 
         // 调用自定义配置委托
         configure?.Invoke(objectValidator);

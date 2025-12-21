@@ -18,17 +18,13 @@ public class ValidatorsTests
         Assert.True(objectValidator.IsValid(new ObjectModel { Name = "Furion" }));
 
         var objectValidator2 = Validators
-            .Object<ObjectModel>(new ValidatorOptions { SuppressAnnotationValidation = true },
-                new Dictionary<object, object?>());
-        Assert.True(objectValidator2.Options.SuppressAnnotationValidation);
+            .Object<ObjectModel>(new Dictionary<object, object?>());
         Assert.NotNull(objectValidator2._items);
         Assert.Null(objectValidator2._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var objectValidator3 = Validators
-            .Object<ObjectModel>(new ValidatorOptions { SuppressAnnotationValidation = true }, serviceProvider,
-                new Dictionary<object, object?>());
-        Assert.True(objectValidator3.Options.SuppressAnnotationValidation);
+            .Object<ObjectModel>(serviceProvider, new Dictionary<object, object?>());
         Assert.NotNull(objectValidator3._items);
         Assert.NotNull(objectValidator3._serviceProvider);
     }

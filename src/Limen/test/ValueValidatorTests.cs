@@ -635,6 +635,47 @@ public class ValueValidatorTests
         Assert.Null(valueValidator.GetCurrentRuleSets());
     }
 
+    [Fact]
+    public void ResolveValidationRuleSets_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+        Assert.Null(valueValidator.ResolveValidationRuleSets(null));
+        Assert.Equal(["login"], (string[]?)valueValidator.ResolveValidationRuleSets(["login"])!);
+
+        var services = new ServiceCollection();
+        services.AddScoped<IValidationDataContext, ValidationDataContext>();
+        using var serviceProvider = services.BuildServiceProvider();
+        var dataContext = serviceProvider.GetRequiredService<IValidationDataContext>();
+        dataContext.SetValidationOptions(new ValidationOptionsMetadata(["login", "email"]));
+
+        valueValidator.InitializeServiceProvider(serviceProvider.GetService);
+        Assert.Equal(["login", "email"], (string[]?)valueValidator.ResolveValidationRuleSets(null)!);
+        Assert.Equal(["login"], (string[]?)valueValidator.ResolveValidationRuleSets(["login"])!);
+    }
+
+    [Fact]
+    public void ToResults_Invalid_Parameters()
+    {
+        var valueValidator = new ValueValidator<string>();
+        Assert.Throws<ArgumentNullException>(() => valueValidator.ToResults(null!));
+    }
+
+    [Fact]
+    public void ToResults_ReturnOK()
+    {
+        var validationContext = new ValidationContext("Fur");
+        var valueValidator = new ValueValidator<string>().NotEqualTo("Fur");
+
+        Assert.Equal(["The field String cannot be equal to 'Fur'."],
+            valueValidator.ToResults(validationContext).Select(u => u.ErrorMessage!).ToArray());
+
+        var validationContext2 = new ValidationContext(new object());
+        var valueValidator2 = new ValueValidator<string>().Required().NotEqualTo("Fur");
+
+        Assert.Equal(["The Object field is required."],
+            valueValidator2.ToResults(validationContext2).Select(u => u.ErrorMessage!).ToArray());
+    }
+
     public class StringValueValidator : AbstractValueValidator<string>
     {
         public StringValueValidator() => Rule().MaxLength(10).NotEqualTo("Fur");

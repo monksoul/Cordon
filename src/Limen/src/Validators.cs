@@ -22,23 +22,17 @@ public static class Validators
     /// <summary>
     ///     创建对象验证器
     /// </summary>
-    /// <param name="options">
-    ///     <see cref="ValidatorOptions" />
-    /// </param>
     /// <param name="items">验证上下文数据</param>
     /// <typeparam name="T">对象类型</typeparam>
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public static ObjectValidator<T> Object<T>(ValidatorOptions options, IDictionary<object, object?>? items)
-        where T : class => new(options, items);
+    public static ObjectValidator<T> Object<T>(IDictionary<object, object?>? items)
+        where T : class => new(items);
 
     /// <summary>
     ///     创建对象验证器
     /// </summary>
-    /// <param name="options">
-    ///     <see cref="ValidatorOptions" />
-    /// </param>
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
     /// </param>
@@ -47,9 +41,8 @@ public static class Validators
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public static ObjectValidator<T> Object<T>(ValidatorOptions options, IServiceProvider? serviceProvider,
-        IDictionary<object, object?>? items)
-        where T : class => new(options, serviceProvider, items);
+    public static ObjectValidator<T> Object<T>(IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
+        where T : class => new(serviceProvider, items);
 
     /// <summary>
     ///     创建单个值验证器

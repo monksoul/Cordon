@@ -9,7 +9,7 @@ namespace Limen;
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
 public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, IObjectValidator<T>,
-    IRuleSetContextProvider, IDisposable
+    IRuleSetContextProvider
 {
     /// <summary>
     ///     当前规则集上下文栈
@@ -90,13 +90,17 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
             return true;
         }
 
+        // 解析验证时使用的规则集
+        var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
+
         // 检查是否设置单个值级别验证器
-        if (_valueValidator is not null && !_valueValidator.IsValid(resolvedValue, ruleSets))
+        if (_valueValidator is not null && !_valueValidator.IsValid(resolvedValue, resolvedRuleSets))
         {
             return false;
         }
 
-        return Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, ruleSets)).All(u => u.IsValid(resolvedValue));
+        return Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets))
+            .All(u => u.IsValid(resolvedValue));
     }
 
     /// <inheritdoc />
@@ -111,6 +115,9 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
             return null;
         }
 
+        // 解析验证时使用的规则集
+        var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
+
         // 获取显示名称和初始化验证结果集合
         var displayName = GetDisplayName();
         var validationResults = new List<ValidationResult>();
@@ -118,11 +125,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 检查是否设置单个值级别验证器
         if (_valueValidator is not null)
         {
-            validationResults.AddRange(_valueValidator.GetValidationResults(resolvedValue, ruleSets) ?? []);
+            validationResults.AddRange(_valueValidator.GetValidationResults(resolvedValue, resolvedRuleSets) ?? []);
         }
 
         // 获取所有验证器验证结果集合
-        validationResults.AddRange(Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, ruleSets))
+        validationResults.AddRange(Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets))
             .SelectMany(u => u.GetValidationResults(resolvedValue, displayName) ?? []));
 
         return validationResults.ToResults();
@@ -140,6 +147,9 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
             return;
         }
 
+        // 解析验证时使用的规则集
+        var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
+
         // 获取显示名称
         var displayName = GetDisplayName();
 
@@ -147,11 +157,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // ReSharper disable once UseNullPropagation
         if (_valueValidator is not null)
         {
-            _valueValidator.Validate(resolvedValue, ruleSets);
+            _valueValidator.Validate(resolvedValue, resolvedRuleSets);
         }
 
         // 遍历验证器集合
-        foreach (var validator in Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, ruleSets)))
+        foreach (var validator in Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets)))
         {
             validator.Validate(resolvedValue, displayName);
         }
@@ -160,6 +170,51 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <inheritdoc />
     void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
         InitializeServiceProvider(serviceProvider);
+
+    /// <inheritdoc />
+    bool IObjectValidator.IsValid(object? instance, string?[]? ruleSets) => IsValid((T?)instance, ruleSets);
+
+    /// <inheritdoc />
+    List<ValidationResult>? IObjectValidator.GetValidationResults(object? instance, string?[]? ruleSets) =>
+        GetValidationResults((T?)instance, ruleSets);
+
+    /// <inheritdoc />
+    void IObjectValidator.Validate(object? instance, string?[]? ruleSets) => Validate((T?)instance, ruleSets);
+
+    /// <inheritdoc />
+    public List<ValidationResult> ToResults(ValidationContext validationContext, bool disposeAfterValidation = true)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validationContext);
+
+        // 同步 IServiceProvider 委托
+        InitializeServiceProvider(validationContext.GetService);
+
+        // 尝试从 ValidationContext.Items 中解析验证选项中的规则集
+        string?[]? ruleSets = null;
+        if (validationContext.Items.TryGetValue(ValidationDataContext.ValidationOptionsKey, out var metadataObj) &&
+            metadataObj is ValidationOptionsMetadata metadata)
+        {
+            ruleSets = metadata.RuleSets;
+        }
+
+        try
+        {
+            // 获取用于验证的值（解决 null 值时 ObjectInstance 为 object 实例问题）
+            var instance = validationContext.ObjectInstance is T value ? value : default;
+
+            // 获取对象验证结果集合
+            return WithDisplayName(validationContext.DisplayName).GetValidationResults(instance, ruleSets) ?? [];
+        }
+        finally
+        {
+            // 自动释放资源
+            if (disposeAfterValidation)
+            {
+                Dispose();
+            }
+        }
+    }
 
     /// <inheritdoc />
     string?[]? IRuleSetContextProvider.GetCurrentRuleSets() => GetCurrentRuleSets();
@@ -444,6 +499,16 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     ///     <see cref="string" />
     /// </returns>
     internal string GetDisplayName() => DisplayName ?? "Value";
+
+    /// <summary>
+    ///     解析验证时使用的规则集
+    /// </summary>
+    /// <param name="ruleSets">规则集</param>
+    /// <returns><see cref="string" />列表</returns>
+    internal string?[]? ResolveValidationRuleSets(string?[]? ruleSets) =>
+        // 优先使用显式传入的规则集，否则从验证数据上下文中解析
+        ruleSets ?? (_serviceProvider?.Invoke(typeof(IValidationDataContext)) as IValidationDataContext)
+        ?.GetValidationOptions()?.RuleSets;
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
     internal new void InitializeServiceProvider(Func<Type, object?>? serviceProvider)

@@ -10,8 +10,7 @@ namespace Limen;
 /// <typeparam name="T">对象类型</typeparam>
 /// <typeparam name="TProperty">属性类型</typeparam>
 public partial class PropertyValidator<T, TProperty> :
-    FluentValidatorBuilder<TProperty, PropertyValidator<T, TProperty>>, IObjectValidator<T>, IMemberPathRepairable,
-    IDisposable
+    FluentValidatorBuilder<TProperty, PropertyValidator<T, TProperty>>, IObjectValidator<T>, IMemberPathRepairable
 {
     /// <inheritdoc cref="PropertyAnnotationValidator{T,TProperty}" />
     internal readonly PropertyAnnotationValidator<T, TProperty> _annotationValidator;
@@ -95,14 +94,14 @@ public partial class PropertyValidator<T, TProperty> :
     internal Func<TProperty, ValidationContext<T>, bool>? UnlessCondition { get; private set; }
 
     /// <inheritdoc />
+    void IMemberPathRepairable.RepairMemberPaths() => RepairMemberPaths();
+
+    /// <inheritdoc />
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-
-    /// <inheritdoc />
-    void IMemberPathRepairable.RepairMemberPaths() => RepairMemberPaths();
 
     /// <inheritdoc />
     public virtual bool IsValid(T? instance, string?[]? ruleSets = null)
@@ -215,6 +214,16 @@ public partial class PropertyValidator<T, TProperty> :
     void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
         InitializeServiceProvider(serviceProvider);
 
+    /// <inheritdoc />
+    bool IObjectValidator.IsValid(object? instance, string?[]? ruleSets) => IsValid((T?)instance, ruleSets);
+
+    /// <inheritdoc />
+    List<ValidationResult>? IObjectValidator.GetValidationResults(object? instance, string?[]? ruleSets) =>
+        GetValidationResults((T?)instance, ruleSets);
+
+    /// <inheritdoc />
+    void IObjectValidator.Validate(object? instance, string?[]? ruleSets) => Validate((T?)instance, ruleSets);
+
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
     internal new void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
     {
@@ -309,7 +318,7 @@ public partial class PropertyValidator<T, TProperty> :
         {
             // 初始化属性级别对象验证器实例
             var propertyValidator =
-                new ObjectValidator<TProperty>(options, null, items) { InheritedRuleSets = ruleSets };
+                new ObjectValidator<TProperty>(items) { InheritedRuleSets = ruleSets }.ConfigureOptions(options);
 
             // 调用自定义配置委托
             configure(propertyValidator);

@@ -7,10 +7,6 @@ namespace Limen.Tests;
 public class ObjectValidatorTests
 {
     [Fact]
-    public void New_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new ObjectValidator<ObjectModel>(null!, null));
-
-    [Fact]
     public void New_ReturnOK()
     {
         Assert.True(typeof(IObjectValidator<ObjectModel>).IsAssignableFrom(typeof(ObjectValidator<ObjectModel>)));
@@ -33,13 +29,12 @@ public class ObjectValidatorTests
         Assert.Null(validator.MemberPath);
         Assert.NotNull(ObjectValidator<Tests.ObjectModel>.ValidationContextsKey);
 
-        using var validator2 =
-            new ObjectValidator<ObjectModel>(new ValidatorOptions { SuppressAnnotationValidation = true }, null);
+        using var validator2 = new ObjectValidator<ObjectModel>(new Dictionary<object, object?>());
         Assert.NotNull(validator2.Options);
-        Assert.True(validator2.Options.SuppressAnnotationValidation);
         Assert.NotNull(validator2.Validators);
         Assert.Null(validator2._serviceProvider);
-        Assert.Null(validator2._items);
+        Assert.NotNull(validator2._items);
+        Assert.Empty(validator2._items);
         Assert.Empty(validator2.Validators);
         Assert.NotNull(validator2._annotationValidator);
         Assert.True(validator2._annotationValidator.ValidateAllProperties);
@@ -57,16 +52,14 @@ public class ObjectValidatorTests
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
-        using var validator3 = new ObjectValidator<ObjectModel>(
-            new ValidatorOptions { SuppressAnnotationValidation = true }, serviceProvider,
-            new Dictionary<object, object?>());
+        using var validator3 = new ObjectValidator<ObjectModel>(serviceProvider, new Dictionary<object, object?>());
         Assert.NotNull(validator3._serviceProvider);
         Assert.NotNull(validator3._annotationValidator._serviceProvider);
         Assert.NotNull(validator3._items);
         Assert.NotNull(validator3._annotationValidator._items);
 
         using var validator4 =
-            new ObjectValidator<ObjectModel>(new ValidatorOptions(), new Dictionary<object, object?>());
+            new ObjectValidator<ObjectModel>(new Dictionary<object, object?>());
         Assert.NotNull(validator4._items);
         Assert.NotNull(validator4._annotationValidator._items);
     }
@@ -766,7 +759,8 @@ public class ObjectValidatorTests
     public void ConfigureOptions_Invalid_Parameters()
     {
         using var validator = new ObjectValidator<ObjectModel>();
-        Assert.Throws<ArgumentNullException>(() => validator.ConfigureOptions(null!));
+        Assert.Throws<ArgumentNullException>(() => validator.ConfigureOptions((ValidatorOptions)null!));
+        Assert.Throws<ArgumentNullException>(() => validator.ConfigureOptions((Action<ValidatorOptions>)null!));
     }
 
     [Fact]
@@ -783,6 +777,14 @@ public class ObjectValidatorTests
         using var validator2 =
             new ObjectValidator<ObjectModel>().ConfigureOptions(options => options.SuppressAnnotationValidation = true);
         Assert.True(validator2.Options.SuppressAnnotationValidation);
+
+        using var validator3 = new ObjectValidator<ObjectModel>();
+        validator3.ConfigureOptions(new ValidatorOptions
+        {
+            SuppressAnnotationValidation = true, ValidateAllProperties = false
+        });
+        Assert.True(validator3.Options.SuppressAnnotationValidation);
+        Assert.False(validator3.Options.ValidateAllProperties);
     }
 
     [Fact]
@@ -863,8 +865,9 @@ public class ObjectValidatorTests
     [Fact]
     public void Dispose_ReturnOK()
     {
-        var validator = new ObjectValidator<ObjectModel>(new ValidatorOptions(),
-            new Dictionary<object, object?> { { "name", "Furion" } }).SetValidator(new ObjectModelValidator());
+        var validator =
+            new ObjectValidator<ObjectModel>(new Dictionary<object, object?> { { "name", "Furion" } }).SetValidator(
+                new ObjectModelValidator());
         Assert.NotNull(validator._items);
         Assert.Single(validator._items);
 
@@ -891,7 +894,7 @@ public class ObjectValidatorTests
     public void ToResults_ReturnOK()
     {
         var validationContext = new ValidationContext(new ObjectModel());
-        var validator = new ObjectValidator<ObjectModel>(new ValidatorOptions(),
+        var validator = new ObjectValidator<ObjectModel>(
             new Dictionary<object, object?>
             {
                 { ObjectValidator<ObjectModel>.ValidationContextsKey, validationContext }

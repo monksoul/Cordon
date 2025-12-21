@@ -191,7 +191,8 @@ public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator
         return SetValidator((ruleSets, items, options) =>
         {
             // 初始化集合元素对象验证器实例
-            var elementValidator = new ObjectValidator<TElement>(options, null, items) { InheritedRuleSets = ruleSets };
+            var elementValidator =
+                new ObjectValidator<TElement>(items) { InheritedRuleSets = ruleSets }.ConfigureOptions(options);
 
             // 调用自定义配置委托
             configure(elementValidator);

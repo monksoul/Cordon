@@ -144,7 +144,7 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
     internal ValidationContext CreateValidationContext(object value, string? name)
     {
         // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext(value, null, _items);
+        var validationContext = new ValidationContext(value, _items);
 
         // 空检查
         if (name is not null)

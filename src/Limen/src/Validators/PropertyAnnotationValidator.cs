@@ -259,7 +259,7 @@ public class PropertyAnnotationValidator<T> : ValidatorBase<T>, IValidatorInitia
     internal ValidationContext CreateValidationContext(object value, string? name)
     {
         // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext(value, null, _items) { MemberName = Property.Name };
+        var validationContext = new ValidationContext(value, _items) { MemberName = Property.Name };
 
         // 空检查
         if (name is not null)
