@@ -87,6 +87,20 @@ public class ObjectValidatorTests
         Assert.False(validator.IsValid(new ObjectModel()));
         Assert.False(validator.IsValid(new ObjectModel { FirstName = "Fu" }));
         Assert.True(validator.IsValid(new ObjectModel { FirstName = "Furion" }));
+        Assert.True(validator.IsValid(new ObjectModel { FirstName = "Furion.NET" }));
+    }
+
+    [Fact]
+    public void IsValid_WithObjectValidator_ReturnOK()
+    {
+        using var validator = new ObjectValidator<ObjectModel>().SkipAnnotationValidation()
+            .RuleFor(u => u.FirstName).AddValidators(new RequiredValidator(), new MinLengthValidator(3)).Then()
+            .SetValidator(new ObjectModelValidator().SkipAnnotationValidation());
+
+        Assert.False(validator.IsValid(new ObjectModel()));
+        Assert.False(validator.IsValid(new ObjectModel { FirstName = "Fu" }));
+        Assert.True(validator.IsValid(new ObjectModel { FirstName = "Furion" }));
+        Assert.False(validator.IsValid(new ObjectModel { FirstName = "Furion.NET" }));
     }
 
     [Fact]
@@ -154,6 +168,35 @@ public class ObjectValidatorTests
             validationResults2.Select(u => u.ErrorMessage));
 
         Assert.Null(validator.GetValidationResults(new ObjectModel { FirstName = "Furion" }));
+        Assert.Null(validator.GetValidationResults(new ObjectModel { FirstName = "Furion.NET" }));
+    }
+
+    [Fact]
+    public void GetValidationResults_WithObjectValidator_ReturnOK()
+    {
+        using var validator = new ObjectValidator<ObjectModel>().SkipAnnotationValidation()
+            .RuleFor(u => u.FirstName).AddValidators(new RequiredValidator(), new MinLengthValidator(3)).Then()
+            .SetValidator(new ObjectModelValidator().SkipAnnotationValidation());
+
+        var validationResults = validator.GetValidationResults(new ObjectModel());
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The FirstName field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 = validator.GetValidationResults(new ObjectModel { FirstName = "Fu" });
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field FirstName must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        Assert.Null(validator.GetValidationResults(new ObjectModel { FirstName = "Furion" }));
+
+        var validationResults3 = validator.GetValidationResults(new ObjectModel { FirstName = "Furion.NET" });
+        Assert.NotNull(validationResults3);
+        Assert.Single(validationResults3);
+        Assert.Equal(["The field FirstName must be a string or array type with a maximum length of '8'."],
+            validationResults3.Select(u => u.ErrorMessage));
     }
 
     [Fact]
@@ -250,6 +293,33 @@ public class ObjectValidatorTests
         Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
 
         validator.Validate(new ObjectModel { FirstName = "Furion" });
+        validator.Validate(new ObjectModel { FirstName = "Furion.NET" });
+    }
+
+    [Fact]
+    public void Validate_WithObjectValidator_ReturnOK()
+    {
+        using var validator = new ObjectValidator<ObjectModel>().SkipAnnotationValidation()
+            .RuleFor(u => u.FirstName).AddValidators(new RequiredValidator(), new MinLengthValidator(3)).Then()
+            .SetValidator(new ObjectModelValidator().SkipAnnotationValidation());
+
+        var exception = Assert.Throws<ValidationException>(() => validator.Validate(new ObjectModel()));
+        Assert.Equal("The FirstName field is required.", exception.Message);
+        Assert.Equal("FirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => validator.Validate(new ObjectModel { FirstName = "Fu" }));
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
+
+        validator.Validate(new ObjectModel { FirstName = "Furion" });
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() => validator.Validate(new ObjectModel { FirstName = "Furion.NET" }));
+        Assert.Equal("The field FirstName must be a string or array type with a maximum length of '8'.",
+            exception3.Message);
+        Assert.Equal("FirstName", exception3.ValidationResult.MemberNames.First());
     }
 
     [Fact]
@@ -649,6 +719,50 @@ public class ObjectValidatorTests
     }
 
     [Fact]
+    public void SetValidator_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).NotEqualTo("Fur").End()
+            .SetValidator(new ObjectModelValidator());
+
+        Assert.Throws<ArgumentNullException>(() =>
+            objectValidator.SetValidator(
+                (Func<IDictionary<object, object?>?, ValidatorOptions, ObjectValidator<ObjectModel>?>)null!));
+
+        var exception =
+            Assert.Throws<InvalidOperationException>(() => objectValidator.SetValidator(new ObjectModelValidator()));
+        Assert.Equal(
+            "An object validator has already been assigned to this object. Only one object validator is allowed per object.",
+            exception.Message);
+    }
+
+    [Fact]
+    public void SetValidator_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).NotEqualTo("Fur").End();
+
+        Assert.Null(objectValidator._objectValidator);
+        objectValidator.SetValidator(new ObjectModelValidator());
+        Assert.NotNull(objectValidator._objectValidator);
+        Assert.Null(objectValidator._objectValidator.MemberPath);
+        Assert.Null(objectValidator._objectValidator.InheritedRuleSets);
+        Assert.Throws<InvalidOperationException>(() =>
+            objectValidator.SetValidator((ObjectValidator<ObjectModel>?)null));
+        Assert.Null(objectValidator._objectValidator.MemberPath);
+
+        using var objectValidator2 = new ObjectValidator<ObjectModel> { MemberPath = "Sub" }.RuleFor(u => u.Name)
+            .NotEqualTo("Fur").End();
+
+        Assert.Null(objectValidator2._objectValidator);
+        objectValidator2.SetValidator(new ObjectModelValidator());
+        Assert.NotNull(objectValidator2._objectValidator);
+        Assert.Equal("Sub", objectValidator2._objectValidator.MemberPath);
+        Assert.Null(objectValidator2._objectValidator.InheritedRuleSets);
+        Assert.Throws<InvalidOperationException>(() =>
+            objectValidator2.SetValidator((ObjectValidator<ObjectModel>?)null));
+        Assert.Equal("Sub", objectValidator2._objectValidator.MemberPath);
+    }
+
+    [Fact]
     public void ConfigureOptions_Invalid_Parameters()
     {
         using var validator = new ObjectValidator<ObjectModel>();
@@ -750,7 +864,7 @@ public class ObjectValidatorTests
     public void Dispose_ReturnOK()
     {
         var validator = new ObjectValidator<ObjectModel>(new ValidatorOptions(),
-            new Dictionary<object, object?> { { "name", "Furion" } });
+            new Dictionary<object, object?> { { "name", "Furion" } }).SetValidator(new ObjectModelValidator());
         Assert.NotNull(validator._items);
         Assert.Single(validator._items);
 
@@ -874,7 +988,7 @@ public class ObjectValidatorTests
     public void RepairMemberPaths_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).Required()
-            .RuleFor(u => u.Id).Min(1).End();
+            .RuleFor(u => u.Id).Min(1).End().SetValidator(new ObjectModelValidator());
         objectValidator.MemberPath = "Sub";
         objectValidator.RepairMemberPaths();
 
@@ -885,6 +999,13 @@ public class ObjectValidatorTests
         var propertyValidator2 = objectValidator.Validators[1] as PropertyValidator<ObjectModel, int>;
         Assert.NotNull(propertyValidator2);
         Assert.Equal("Sub.Id", propertyValidator2.GetEffectiveMemberName());
+
+        Assert.NotNull(objectValidator._objectValidator);
+        Assert.Equal("Sub", objectValidator._objectValidator.MemberPath);
+        var propertyValidator3 =
+            objectValidator._objectValidator.Validators[0] as PropertyValidator<ObjectModel, string?>;
+        Assert.NotNull(propertyValidator3);
+        Assert.Equal("Sub.FirstName", propertyValidator3.GetEffectiveMemberName());
     }
 
     public class ObjectModel
@@ -898,6 +1019,11 @@ public class ObjectValidatorTests
         [MinLength(5)] public string? Address { get; set; }
 
         public List<Child>? Children { get; set; }
+    }
+
+    public class ObjectModelValidator : AbstractValidator<ObjectModel>
+    {
+        public ObjectModelValidator() => RuleFor(u => u.FirstName).MaxLength(8);
     }
 
     public class Child

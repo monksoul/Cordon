@@ -858,6 +858,17 @@ public static class Validators
         new(maximumLength) { MinimumLength = minimumLength };
 
     /// <summary>
+    ///     创建不包含特定字符/字符串的验证器
+    /// </summary>
+    /// <param name="searchValue">检索的值</param>
+    /// <param name="comparison"><see cref="StringComparison" />，默认值为：<see cref="StringComparison.Ordinal" /></param>
+    /// <returns>
+    ///     <see cref="StringNotContainsValidator" />
+    /// </returns>
+    public static StringNotContainsValidator StringNotContains(string searchValue,
+        StringComparison comparison = StringComparison.Ordinal) => new(searchValue) { Comparison = comparison };
+
+    /// <summary>
     ///     创建强密码模式验证器
     /// </summary>
     /// <returns>

@@ -1589,6 +1589,38 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void StringNotContains_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .StringNotContains("ion");
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as StringNotContainsValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(StringComparison.Ordinal, addedValidator.Comparison);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "free" }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "furion" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "FURION" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .StringNotContains("ion", StringComparison.OrdinalIgnoreCase);
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator2 = propertyValidator2._lastAddedValidator as StringNotContainsValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.Equal(StringComparison.OrdinalIgnoreCase, addedValidator2.Comparison);
+
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "free" }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = "furion" }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = "FURION" }));
+    }
+
+    [Fact]
     public void StrongPassword_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()

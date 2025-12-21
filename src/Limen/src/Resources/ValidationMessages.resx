@@ -300,4 +300,7 @@
     <data name="CompareValidator_ValidationError" xml:space="preserve">
         <value>'{0}' and '{1}' do not match.</value>
     </data>
+    <data name="StringNotContainsValidator_ValidationError" xml:space="preserve">
+        <value>The field {0} must not contain the string '{1}'.</value>
+    </data>
 </root>

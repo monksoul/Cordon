@@ -31,6 +31,10 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     /// </summary>
     internal readonly Stack<string?> _ruleSetStack;
 
+    /// <inheritdoc cref="ObjectValidator{T}" />
+    /// <remarks>对象级别验证器。</remarks>
+    internal ObjectValidator<T>? _objectValidator;
+
     /// <summary>
     ///     <see cref="IServiceProvider" /> 委托
     /// </summary>
@@ -159,6 +163,12 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
             return false;
         }
 
+        // 检查是否设置了对象级别验证器
+        if (_objectValidator is not null && !_objectValidator.IsValid(instance, ruleSets))
+        {
+            return false;
+        }
+
         return Validators.All(u => u.IsValid(instance, resolvedRuleSets));
     }
 
@@ -185,6 +195,12 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
         if (ShouldRunAnnotationValidation())
         {
             validationResults.AddRange(_annotationValidator.GetValidationResults(instance, null!) ?? []);
+        }
+
+        // 检查是否设置了对象级别验证器
+        if (_objectValidator is not null)
+        {
+            validationResults.AddRange(_objectValidator.GetValidationResults(instance, ruleSets) ?? []);
         }
 
         // 获取所有属性验证器验证结果集合
@@ -216,6 +232,13 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
             _annotationValidator.Validate(instance, null!);
         }
 
+        // 检查是否设置了对象级别验证器
+        // ReSharper disable once UseNullPropagation
+        if (_objectValidator is not null)
+        {
+            _objectValidator.Validate(instance, ruleSets);
+        }
+
         // 遍历属性验证器集合
         foreach (var validator in Validators)
         {
@@ -230,6 +253,9 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
 
         // 同步 _annotationValidator 实例 IServiceProvider 委托
         _annotationValidator.InitializeServiceProvider(serviceProvider);
+
+        // 同步 _objectValidator 实例 IServiceProvider 委托
+        _objectValidator?.InitializeServiceProvider(serviceProvider);
 
         // 遍历所有属性验证器并尝试同步 IServiceProvider 委托
         foreach (var propertyValidator in Validators)
@@ -439,6 +465,63 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     }
 
     /// <summary>
+    ///     设置对象验证器
+    /// </summary>
+    /// <param name="validatorFactory">
+    ///     <see cref="ObjectValidator{T}" /> 工厂委托
+    /// </param>
+    /// <returns>
+    ///     <see cref="ObjectValidator{T}" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public ObjectValidator<T> SetValidator(
+        Func<IDictionary<object, object?>?, ValidatorOptions, ObjectValidator<T>?> validatorFactory)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validatorFactory);
+
+        // 空检查
+        if (_objectValidator is not null)
+        {
+            throw new InvalidOperationException(
+                "An object validator has already been assigned to this object. Only one object validator is allowed per object.");
+        }
+
+        // 调用工厂方法，传入当前 _items 和 Options
+        _objectValidator = validatorFactory(_items, Options);
+
+        // 空检查
+        if (_objectValidator is null)
+        {
+            return this;
+        }
+
+        // 继承当前规则集
+        _objectValidator.SetInheritedRuleSetsIfNotSet(InheritedRuleSets);
+
+        // 同步 IServiceProvider 委托
+        _objectValidator.InitializeServiceProvider(_serviceProvider);
+
+        // 修复整个子验证器树的成员路径
+        RepairMemberPaths();
+
+        return this;
+    }
+
+    /// <summary>
+    ///     设置对象验证器
+    /// </summary>
+    /// <param name="validator">
+    ///     <see cref="ObjectValidator{T}" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="ObjectValidator{T}" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public ObjectValidator<T> SetValidator(ObjectValidator<T>? validator) =>
+        SetValidator((_, _) => validator);
+
+    /// <summary>
     ///     配置是否启用对象属性验证特性验证
     /// </summary>
     /// <param name="enabled">是否启用</param>
@@ -563,6 +646,12 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
                 disposable.Dispose();
             }
         }
+
+        // 释放对象级别验证器资源
+        if (_objectValidator is IDisposable objectValidatorDisposable)
+        {
+            objectValidatorDisposable.Dispose();
+        }
     }
 
     /// <summary>
@@ -650,6 +739,22 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
                 // 修复验证器及其子验证器的成员路径
                 repairable.RepairMemberPaths();
             }
+        }
+
+        // 空检查
+        if (_objectValidator is null)
+        {
+            return;
+        }
+
+        // 设置当前对象级别验证器的完整成员路径
+        _objectValidator.MemberPath = MemberPath;
+
+        // 检查对象级别验证器是否实现 IMemberPathRepairable 接口
+        if (_objectValidator is IMemberPathRepairable objectValidatorRepairable)
+        {
+            // 修复验证器及其子验证器的成员路径
+            objectValidatorRepairable.RepairMemberPaths();
         }
     }
 }

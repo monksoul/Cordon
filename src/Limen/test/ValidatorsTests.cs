@@ -694,6 +694,18 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void StringNotContains_ReturnOK()
+    {
+        var validator = Validators.StringNotContains("ion");
+        Assert.Equal("ion", validator.SearchValue);
+        Assert.Equal(StringComparison.Ordinal, validator.Comparison);
+
+        var validator2 = Validators.StringNotContains("ion", StringComparison.OrdinalIgnoreCase);
+        Assert.Equal("ion", validator2.SearchValue);
+        Assert.Equal(StringComparison.OrdinalIgnoreCase, validator2.Comparison);
+    }
+
+    [Fact]
     public void StrongPassword_ReturnOK()
     {
         var validator = Validators.StrongPassword();

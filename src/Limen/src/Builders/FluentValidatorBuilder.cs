@@ -924,6 +924,18 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         AddValidator(new StringLengthValidator(maximumLength) { MinimumLength = minimumLength });
 
     /// <summary>
+    ///     添加不包含特定字符/字符串的验证器
+    /// </summary>
+    /// <param name="searchValue">检索的值</param>
+    /// <param name="comparison"><see cref="StringComparison" />，默认值为：<see cref="StringComparison.Ordinal" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf
+        StringNotContains(string searchValue, StringComparison comparison = StringComparison.Ordinal) =>
+        AddValidator(new StringNotContainsValidator(searchValue) { Comparison = comparison });
+
+    /// <summary>
     ///     添加强密码模式验证器
     /// </summary>
     /// <returns>

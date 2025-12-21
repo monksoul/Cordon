@@ -80,7 +80,7 @@ public class ValidationBuilderTests
         builder.AddValidatorFromAssemblies(typeof(ObjectModel).Assembly);
 
         Assert.NotNull(builder._validatorTypes);
-        Assert.Equal(10, builder._validatorTypes.Count);
+        Assert.Equal(11, builder._validatorTypes.Count);
     }
 
     [Fact]

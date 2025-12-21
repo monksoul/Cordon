@@ -1172,6 +1172,34 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void StringNotContains_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().StringNotContains("ion");
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as StringNotContainsValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(StringComparison.Ordinal, addedValidator.Comparison);
+
+        Assert.True(valueValidator.IsValid("free"));
+        Assert.False(valueValidator.IsValid("furion"));
+        Assert.True(valueValidator.IsValid("FURION"));
+
+        var valueValidator2 = new ValueValidator<object>().StringNotContains("ion", StringComparison.OrdinalIgnoreCase);
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator2 = valueValidator2._lastAddedValidator as StringNotContainsValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.Equal(StringComparison.OrdinalIgnoreCase, addedValidator2.Comparison);
+
+        Assert.True(valueValidator2.IsValid("free"));
+        Assert.False(valueValidator2.IsValid("furion"));
+        Assert.False(valueValidator2.IsValid("FURION"));
+    }
+
+    [Fact]
     public void StrongPassword_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().StrongPassword();
