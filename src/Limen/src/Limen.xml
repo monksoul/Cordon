@@ -9303,3 +9303,13 @@
         </member>
     </members>
 </doc>
+      </param>
+            <param name="validationBuilder">
+                <see cref="T:Limen.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>

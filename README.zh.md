@@ -44,9 +44,10 @@ public class User : IValidatableObject
         return context.ContinueWith<User>()
             .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("{0} 不是有效的互联网用户名")
             .RuleFor(u => u.Id).Max(int.MaxValue)
-            .RuleSet("rule", validator => 
+            // 支持规则集（场景）
+            .RuleSet("rule", v => 
             {
-                validator.RuleFor(u => u.Name).EmailAddress().WithMessage("{0} 不是有效的电子邮箱格式");
+                v.RuleFor(u => u.Name).EmailAddress().WithMessage("{0} 不是有效的电子邮箱格式");
             }).ToResults();
     }
 }
