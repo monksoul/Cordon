@@ -364,23 +364,23 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     ///     为指定属性配置验证规则
     /// </summary>
     /// <param name="selector">属性选择器</param>
-    /// <typeparam name="TOtherProperty">属性类型</typeparam>
+    /// <typeparam name="TProperty1">属性类型</typeparam>
     /// <returns>
-    ///     <see cref="PropertyValidator{T,TOtherProperty}" />
+    ///     <see cref="PropertyValidator{T,TProperty1}" />
     /// </returns>
-    public PropertyValidator<T, TOtherProperty>
-        RuleFor<TOtherProperty>(Expression<Func<T, TOtherProperty?>> selector) => _objectValidator.RuleFor(selector);
+    public PropertyValidator<T, TProperty1> RuleFor<TProperty1>(Expression<Func<T, TProperty1?>> selector) =>
+        _objectValidator.RuleFor(selector);
 
     /// <summary>
     ///     为集合类型属性中的每一个元素配置验证规则
     /// </summary>
     /// <param name="selector">属性选择器</param>
-    /// <typeparam name="TOtherElement">元素类型</typeparam>
+    /// <typeparam name="TElement">元素类型</typeparam>
     /// <returns>
-    ///     <see cref="CollectionPropertyValidator{T,TOtherElement}" />
+    ///     <see cref="CollectionPropertyValidator{T,TElement}" />
     /// </returns>
-    public CollectionPropertyValidator<T, TOtherElement> RuleForEach<TOtherElement>(
-        Expression<Func<T, IEnumerable<TOtherElement>?>> selector) where TOtherElement : class =>
+    public CollectionPropertyValidator<T, TElement>
+        RuleForEach<TElement>(Expression<Func<T, IEnumerable<TElement?>?>> selector) where TElement : class =>
         _objectValidator.RuleForEach(selector);
 
     /// <summary>

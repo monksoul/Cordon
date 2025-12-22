@@ -376,9 +376,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 从父对象验证器中移除当前实例
         _objectValidator.Validators.Remove(this);
 
-        // 重建属性选择器为 Expression<Func<T, IEnumerable<TElement>?>> 类型
+        // 重建属性选择器为 Expression<Func<T, IEnumerable<TElement?>?>> 类型
         var collectionSelector =
-            Expression.Lambda<Func<T, IEnumerable<TElement>?>>(_selector.Body, _selector.Parameters);
+            Expression.Lambda<Func<T, IEnumerable<TElement?>?>>(_selector.Body, _selector.Parameters);
 
         // 创建新的 CollectionPropertyValidator 实例
         var collectionValidator = new CollectionPropertyValidator<T, TElement>(collectionSelector, _objectValidator)

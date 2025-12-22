@@ -19,8 +19,8 @@ public sealed class
     internal ObjectValidator<TElement>? _elementValidator;
 
     /// <inheritdoc />
-    internal CollectionPropertyValidator(Expression<Func<T, IEnumerable<TElement>?>> selector,
-        ObjectValidator<T> objectValidator) : base(selector, objectValidator)
+    internal CollectionPropertyValidator(Expression<Func<T, IEnumerable<TElement?>?>> selector,
+        ObjectValidator<T> objectValidator) : base(selector!, objectValidator)
     {
     }
 
