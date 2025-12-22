@@ -16,7 +16,7 @@ public class Custom : IValidatableObject
         return validationContext.ContinueWith<Custom>()
             .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
             .RuleFor(u => u.Id).Max(int.MaxValue)
-            .RuleForEach(u => u.Addresses).ChildRules(u =>
+            .RuleForEach(u => u.Addresses).NotEmpty().ChildRules(u =>
             {
                 u.RuleFor(c => c.Country).Required()
                     .RuleFor(c => c.Province).Required()

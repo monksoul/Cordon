@@ -119,7 +119,7 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     /// <summary>
     ///     从父级继承的规则集
     /// </summary>
-    /// <remarks>用于 <see cref="PropertyValidator{T,TProperty}.ChildRules" /> 场景。</remarks>
+    /// <remarks>用于 <see cref="PropertyValidator{T,TProperty,TSelf}.ChildRules" /> 场景。</remarks>
     internal string?[]? InheritedRuleSets { get; set => field = value?.Select(u => u?.Trim()).ToArray(); }
 
     /// <inheritdoc />

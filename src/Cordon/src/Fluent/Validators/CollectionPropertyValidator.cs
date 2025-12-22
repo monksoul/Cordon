@@ -9,7 +9,9 @@ namespace Cordon;
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
 /// <typeparam name="TElement">元素类型</typeparam>
-public sealed class CollectionPropertyValidator<T, TElement> : PropertyValidator<T, IEnumerable<TElement>?>
+public sealed class
+    CollectionPropertyValidator<T, TElement> : PropertyValidator<T, IEnumerable<TElement>?,
+    CollectionPropertyValidator<T, TElement>>
     where TElement : class
 {
     /// <inheritdoc cref="ObjectValidator{T}" />

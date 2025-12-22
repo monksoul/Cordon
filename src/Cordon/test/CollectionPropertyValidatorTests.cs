@@ -331,13 +331,10 @@ public class CollectionPropertyValidatorTests
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var subValidator = new ChildValidator();
-        var collectionPropertyValidator =
+        var propertyValidator =
             new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator)
                 .SetValidator(subValidator)
                 .AddAnnotations(new RequiredAttribute());
-
-        var propertyValidator = collectionPropertyValidator as CollectionPropertyValidator<ObjectModel, Child>;
-        Assert.NotNull(propertyValidator);
 
         Assert.Null(propertyValidator._serviceProvider);
         Assert.Null(propertyValidator._annotationValidator._serviceProvider);
