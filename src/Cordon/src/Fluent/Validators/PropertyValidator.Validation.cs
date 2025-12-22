@@ -8,7 +8,8 @@ namespace Cordon;
 public partial class PropertyValidator<T, TProperty>
 {
     /// <inheritdoc />
-    public List<ValidationResult> ToResults(ValidationContext validationContext, bool disposeAfterValidation = true) =>
+    public virtual List<ValidationResult> ToResults(ValidationContext validationContext,
+        bool disposeAfterValidation = true) =>
         _objectValidator.ToResults(validationContext, disposeAfterValidation);
 
     /// <summary>
@@ -18,7 +19,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> UseAnnotationValidation(bool? enabled)
+    public virtual PropertyValidator<T, TProperty> UseAnnotationValidation(bool? enabled)
     {
         SuppressAnnotationValidation = !enabled;
 
@@ -31,7 +32,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> UseAnnotationValidation() => UseAnnotationValidation(true);
+    public virtual PropertyValidator<T, TProperty> UseAnnotationValidation() => UseAnnotationValidation(true);
 
     /// <summary>
     ///     配置跳过该属性上的验证特性验证
@@ -39,7 +40,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> SkipAnnotationValidation() => UseAnnotationValidation(false);
+    public virtual PropertyValidator<T, TProperty> SkipAnnotationValidation() => UseAnnotationValidation(false);
 
     /// <summary>
     ///     配置跳过该属性上的验证特性验证
@@ -48,7 +49,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> CustomOnly() => UseAnnotationValidation(false);
+    public virtual PropertyValidator<T, TProperty> CustomOnly() => UseAnnotationValidation(false);
 
     /// <summary>
     ///     添加条件验证器
@@ -57,7 +58,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> Conditional(
+    public virtual PropertyValidator<T, TProperty> Conditional(
         Action<ConditionBuilder<TProperty>, ValidationContext<T>> buildConditions)
     {
         // 空检查
@@ -74,7 +75,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> Compare(Expression<Func<T, object?>> selector)
+    public virtual PropertyValidator<T, TProperty> Compare(Expression<Func<T, object?>> selector)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(selector);
@@ -89,7 +90,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> Compare(string propertyName)
+    public virtual PropertyValidator<T, TProperty> Compare(string propertyName)
     {
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
@@ -104,7 +105,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> EqualTo(Func<ValidationContext<T>, object?> compareValueAccessor)
+    public virtual PropertyValidator<T, TProperty> EqualTo(Func<ValidationContext<T>, object?> compareValueAccessor)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(compareValueAccessor);
@@ -119,7 +120,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> GreaterThanOrEqualTo(
+    public virtual PropertyValidator<T, TProperty> GreaterThanOrEqualTo(
         Func<ValidationContext<T>, IComparable> compareValueAccessor)
     {
         // 空检查
@@ -135,7 +136,8 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> GreaterThan(Func<ValidationContext<T>, IComparable> compareValueAccessor)
+    public virtual PropertyValidator<T, TProperty> GreaterThan(
+        Func<ValidationContext<T>, IComparable> compareValueAccessor)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(compareValueAccessor);
@@ -150,7 +152,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> LessThanOrEqualTo(
+    public virtual PropertyValidator<T, TProperty> LessThanOrEqualTo(
         Func<ValidationContext<T>, IComparable> compareValueAccessor)
     {
         // 空检查
@@ -166,7 +168,8 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> LessThan(Func<ValidationContext<T>, IComparable> compareValueAccessor)
+    public virtual PropertyValidator<T, TProperty> LessThan(
+        Func<ValidationContext<T>, IComparable> compareValueAccessor)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(compareValueAccessor);
@@ -181,7 +184,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> MustUnless(Func<TProperty, ValidationContext<T>, bool> condition)
+    public virtual PropertyValidator<T, TProperty> MustUnless(Func<TProperty, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
@@ -197,7 +200,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> MustUnless_(Func<TProperty, ValidationContext<T>, bool> condition) =>
+    public virtual PropertyValidator<T, TProperty> MustUnless_(Func<TProperty, ValidationContext<T>, bool> condition) =>
         MustUnless(condition);
 
     /// <summary>
@@ -207,7 +210,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> Must(Func<TProperty, ValidationContext<T>, bool> condition)
+    public virtual PropertyValidator<T, TProperty> Must(Func<TProperty, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
@@ -223,7 +226,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> Must_(Func<TProperty, ValidationContext<T>, bool> condition) =>
+    public virtual PropertyValidator<T, TProperty> Must_(Func<TProperty, ValidationContext<T>, bool> condition) =>
         Must(condition);
 
     /// <summary>
@@ -235,7 +238,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> MustAny<TElement>(IEnumerable<TElement> enumerable,
+    public virtual PropertyValidator<T, TProperty> MustAny<TElement>(IEnumerable<TElement> enumerable,
         Func<TProperty, ValidationContext<T>, TElement, bool> condition)
     {
         // 空检查
@@ -255,7 +258,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> MustAny_<TElement>(IEnumerable<TElement> enumerable,
+    public virtual PropertyValidator<T, TProperty> MustAny_<TElement>(IEnumerable<TElement> enumerable,
         Func<TProperty, ValidationContext<T>, TElement, bool> condition) =>
         MustAny(enumerable, condition);
 
@@ -266,7 +269,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> NotEqualTo(Func<ValidationContext<T>, object?> compareValueAccessor)
+    public virtual PropertyValidator<T, TProperty> NotEqualTo(Func<ValidationContext<T>, object?> compareValueAccessor)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(compareValueAccessor);
@@ -281,7 +284,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> Predicate(Func<TProperty, ValidationContext<T>, bool> condition)
+    public virtual PropertyValidator<T, TProperty> Predicate(Func<TProperty, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
@@ -297,7 +300,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> Predicate_(Func<TProperty, ValidationContext<T>, bool> condition) =>
+    public virtual PropertyValidator<T, TProperty> Predicate_(Func<TProperty, ValidationContext<T>, bool> condition) =>
         Predicate(condition);
 
     /// <summary>
@@ -312,7 +315,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> ValidatorProxy<TValidator>(
+    public virtual PropertyValidator<T, TProperty> ValidatorProxy<TValidator>(
         Func<ValidationContext<T>, object?[]?>? constructorArgsFactory = null,
         Func<T, object?>? validatedObjectProvider = null, Action<TValidator>? configure = null)
         where TValidator : ValidatorBase
@@ -339,7 +342,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public ObjectValidator<T> And() => _objectValidator;
+    public virtual ObjectValidator<T> And() => _objectValidator;
 
     /// <summary>
     ///     结束当前属性验证器的配置，返回到对象验证器以继续链式操作
@@ -347,7 +350,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public ObjectValidator<T> Then() => _objectValidator;
+    public virtual ObjectValidator<T> Then() => _objectValidator;
 
     /// <summary>
     ///     结束当前属性验证器的配置，返回到对象验证器以继续链式操作
@@ -355,7 +358,7 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public ObjectValidator<T> End() => _objectValidator;
+    public virtual ObjectValidator<T> End() => _objectValidator;
 
     /// <summary>
     ///     为指定属性配置验证规则
@@ -431,6 +434,6 @@ public partial class PropertyValidator<T, TProperty>
     /// <returns>
     ///     <see cref="List{T}" />
     /// </returns>
-    public List<ValidationResult> ToResults(bool disposeAfterValidation = true) =>
+    public virtual List<ValidationResult> ToResults(bool disposeAfterValidation = true) =>
         _objectValidator.ToResults(disposeAfterValidation);
 }

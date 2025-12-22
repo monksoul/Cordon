@@ -247,7 +247,7 @@ public partial class PropertyValidator<T, TProperty> :
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public PropertyValidator<T, TProperty> SetValidator(
+    public virtual PropertyValidator<T, TProperty> SetValidator(
         Func<string?[]?, IDictionary<object, object?>?, ValidatorOptions, ObjectValidator<TProperty>?> validatorFactory)
     {
         // 空检查
@@ -291,7 +291,7 @@ public partial class PropertyValidator<T, TProperty> :
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public PropertyValidator<T, TProperty> SetValidator(ObjectValidator<TProperty>? validator) =>
+    public virtual PropertyValidator<T, TProperty> SetValidator(ObjectValidator<TProperty>? validator) =>
         SetValidator((_, _, _) => validator);
 
     /// <summary>
@@ -302,7 +302,7 @@ public partial class PropertyValidator<T, TProperty> :
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public PropertyValidator<T, TProperty> ChildRules(Action<ObjectValidator<TProperty>> configure)
+    public virtual PropertyValidator<T, TProperty> ChildRules(Action<ObjectValidator<TProperty>> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
@@ -337,7 +337,7 @@ public partial class PropertyValidator<T, TProperty> :
     ///     <see cref="CollectionPropertyValidator{T,TElement}" />
     /// </returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public CollectionPropertyValidator<T, TElement> Each<TElement>(Action<ObjectValidator<TElement>> configure)
+    public virtual CollectionPropertyValidator<T, TElement> Each<TElement>(Action<ObjectValidator<TElement>> configure)
         where TElement : class
     {
         // 空检查
@@ -393,7 +393,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> When(Func<TProperty, bool> condition)
+    public virtual PropertyValidator<T, TProperty> When(Func<TProperty, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
@@ -411,7 +411,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> Unless(Func<TProperty, bool> condition)
+    public virtual PropertyValidator<T, TProperty> Unless(Func<TProperty, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
@@ -429,7 +429,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> When(Func<TProperty, ValidationContext<T>, bool> condition)
+    public virtual PropertyValidator<T, TProperty> When(Func<TProperty, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
@@ -447,7 +447,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> Unless(Func<TProperty, ValidationContext<T>, bool> condition)
+    public virtual PropertyValidator<T, TProperty> Unless(Func<TProperty, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
@@ -465,7 +465,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T, TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> PreProcess(Func<TProperty, TProperty>? preProcess)
+    public virtual PropertyValidator<T, TProperty> PreProcess(Func<TProperty, TProperty>? preProcess)
     {
         _preProcessor = preProcess;
 
@@ -479,7 +479,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> WithDisplayName(string? displayName)
+    public virtual PropertyValidator<T, TProperty> WithDisplayName(string? displayName)
     {
         DisplayName = displayName;
 
@@ -493,7 +493,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> WithMemberName(string? memberName)
+    public virtual PropertyValidator<T, TProperty> WithMemberName(string? memberName)
     {
         MemberName = memberName;
 
@@ -507,7 +507,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> WithName(string? memberName) => WithMemberName(memberName);
+    public virtual PropertyValidator<T, TProperty> WithName(string? memberName) => WithMemberName(memberName);
 
     /// <summary>
     ///     设置成员名称
@@ -518,7 +518,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> WithMemberName(JsonNamingPolicy jsonNamingPolicy)
+    public virtual PropertyValidator<T, TProperty> WithMemberName(JsonNamingPolicy jsonNamingPolicy)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(jsonNamingPolicy);
@@ -537,7 +537,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> WithName(JsonNamingPolicy jsonNamingPolicy) =>
+    public virtual PropertyValidator<T, TProperty> WithName(JsonNamingPolicy jsonNamingPolicy) =>
         WithMemberName(jsonNamingPolicy);
 
     /// <summary>
@@ -547,7 +547,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> WithMemberName(Func<PropertyInfo, string?> memberNameProvider)
+    public virtual PropertyValidator<T, TProperty> WithMemberName(Func<PropertyInfo, string?> memberNameProvider)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(memberNameProvider);
@@ -564,7 +564,7 @@ public partial class PropertyValidator<T, TProperty> :
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty}" />
     /// </returns>
-    public PropertyValidator<T, TProperty> WithName(Func<PropertyInfo, string?> memberNameProvider) =>
+    public virtual PropertyValidator<T, TProperty> WithName(Func<PropertyInfo, string?> memberNameProvider) =>
         WithMemberName(memberNameProvider);
 
     /// <summary>
