@@ -1,10 +1,10 @@
-# Limen
+# Cordon
 
-[![license](https://img.shields.io/badge/license-MIT-orange?cacheSeconds=10800)](https://gitee.com/dotnetchina/Limen/blob/master/LICENSE) [![nuget](https://img.shields.io/nuget/v/Limen.svg?cacheSeconds=10800)](https://www.nuget.org/packages/Limen) [![dotNET China](https://img.shields.io/badge/organization-dotNET%20China-yellow?cacheSeconds=10800)](https://gitee.com/dotnetchina)
+[![license](https://img.shields.io/badge/license-MIT-orange?cacheSeconds=10800)](https://gitee.com/dotnetchina/Cordon/blob/master/LICENSE) [![nuget](https://img.shields.io/nuget/v/Cordon.svg?cacheSeconds=10800)](https://www.nuget.org/packages/Cordon) [![dotNET China](https://img.shields.io/badge/organization-dotNET%20China-yellow?cacheSeconds=10800)](https://gitee.com/dotnetchina)
 
-Limen is a highly expressive data validation library built for .NET developers. With its fluent syntax and extensible
+Cordon is a highly expressive data validation library built for .NET developers. With its fluent syntax and extensible
 rule engine, it establishes precise "guardrails" for data flows. Whether validating API inputs, form submissions, or
-cleansing heterogeneous data streams, Limen enables enterprise-grade validation with minimal code.
+cleansing heterogeneous data streams, Cordon enables enterprise-grade validation with minimal code.
 
 ## Features
 
@@ -25,12 +25,12 @@ cleansing heterogeneous data streams, Limen enables enterprise-grade validation 
 ## Installation
 
 ```powershell
-dotnet add package Limen
+dotnet add package Cordon
 ```
 
 ## Getting Started
 
-We have many examples on our [homepage](https://furion.net/docs/limen/). Here's your first one to get you started:
+We have many examples on our [homepage](https://furion.net/docs/cordon/). Here's your first one to get you started:
 
 ```cs
 public class User : IValidatableObject
@@ -55,20 +55,20 @@ public class User : IValidatableObject
 }
 ```
 
-[More Documentation](https://furion.net/docs/limen/)
+[More Documentation](https://furion.net/docs/cordon/)
 
 ## Documentation
 
-You can find the Limen documentation on our [homepage](https://furion.net/docs/limen/).
+You can find the Cordon documentation on our [homepage](https://furion.net/docs/cordon/).
 
 ## Contributing
 
-The main purpose of this repository is to continue developing the core of Limen, making it faster and easier to use.
-The development of Limen is publicly hosted on [Gitee](https://gitee.com/dotnetchina/Limen), and we appreciate
+The main purpose of this repository is to continue developing the core of Cordon, making it faster and easier to use.
+The development of Cordon is publicly hosted on [Gitee](https://gitee.com/dotnetchina/Cordon), and we appreciate
 community contributions for bug fixes and improvements.
 
 ## License
 
-Limen is released under the [MIT](./LICENSE) open source license.
+Cordon is released under the [MIT](./LICENSE) open source license.
 
 [![](./assets/baiqian.svg)](https://baiqian.com)

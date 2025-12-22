@@ -1,0 +1,1116 @@
+﻿// 版权归百小僧及百签科技（广东）有限公司所有。
+// 
+// 此源代码遵循位于源代码树根目录中的 LICENSE 文件的许可证。
+
+namespace Cordon;
+
+/// <summary>
+///     链式验证器构建器
+/// </summary>
+/// <typeparam name="T">对象类型</typeparam>
+public class FluentValidatorBuilder<T> : FluentValidatorBuilder<T, FluentValidatorBuilder<T>>;
+
+/// <summary>
+///     链式验证器构建器
+/// </summary>
+/// <typeparam name="T">对象类型</typeparam>
+/// <typeparam name="TSelf">派生类型自身类型</typeparam>
+public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
+    where TSelf : FluentValidatorBuilder<T, TSelf>
+{
+    /// <summary>
+    ///     验证上下文数据
+    /// </summary>
+    internal readonly IDictionary<object, object?>? _items;
+
+    /// <summary>
+    ///     高优先级验证器区域的结束索引（同时也是普通验证器区域的起始索引）
+    /// </summary>
+    /// <remarks>
+    ///     该索引将验证器列表划分为两个区域：<c>[0, _highPriorityEndIndex)</c> 为高优先级验证器区域（按 <see cref="IHighPriorityValidator.Priority" />
+    ///     升序排列），<c>[_highPriorityEndIndex, Count)</c>
+    ///     为普通验证器区域。当添加新验证器时，高优先级验证器会插入到指定位置以维持顺序，普通验证器则直接追加到列表末尾，此索引值会相应更新以维护区域边界。
+    /// </remarks>
+    internal int _highPriorityEndIndex;
+
+    /// <summary>
+    ///     跟踪最新添加的 <see cref="ValidatorBase" /> 实例
+    /// </summary>
+    internal ValidatorBase? _lastAddedValidator;
+
+    /// <summary>
+    ///     <see cref="IServiceProvider" /> 委托
+    /// </summary>
+    internal Func<Type, object?>? _serviceProvider;
+
+    /// <summary>
+    ///     <inheritdoc cref="FluentValidatorBuilder{T,TSelf}" />
+    /// </summary>
+    internal FluentValidatorBuilder()
+        : this(null, null)
+    {
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="FluentValidatorBuilder{T,TSelf}" />
+    /// </summary>
+    /// <param name="items">验证上下文数据</param>
+    internal FluentValidatorBuilder(IDictionary<object, object?>? items)
+        : this(null, items)
+    {
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="FluentValidatorBuilder{T,TSelf}" />
+    /// </summary>
+    /// <param name="serviceProvider">
+    ///     <see cref="IServiceProvider" />
+    /// </param>
+    /// <param name="items">验证上下文数据</param>
+    internal FluentValidatorBuilder(IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
+    {
+        // 空检查
+        if (serviceProvider is not null)
+        {
+            _serviceProvider = serviceProvider.GetService;
+        }
+
+        _items = items;
+        Validators = [];
+    }
+
+    /// <summary>
+    ///     派生类型自身引用
+    /// </summary>
+    internal TSelf This => (TSelf)this;
+
+    /// <summary>
+    ///     验证器集合
+    /// </summary>
+    internal List<ValidatorBase> Validators { get; }
+
+    /// <inheritdoc />
+    void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
+        InitializeServiceProvider(serviceProvider);
+
+    /// <summary>
+    ///     获取验证器集合
+    /// </summary>
+    /// <returns>
+    ///     <see cref="IReadOnlyList{T}" />
+    /// </returns>
+    public IReadOnlyList<ValidatorBase> GetValidators() => Validators;
+
+    /// <summary>
+    ///     批量添加添加验证器
+    /// </summary>
+    /// <param name="validators">验证器集合</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf AddValidators(params IEnumerable<ValidatorBase> validators)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validators);
+
+        // 遍历集合并逐项添加
+        foreach (var validator in validators)
+        {
+            AddValidator(validator);
+        }
+
+        return This;
+    }
+
+    /// <summary>
+    ///     添加验证器
+    /// </summary>
+    /// <param name="validator">
+    ///     <see cref="ValidatorBase" />
+    /// </param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf AddValidator<TValidator>(TValidator validator, Action<TValidator>? configure = null)
+        where TValidator : ValidatorBase
+    {
+        // 空检查 
+        ArgumentNullException.ThrowIfNull(validator);
+
+        // 检查派生类型是否实现 IRuleSetContextProvider 接口
+        if (this is IRuleSetContextProvider ruleSetProvider)
+        {
+            // 获取当前上下文中的规则集并设置
+            validator.RuleSets = ruleSetProvider.GetCurrentRuleSets();
+        }
+
+        // 检查是否是高优先级验证器
+        if (validator is IHighPriorityValidator highPriorityValidator)
+        {
+            // 只在 [0, _highPriorityEndIndex) 范围内查找插入位置（保持 Priority 升序）
+            var insertIndex = _highPriorityEndIndex;
+            for (var i = 0; i < _highPriorityEndIndex; i++)
+            {
+                // ReSharper disable once InvertIf
+                if (Validators[i] is IHighPriorityValidator existing &&
+                    existing.Priority > highPriorityValidator.Priority)
+                {
+                    insertIndex = i;
+                    break;
+                }
+            }
+
+            Validators.Insert(insertIndex, validator);
+
+            // 高优先级区域扩大
+            _highPriorityEndIndex++;
+        }
+        else
+        {
+            Validators.Add(validator);
+        }
+
+        // 调用自定义配置委托
+        configure?.Invoke(validator);
+
+        // 记录最新添加的验证器实例
+        _lastAddedValidator = validator;
+
+        // 检查验证器是否实现 IValidatorInitializer 接口
+        if (validator is IValidatorInitializer initializer)
+        {
+            // 同步 IServiceProvider 委托
+            initializer.InitializeServiceProvider(_serviceProvider);
+        }
+
+        return This;
+    }
+
+    /// <summary>
+    ///     设置错误信息
+    /// </summary>
+    /// <param name="errorMessage">错误信息</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf WithMessage(string? errorMessage) => WithErrorMessage(errorMessage);
+
+    /// <summary>
+    ///     设置错误信息
+    /// </summary>
+    /// <param name="errorMessage">错误信息</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf WithErrorMessage(string? errorMessage)
+    {
+        // 空检查
+        if (_lastAddedValidator is null)
+        {
+            return This;
+        }
+
+        // 将错误消息设置给最新添加的验证器实例
+        _lastAddedValidator.WithErrorMessage(errorMessage);
+
+        // 重置最新添加的验证器实例
+        _lastAddedValidator = null;
+
+        return This;
+    }
+
+    /// <summary>
+    ///     设置错误信息
+    /// </summary>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf WithMessage(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName) =>
+        WithErrorMessage(resourceType, resourceName);
+
+    /// <summary>
+    ///     设置错误信息
+    /// </summary>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf WithErrorMessage(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName)
+    {
+        // 空检查
+        if (_lastAddedValidator is null)
+        {
+            return This;
+        }
+
+        // 将错误消息设置给最新添加的验证器实例
+        _lastAddedValidator.WithErrorMessage(resourceType, resourceName);
+
+        // 重置最新添加的验证器实例
+        _lastAddedValidator = null;
+
+        return This;
+    }
+
+    /// <summary>
+    ///     添加年龄（0-120 岁）验证器
+    /// </summary>
+    /// <param name="isAdultOnly">是否仅验证成年人（18 岁及以上），默认值为：<c>false</c></param>
+    /// <param name="allowStringValues">允许字符串数值，默认值为：<c>false</c></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Age(bool isAdultOnly = false, bool allowStringValues = false) =>
+        AddValidator(new AgeValidator { IsAdultOnly = isAdultOnly, AllowStringValues = allowStringValues });
+
+    /// <summary>
+    ///     添加允许的值列表验证器
+    /// </summary>
+    /// <param name="values">允许的值列表</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf AllowedValues(params object?[] values) => AddValidator(new AllowedValuesValidator(values));
+
+    /// <summary>
+    ///     添加银行卡号验证器（Luhn 算法）
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf BankCard() => AddValidator(new BankCardValidator());
+
+    /// <summary>
+    ///     添加 Base64 字符串验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Base64String() => AddValidator(new Base64StringValidator());
+
+    /// <summary>
+    ///     添加中文姓名验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf ChineseName() => AddValidator(new ChineseNameValidator());
+
+    /// <summary>
+    ///     添加中文/汉字验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Chinese() => AddValidator(new ChineseValidator());
+
+    /// <summary>
+    ///     添加颜色值验证器
+    /// </summary>
+    /// <param name="fullMode">
+    ///     是否启用完整模式。在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA。若未启用，则仅支持：十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>
+    /// </param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf ColorValue(bool fullMode = false) =>
+        AddValidator(new ColorValueValidator { FullMode = fullMode });
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
+    /// <param name="validators">验证器列表</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Composite(params ValidatorBase[] validators) =>
+        AddValidator(new CompositeValidator(validators));
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
+    /// <param name="validators">验证器列表</param>
+    /// <param name="mode">
+    ///     <see cref="ValidationMode" />
+    /// </param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Composite(ValidatorBase[] validators, ValidationMode mode) =>
+        AddValidator(new CompositeValidator(validators) { Mode = mode });
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
+    /// <remarks>验证所有。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf ValidateAll(Action<FluentValidatorBuilder<T>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], ValidationMode.ValidateAll);
+    }
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
+    /// <remarks>首个验证成功则视为通过。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf BreakOnFirstSuccess(Action<FluentValidatorBuilder<T>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], ValidationMode.BreakOnFirstSuccess);
+    }
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
+    /// <remarks>首个验证失败则停止验证。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf BreakOnFirstError(Action<FluentValidatorBuilder<T>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], ValidationMode.BreakOnFirstError);
+    }
+
+    /// <summary>
+    ///     添加条件验证器
+    /// </summary>
+    /// <param name="buildConditions">条件构建器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Conditional(Action<ConditionBuilder<T>> buildConditions) =>
+        AddValidator(new ConditionalValidator<T>(buildConditions));
+
+    /// <summary>
+    ///     添加 <see cref="System.DateOnly" /> 验证器
+    /// </summary>
+    /// <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf DateOnly(params string[] formats) => AddValidator(new DateOnlyValidator(formats));
+
+    /// <summary>
+    ///     添加 <see cref="System.DateOnly" /> 验证器
+    /// </summary>
+    /// <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+    /// <param name="provider">格式提供器</param>
+    /// <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf DateOnly(string[] formats, IFormatProvider? provider,
+        DateTimeStyles style = DateTimeStyles.None) =>
+        AddValidator(new DateOnlyValidator(formats) { Provider = provider, Style = style });
+
+    /// <summary>
+    ///     添加 <see cref="System.DateTime" /> 验证器
+    /// </summary>
+    /// <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf DateTime(params string[] formats) => AddValidator(new DateTimeValidator(formats));
+
+    /// <summary>
+    ///     添加 <see cref="System.DateTime" /> 验证器
+    /// </summary>
+    /// <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+    /// <param name="provider">格式提供器</param>
+    /// <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf DateTime(string[] formats, IFormatProvider? provider,
+        DateTimeStyles style = DateTimeStyles.None) =>
+        AddValidator(new DateTimeValidator(formats) { Provider = provider, Style = style });
+
+    /// <summary>
+    ///     添加验证数值的小数位数验证器
+    /// </summary>
+    /// <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
+    /// <param name="allowStringValues">允许字符串数值，默认值为：<c>false</c></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf DecimalPlaces(int maxDecimalPlaces, bool allowStringValues = false) =>
+        AddValidator(new DecimalPlacesValidator(maxDecimalPlaces) { AllowStringValues = allowStringValues });
+
+    /// <summary>
+    ///     添加不允许的值列表验证器
+    /// </summary>
+    /// <param name="values">不允许的值列表</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf DeniedValues(params object?[] values) => AddValidator(new DeniedValuesValidator(values));
+
+    /// <summary>
+    ///     添加域名验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Domain() => AddValidator(new DomainValidator());
+
+    /// <summary>
+    ///     添加邮箱地址验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf EmailAddress() => AddValidator(new EmailAddressValidator());
+
+    /// <summary>
+    ///     添加以特定字符/字符串结尾的验证器
+    /// </summary>
+    /// <param name="searchValue">检索的值</param>
+    /// <param name="comparison"><see cref="StringComparison" />，默认值为：<see cref="StringComparison.Ordinal" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf EndsWith(string searchValue, StringComparison comparison = StringComparison.Ordinal) =>
+        AddValidator(new EndsWithValidator(searchValue) { Comparison = comparison });
+
+    /// <summary>
+    ///     添加相等验证器
+    /// </summary>
+    /// <param name="compareValue">比较的值</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf EqualTo(object? compareValue) => AddValidator(new EqualToValidator(compareValue));
+
+    /// <summary>
+    ///     添加大于等于验证器
+    /// </summary>
+    /// <param name="compareValue">比较的值</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf GreaterThanOrEqualTo(IComparable compareValue) =>
+        AddValidator(new GreaterThanOrEqualToValidator(compareValue));
+
+    /// <summary>
+    ///     添加大于验证器
+    /// </summary>
+    /// <param name="compareValue">比较的值</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf GreaterThan(IComparable compareValue) => AddValidator(new GreaterThanValidator(compareValue));
+
+    /// <summary>
+    ///     添加身份证号验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf IDCard() => AddValidator(new IDCardValidator());
+
+    /// <summary>
+    ///     添加 IP 地址验证器
+    /// </summary>
+    /// <param name="allowIPv6">是否允许 IPv6 地址，默认值为：<c>false</c></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf IpAddress(bool allowIPv6 = false) =>
+        AddValidator(new IpAddressValidator { AllowIPv6 = allowIPv6 });
+
+    /// <summary>
+    ///     添加 JSON 格式验证器
+    /// </summary>
+    /// <param name="allowTrailingCommas">是否允许末尾多余逗号，默认值为：<c>false</c></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Json(bool allowTrailingCommas = false) =>
+        AddValidator(new JsonValidator { AllowTrailingCommas = allowTrailingCommas });
+
+    /// <summary>
+    ///     添加长度验证器
+    /// </summary>
+    /// <param name="minimumLength">最小允许长度</param>
+    /// <param name="maximumLength">最大允许长度</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Length(int minimumLength, int maximumLength) =>
+        AddValidator(new LengthValidator(minimumLength, maximumLength));
+
+    /// <summary>
+    ///     添加小于等于验证器
+    /// </summary>
+    /// <param name="compareValue">比较的值</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf LessThanOrEqualTo(IComparable compareValue) =>
+        AddValidator(new LessThanOrEqualToValidator(compareValue));
+
+    /// <summary>
+    ///     添加小于验证器
+    /// </summary>
+    /// <param name="compareValue">比较的值</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf LessThan(IComparable compareValue) => AddValidator(new LessThanValidator(compareValue));
+
+    /// <summary>
+    ///     添加最大长度验证器
+    /// </summary>
+    /// <param name="length">最大允许长度</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MaxLength(int length) => AddValidator(new MaxLengthValidator(length));
+
+    /// <summary>
+    ///     添加最大值验证器
+    /// </summary>
+    /// <param name="maximum">允许的最大字段值</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Max(IComparable maximum) => AddValidator(new MaxValidator(maximum));
+
+    /// <summary>
+    ///     添加 MD5 字符串验证器
+    /// </summary>
+    /// <param name="allowShortFormat">是否允许截断的 128 位哈希值（16 字节的十六进制字符串，共 32 字符），默认值为：<c>false</c></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MD5String(bool allowShortFormat = false) =>
+        AddValidator(new MD5StringValidator { AllowShortFormat = allowShortFormat });
+
+    /// <summary>
+    ///     添加最小长度验证器
+    /// </summary>
+    /// <param name="length">最小允许长度</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MinLength(int length) => AddValidator(new MinLengthValidator(length));
+
+    /// <summary>
+    ///     添加最小值验证器
+    /// </summary>
+    /// <param name="minimum">允许的最小字段值</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Min(IComparable minimum) => AddValidator(new MinValidator(minimum));
+
+    /// <summary>
+    ///     添加自定义条件不成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustUnless(Func<T, bool> condition) =>
+        AddValidator(new MustUnlessValidator<T>(condition));
+
+    /// <summary>
+    ///     添加自定义条件不成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustUnless(Func<T, ValidationContext<T>, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustUnlessValidator<T>(u => condition(u, CreateValidationContext(u))));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Must(Func<T, bool> condition) => AddValidator(new MustValidator<T>(condition));
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Must(Func<T, ValidationContext<T>, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u => condition(u, CreateValidationContext(u))));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustAny<TElement>(IEnumerable<TElement> enumerable, Func<T, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u => enumerable.Any(x => condition(u, x))));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustAny<TElement>(IEnumerable<TElement> enumerable,
+        Func<T, ValidationContext<T>, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u =>
+            enumerable.Any(x => condition(u, CreateValidationContext(u), x))));
+    }
+
+    /// <summary>
+    ///     添加非空白字符串验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf NotBlank() => AddValidator(new NotBlankValidator());
+
+    /// <summary>
+    ///     添加非空集合、数组和字符串验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf NotEmpty() => AddValidator(new NotEmptyValidator());
+
+    /// <summary>
+    ///     添加不相等验证器
+    /// </summary>
+    /// <param name="compareValue">比较的值</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf NotEqualTo(object? compareValue) => AddValidator(new NotEqualToValidator(compareValue));
+
+    /// <summary>
+    ///     添加非 null 验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf NotNull() => AddValidator(new NotNullValidator());
+
+    /// <summary>
+    ///     添加密码验证器
+    /// </summary>
+    /// <param name="strong">是否启用强密码验证模式，默认值为：<c>false</c></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Password(bool strong = false) => AddValidator(new PasswordValidator { Strong = strong });
+
+    /// <summary>
+    ///     添加手机号（中国）验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf PhoneNumber() => AddValidator(new PhoneNumberValidator());
+
+    /// <summary>
+    ///     添加邮政编码（中国）验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf PostalCode() => AddValidator(new PostalCodeValidator());
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Predicate(Func<T, bool> condition) => AddValidator(new PredicateValidator<T>(condition));
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Predicate(Func<T, ValidationContext<T>, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new PredicateValidator<T>(u => condition(u, CreateValidationContext(u))));
+    }
+
+    /// <summary>
+    ///     添加指定数值范围约束验证器
+    /// </summary>
+    /// <param name="minimum">允许的最小字段值</param>
+    /// <param name="maximum">允许的最大字段值</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Range(int minimum, int maximum, Action<RangeValidator>? configure = null) =>
+        AddValidator(new RangeValidator(minimum, maximum), configure);
+
+    /// <summary>
+    ///     添加指定数值范围约束验证器
+    /// </summary>
+    /// <param name="minimum">允许的最小字段值</param>
+    /// <param name="maximum">允许的最大字段值</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Range(double minimum, double maximum, Action<RangeValidator>? configure = null) =>
+        AddValidator(new RangeValidator(minimum, maximum), configure);
+
+    /// <summary>
+    ///     添加指定数值范围约束验证器
+    /// </summary>
+    /// <param name="type">数据字段值的类型</param>
+    /// <param name="minimum">允许的最小字段值</param>
+    /// <param name="maximum">允许的最大字段值</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Range([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type,
+        string minimum,
+        string maximum, Action<RangeValidator>? configure = null) =>
+        AddValidator(new RangeValidator(type, minimum, maximum), configure);
+
+    /// <summary>
+    ///     添加指定数值范围约束验证器
+    /// </summary>
+    /// <param name="minimum">允许的最小字段值</param>
+    /// <param name="maximum">允许的最大字段值</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Between(int minimum, int maximum, Action<RangeValidator>? configure = null) =>
+        AddValidator(new RangeValidator(minimum, maximum), configure);
+
+    /// <summary>
+    ///     添加指定数值范围约束验证器
+    /// </summary>
+    /// <param name="minimum">允许的最小字段值</param>
+    /// <param name="maximum">允许的最大字段值</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Between(double minimum, double maximum, Action<RangeValidator>? configure = null) =>
+        AddValidator(new RangeValidator(minimum, maximum), configure);
+
+    /// <summary>
+    ///     添加指定数值范围约束验证器
+    /// </summary>
+    /// <param name="type">数据字段值的类型</param>
+    /// <param name="minimum">允许的最小字段值</param>
+    /// <param name="maximum">允许的最大字段值</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Between([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type type,
+        string minimum,
+        string maximum, Action<RangeValidator>? configure = null) =>
+        AddValidator(new RangeValidator(type, minimum, maximum), configure);
+
+    /// <summary>
+    ///     添加正则表达式验证器
+    /// </summary>
+    /// <param name="pattern">正则表达式模式</param>
+    /// <param name="matchTimeoutInMilliseconds">用于在操作超时前执行单个匹配操作的时间量。以毫秒为单位，默认值为：2000。</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf RegularExpression(string pattern, int matchTimeoutInMilliseconds = 2000) =>
+        AddValidator(
+            new RegularExpressionValidator(pattern) { MatchTimeoutInMilliseconds = matchTimeoutInMilliseconds });
+
+    /// <summary>
+    ///     添加正则表达式验证器
+    /// </summary>
+    /// <param name="pattern">正则表达式模式</param>
+    /// <param name="matchTimeoutInMilliseconds">用于在操作超时前执行单个匹配操作的时间量。以毫秒为单位，默认值为：2000。</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Matches(string pattern, int matchTimeoutInMilliseconds = 2000) =>
+        AddValidator(
+            new RegularExpressionValidator(pattern) { MatchTimeoutInMilliseconds = matchTimeoutInMilliseconds });
+
+    /// <summary>
+    ///     添加必填验证器
+    /// </summary>
+    /// <param name="allowEmptyStrings">是否允许空字符串。默认值为：<c>false</c>。</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Required(bool allowEmptyStrings = false) =>
+        AddValidator(new RequiredValidator { AllowEmptyStrings = allowEmptyStrings });
+
+    /// <summary>
+    ///     添加单项验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Single() => AddValidator(new SingleValidator());
+
+    /// <summary>
+    ///     添加以特定字符/字符串开头的验证器
+    /// </summary>
+    /// <param name="searchValue">检索的值</param>
+    /// <param name="comparison"><see cref="StringComparison" />，默认值为：<see cref="StringComparison.Ordinal" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf StartsWith(string searchValue, StringComparison comparison = StringComparison.Ordinal) =>
+        AddValidator(new StartsWithValidator(searchValue) { Comparison = comparison });
+
+    /// <summary>
+    ///     添加包含特定字符/字符串的验证器
+    /// </summary>
+    /// <param name="searchValue">检索的值</param>
+    /// <param name="comparison"><see cref="StringComparison" />，默认值为：<see cref="StringComparison.Ordinal" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf StringContains(string searchValue, StringComparison comparison = StringComparison.Ordinal) =>
+        AddValidator(new StringContainsValidator(searchValue) { Comparison = comparison });
+
+    /// <summary>
+    ///     添加字符串长度验证器
+    /// </summary>
+    /// <param name="maximumLength">最大允许长度</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf StringLength(int maximumLength) => AddValidator(new StringLengthValidator(maximumLength));
+
+    /// <summary>
+    ///     添加字符串长度验证器
+    /// </summary>
+    /// <param name="minimumLength">最小允许长度</param>
+    /// <param name="maximumLength">最大允许长度</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf StringLength(int minimumLength, int maximumLength) =>
+        AddValidator(new StringLengthValidator(maximumLength) { MinimumLength = minimumLength });
+
+    /// <summary>
+    ///     添加不包含特定字符/字符串的验证器
+    /// </summary>
+    /// <param name="searchValue">检索的值</param>
+    /// <param name="comparison"><see cref="StringComparison" />，默认值为：<see cref="StringComparison.Ordinal" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf
+        StringNotContains(string searchValue, StringComparison comparison = StringComparison.Ordinal) =>
+        AddValidator(new StringNotContainsValidator(searchValue) { Comparison = comparison });
+
+    /// <summary>
+    ///     添加强密码模式验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf StrongPassword() => AddValidator(new StrongPasswordValidator());
+
+    /// <summary>
+    ///     添加座机（电话）验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Telephone() => AddValidator(new TelephoneValidator());
+
+    /// <summary>
+    ///     添加时间格式 <see cref="System.TimeOnly" /> 验证器
+    /// </summary>
+    /// <param name="formats">允许的时间格式（如 "HH:mm:ss"）</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf TimeOnly(params string[] formats) => AddValidator(new TimeOnlyValidator(formats));
+
+    /// <summary>
+    ///     添加时间格式 <see cref="System.TimeOnly" /> 验证器
+    /// </summary>
+    /// <param name="formats">允许的时间格式（如 "HH:mm:ss"）</param>
+    /// <param name="provider">格式提供器</param>
+    /// <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf TimeOnly(string[] formats, IFormatProvider? provider,
+        DateTimeStyles style = DateTimeStyles.None) =>
+        AddValidator(new TimeOnlyValidator(formats) { Provider = provider, Style = style });
+
+    /// <summary>
+    ///     添加 URL 地址验证器
+    /// </summary>
+    /// <param name="supportsFtp">是否支持 FTP 协议。默认值为：<c>false</c>。</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Url(bool supportsFtp = false) => AddValidator(new UrlValidator { SupportsFtp = supportsFtp });
+
+    /// <summary>
+    ///     添加用户名验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf UserName() => AddValidator(new UserNameValidator());
+
+    /// <summary>
+    ///     添加验证器代理
+    /// </summary>
+    /// <param name="constructorArgs"><typeparamref name="TValidator" /> 构造函数参数列表</param>
+    /// <param name="configure">配置验证器实例</param>
+    /// <typeparam name="TValidator">
+    ///     <see cref="ValidatorBase" />
+    /// </typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf ValidatorProxy<TValidator>(object?[]? constructorArgs, Action<TValidator>? configure = null)
+        where TValidator : ValidatorBase
+    {
+        // 初始化 ValidatorProxy<TValidator> 实例
+        var validatorProxy = new ValidatorProxy<TValidator>(constructorArgs);
+
+        // 空检查
+        if (configure is not null)
+        {
+            validatorProxy.Configure(configure);
+        }
+
+        return AddValidator(validatorProxy);
+    }
+
+    /// <summary>
+    ///     添加验证特性验证器
+    /// </summary>
+    /// <param name="attributes">验证特性列表</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf AddAnnotations(params ValidationAttribute[] attributes) =>
+        AddValidator(new ValueAnnotationValidator(attributes, null, _items));
+
+    /// <summary>
+    ///     构建验证器集合
+    /// </summary>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <see cref="IReadOnlyList{T}" />
+    /// </returns>
+    internal IReadOnlyList<ValidatorBase> Build(Action<TSelf>? configure = null)
+    {
+        // 调用验证器配置委托
+        configure?.Invoke((TSelf)this);
+
+        return Validators;
+    }
+
+    /// <summary>
+    ///     创建 <see cref="ValidationContext{T}" /> 实例
+    /// </summary>
+    /// <param name="value">对象</param>
+    /// <returns>
+    ///     <see cref="ValidationContext{T}" />
+    /// </returns>
+    internal ValidationContext<T> CreateValidationContext(T value)
+    {
+        // 初始化 ValidationContext 实例
+        var validationContext = new ValidationContext<T>(value, null, _items);
+
+        // 同步 IServiceProvider 委托
+        validationContext.InitializeServiceProvider(_serviceProvider);
+
+        return validationContext;
+    }
+
+    /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
+    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+
+        // 遍历所有验证器并尝试同步 IServiceProvider 委托
+        foreach (var validator in Validators)
+        {
+            // 检查验证器是否实现 IValidatorInitializer 接口
+            if (validator is IValidatorInitializer initializer)
+            {
+                // 同步 IServiceProvider 委托
+                initializer.InitializeServiceProvider(serviceProvider);
+            }
+        }
+    }
+}

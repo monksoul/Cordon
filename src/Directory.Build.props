@@ -12,15 +12,15 @@
         <Version>0.2.1</Version>
         <PackageVersion>$(Version)</PackageVersion>
         <Authors>百小僧</Authors>
-        <Description>Limen 是一个为 .NET 开发者打造的高表现力数据校验库，通过链式语法与可扩展规则引擎，为数据流动设置精准的“警戒线”。无论是验证 API 输入、表单提交，还是清洗异构数据流，Limen 都能以极简代码实现企业级校验强度。</Description>
-        <PackageTags>Furion;ASP.NET;dotNET China;Cross Platform;百小僧;Monk;MonkSoul;Core;Limen;Validation;Fluent;FluentValidation;Validator</PackageTags>
+        <Description>Cordon 是一个为 .NET 开发者打造的高表现力数据校验库，通过链式语法与可扩展规则引擎，为数据流动设置精准的“警戒线”。无论是验证 API 输入、表单提交，还是清洗异构数据流，Cordon 都能以极简代码实现企业级校验强度。</Description>
+        <PackageTags>Furion;ASP.NET;dotNET China;Cross Platform;百小僧;Monk;MonkSoul;Core;Cordon;Validation;Fluent;FluentValidation;Validator</PackageTags>
         <Company>百签科技（广东）有限公司</Company>
-        <Product>Limen</Product>
+        <Product>Cordon</Product>
         <Copyright>版权所有 © 2020-2025 百小僧及百签科技（广东）有限公司</Copyright>
-        <PackageProjectUrl>https://furion.net/docs/limen/</PackageProjectUrl>
+        <PackageProjectUrl>https://furion.net/docs/cordon/</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <RepositoryUrl>https://gitee.com/dotnetchina/Limen</RepositoryUrl>
+        <RepositoryUrl>https://gitee.com/dotnetchina/Cordon</RepositoryUrl>
         <RepositoryType>Gitee</RepositoryType>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <DocumentationFile>$(MSBuildProjectName).xml</DocumentationFile>

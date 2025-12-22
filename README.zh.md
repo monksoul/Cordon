@@ -1,9 +1,9 @@
-# Limen
+# Cordon
 
-[![license](https://img.shields.io/badge/license-MIT-orange?cacheSeconds=10800)](https://gitee.com/dotnetchina/Limen/blob/master/LICENSE) [![nuget](https://img.shields.io/nuget/v/Limen.svg?cacheSeconds=10800)](https://www.nuget.org/packages/Limen) [![dotNET China](https://img.shields.io/badge/organization-dotNET%20China-yellow?cacheSeconds=10800)](https://gitee.com/dotnetchina)
+[![license](https://img.shields.io/badge/license-MIT-orange?cacheSeconds=10800)](https://gitee.com/dotnetchina/Cordon/blob/master/LICENSE) [![nuget](https://img.shields.io/nuget/v/Cordon.svg?cacheSeconds=10800)](https://www.nuget.org/packages/Cordon) [![dotNET China](https://img.shields.io/badge/organization-dotNET%20China-yellow?cacheSeconds=10800)](https://gitee.com/dotnetchina)
 
-Limen 是一个为 .NET 开发者打造的高表现力数据校验库，通过链式语法与可扩展规则引擎，为数据流动设置精准的“警戒线”。无论是验证
-API 输入、表单提交，还是清洗异构数据流，Limen 都能以极简代码实现企业级校验强度。
+Cordon 是一个为 .NET 开发者打造的高表现力数据校验库，通过链式语法与可扩展规则引擎，为数据流动设置精准的“警戒线”。无论是验证
+API 输入、表单提交，还是清洗异构数据流，Cordon 都能以极简代码实现企业级校验强度。
 
 ## 特性
 
@@ -23,12 +23,12 @@ API 输入、表单提交，还是清洗异构数据流，Limen 都能以极简�
 ## 安装
 
 ```powershell
-dotnet add package Limen
+dotnet add package Cordon
 ```
 
 ## 快速入门
 
-我们在[主页](https://furion.net/docs/limen/)上有不少例子，这是让您入门的第一个：
+我们在[主页](https://furion.net/docs/cordon/)上有不少例子，这是让您入门的第一个：
 
 ```cs
 public class User : IValidatableObject
@@ -53,19 +53,19 @@ public class User : IValidatableObject
 }
 ```
 
-[更多文档](https://furion.net/docs/limen/)
+[更多文档](https://furion.net/docs/cordon/)
 
 ## 文档
 
-您可以在[主页](https://furion.net/docs/limen/)找到 Limen 文档。
+您可以在[主页](https://furion.net/docs/cordon/)找到 Cordon 文档。
 
 ## 贡献
 
-该存储库的主要目的是继续发展 Limen 核心，使其更快、更易于使用。Limen
-的开发在 [Gitee](https://gitee.com/dotnetchina/Limen) 上公开进行，我们感谢社区贡献错误修复和改进。
+该存储库的主要目的是继续发展 Cordon 核心，使其更快、更易于使用。Cordon
+的开发在 [Gitee](https://gitee.com/dotnetchina/Cordon) 上公开进行，我们感谢社区贡献错误修复和改进。
 
 ## 许可证
 
-Limen 采用 [MIT](./LICENSE) 开源许可证。
+Cordon 采用 [MIT](./LICENSE) 开源许可证。
 
 [![](./assets/baiqian.svg)](https://baiqian.com)

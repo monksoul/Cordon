@@ -1,0 +1,7 @@
+﻿<Solution>
+    <Project Path="..\samples\Cordon.Samples\Cordon.Samples.csproj" Type="Classic C#"/>
+    <Project Path="Cordon.AspNetCore\src\Cordon.AspNetCore.csproj" Type="Classic C#"/>
+    <Project Path="Cordon.AspNetCore\test\Cordon.AspNetCore.Tests.csproj" Type="Classic C#"/>
+    <Project Path="Cordon\src\Cordon.csproj" Type="Classic C#"/>
+    <Project Path="Cordon\test\Cordon.Tests.csproj" Type="Classic C#"/>
+</Solution>
