@@ -22,7 +22,6 @@ public class UrlValidatorTests
             validator2._errorMessageResourceAccessor());
     }
 
-
     [Theory]
     [InlineData(null, true)]
     [InlineData("", false)]

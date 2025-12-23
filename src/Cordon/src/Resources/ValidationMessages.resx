@@ -303,4 +303,16 @@
     <data name="StringNotContainsValidator_ValidationError" xml:space="preserve">
         <value>The field {0} must not contain the string '{1}'.</value>
     </data>
+    <data name="NullValidator_ValidationError" xml:space="preserve">
+        <value>The field {0} must be null.</value>
+    </data>
+    <data name="EmptyValidator_ValidationError" xml:space="preserve">
+        <value>The field {0} must be empty.</value>
+    </data>
+    <data name="EnumValidator_ValidationError" xml:space="preserve">
+        <value>The field {0} must be a defined value of enum {1}.</value>
+    </data>
+    <data name="EnumValidator_ValidationError_SupportFlags" xml:space="preserve">
+        <value>The field {0} must be a valid combination of values defined in enum {1}.</value>
+    </data>
 </root>

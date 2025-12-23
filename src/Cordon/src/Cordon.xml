@@ -327,6 +327,24 @@
         <member name="M:System.ComponentModel.DataAnnotations.EmailAddressStrictAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
+        <member name="T:System.ComponentModel.DataAnnotations.EmptyAttribute">
+            <summary>
+                空集合、数组和字符串验证特性
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.EmptyAttribute.#ctor">
+            <summary>
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EmptyAttribute" />
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.EmptyAttribute.Validator">
+            <summary>
+                <inheritdoc cref="T:Cordon.EmptyValidator" />
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.EmptyAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
         <member name="T:System.ComponentModel.DataAnnotations.EndsWithAttribute">
             <summary>
                 以特定字符/字符串结尾的验证特性
@@ -365,6 +383,54 @@
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EndsWithAttribute.FormatErrorMessage(System.String)">
             <inheritdoc />
+        </member>
+        <member name="T:System.ComponentModel.DataAnnotations.EnumAttribute`1">
+            <summary>
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EnumAttribute" />
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute`1.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="T:System.ComponentModel.DataAnnotations.EnumAttribute">
+            <summary>
+                枚举验证特性
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.#ctor(System.Type)">
+            <summary>
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EnumAttribute" />
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.EnumAttribute.EnumType">
+            <summary>
+                枚举类型
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.EnumAttribute.SupportFlags">
+            <summary>
+                是否支持 Flags 模式
+            </summary>
+            <remarks>默认值为：<c>false</c>。</remarks>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.EnumAttribute.Validator">
+            <summary>
+                <inheritdoc cref="T:Cordon.EnumValidator" />
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.FormatErrorMessage(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.GetResourceKey">
+            <summary>
+                获取错误信息对应的资源键
+            </summary>
+            <returns>
+                <see cref="T:System.String" />
+            </returns>
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.EqualToAttribute">
             <summary>
@@ -758,6 +824,24 @@
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.NotNullAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="T:System.ComponentModel.DataAnnotations.NullAttribute">
+            <summary>
+                <c>null</c> 验证特性
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.NullAttribute.#ctor">
+            <summary>
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.NullAttribute" />
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.NullAttribute.Validator">
+            <summary>
+                <inheritdoc cref="T:Cordon.NullValidator" />
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.NullAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.NumericComparisonAttribute">
@@ -1690,9 +1774,6 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
-        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1702,8 +1783,11 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -1784,7 +1868,7 @@
                 <see cref="T:Cordon.ConditionBuilder`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ConditionBuilder`1.OtherwiseMestherwiseMessage(System.String)">
+        <member name="M:Cordon.ConditionBuilder`1.OtherwiseMessage(System.String)">
             <summary>
                 配置默认错误消息
             </summary>
@@ -2241,12 +2325,40 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.Empty">
+            <summary>
+                添加空集合、数组和字符串验证器
+            </summary>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.EndsWith(System.String,System.StringComparison)">
             <summary>
                 添加以特定字符/字符串结尾的验证器
             </summary>
             <param name="searchValue">检索的值</param>
             <param name="comparison"><see cref="T:System.StringComparison" />，默认值为：<see cref="F:System.StringComparison.Ordinal" /></param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.Enum``1(System.Boolean)">
+            <summary>
+                添加枚举验证器
+            </summary>
+            <param name="supportFlags">是否支持 Flags 模式。默认值为：<c>false</c>。</param>
+            <typeparam name="TEnum">枚举类型</typeparam>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.Enum(System.Type,System.Boolean)">
+            <summary>
+                添加枚举验证器
+            </summary>
+            <param name="enumType">枚举类型</param>
+            <param name="supportFlags">是否支持 Flags 模式。默认值为：<c>false</c>。</param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -2463,6 +2575,14 @@
         <member name="M:Cordon.FluentValidatorBuilder`2.NotNull">
             <summary>
                 添加非 null 验证器
+            </summary>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.Null">
+            <summary>
+                添加 null 验证器
             </summary>
             <returns>
                 <typeparamref name="TSelf" />
@@ -2768,15 +2888,15 @@
         </member>
         <member name="F:Cordon.ValidationBuilder._validatorTypes">
             <summary>
-                <see cref="T:Cordon.AbstractValidator`1" /> 类型集合
+                <see cref="T:Cordon.IObjectValidator`1" /> 类型集合
             </summary>
         </member>
         <member name="M:Cordon.ValidationBuilder.AddValidator(System.Type)">
             <summary>
-                添加 <see cref="T:Cordon.AbstractValidator`1" /> 对象验证器
+                添加 <see cref="T:Cordon.IObjectValidator`1" /> 验证器
             </summary>
             <param name="validatorType">
-                <see cref="T:Cordon.AbstractValidator`1" />
+                <see cref="T:Cordon.IObjectValidator`1" />
             </param>
             <returns>
                 <see cref="T:Cordon.ValidationBuilder" />
@@ -2785,10 +2905,10 @@
         </member>
         <member name="M:Cordon.ValidationBuilder.AddValidators(System.Collections.Generic.IEnumerable{System.Type})">
             <summary>
-                添加 <see cref="T:Cordon.AbstractValidator`1" /> 对象验证器
+                添加 <see cref="T:Cordon.IObjectValidator`1" /> 验证器
             </summary>
             <param name="validatorTypes">
-                <see cref="T:Cordon.AbstractValidator`1" /> 集合
+                <see cref="T:Cordon.IObjectValidator`1" /> 集合
             </param>
             <returns>
                 <see cref="T:Cordon.ValidationBuilder" />
@@ -2797,7 +2917,7 @@
         </member>
         <member name="M:Cordon.ValidationBuilder.AddValidatorFromAssemblies(System.Collections.Generic.IEnumerable{System.Reflection.Assembly})">
             <summary>
-                扫描程序集并添加 <see cref="T:Cordon.AbstractValidator`1" /> 对象验证器
+                扫描程序集并添加 <see cref="T:Cordon.IObjectValidator`1" /> 验证器
             </summary>
             <param name="assemblies"><see cref="T:System.Reflection.Assembly" /> 集合</param>
             <returns>
@@ -2813,35 +2933,37 @@
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
         </member>
-        <member name="M:Cordon.ValidationBuilder.BuildObjectValidatorServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:Cordon.ValidationBuilder.BuildValidatorServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
-                构建对象验证器服务
+                构建验证器服务
             </summary>
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
         </member>
-        <member name="M:Cordon.ValidationBuilder.CreateObjectValidator(System.IServiceProvider,System.Type)">
+        <member name="M:Cordon.ValidationBuilder.CreateValidator(System.IServiceProvider,System.Type)">
             <summary>
-                创建对象验证器实例
+                创建验证器实例
             </summary>
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="validatorType">对象验证器类型</param>
+            <param name="validatorType">验证器类型</param>
             <returns>
                 <see cref="T:System.Object" />
             </returns>
         </member>
-        <member name="M:Cordon.ValidationBuilder.TryGetValidatedType(System.Type,System.Type@)">
+        <member name="M:Cordon.ValidationBuilder.TryGetValidatedType(System.Type,System.Type,System.Type@)">
             <summary>
-                检查是否继承自 <see cref="T:Cordon.AbstractValidator`1" /> 抽象基类
+                检查是否继承自 <paramref name="baseGenericTypeDefinition" /> 抽象基类
             </summary>
             <param name="type">类型</param>
+            <param name="baseGenericTypeDefinition">泛型基类定义类型</param>
             <param name="modelType">被验证的模型类型</param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
+            <exception cref="T:System.ArgumentException"></exception>
         </member>
         <member name="T:Cordon.ValidationMode">
             <summary>
@@ -3581,6 +3703,17 @@
             </summary>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
+        </member>
+        <member name="T:Cordon.IValueValidator">
+            <summary>
+                单个值验证器服务
+            </summary>
+        </member>
+        <member name="T:Cordon.IValueValidator`1">
+            <summary>
+                <inheritdoc cref="T:Cordon.IValueValidator" />
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="T:Cordon.ObjectValidator`1">
             <summary>
@@ -5069,9 +5202,24 @@
               Looks up a localized string similar to The {0} field is not a valid e-mail address..
             </summary>
         </member>
+        <member name="P:Cordon.Resources.ValidationMessages.EmptyValidator_ValidationError">
+            <summary>
+              Looks up a localized string similar to The field {0} must be empty..
+            </summary>
+        </member>
         <member name="P:Cordon.Resources.ValidationMessages.EndsWithValidator_ValidationError">
             <summary>
               Looks up a localized string similar to The field {0} does not end with the string &apos;{1}&apos;..
+            </summary>
+        </member>
+        <member name="P:Cordon.Resources.ValidationMessages.EnumValidator_ValidationError">
+            <summary>
+              Looks up a localized string similar to The field {0} must be a defined value of enum {1}..
+            </summary>
+        </member>
+        <member name="P:Cordon.Resources.ValidationMessages.EnumValidator_ValidationError_SupportFlags">
+            <summary>
+              Looks up a localized string similar to The field {0} must be a valid combination of values defined in enum {1}..
             </summary>
         </member>
         <member name="P:Cordon.Resources.ValidationMessages.EqualToValidator_ValidationError">
@@ -5167,6 +5315,11 @@
         <member name="P:Cordon.Resources.ValidationMessages.NotNullValidator_ValidationError">
             <summary>
               Looks up a localized string similar to The field {0} does not allow null values..
+            </summary>
+        </member>
+        <member name="P:Cordon.Resources.ValidationMessages.NullValidator_ValidationError">
+            <summary>
+              Looks up a localized string similar to The field {0} must be null..
             </summary>
         </member>
         <member name="P:Cordon.Resources.ValidationMessages.PasswordValidator_ValidationError">
@@ -5551,6 +5704,14 @@
                 <see cref="T:Cordon.EmailAddressValidator" />
             </returns>
         </member>
+        <member name="M:Cordon.Validators.Empty">
+            <summary>
+                创建空集合、数组和字符串验证器
+            </summary>
+            <returns>
+                <see cref="T:Cordon.EmptyValidator" />
+            </returns>
+        </member>
         <member name="M:Cordon.Validators.EndsWith(System.String,System.StringComparison)">
             <summary>
                 创建以特定字符/字符串结尾的验证器
@@ -5559,6 +5720,26 @@
             <param name="comparison"><see cref="T:System.StringComparison" />，默认值为：<see cref="F:System.StringComparison.Ordinal" /></param>
             <returns>
                 <see cref="T:Cordon.EndsWithValidator" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.Enum``1(System.Boolean)">
+            <summary>
+                创建枚举验证器
+            </summary>
+            <param name="supportFlags">是否支持 Flags 模式。默认值为：<c>false</c>。</param>
+            <typeparam name="TEnum">枚举类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.EnumValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.Enum(System.Type,System.Boolean)">
+            <summary>
+                创建枚举验证器
+            </summary>
+            <param name="enumType">枚举类型</param>
+            <param name="supportFlags">是否支持 Flags 模式。默认值为：<c>false</c>。</param>
+            <returns>
+                <see cref="T:Cordon.EnumValidator" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.EqualTo(System.Object)">
@@ -5750,6 +5931,14 @@
             </summary>
             <returns>
                 <see cref="T:Cordon.NotNullValidator" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.Null">
+            <summary>
+                创建 null 验证器
+            </summary>
+            <returns>
+                <see cref="T:Cordon.NullValidator" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.ObjectAnnotation">
@@ -7123,6 +7312,19 @@
             </code>
             </remarks>
         </member>
+        <member name="T:Cordon.EmptyValidator">
+            <summary>
+                空集合、数组和字符串验证器
+            </summary>
+        </member>
+        <member name="M:Cordon.EmptyValidator.#ctor">
+            <summary>
+                <inheritdoc cref="T:Cordon.EmptyValidator" />
+            </summary>
+        </member>
+        <member name="M:Cordon.EmptyValidator.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
         <member name="T:Cordon.EndsWithValidator">
             <summary>
                 以特定字符/字符串结尾的验证器
@@ -7156,6 +7358,62 @@
         </member>
         <member name="M:Cordon.EndsWithValidator.FormatErrorMessage(System.String)">
             <inheritdoc />
+        </member>
+        <member name="T:Cordon.EnumValidator`1">
+            <summary>
+                <inheritdoc cref="T:Cordon.EnumValidator" />
+            </summary>
+            <typeparam name="TEnum">枚举类型</typeparam>
+        </member>
+        <member name="M:Cordon.EnumValidator`1.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="T:Cordon.EnumValidator">
+            <summary>
+                枚举验证器
+            </summary>
+        </member>
+        <member name="M:Cordon.EnumValidator.#ctor(System.Type)">
+            <summary>
+                <inheritdoc cref="T:Cordon.EnumValidator" />
+            </summary>
+            <param name="enumType">枚举类型</param>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="P:Cordon.EnumValidator.EnumType">
+            <summary>
+                枚举类型
+            </summary>
+        </member>
+        <member name="P:Cordon.EnumValidator.SupportFlags">
+            <summary>
+                是否支持 Flags 模式
+            </summary>
+            <remarks>默认值为：<c>false</c>。</remarks>
+        </member>
+        <member name="M:Cordon.EnumValidator.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.EnumValidator.FormatErrorMessage(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.EnumValidator.IsEnumValueDefined(System.Object)">
+            <summary>
+                判断值是否为合法的枚举成员
+            </summary>
+            <remarks>支持 Flags 模式。</remarks>
+            <param name="value">值</param>
+            <returns>
+                <see cref="T:System.Boolean" />
+            </returns>
+        </member>
+        <member name="M:Cordon.EnumValidator.GetResourceKey">
+            <summary>
+                获取错误信息对应的资源键
+            </summary>
+            <returns>
+                <see cref="T:System.String" />
+            </returns>
         </member>
         <member name="T:Cordon.EqualToValidator">
             <summary>
@@ -7739,6 +7997,23 @@
         <member name="M:Cordon.NotNullValidator.IsValid(System.Object)">
             <inheritdoc />
         </member>
+        <member name="T:Cordon.NullValidator">
+            <summary>
+                <c>null</c> 验证器
+            </summary>
+        </member>
+        <member name="M:Cordon.NullValidator.#ctor">
+            <summary>
+                <inheritdoc cref="T:Cordon.NullValidator" />
+            </summary>
+        </member>
+        <member name="P:Cordon.NullValidator.Priority">
+            <inheritdoc />
+            <remarks>默认值为：0。</remarks>
+        </member>
+        <member name="M:Cordon.NullValidator.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
         <member name="T:Cordon.NumericComparisonValidator">
             <summary>
                 <see cref="T:System.Decimal" /> 类型比较验证器抽象基类
@@ -8227,7 +8502,12 @@
             <param name="minimum">允许的最小字段值</param>
             <param name="maximum">允许的最大字段值</param>
         </member>
-        <m        <member name="P:Cordon.RangeValidator.Maximum">
+        <member name="P:Cordon.RangeValidator.Minimum">
+            <summary>
+                允许的最小字段值
+            </summary>
+        </member>
+        <member name="P:Cordon.RangeValidator.Maximum">
             <summary>
                 允许的最大字段值
             </summary>
@@ -8738,12 +9018,12 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match an ASCII letter.<br/>
+            ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [\-_] exactly 2 times.<br/>
-            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match an ASCII letter or digit.<br/>
+                ○ Match a character in the set [-_] exactly 2 times.<br/>
+            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match a character in the set [0-9A-Za-z].<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8897,11 +9177,6 @@
                 错误信息字符串
             </summary>
         </member>
-        <member name="P:Cordon.ValidatorBase.CustomErrorMessageSet">
-            <summary>
-                是否设置了错误信息
-            </summary>
-        member>
         <member name="P:Cordon.ValidatorBase.CustomErrorMessageSet">
             <summary>
                 是否设置了错误信息
@@ -9076,7 +9351,9 @@
             <param name="eventArgs">
                 <see cref="T:Cordon.ValidationPropertyChangedEventArgs" />
             </param>
-        </membzer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
+        </member>
+        <member name="M:Cordon.ValidatorProxy`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
         <member name="T:Cordon.ValidatorProxy`2">
             <summary>
@@ -9279,12 +9556,12 @@
         <member name="M:Cordon.ValueAnnotationValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
-        <member name="T:Microsoft.Extensions.DependencyInjection.ObjectValidationServiceCollectionExtensions">
+        <member name="T:Microsoft.Extensions.DependencyInjection.ValidationCoreServiceCollectionExtensions">
             <summary>
                 数据验证模块 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> 拓展类
             </summary>
         </member>
-        <member name="M:Microsoft.Extensions.DependencyInjection.ObjectValidationServiceCollectionExtensions.AddObjectValidation(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Cordon.ValidationBuilder})">
+        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationCoreServiceCollectionExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Cordon.ValidationBuilder})">
             <summary>
                 添加数据验证服务
             </summary>
@@ -9296,23 +9573,9 @@
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </returns>
         </member>
-        <member name="M:Microsoft.Extensions.DependencyInjection.ObjectValidationServiceCollectionExtensions.AddObjectValidation(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
+        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationCoreServiceCollectionExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
             <summary>
                 添加数据验证服务
-            </summary>
-            <param name="services">
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-据验证服务
             </summary>
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />

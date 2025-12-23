@@ -4,26 +4,26 @@
 
 namespace Cordon.Tests;
 
-public class ObjectValidationServiceCollectionExtensionsTests
+public class ValidationCoreServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddObjectValidation_Invalid_Parameters()
+    public void AddValidationCore_Invalid_Parameters()
     {
         var services = new ServiceCollection();
 
         Assert.Throws<ArgumentNullException>(() =>
         {
-            services.AddObjectValidation((ValidationBuilder)null!);
+            services.AddValidationCore((ValidationBuilder)null!);
         });
     }
 
     [Fact]
-    public void AddObjectValidation_ReturnOK()
+    public void AddValidationCore_ReturnOK()
     {
         var services = new ServiceCollection();
 
         var validationBuilder = new ValidationBuilder();
-        services.AddObjectValidation(validationBuilder);
+        services.AddValidationCore(validationBuilder);
 
         Assert.Single(services);
         Assert.Contains(services, x => x.ServiceType == typeof(IValidationDataContext));
@@ -31,10 +31,10 @@ public class ObjectValidationServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddObjectValidation_Action_Empty_Parameters()
+    public void AddValidationCore_Action_Empty_Parameters()
     {
         var services = new ServiceCollection();
-        services.AddObjectValidation();
+        services.AddValidationCore();
 
         Assert.Single(services);
         Assert.Contains(services, x => x.ServiceType == typeof(IValidationDataContext));
@@ -42,25 +42,26 @@ public class ObjectValidationServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddObjectValidation_Action_ReturnOK()
+    public void AddValidationCore_Action_ReturnOK()
     {
         var services = new ServiceCollection();
-        services.AddObjectValidation(builder => builder.AddValidator(typeof(ObjectModelValidator1)));
+        services.AddValidationCore(builder => builder.AddValidator(typeof(ObjectModelValidator1)));
 
-        Assert.Equal(3, services.Count);
+        Assert.Equal(4, services.Count);
         Assert.Contains(services, x => x.ServiceType == typeof(IObjectValidator<ObjectModel>));
+        Assert.Contains(services, x => x.ServiceType == typeof(ObjectModelValidator1));
         _ = services.BuildServiceProvider();
     }
 
     [Fact]
-    public void AddObjectValidation_Duplicate_ReturnOK()
+    public void AddValidationCore_Duplicate_ReturnOK()
     {
         var services = new ServiceCollection();
-        services.AddObjectValidation(s => s.AddValidator(typeof(ObjectModelValidator1)));
-        services.AddObjectValidation(s => s.AddValidator(typeof(ObjectModelValidator1)));
-        services.AddObjectValidation(s => s.AddValidator(typeof(ObjectModelValidator1)));
+        services.AddValidationCore(s => s.AddValidator(typeof(ObjectModelValidator1)));
+        services.AddValidationCore(s => s.AddValidator(typeof(ObjectModelValidator1)));
+        services.AddValidationCore(s => s.AddValidator(typeof(ObjectModelValidator1)));
 
-        Assert.Equal(3, services.Count);
+        Assert.Equal(4, services.Count);
         _ = services.BuildServiceProvider();
     }
 }

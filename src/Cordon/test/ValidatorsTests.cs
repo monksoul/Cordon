@@ -6,6 +6,19 @@ namespace Cordon.Tests;
 
 public class ValidatorsTests
 {
+    public enum MyEnum
+    {
+        Enum1,
+        Enum2
+    }
+
+    [Flags]
+    public enum MyFlagsEnum
+    {
+        Enum1,
+        Enum2
+    }
+
     [Fact]
     public void Object_ReturnOK()
     {
@@ -220,6 +233,13 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void Empty_ReturnOK()
+    {
+        var validator = Validators.Empty();
+        Assert.NotNull(validator);
+    }
+
+    [Fact]
     public void EndsWith_ReturnOK()
     {
         var validator = Validators.EndsWith("ion");
@@ -229,6 +249,22 @@ public class ValidatorsTests
         var validator2 = Validators.EndsWith("ion", StringComparison.OrdinalIgnoreCase);
         Assert.Equal("ion", validator2.SearchValue);
         Assert.Equal(StringComparison.OrdinalIgnoreCase, validator2.Comparison);
+    }
+
+    [Fact]
+    public void Enum_ReturnOK()
+    {
+        var validator = Validators.Enum(typeof(MyEnum));
+        Assert.False(validator.SupportFlags);
+
+        var validator2 = Validators.Enum(typeof(MyFlagsEnum), true);
+        Assert.True(validator2.SupportFlags);
+
+        var validator3 = Validators.Enum<MyEnum>();
+        Assert.False(validator3.SupportFlags);
+
+        var validator4 = Validators.Enum<MyFlagsEnum>(true);
+        Assert.True(validator4.SupportFlags);
     }
 
     [Fact]
@@ -378,6 +414,13 @@ public class ValidatorsTests
     public void NotNull_ReturnOK()
     {
         var validator = Validators.NotNull();
+        Assert.NotNull(validator);
+    }
+
+    [Fact]
+    public void Null_ReturnOK()
+    {
+        var validator = Validators.Null();
         Assert.NotNull(validator);
     }
 

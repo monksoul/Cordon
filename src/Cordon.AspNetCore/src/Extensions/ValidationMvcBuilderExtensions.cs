@@ -23,7 +23,7 @@ public static class ValidationMvcBuilderExtensions
         Action<ValidationBuilder>? configure = null)
     {
         // 添加数据验证服务
-        mvcBuilder.Services.AddObjectValidation(configure);
+        mvcBuilder.Services.AddValidationCore(configure);
 
         // 添加验证选项模型验证器提供器
         mvcBuilder.AddMvcOptions(options =>

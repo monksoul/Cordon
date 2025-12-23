@@ -488,6 +488,14 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf EmailAddress() => AddValidator(new EmailAddressValidator());
 
     /// <summary>
+    ///     添加空集合、数组和字符串验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Empty() => AddValidator(new EmptyValidator());
+
+    /// <summary>
     ///     添加以特定字符/字符串结尾的验证器
     /// </summary>
     /// <param name="searchValue">检索的值</param>
@@ -497,6 +505,29 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// </returns>
     public virtual TSelf EndsWith(string searchValue, StringComparison comparison = StringComparison.Ordinal) =>
         AddValidator(new EndsWithValidator(searchValue) { Comparison = comparison });
+
+    /// <summary>
+    ///     添加枚举验证器
+    /// </summary>
+    /// <param name="supportFlags">是否支持 Flags 模式。默认值为：<c>false</c>。</param>
+    /// <typeparam name="TEnum">枚举类型</typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Enum<TEnum>(bool supportFlags = false)
+        where TEnum : struct, Enum =>
+        AddValidator(new EnumValidator<TEnum> { SupportFlags = supportFlags });
+
+    /// <summary>
+    ///     添加枚举验证器
+    /// </summary>
+    /// <param name="enumType">枚举类型</param>
+    /// <param name="supportFlags">是否支持 Flags 模式。默认值为：<c>false</c>。</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Enum(Type enumType, bool supportFlags = false) =>
+        AddValidator(new EnumValidator(enumType) { SupportFlags = supportFlags });
 
     /// <summary>
     ///     添加相等验证器
@@ -749,6 +780,14 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf NotNull() => AddValidator(new NotNullValidator());
+
+    /// <summary>
+    ///     添加 null 验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Null() => AddValidator(new NullValidator());
 
     /// <summary>
     ///     添加密码验证器

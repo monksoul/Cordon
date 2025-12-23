@@ -31,8 +31,14 @@ public class User : IValidatableObject
             .RuleFor(u => u.EmailAddress)
             .MustAny(["@outlook.com", "@qq.com", "@163.com"],
                 (email, domain) => email.EndsWith(domain, StringComparison.OrdinalIgnoreCase))
+            // .MustAny(["@outlook.com", "@qq.com", "@163.com"], BeAValidEmailAddress)
             .WithMessage("仅支持 outlook、qq 和 163 邮箱格式。")
             .ToResults();
+    }
+
+    private static bool BeAValidEmailAddress(string email, string domain)
+    {
+        return email.EndsWith(domain, StringComparison.OrdinalIgnoreCase);
     }
 }
 

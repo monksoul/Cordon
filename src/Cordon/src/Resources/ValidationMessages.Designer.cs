@@ -213,11 +213,38 @@ namespace Cordon.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The field {0} must be empty..
+        /// </summary>
+        internal static string EmptyValidator_ValidationError {
+            get {
+                return ResourceManager.GetString("EmptyValidator_ValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The field {0} does not end with the string &apos;{1}&apos;..
         /// </summary>
         internal static string EndsWithValidator_ValidationError {
             get {
                 return ResourceManager.GetString("EndsWithValidator_ValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The field {0} must be a defined value of enum {1}..
+        /// </summary>
+        internal static string EnumValidator_ValidationError {
+            get {
+                return ResourceManager.GetString("EnumValidator_ValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The field {0} must be a valid combination of values defined in enum {1}..
+        /// </summary>
+        internal static string EnumValidator_ValidationError_SupportFlags {
+            get {
+                return ResourceManager.GetString("EnumValidator_ValidationError_SupportFlags", resourceCulture);
             }
         }
         
@@ -389,6 +416,15 @@ namespace Cordon.Resources {
         internal static string NotNullValidator_ValidationError {
             get {
                 return ResourceManager.GetString("NotNullValidator_ValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The field {0} must be null..
+        /// </summary>
+        internal static string NullValidator_ValidationError {
+            get {
+                return ResourceManager.GetString("NullValidator_ValidationError", resourceCulture);
             }
         }
         

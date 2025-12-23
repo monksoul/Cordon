@@ -27,7 +27,7 @@ public class ValidationBuilderTests
 
         var exception2 = Assert.Throws<ArgumentException>(() => builder.AddValidator(typeof(ObjectModel)));
         Assert.Equal(
-            "Type `Cordon.Tests.ObjectModel` is not a valid validator; it does not derive from `AbstractValidator<T>`. (Parameter 'validatorType')",
+            "Type `Cordon.Tests.ObjectModel` is not a valid validator; it does not derive from `AbstractValidator<>`. (Parameter 'validatorType')",
             exception2.Message);
     }
 
@@ -92,56 +92,60 @@ public class ValidationBuilderTests
         var services = new ServiceCollection();
         builder.Build(services);
 
-        Assert.Equal(3, services.Count);
+        Assert.Equal(4, services.Count);
         Assert.Contains(services, u => u.ServiceType == typeof(IValidationDataContext));
         Assert.Contains(services, u => u.ServiceType == typeof(IObjectValidator<ObjectModel>));
+        Assert.Contains(services, u => u.ServiceType == typeof(ObjectModelValidator1));
         Assert.DoesNotContain(services, u => u.ServiceType == typeof(AbstractValidator<ObjectModel>));
 
         // 支持重复构建
         builder.Build(services);
-        Assert.Equal(3, services.Count);
+        Assert.Equal(4, services.Count);
         Assert.Contains(services, u => u.ServiceType == typeof(IValidationDataContext));
         Assert.Contains(services, u => u.ServiceType == typeof(IObjectValidator<ObjectModel>));
+        Assert.Contains(services, u => u.ServiceType == typeof(ObjectModelValidator1));
         Assert.DoesNotContain(services, u => u.ServiceType == typeof(AbstractValidator<ObjectModel>));
     }
 
     [Fact]
-    public void BuildObjectValidatorServices_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new ValidationBuilder().BuildObjectValidatorServices(null!));
+    public void BuildValidatorServices_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => new ValidationBuilder().BuildValidatorServices(null!));
 
     [Fact]
-    public void BuildObjectValidatorServices_ReturnOK()
+    public void BuildValidatorServices_ReturnOK()
     {
         var builder = new ValidationBuilder();
         builder.AddValidator(typeof(ObjectModelValidator1));
 
         var services = new ServiceCollection();
-        builder.BuildObjectValidatorServices(services);
+        builder.BuildValidatorServices(services);
 
-        Assert.Equal(2, services.Count);
+        Assert.Equal(3, services.Count);
         Assert.Contains(services, u => u.ServiceType == typeof(IObjectValidator<ObjectModel>));
+        Assert.Contains(services, u => u.ServiceType == typeof(ObjectModelValidator1));
         Assert.DoesNotContain(services, u => u.ServiceType == typeof(AbstractValidator<ObjectModel>));
 
         // 仅在单元测试重复注册
-        builder.BuildObjectValidatorServices(services);
-        Assert.Equal(4, services.Count);
+        builder.BuildValidatorServices(services);
+        Assert.Equal(6, services.Count);
         Assert.Contains(services, u => u.ServiceType == typeof(IObjectValidator<ObjectModel>));
+        Assert.Contains(services, u => u.ServiceType == typeof(ObjectModelValidator1));
         Assert.DoesNotContain(services, u => u.ServiceType == typeof(AbstractValidator<ObjectModel>));
     }
 
     [Fact]
-    public void CreateObjectValidator_Invalid_Parameters()
+    public void CreateValidator_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => ValidationBuilder.CreateObjectValidator(null!, null!));
+        Assert.Throws<ArgumentNullException>(() => ValidationBuilder.CreateValidator(null!, null!));
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        Assert.Throws<ArgumentNullException>(() => ValidationBuilder.CreateObjectValidator(serviceProvider, null!));
+        Assert.Throws<ArgumentNullException>(() => ValidationBuilder.CreateValidator(serviceProvider, null!));
     }
 
     [Fact]
-    public void CreateObjectValidator_ReturnOK()
+    public void CreateValidator_ReturnOK()
     {
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        var validatorObject = ValidationBuilder.CreateObjectValidator(serviceProvider, typeof(ObjectModelValidator1));
+        var validatorObject = ValidationBuilder.CreateValidator(serviceProvider, typeof(ObjectModelValidator1));
         Assert.NotNull(validatorObject);
 
         var validator = validatorObject as ObjectModelValidator1;
@@ -150,8 +154,18 @@ public class ValidationBuilderTests
     }
 
     [Fact]
-    public void TryGetValidatedType_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => ValidationBuilder.TryGetValidatedType(null!, out _));
+    public void TryGetValidatedType_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => ValidationBuilder.TryGetValidatedType(null!, null!, out _));
+        Assert.Throws<ArgumentNullException>(() =>
+            ValidationBuilder.TryGetValidatedType(typeof(ObjectModelValidator1), null!, out _));
+
+        var exception = Assert.Throws<ArgumentException>(() =>
+            ValidationBuilder.TryGetValidatedType(typeof(ObjectModelValidator1), typeof(IObjectValidator), out _));
+        Assert.Equal(
+            "The type 'Cordon.IObjectValidator' is not a generic type definition; expected an open generic such as AbstractValidator<>. (Parameter 'baseGenericTypeDefinition')",
+            exception.Message);
+    }
 
     [Theory]
     [InlineData(typeof(ObjectModel), false, null)]
@@ -165,7 +179,8 @@ public class ValidationBuilderTests
     [InlineData(typeof(object), false, null)]
     public void TryGetValidatedType_ReturnOK(Type type, bool valid, Type? modelType)
     {
-        Assert.Equal(valid, ValidationBuilder.TryGetValidatedType(type, out var modelType1));
+        Assert.Equal(valid,
+            ValidationBuilder.TryGetValidatedType(type, typeof(AbstractValidator<>), out var modelType1));
         Assert.Equal(modelType, modelType1);
     }
 }

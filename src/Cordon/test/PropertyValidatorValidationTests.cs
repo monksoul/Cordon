@@ -6,6 +6,19 @@ namespace Cordon.Tests;
 
 public class PropertyValidatorValidationTests
 {
+    public enum MyEnum
+    {
+        Enum1,
+        Enum2
+    }
+
+    [Flags]
+    public enum MyFlagsEnum
+    {
+        Enum1,
+        Enum2
+    }
+
     [Fact]
     public void GetValidators_ReturnOK()
     {
@@ -644,6 +657,22 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void Empty_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Empty();
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as EmptyValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = string.Empty }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "Furion" }));
+    }
+
+    [Fact]
     public void EndsWith_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
@@ -673,6 +702,66 @@ public class PropertyValidatorValidationTests
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "Furion" }));
         Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = "Fur" }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "FURION" }));
+    }
+
+    [Fact]
+    public void Enum_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Enum(typeof(MyEnum));
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as EnumValidator;
+        Assert.NotNull(addedValidator);
+        Assert.False(addedValidator.SupportFlags);
+
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = MyFlagsEnum.Enum1 }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = 2 }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = MyEnum.Enum1 }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Enum(typeof(MyFlagsEnum), true);
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator2 = propertyValidator2._lastAddedValidator as EnumValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.True(addedValidator2.SupportFlags);
+
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = MyEnum.Enum1 }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = 2 }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = MyFlagsEnum.Enum1 }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Enum<MyEnum>();
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 = propertyValidator3._lastAddedValidator as EnumValidator;
+        Assert.NotNull(addedValidator3);
+        Assert.False(addedValidator3.SupportFlags);
+
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Data1 = MyFlagsEnum.Enum1 }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Data1 = 2 }));
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { Data1 = MyEnum.Enum1 }));
+
+        var propertyValidator4 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Enum<MyFlagsEnum>(true);
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator4 = propertyValidator4._lastAddedValidator as EnumValidator;
+        Assert.NotNull(addedValidator4);
+        Assert.True(addedValidator4.SupportFlags);
+
+        Assert.False(propertyValidator4.IsValid(new ValidationModel { Data1 = MyEnum.Enum1 }));
+        Assert.False(propertyValidator4.IsValid(new ValidationModel { Data1 = 2 }));
+        Assert.True(propertyValidator4.IsValid(new ValidationModel { Data1 = MyFlagsEnum.Enum1 }));
     }
 
     [Fact]
@@ -1291,6 +1380,22 @@ public class PropertyValidatorValidationTests
 
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
         Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "Furion" }));
+    }
+
+    [Fact]
+    public void Null_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Null();
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as NullValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "Furion" }));
     }
 
     [Fact]

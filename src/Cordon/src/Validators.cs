@@ -300,6 +300,14 @@ public static class Validators
     public static EmailAddressValidator EmailAddress() => new();
 
     /// <summary>
+    ///     创建空集合、数组和字符串验证器
+    /// </summary>
+    /// <returns>
+    ///     <see cref="EmptyValidator" />
+    /// </returns>
+    public static EmptyValidator Empty() => new();
+
+    /// <summary>
     ///     创建以特定字符/字符串结尾的验证器
     /// </summary>
     /// <param name="searchValue">检索的值</param>
@@ -310,6 +318,28 @@ public static class Validators
     public static EndsWithValidator
         EndsWith(string searchValue, StringComparison comparison = StringComparison.Ordinal) =>
         new(searchValue) { Comparison = comparison };
+
+    /// <summary>
+    ///     创建枚举验证器
+    /// </summary>
+    /// <param name="supportFlags">是否支持 Flags 模式。默认值为：<c>false</c>。</param>
+    /// <typeparam name="TEnum">枚举类型</typeparam>
+    /// <returns>
+    ///     <see cref="EnumValidator{TEnum}" />
+    /// </returns>
+    public static EnumValidator Enum<TEnum>(bool supportFlags = false)
+        where TEnum : struct, Enum => new EnumValidator<TEnum> { SupportFlags = supportFlags };
+
+    /// <summary>
+    ///     创建枚举验证器
+    /// </summary>
+    /// <param name="enumType">枚举类型</param>
+    /// <param name="supportFlags">是否支持 Flags 模式。默认值为：<c>false</c>。</param>
+    /// <returns>
+    ///     <see cref="EnumValidator" />
+    /// </returns>
+    public static EnumValidator Enum(Type enumType, bool supportFlags = false) =>
+        new(enumType) { SupportFlags = supportFlags };
 
     /// <summary>
     ///     创建相等验证器
@@ -511,6 +541,14 @@ public static class Validators
     ///     <see cref="NotNullValidator" />
     /// </returns>
     public static NotNullValidator NotNull() => new();
+
+    /// <summary>
+    ///     创建 null 验证器
+    /// </summary>
+    /// <returns>
+    ///     <see cref="NullValidator" />
+    /// </returns>
+    public static NullValidator Null() => new();
 
     /// <summary>
     ///     创建对象验证特性验证器

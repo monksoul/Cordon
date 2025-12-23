@@ -6,6 +6,19 @@ namespace Cordon.Tests;
 
 public class ValueValidatorValidationTests
 {
+    public enum MyEnum
+    {
+        Enum1,
+        Enum2
+    }
+
+    [Flags]
+    public enum MyFlagsEnum
+    {
+        Enum1,
+        Enum2
+    }
+
     [Fact]
     public void GetValidators_ReturnOK()
     {
@@ -444,6 +457,20 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void Empty_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().Empty();
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as EmptyValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid(string.Empty));
+        Assert.False(valueValidator.IsValid("Furion"));
+    }
+
+    [Fact]
     public void EndsWith_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().EndsWith("ion");
@@ -483,6 +510,58 @@ public class ValueValidatorValidationTests
 
         Assert.True(valueValidator.IsValid("Furion"));
         Assert.False(valueValidator.IsValid("百小僧"));
+    }
+
+    [Fact]
+    public void Enum_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().Enum(typeof(MyEnum));
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as EnumValidator;
+        Assert.NotNull(addedValidator);
+        Assert.False(addedValidator.SupportFlags);
+
+        Assert.False(valueValidator.IsValid(MyFlagsEnum.Enum1));
+        Assert.False(valueValidator.IsValid(2));
+        Assert.True(valueValidator.IsValid(MyEnum.Enum1));
+
+        var valueValidator2 = new ValueValidator<object>().Enum(typeof(MyFlagsEnum), true);
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator2 = valueValidator2._lastAddedValidator as EnumValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.True(addedValidator2.SupportFlags);
+
+        Assert.False(valueValidator2.IsValid(MyEnum.Enum1));
+        Assert.False(valueValidator2.IsValid(2));
+        Assert.True(valueValidator2.IsValid(MyFlagsEnum.Enum1));
+
+        var valueValidator3 = new ValueValidator<object>().Enum<MyEnum>();
+
+        Assert.Single(valueValidator3.Validators);
+
+        var addedValidator3 = valueValidator3._lastAddedValidator as EnumValidator;
+        Assert.NotNull(addedValidator3);
+        Assert.False(addedValidator3.SupportFlags);
+
+        Assert.False(valueValidator3.IsValid(MyFlagsEnum.Enum1));
+        Assert.False(valueValidator3.IsValid(2));
+        Assert.True(valueValidator3.IsValid(MyEnum.Enum1));
+
+        var valueValidator4 = new ValueValidator<object>().Enum<MyFlagsEnum>(true);
+
+        Assert.Single(valueValidator3.Validators);
+
+        var addedValidator4 = valueValidator4._lastAddedValidator as EnumValidator;
+        Assert.NotNull(addedValidator4);
+        Assert.True(addedValidator4.SupportFlags);
+
+        Assert.False(valueValidator4.IsValid(MyEnum.Enum1));
+        Assert.False(valueValidator4.IsValid(2));
+        Assert.True(valueValidator4.IsValid(MyFlagsEnum.Enum1));
     }
 
     [Fact]
@@ -886,6 +965,20 @@ public class ValueValidatorValidationTests
 
         Assert.False(valueValidator.IsValid(null));
         Assert.True(valueValidator.IsValid("Furion"));
+    }
+
+    [Fact]
+    public void Null_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().Null();
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as NullValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid(null));
+        Assert.False(valueValidator.IsValid("Furion"));
     }
 
     [Fact]
