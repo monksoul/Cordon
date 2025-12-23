@@ -88,7 +88,7 @@ public class EnumValidator : ValidatorBase
             return Enum.IsDefined(EnumType, value);
         }
 
-        // 显示检查枚举
+        // 显式检查枚举
         if (Enum.IsDefined(EnumType, value))
         {
             return true;
