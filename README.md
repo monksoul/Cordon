@@ -44,12 +44,12 @@ public class User : IValidatableObject
     public IEnumerable<ValidationResult> Validate(ValidationContext context)
     {
         return context.ContinueWith<User>()
-            .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("{0} 不是有效的互联网用户名")
+            .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("{0} is not a valid internet username")
             .RuleFor(u => u.Id).Max(int.MaxValue)
             // Support rule sets (scenarios)
             .RuleSet("rule", v => 
             {
-                v.RuleFor(u => u.Name).EmailAddress().WithMessage("{0} 不是有效的电子邮箱格式");
+                v.RuleFor(u => u.Name).EmailAddress().WithMessage({0} is not a valid email format");
             }).ToResults();
     }
 }
