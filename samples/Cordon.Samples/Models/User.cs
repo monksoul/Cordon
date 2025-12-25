@@ -27,13 +27,15 @@ public class User : IValidatableObject
         //     !_allowedDomains.Any(domain => EmailAddress.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
         //     yield return new ValidationResult("仅支持 outlook、qq 和 163 邮箱格式。", [nameof(EmailAddress)]);
 
-        return validationContext.ContinueWith<User>()
-            .RuleFor(u => u.EmailAddress)
-            .MustAny(["@outlook.com", "@qq.com", "@163.com"],
-                (email, domain) => email.EndsWith(domain, StringComparison.OrdinalIgnoreCase))
-            // .MustAny(["@outlook.com", "@qq.com", "@163.com"], BeAValidEmailAddress)
-            .WithMessage("仅支持 outlook、qq 和 163 邮箱格式。")
-            .ToResults();
+        // return validationContext.ContinueWith<User>()
+        //     .RuleFor(u => u.EmailAddress)
+        //     .MustAny(["@outlook.com", "@qq.com", "@163.com"],
+        //         (email, domain) => email.EndsWith(domain, StringComparison.OrdinalIgnoreCase))
+        //     // .MustAny(["@outlook.com", "@qq.com", "@163.com"], BeAValidEmailAddress)
+        //     .WithMessage("仅支持 outlook、qq 和 163 邮箱格式。")
+        //     .ToResults();
+
+        return validationContext.ValidateWith<UserValidator>();
     }
 
     private static bool BeAValidEmailAddress(string email, string domain)
@@ -60,5 +62,20 @@ public class AllowedEmailDomainsAttribute : ValidationAttribute
             return new ValidationResult(GetErrorMessage());
 
         return base.IsValid(value, validationContext);
+    }
+}
+
+public class UserValidator : AbstractValidator<User>
+{
+    public UserValidator()
+    {
+        RuleFor(u => u.EmailAddress)
+            .MustAny(["@outlook.com", "@qq.com", "@163.com"], BeAValidEmailAddress)
+            .WithMessage("仅支持 outlook、qq 和 163 邮箱格式。");
+    }
+
+    private static bool BeAValidEmailAddress(string email, string domain)
+    {
+        return email.EndsWith(domain, StringComparison.OrdinalIgnoreCase);
     }
 }

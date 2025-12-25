@@ -135,7 +135,8 @@ public class ValidationExtensionsTests
         Assert.Throws<ArgumentNullException>(() =>
             new ValidationContext(new ObjectModel(), null, null).ValidateWith<ObjectModel>(null!));
         Assert.Throws<InvalidCastException>(() =>
-            new ValidationContext(new object(), null, null).ValidateUsing<ObjectModel>());
+            new ValidationContext(new object(), null, null).ValidateWith(new ObjectModelValidator()));
+        Assert.Throws<ArgumentNullException>(() => ValidationExtensions.ValidateWith<ObjectModelValidator>(null!));
     }
 
     [Fact]
@@ -151,6 +152,13 @@ public class ValidationExtensionsTests
         Assert.Equal("The field Name must be a string or array type with a minimum length of '3'.",
             validationResults.First().ErrorMessage);
         Assert.Equal("The field Name is not a valid username.", validationResults.Last().ErrorMessage);
+
+        var validationContext3 = new ValidationContext(new ObjectModel { Name = "Fu" }, null, null);
+        var validationResults2 = validationContext3.ValidateWith<ObjectModelValidator>().ToList();
+        Assert.Equal(2, validationResults2.Count);
+        Assert.Equal("The field Name must be a string or array type with a minimum length of '3'.",
+            validationResults2.First().ErrorMessage);
+        Assert.Equal("The field Name is not a valid username.", validationResults2.Last().ErrorMessage);
     }
 
     public class ObjectModel : IValidatableObject

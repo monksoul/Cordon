@@ -204,7 +204,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
             // 获取用于验证的值（解决 null 值时 ObjectInstance 为 object 实例问题）
             var instance = validationContext.ObjectInstance is T value ? value : default;
 
-            // 获取对象验证结果集合
+            // 设置显示名称并返回对象验证结果集合
             return WithDisplayName(validationContext.DisplayName).GetValidationResults(instance, ruleSets) ?? [];
         }
         finally

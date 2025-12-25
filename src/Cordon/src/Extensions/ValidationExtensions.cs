@@ -99,9 +99,8 @@ public static class ValidationExtensions
         // 空检查
         ArgumentNullException.ThrowIfNull(validationContext);
 
-        // 初始化 ObjectValidator<T> 实例并跳过属性验证特性验证，避免死循环
-        var objectValidator = new ObjectValidator<T>(new Dictionary<object, object?>(validationContext.Items))
-            .SkipAnnotationValidation();
+        // 初始化 ObjectValidator<T> 实例
+        var objectValidator = new ObjectValidator<T>(new Dictionary<object, object?>(validationContext.Items));
 
         // 调用自定义配置委托
         configure?.Invoke(objectValidator);
@@ -132,29 +131,39 @@ public static class ValidationExtensions
         ArgumentNullException.ThrowIfNull(validationContext);
         ArgumentNullException.ThrowIfNull(objectValidator);
 
-        // 禁用属性验证特性验证，避免死循环（TODO: 这里存在线程安全问题）
-        var needsRestoreSuppressAnnotationValidation = false;
-        if (!objectValidator.Options.SuppressAnnotationValidation)
+        // 跳过属性验证特性验证并返回对象验证结果集合
+        return objectValidator.UseAnnotationValidation(false).ToResults(validationContext, disposeAfterValidation);
+    }
+
+    /// <summary>
+    ///     使用指定对象验证器验证当前实例并返回验证结果集合
+    /// </summary>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext" />
+    /// </param>
+    /// <typeparam name="TValidator">
+    ///     <see cref="ObjectValidator{T}" />
+    /// </typeparam>
+    /// <returns>
+    ///     <see cref="IEnumerable{T}" />
+    /// </returns>
+    public static IEnumerable<ValidationResult> ValidateWith<TValidator>(this ValidationContext validationContext)
+        where TValidator : IObjectValidator
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validationContext);
+
+        // 创建 TValidator 实例
+        var validator = validationContext.GetService<IServiceProvider>() is null
+            ? Activator.CreateInstance<TValidator>()
+            : ActivatorUtilities.CreateInstance<TValidator>(validationContext);
+
+        // 检查验证器是否实现 IValidationAnnotationsConfigurable 接口
+        if (validator is IValidationAnnotationsConfigurable configurable)
         {
-            objectValidator.Options.SuppressAnnotationValidation = true;
-            needsRestoreSuppressAnnotationValidation = true;
+            configurable.UseAnnotationValidation(false);
         }
 
-        // 同步 IServiceProvider 委托
-        objectValidator.InitializeServiceProvider(validationContext.GetService);
-
-        try
-        {
-            // 获取对象验证结果集合
-            return objectValidator.ToResults(validationContext, disposeAfterValidation);
-        }
-        finally
-        {
-            // 恢复禁用属性验证特性验证状态
-            if (needsRestoreSuppressAnnotationValidation)
-            {
-                objectValidator.Options.SuppressAnnotationValidation = false;
-            }
-        }
+        return validator.ToResults(validationContext);
     }
 }

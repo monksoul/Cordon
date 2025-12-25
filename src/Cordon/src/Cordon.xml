@@ -3367,6 +3367,20 @@
                 <see cref="T:System.Collections.Generic.IEnumerable`1" />
             </returns>
         </member>
+        <member name="M:Cordon.ValidationExtensions.ValidateWith``1(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+                使用指定对象验证器验证当前实例并返回验证结果集合
+            </summary>
+            <param name="validationContext">
+                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
+            </param>
+            <typeparam name="TValidator">
+                <see cref="T:Cordon.ObjectValidator`1" />
+            </typeparam>
+            <returns>
+                <see cref="T:System.Collections.Generic.IEnumerable`1" />
+            </returns>
+        </member>
         <member name="T:Cordon.ValidatorBaseExtensions">
             <summary>
                 <see cref="T:Cordon.ValidatorBase" /> 拓展类
@@ -3485,6 +3499,17 @@
                 获取当前上下文中的规则集
             </summary>
             <returns><see cref="T:System.String" />[]</returns>
+        </member>
+        <member name="T:Cordon.IValidationAnnotationsConfigurable">
+            <summary>
+                定义可配置是否启用基于特性的验证行为
+            </summary>
+        </member>
+        <member name="M:Cordon.IValidationAnnotationsConfigurable.UseAnnotationValidation(System.Boolean)">
+            <summary>
+                配置是否启用对象属性验证特性验证
+            </summary>
+            <param name="enabled">是否启用</param>
         </member>
         <member name="T:Cordon.ValidationOptionsMetadata">
             <summary>
@@ -3836,6 +3861,9 @@
         <member name="M:Cordon.ObjectValidator`1.Cordon#IRuleSetContextProvider#GetCurrentRuleSets">
             <inheritdoc />
         </member>
+        <member name="M:Cordon.ObjectValidator`1.Cordon#IValidationAnnotationsConfigurable#UseAnnotationValidation(System.Boolean)">
+            <inheritdoc />
+        </member>
         <member name="M:Cordon.ObjectValidator`1.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
             <summary>
                 为指定属性配置验证规则
@@ -4165,6 +4193,9 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.PropertyValidator`3.Cordon#IObjectValidator#Validate(System.Object,System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.PropertyValidator`3.Cordon#IValidationAnnotationsConfigurable#UseAnnotationValidation(System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.PropertyValidator`3.InitializeServiceProvider(System.Func{System.Type,System.Object})">

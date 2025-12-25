@@ -25,7 +25,7 @@ public class PropertyValidator<T, TProperty> : PropertyValidator<T, TProperty, P
 /// <typeparam name="TProperty">属性类型</typeparam>
 /// <typeparam name="TSelf">派生类型自身类型</typeparam>
 public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentValidatorBuilder<TProperty, TSelf>,
-    IObjectValidator<T>, IMemberPathRepairable
+    IObjectValidator<T>, IMemberPathRepairable, IValidationAnnotationsConfigurable
     where TSelf : PropertyValidator<T, TProperty, TSelf>
 {
     /// <inheritdoc cref="PropertyAnnotationValidator{T,TProperty}" />
@@ -239,6 +239,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
 
     /// <inheritdoc />
     void IObjectValidator.Validate(object? instance, string?[]? ruleSets) => Validate((T?)instance, ruleSets);
+
+    /// <inheritdoc />
+    void IValidationAnnotationsConfigurable.UseAnnotationValidation(bool enabled) => UseAnnotationValidation(enabled);
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
     internal new void InitializeServiceProvider(Func<Type, object?>? serviceProvider)

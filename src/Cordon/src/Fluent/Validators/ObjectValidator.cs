@@ -8,7 +8,8 @@ namespace Cordon;
 ///     对象验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IRuleSetContextProvider
+public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IRuleSetContextProvider,
+    IValidationAnnotationsConfigurable
 {
     /// <summary>
     ///     验证上下文键
@@ -301,6 +302,9 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
 
     /// <inheritdoc />
     string?[]? IRuleSetContextProvider.GetCurrentRuleSets() => GetCurrentRuleSets();
+
+    /// <inheritdoc />
+    void IValidationAnnotationsConfigurable.UseAnnotationValidation(bool enabled) => UseAnnotationValidation(enabled);
 
     /// <summary>
     ///     为指定属性配置验证规则
