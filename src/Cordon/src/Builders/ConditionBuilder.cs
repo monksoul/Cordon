@@ -27,7 +27,7 @@ public class ConditionBuilder<T>
     internal ConditionBuilder() => _conditions = [];
 
     /// <summary>
-    ///     定义满足指定条件时执行的验证规则
+    ///     定义满足指定的条件委托
     /// </summary>
     /// <param name="condition">条件委托</param>
     /// <returns>
@@ -42,7 +42,44 @@ public class ConditionBuilder<T>
     }
 
     /// <summary>
-    ///     定义不满足指定条件时执行的验证规则
+    ///     定义满足指定条件时执行的验证规则
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <param name="thenConfigure">验证器配置委托</param>
+    /// <returns>
+    ///     <see cref="ConditionThenBuilder{T}" />
+    /// </returns>
+    public ConditionBuilder<T> WhenMatch(Func<T, bool> condition, Action<FluentValidatorBuilder<T>> thenConfigure) =>
+        When(condition).Then(thenConfigure);
+
+    /// <summary>
+    ///     定义满足指定条件时返回指定的错误消息
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <param name="errorMessage">错误消息</param>
+    /// <returns>
+    ///     <see cref="ConditionThenBuilder{T}" />
+    /// </returns>
+    public ConditionBuilder<T> WhenMatch(Func<T, bool> condition, string? errorMessage) =>
+        When(condition).ThenErrorMessage(errorMessage);
+
+    /// <summary>
+    ///     定义满足指定条件时返回指定的错误消息
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <returns>
+    ///     <see cref="ConditionThenBuilder{T}" />
+    /// </returns>
+    public ConditionBuilder<T> WhenMatch(Func<T, bool> condition,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName) =>
+        When(condition).ThenErrorMessage(resourceType, resourceName);
+
+    /// <summary>
+    ///     定义不满足指定的条件委托
     /// </summary>
     /// <param name="condition">条件委托</param>
     /// <returns>
@@ -55,6 +92,43 @@ public class ConditionBuilder<T>
 
         return new ConditionThenBuilder<T>(this, u => !condition(u));
     }
+
+    /// <summary>
+    ///     定义不满足指定条件时执行的验证规则
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <param name="thenConfigure">验证器配置委托</param>
+    /// <returns>
+    ///     <see cref="ConditionThenBuilder{T}" />
+    /// </returns>
+    public ConditionBuilder<T> UnlessMatch(Func<T, bool> condition, Action<FluentValidatorBuilder<T>> thenConfigure) =>
+        Unless(condition).Then(thenConfigure);
+
+    /// <summary>
+    ///     定义不满足指定条件时返回指定的错误消息
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <param name="errorMessage">错误消息</param>
+    /// <returns>
+    ///     <see cref="ConditionThenBuilder{T}" />
+    /// </returns>
+    public ConditionBuilder<T> UnlessMatch(Func<T, bool> condition, string? errorMessage) =>
+        Unless(condition).ThenErrorMessage(errorMessage);
+
+    /// <summary>
+    ///     定义不满足指定条件时返回指定的错误消息
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <returns>
+    ///     <see cref="ConditionThenBuilder{T}" />
+    /// </returns>
+    public ConditionBuilder<T> UnlessMatch(Func<T, bool> condition,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName) =>
+        Unless(condition).ThenErrorMessage(resourceType, resourceName);
 
     /// <summary>
     ///     配置默认验证规则

@@ -341,12 +341,12 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// </summary>
     /// <param name="validators">验证器列表</param>
     /// <param name="mode">
-    ///     <see cref="ValidationMode" />
+    ///     <see cref="CompositeMode" />
     /// </param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf Composite(ValidatorBase[] validators, ValidationMode mode) =>
+    public virtual TSelf Composite(ValidatorBase[] validators, CompositeMode mode) =>
         AddValidator(new CompositeValidator(validators) { Mode = mode });
 
     /// <summary>
@@ -357,12 +357,12 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf ValidateAll(Action<FluentValidatorBuilder<T>> configure)
+    public virtual TSelf All(Action<FluentValidatorBuilder<T>> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
-        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], ValidationMode.ValidateAll);
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], CompositeMode.All);
     }
 
     /// <summary>
@@ -373,12 +373,12 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf BreakOnFirstSuccess(Action<FluentValidatorBuilder<T>> configure)
+    public virtual TSelf Any(Action<FluentValidatorBuilder<T>> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
-        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], ValidationMode.BreakOnFirstSuccess);
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], CompositeMode.Any);
     }
 
     /// <summary>
@@ -389,12 +389,12 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf BreakOnFirstError(Action<FluentValidatorBuilder<T>> configure)
+    public virtual TSelf FailFast(Action<FluentValidatorBuilder<T>> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
-        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], ValidationMode.BreakOnFirstError);
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], CompositeMode.FailFast);
     }
 
     /// <summary>
@@ -406,6 +406,110 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// </returns>
     public virtual TSelf Conditional(Action<ConditionBuilder<T>> buildConditions) =>
         AddValidator(new ConditionalValidator<T>(buildConditions));
+
+    /// <summary>
+    ///     添加条件验证器
+    /// </summary>
+    /// <remarks>定义满足指定条件时执行的验证规则。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="thenConfigure">验证器配置委托</param>
+    /// <param name="otherwiseConfigure">验证器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf WhenMatch(Func<T, bool> condition, Action<FluentValidatorBuilder<T>> thenConfigure,
+        Action<FluentValidatorBuilder<T>>? otherwiseConfigure = null) =>
+        Conditional(builder =>
+        {
+            // 构建 ConditionBuilder<T> 实例
+            var conditionBuilder = builder.When(condition).Then(thenConfigure);
+
+            // 空检查
+            if (otherwiseConfigure is not null)
+            {
+                conditionBuilder.Otherwise(otherwiseConfigure);
+            }
+        });
+
+    /// <summary>
+    ///     添加条件验证器
+    /// </summary>
+    /// <remarks>定义满足指定条件时返回指定的错误消息。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="errorMessage">错误消息</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf WhenMatch(Func<T, bool> condition, string? errorMessage) =>
+        Conditional(builder => builder.When(condition).ThenErrorMessage(errorMessage));
+
+    /// <summary>
+    ///     添加条件验证器
+    /// </summary>
+    /// <remarks>定义满足指定条件时返回指定的错误消息。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf WhenMatch(Func<T, bool> condition,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName) =>
+        Conditional(builder => builder.When(condition).ThenErrorMessage(resourceType, resourceName));
+
+    /// <summary>
+    ///     添加条件验证器
+    /// </summary>
+    /// <remarks>定义不满足指定条件时执行的验证规则。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="thenConfigure">验证器配置委托</param>
+    /// <param name="otherwiseConfigure">验证器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf UnlessMatch(Func<T, bool> condition, Action<FluentValidatorBuilder<T>> thenConfigure,
+        Action<FluentValidatorBuilder<T>>? otherwiseConfigure = null) =>
+        Conditional(builder =>
+        {
+            // 构建 ConditionBuilder<T> 实例
+            var conditionBuilder = builder.Unless(condition).Then(thenConfigure);
+
+            // 空检查
+            if (otherwiseConfigure is not null)
+            {
+                conditionBuilder.Otherwise(otherwiseConfigure);
+            }
+        });
+
+    /// <summary>
+    ///     添加条件验证器
+    /// </summary>
+    /// <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="errorMessage">错误消息</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf UnlessMatch(Func<T, bool> condition, string? errorMessage) =>
+        Conditional(builder => builder.Unless(condition).ThenErrorMessage(errorMessage));
+
+    /// <summary>
+    ///     添加条件验证器
+    /// </summary>
+    /// <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf UnlessMatch(Func<T, bool> condition,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName) =>
+        Conditional(builder => builder.Unless(condition).ThenErrorMessage(resourceType, resourceName));
 
     /// <summary>
     ///     添加 <see cref="System.DateOnly" /> 验证器
@@ -537,6 +641,14 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf EqualTo(object? compareValue) => AddValidator(new EqualToValidator(compareValue));
+
+    /// <summary>
+    ///     添加固定失败验证器
+    /// </summary>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Failure() => AddValidator(new FailureValidator());
 
     /// <summary>
     ///     添加大于等于验证器
@@ -746,6 +858,44 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
 
         return AddValidator(new MustValidator<T>(u =>
             enumerable.Any(x => condition(u, CreateValidationContext(u), x))));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustAll<TElement>(IEnumerable<TElement> enumerable, Func<T, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u => enumerable.All(x => condition(u, x))));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustAll<TElement>(IEnumerable<TElement> enumerable,
+        Func<T, ValidationContext<T>, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u =>
+            enumerable.All(x => condition(u, CreateValidationContext(u), x))));
     }
 
     /// <summary>

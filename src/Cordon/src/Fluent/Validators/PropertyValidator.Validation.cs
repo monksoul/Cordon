@@ -13,6 +13,20 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
         _objectValidator.ToResults(validationContext, disposeAfterValidation);
 
     /// <summary>
+    ///     配置是否允许空字符串
+    /// </summary>
+    /// <param name="allowEmptyStrings">是否允许空字符串，默认值为：<c>true</c>。</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf AllowEmptyStrings(bool allowEmptyStrings = true)
+    {
+        _allowEmptyStrings = allowEmptyStrings;
+
+        return This;
+    }
+
+    /// <summary>
     ///     配置是否启用该属性上的验证特性验证
     /// </summary>
     /// <param name="enabled">是否启用</param>
@@ -261,6 +275,39 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     public virtual TSelf MustAny_<TElement>(IEnumerable<TElement> enumerable,
         Func<TProperty, ValidationContext<T>, TElement, bool> condition) =>
         MustAny(enumerable, condition);
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustAll<TElement>(IEnumerable<TElement> enumerable,
+        Func<TProperty, ValidationContext<T>, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return ValidatorProxy<MustValidator<TProperty>>(context =>
+            [new Func<TProperty, bool>(u => enumerable.All(x => condition(u, context, x)))]);
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustAll_<TElement>(IEnumerable<TElement> enumerable,
+        Func<TProperty, ValidationContext<T>, TElement, bool> condition) =>
+        MustAll(enumerable, condition);
 
     /// <summary>
     ///     添加不相等验证器

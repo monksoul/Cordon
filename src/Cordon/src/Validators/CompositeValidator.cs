@@ -53,10 +53,10 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     public IReadOnlyList<ValidatorBase> Validators { get; }
 
     /// <summary>
-    ///     <inheritdoc cref="ValidationMode" />
+    ///     <inheritdoc cref="CompositeMode" />
     /// </summary>
-    /// <remarks>默认值为：<see cref="ValidationMode.ValidateAll" />。</remarks>
-    public ValidationMode Mode { get; set; } = ValidationMode.ValidateAll;
+    /// <remarks>默认值为：<see cref="CompositeMode.All" />。</remarks>
+    public CompositeMode Mode { get; set; } = CompositeMode.All;
 
     /// <inheritdoc />
     public void Dispose()
@@ -73,8 +73,8 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     public override bool IsValid(object? value) =>
         Mode switch
         {
-            ValidationMode.ValidateAll or ValidationMode.BreakOnFirstError => Validators.All(u => u.IsValid(value)),
-            ValidationMode.BreakOnFirstSuccess => Validators.Any(u => u.IsValid(value)),
+            CompositeMode.All or CompositeMode.FailFast => Validators.All(u => u.IsValid(value)),
+            CompositeMode.Any => Validators.Any(u => u.IsValid(value)),
             _ => throw new NotSupportedException()
         };
 
@@ -96,13 +96,13 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
                 validationResults.AddRange(results);
 
                 // 检查验证器模式是否是首个验证失败则停止验证
-                if (Mode is ValidationMode.BreakOnFirstError)
+                if (Mode is CompositeMode.FailFast)
                 {
                     break;
                 }
             }
             // 检查验证器模式是否是首个验证成功则视为通过
-            else if (Mode is ValidationMode.BreakOnFirstSuccess)
+            else if (Mode is CompositeMode.Any)
             {
                 // 清空验证结果集合
                 validationResults.Clear();
@@ -137,13 +137,13 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
                 firstFailedValidator ??= validator;
 
                 // 检查验证器模式是否是验证所有或首个验证失败则停止验证
-                if (Mode is ValidationMode.ValidateAll or ValidationMode.BreakOnFirstError)
+                if (Mode is CompositeMode.All or CompositeMode.FailFast)
                 {
                     ThrowValidationException(value, name, validator, memberNameList);
                 }
             }
             // 检查验证器模式是否是首个验证成功则视为通过
-            else if (Mode is ValidationMode.BreakOnFirstSuccess)
+            else if (Mode is CompositeMode.Any)
             {
                 return;
             }
@@ -187,12 +187,12 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     ///     设置验证模式
     /// </summary>
     /// <param name="mode">
-    ///     <see cref="ValidationMode" />
+    ///     <see cref="CompositeMode" />
     /// </param>
     /// <returns>
     ///     <see cref="CompositeValidator" />
     /// </returns>
-    public CompositeValidator UseMode(ValidationMode mode)
+    public CompositeValidator UseMode(CompositeMode mode)
     {
         Mode = mode;
 

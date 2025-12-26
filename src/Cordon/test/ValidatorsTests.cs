@@ -115,48 +115,48 @@ public class ValidatorsTests
     {
         var validator = Validators.Composite(Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧"));
         Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(ValidationMode.ValidateAll, validator.Mode);
+        Assert.Equal(CompositeMode.All, validator.Mode);
 
         var validator2 = Validators.Composite([Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧")],
-            ValidationMode.BreakOnFirstSuccess);
+            CompositeMode.Any);
         Assert.Equal(2, validator2.Validators.Count);
-        Assert.Equal(ValidationMode.BreakOnFirstSuccess, validator2.Mode);
+        Assert.Equal(CompositeMode.Any, validator2.Mode);
     }
 
     [Fact]
-    public void ValidateAll_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => Validators.ValidateAll(null!));
+    public void All_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => Validators.All(null!));
 
     [Fact]
-    public void ValidateAll_ReturnOK()
+    public void All_ReturnOK()
     {
-        var validator = Validators.ValidateAll(u => u.ChineseName().AllowedValues("百签", "百小僧"));
+        var validator = Validators.All(u => u.ChineseName().AllowedValues("百签", "百小僧"));
         Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(ValidationMode.ValidateAll, validator.Mode);
+        Assert.Equal(CompositeMode.All, validator.Mode);
     }
 
     [Fact]
-    public void BreakOnFirstSuccess_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => Validators.BreakOnFirstSuccess(null!));
+    public void Any_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => Validators.Any(null!));
 
     [Fact]
-    public void BreakOnFirstSuccess_ReturnOK()
+    public void Any_ReturnOK()
     {
-        var validator = Validators.BreakOnFirstSuccess(u => u.ChineseName().AllowedValues("百签", "百小僧"));
+        var validator = Validators.Any(u => u.ChineseName().AllowedValues("百签", "百小僧"));
         Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(ValidationMode.BreakOnFirstSuccess, validator.Mode);
+        Assert.Equal(CompositeMode.Any, validator.Mode);
     }
 
     [Fact]
-    public void BreakOnFirstError_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => Validators.BreakOnFirstError(null!));
+    public void FailFast_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => Validators.FailFast(null!));
 
     [Fact]
-    public void BreakOnFirstError_ReturnOK()
+    public void FailFast_ReturnOK()
     {
-        var validator = Validators.BreakOnFirstError(u => u.ChineseName().AllowedValues("百签", "百小僧"));
+        var validator = Validators.FailFast(u => u.ChineseName().AllowedValues("百签", "百小僧"));
         Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(ValidationMode.BreakOnFirstError, validator.Mode);
+        Assert.Equal(CompositeMode.FailFast, validator.Mode);
     }
 
     [Fact]
@@ -167,6 +167,53 @@ public class ValidatorsTests
         Assert.NotNull(validator);
         Assert.Single(validator._conditions);
         Assert.NotNull(validator._defaultValidators);
+    }
+
+    [Fact]
+    public void WhenMatch_ReturnOK()
+    {
+        var validator = Validators.WhenMatch<int>(u => u > 10, b => b.Age(), b => b.Min(5));
+        Assert.NotNull(validator);
+        Assert.Single(validator._conditions);
+        Assert.NotNull(validator._defaultValidators);
+
+        var validator2 = Validators.WhenMatch<int>(u => u > 10, "错误消息1");
+        Assert.NotNull(validator2);
+        Assert.Single(validator2._conditions);
+        Assert.Null(validator2._defaultValidators);
+
+        var validator3 =
+            Validators.WhenMatch<int>(u => u > 10, typeof(TestValidationMessages), "TestValidator_ValidationError");
+        Assert.NotNull(validator3);
+        Assert.Single(validator3._conditions);
+        Assert.Null(validator3._defaultValidators);
+    }
+
+    [Fact]
+    public void UnlessMatch_ReturnOK()
+    {
+        var validator = Validators.UnlessMatch<int>(u => u > 10, b => b.Age(), b => b.Min(5));
+        Assert.NotNull(validator);
+        Assert.Single(validator._conditions);
+        Assert.NotNull(validator._defaultValidators);
+
+        var validator2 = Validators.UnlessMatch<int>(u => u > 10, "错误消息1");
+        Assert.NotNull(validator2);
+        Assert.Single(validator2._conditions);
+        Assert.Null(validator2._defaultValidators);
+
+        var validator3 =
+            Validators.UnlessMatch<int>(u => u > 10, typeof(TestValidationMessages), "TestValidator_ValidationError");
+        Assert.NotNull(validator3);
+        Assert.Single(validator3._conditions);
+        Assert.Null(validator3._defaultValidators);
+    }
+
+    [Fact]
+    public void Failure_ReturnOK()
+    {
+        var validator = Validators.Failure();
+        Assert.NotNull(validator);
     }
 
     [Fact]
@@ -386,6 +433,34 @@ public class ValidatorsTests
     public void Must_ReturnOK()
     {
         var validator = Validators.Must<int>(u => u > 10);
+        Assert.NotNull(validator.Condition);
+    }
+
+    [Fact]
+    public void MustAny_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => Validators.MustAny<int, int>(null!, null!));
+        Assert.Throws<ArgumentNullException>(() => Validators.MustAny<int, int>([], null!));
+    }
+
+    [Fact]
+    public void MustAny_ReturnOK()
+    {
+        var validator = Validators.MustAny<int, int>([], (u, _) => u > 10);
+        Assert.NotNull(validator.Condition);
+    }
+
+    [Fact]
+    public void MustAll_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => Validators.MustAll<int, int>(null!, null!));
+        Assert.Throws<ArgumentNullException>(() => Validators.MustAll<int, int>([], null!));
+    }
+
+    [Fact]
+    public void MustAll_ReturnOK()
+    {
+        var validator = Validators.MustAny<int, int>([], (u, _) => u > 10);
         Assert.NotNull(validator.Condition);
     }
 

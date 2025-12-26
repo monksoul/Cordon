@@ -7,20 +7,20 @@ namespace Cordon;
 /// <summary>
 ///     组合验证器模式
 /// </summary>
-public enum ValidationMode
+public enum CompositeMode
 {
     /// <summary>
-    ///     验证所有
+    ///     所有验证器都会执行，且全部必须通过
     /// </summary>
-    ValidateAll = 0,
+    All = 0,
 
     /// <summary>
-    ///     首个验证成功则视为通过
+    ///     任一验证器验证成功，即视为整体验证通过
     /// </summary>
-    BreakOnFirstSuccess,
+    Any,
 
     /// <summary>
-    ///     首个验证失败则停止验证
+    ///     遇到首个验证失败即停止后续验证
     /// </summary>
-    BreakOnFirstError
+    FailFast
 }

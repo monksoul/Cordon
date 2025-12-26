@@ -35,6 +35,22 @@ public class ConditionBuilderTests
     }
 
     [Fact]
+    public void WhenMatch_ReturnOK()
+    {
+        var conditionBuilder = new ConditionBuilder<int>();
+        conditionBuilder.WhenMatch(u => u > 10, u => u.Min(10));
+        Assert.Single(conditionBuilder._conditions);
+
+        var conditionBuilder2 = new ConditionBuilder<int>();
+        conditionBuilder2.WhenMatch(u => u > 10, "验证失败");
+        Assert.Single(conditionBuilder2._conditions);
+
+        var conditionBuilder3 = new ConditionBuilder<int>();
+        conditionBuilder3.WhenMatch(u => u > 10, typeof(TestValidationMessages), "TestValidator_ValidationError");
+        Assert.Single(conditionBuilder3._conditions);
+    }
+
+    [Fact]
     public void Unless_Invalid_Parameters()
     {
         var conditionBuilder = new ConditionBuilder<int>();
@@ -51,6 +67,22 @@ public class ConditionBuilderTests
 
         conditionBuilder.Unless(u => u <= 100).Then(b => b.Min(50));
         Assert.Equal(2, conditionBuilder._conditions.Count);
+    }
+
+    [Fact]
+    public void UnlessMatch_ReturnOK()
+    {
+        var conditionBuilder = new ConditionBuilder<int>();
+        conditionBuilder.UnlessMatch(u => u > 10, u => u.Min(10));
+        Assert.Single(conditionBuilder._conditions);
+
+        var conditionBuilder2 = new ConditionBuilder<int>();
+        conditionBuilder2.UnlessMatch(u => u > 10, "验证失败");
+        Assert.Single(conditionBuilder2._conditions);
+
+        var conditionBuilder3 = new ConditionBuilder<int>();
+        conditionBuilder3.UnlessMatch(u => u > 10, typeof(TestValidationMessages), "TestValidator_ValidationError");
+        Assert.Single(conditionBuilder3._conditions);
     }
 
     [Fact]

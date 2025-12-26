@@ -17,6 +17,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     internal readonly Stack<string?> _ruleSetStack;
 
     /// <summary>
+    ///     是否允许空字符串
+    /// </summary>
+    internal bool? _allowEmptyStrings;
+
+    /// <summary>
     ///     值验证前的预处理器
     /// </summary>
     /// <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
@@ -434,6 +439,20 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <summary>
+    ///     配置是否允许空字符串
+    /// </summary>
+    /// <param name="allowEmptyStrings">是否允许空字符串，默认值为：<c>true</c>。</param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public virtual ValueValidator<T> AllowEmptyStrings(bool allowEmptyStrings = true)
+    {
+        _allowEmptyStrings = allowEmptyStrings;
+
+        return this;
+    }
+
+    /// <summary>
     ///     释放资源
     /// </summary>
     /// <param name="disposing">是否释放托管资源</param>
@@ -478,6 +497,13 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 检查逆向条件（Unless）
         // ReSharper disable once ConvertIfStatementToReturnStatement
         if (UnlessCondition is not null && UnlessCondition(value!))
+        {
+            return false;
+        }
+
+        // 处理空字符串验证问题
+        // ReSharper disable once ConvertIfStatementToReturnStatement
+        if (_allowEmptyStrings == true && value is string { Length: 0 })
         {
             return false;
         }

@@ -25,6 +25,7 @@ public class ValueValidatorTests
         Assert.Null(valueValidator.UnlessCondition);
         Assert.NotNull(valueValidator.This);
         Assert.Equal(valueValidator.This, valueValidator);
+        Assert.Null(valueValidator._allowEmptyStrings);
 
         var valueValidator2 = new ValueValidator<string>(new Dictionary<object, object?>());
         Assert.Null(valueValidator2._serviceProvider);
@@ -556,6 +557,21 @@ public class ValueValidatorTests
     }
 
     [Fact]
+    public void ShouldValidate_WithAllowEmptyStrings_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string?>();
+
+        Assert.True(valueValidator.ShouldValidate(null));
+        Assert.True(valueValidator.ShouldValidate(string.Empty));
+        Assert.True(valueValidator.ShouldValidate("Furion"));
+
+        valueValidator.AllowEmptyStrings();
+        Assert.True(valueValidator.ShouldValidate(null));
+        Assert.False(valueValidator.ShouldValidate(string.Empty));
+        Assert.True(valueValidator.ShouldValidate("Furion"));
+    }
+
+    [Fact]
     public void GetDisplayName_ReturnOK()
     {
         var valueValidator = new ValueValidator<string>();
@@ -674,6 +690,17 @@ public class ValueValidatorTests
 
         Assert.Equal(["The Name field is required."],
             valueValidator2.ToResults(validationContext2).Select(u => u.ErrorMessage!).ToArray());
+    }
+
+    [Fact]
+    public void AllowEmptyStrings_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+        Assert.Null(valueValidator._allowEmptyStrings);
+        valueValidator.AllowEmptyStrings();
+        Assert.True(valueValidator._allowEmptyStrings);
+        valueValidator.AllowEmptyStrings(false);
+        Assert.False(valueValidator._allowEmptyStrings);
     }
 
     public class StringValueValidator : AbstractValueValidator<string>

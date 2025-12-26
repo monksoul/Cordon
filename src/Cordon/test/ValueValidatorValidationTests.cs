@@ -224,7 +224,7 @@ public class ValueValidatorValidationTests
 
         var valueValidator2 =
             new ValueValidator<object>().Composite([new EmailAddressValidator(), new UserNameValidator()],
-                ValidationMode.BreakOnFirstSuccess);
+                CompositeMode.Any);
 
         Assert.Single(valueValidator2.Validators);
 
@@ -238,19 +238,19 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
-    public void ValidateAll_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new ValueValidator<object>().ValidateAll(null!));
+    public void All_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => new ValueValidator<object>().All(null!));
 
     [Fact]
-    public void ValidateAll_ReturnOK()
+    public void All_ReturnOK()
     {
-        var valueValidator = new ValueValidator<object>().ValidateAll(u => u.NotNull().MinLength(3));
+        var valueValidator = new ValueValidator<object>().All(u => u.NotNull().MinLength(3));
 
         Assert.Single(valueValidator.Validators);
 
         var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
         Assert.NotNull(addedValidator);
-        Assert.Equal(ValidationMode.ValidateAll, addedValidator.Mode);
+        Assert.Equal(CompositeMode.All, addedValidator.Mode);
         Assert.Equal(2, addedValidator.Validators.Count);
 
         Assert.False(valueValidator.IsValid(null));
@@ -259,20 +259,20 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
-    public void BreakOnFirstSuccess_Invalid_Parameters() =>
+    public void Any_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() =>
-            new ValueValidator<object>().BreakOnFirstSuccess(null!));
+            new ValueValidator<object>().Any(null!));
 
     [Fact]
-    public void BreakOnFirstSuccess_ReturnOK()
+    public void Any_ReturnOK()
     {
-        var valueValidator = new ValueValidator<object>().BreakOnFirstSuccess(u => u.EmailAddress().UserName());
+        var valueValidator = new ValueValidator<object>().Any(u => u.EmailAddress().UserName());
 
         Assert.Single(valueValidator.Validators);
 
         var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
         Assert.NotNull(addedValidator);
-        Assert.Equal(ValidationMode.BreakOnFirstSuccess, addedValidator.Mode);
+        Assert.Equal(CompositeMode.Any, addedValidator.Mode);
         Assert.Equal(2, addedValidator.Validators.Count);
 
         Assert.True(valueValidator.IsValid(null));
@@ -281,20 +281,20 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
-    public void BreakOnFirstError_Invalid_Parameters() =>
+    public void FailFast_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() =>
-            new ValueValidator<object>().BreakOnFirstError(null!));
+            new ValueValidator<object>().FailFast(null!));
 
     [Fact]
-    public void BreakOnFirstError_ReturnOK()
+    public void FailFast_ReturnOK()
     {
-        var valueValidator = new ValueValidator<object>().BreakOnFirstError(u => u.NotNull().MinLength(3));
+        var valueValidator = new ValueValidator<object>().FailFast(u => u.NotNull().MinLength(3));
 
         Assert.Single(valueValidator.Validators);
 
         var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
         Assert.NotNull(addedValidator);
-        Assert.Equal(ValidationMode.BreakOnFirstError, addedValidator.Mode);
+        Assert.Equal(CompositeMode.FailFast, addedValidator.Mode);
         Assert.Equal(2, addedValidator.Validators.Count);
 
         Assert.False(valueValidator.IsValid(null));
@@ -321,6 +321,69 @@ public class ValueValidatorValidationTests
 
         Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
         Assert.False(valueValidator.IsValid("monk__soul"));
+    }
+
+    [Fact]
+    public void WhenMatch_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().WhenMatch(u => u?.Contains('@') == true,
+            b => b.EmailAddress(), b => b.UserName());
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as ConditionalValidator<string>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
+        Assert.False(valueValidator.IsValid("monk__soul"));
+
+        var valueValidator2 = new ValueValidator<string>().WhenMatch(u => u?.Contains('@') == true, "错误消息1");
+        Assert.False(valueValidator2.IsValid("monksoul@outlook.com"));
+        Assert.True(valueValidator2.IsValid("monk__soul"));
+
+        var valueValidator3 = new ValueValidator<string>().WhenMatch(u => u?.Contains('@') == true,
+            typeof(TestValidationMessages), "TestValidator_ValidationError");
+        Assert.False(valueValidator3.IsValid("monksoul@outlook.com"));
+        Assert.True(valueValidator3.IsValid("monk__soul"));
+    }
+
+    [Fact]
+    public void UnlessMatch_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().UnlessMatch(u => u?.Contains('@') == true, b => b.UserName(),
+            b => b.EmailAddress());
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as ConditionalValidator<string>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
+        Assert.False(valueValidator.IsValid("monk__soul"));
+
+        var valueValidator2 = new ValueValidator<string>().UnlessMatch(u => u?.Contains('@') == true, "错误消息1");
+        Assert.True(valueValidator2.IsValid("monksoul@outlook.com"));
+        Assert.False(valueValidator2.IsValid("monk__soul"));
+
+        var valueValidator3 = new ValueValidator<string>().UnlessMatch(u => u?.Contains('@') == true,
+            typeof(TestValidationMessages),
+            "TestValidator_ValidationError");
+        Assert.True(valueValidator3.IsValid("monksoul@outlook.com"));
+        Assert.False(valueValidator3.IsValid("monk__soul"));
+    }
+
+    [Fact]
+    public void Failure_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().Failure();
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as FailureValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.False(valueValidator.IsValid("蒙奇·D·路飞"));
+        Assert.False(valueValidator.IsValid("百小僧"));
     }
 
     [Fact]
@@ -899,6 +962,55 @@ public class ValueValidatorValidationTests
         Assert.False(valueValidator.IsValid("monksoul@gmail.com"));
 
         var valueValidator2 = new ValueValidator<string>().MustAny(allowedDomains,
+            (_, ctx, x) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator2 =
+            valueValidator2._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.True(valueValidator2.IsValid("monksoul@outlook.com"));
+        Assert.False(valueValidator2.IsValid("monksoul@gmail.com"));
+    }
+
+    [Fact]
+    public void MustAll_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<string>()
+                .MustAll(null!, (Func<string, string, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<string>()
+                .MustAll([], (Func<string, string, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<string>()
+                .MustAll(null!, (Func<string, ValidationContext<string>, string, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<string>()
+                .MustAll([], (Func<string, ValidationContext<string>, string, bool>)null!));
+    }
+
+    [Fact]
+    public void MustAll_ReturnOK()
+    {
+        string[] allowedDomains = ["@outlook.com"];
+
+        var valueValidator = new ValueValidator<string>()
+            .MustAll(allowedDomains, (u, x) => u.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
+        Assert.False(valueValidator.IsValid("monksoul@gmail.com"));
+
+        var valueValidator2 = new ValueValidator<string>().MustAll(allowedDomains,
             (_, ctx, x) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         Assert.Single(valueValidator2.Validators);

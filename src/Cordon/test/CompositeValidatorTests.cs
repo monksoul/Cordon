@@ -35,7 +35,7 @@ public class CompositeValidatorTests
         Assert.Equal(3, validator2.Validators.Count);
         Assert.Equal([typeof(NotNullValidator), typeof(RequiredValidator), typeof(ChineseValidator)],
             validator2.Validators.Select(u => u.GetType()));
-        Assert.Equal(ValidationMode.ValidateAll, validator2.Mode);
+        Assert.Equal(CompositeMode.All, validator2.Mode);
 
         Assert.NotNull(validator2._errorMessageResourceAccessor);
         Assert.Null(validator2._errorMessageResourceAccessor());
@@ -66,10 +66,10 @@ public class CompositeValidatorTests
         var validator = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
         Assert.False(validator.IsValid("凯文·杜兰特"));
 
-        validator.Mode = ValidationMode.BreakOnFirstError;
+        validator.Mode = CompositeMode.FailFast;
         Assert.False(validator.IsValid("凯文·杜兰特"));
 
-        validator.Mode = ValidationMode.BreakOnFirstSuccess;
+        validator.Mode = CompositeMode.Any;
         Assert.True(validator.IsValid("凯文·杜兰特"));
     }
 
@@ -138,10 +138,10 @@ public class CompositeValidatorTests
         var validator = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
         Assert.Null(validator.GetValidationResults(null, "Value"));
 
-        validator.Mode = ValidationMode.BreakOnFirstError;
+        validator.Mode = CompositeMode.FailFast;
         Assert.Null(validator.GetValidationResults(null, "Value"));
 
-        validator.Mode = ValidationMode.BreakOnFirstSuccess;
+        validator.Mode = CompositeMode.Any;
         Assert.Null(validator.GetValidationResults(null, "Value"));
 
         var validator2 = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
@@ -149,12 +149,12 @@ public class CompositeValidatorTests
         Assert.NotNull(validationResults);
         Assert.Equal(2, validationResults.Count);
 
-        validator2.Mode = ValidationMode.BreakOnFirstError;
+        validator2.Mode = CompositeMode.FailFast;
         validationResults = validator2.GetValidationResults("Furion", "Value");
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
 
-        validator2.Mode = ValidationMode.BreakOnFirstSuccess;
+        validator2.Mode = CompositeMode.Any;
         validationResults = validator2.GetValidationResults("Furion", "Value");
         Assert.NotNull(validationResults);
         Assert.Equal(2, validationResults.Count);
@@ -164,12 +164,12 @@ public class CompositeValidatorTests
         Assert.NotNull(validationResults2);
         Assert.Single(validationResults2);
 
-        validator3.Mode = ValidationMode.BreakOnFirstError;
+        validator3.Mode = CompositeMode.FailFast;
         validationResults2 = validator3.GetValidationResults("凯文·杜兰特", "Value");
         Assert.NotNull(validationResults2);
         Assert.Single(validationResults2);
 
-        validator3.Mode = ValidationMode.BreakOnFirstSuccess;
+        validator3.Mode = CompositeMode.Any;
         validationResults2 = validator3.GetValidationResults("凯文·杜兰特", "Value");
         Assert.Null(validationResults2);
     }
@@ -226,28 +226,28 @@ public class CompositeValidatorTests
         var validator = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
         validator.Validate(null, "Value");
 
-        validator.Mode = ValidationMode.BreakOnFirstError;
+        validator.Mode = CompositeMode.FailFast;
         validator.Validate(null, "Value");
 
-        validator.Mode = ValidationMode.BreakOnFirstSuccess;
+        validator.Mode = CompositeMode.Any;
         validator.Validate(null, "Value");
 
         var validator2 = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
         Assert.Throws<ValidationException>(() => validator2.Validate("Furion", "Value"));
 
-        validator2.Mode = ValidationMode.BreakOnFirstError;
+        validator2.Mode = CompositeMode.FailFast;
         Assert.Throws<ValidationException>(() => validator2.Validate("Furion", "Value"));
 
-        validator2.Mode = ValidationMode.BreakOnFirstSuccess;
+        validator2.Mode = CompositeMode.Any;
         Assert.Throws<ValidationException>(() => validator2.Validate("Furion", "Value"));
 
         var validator3 = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
         Assert.Throws<ValidationException>(() => validator3.Validate("凯文·杜兰特", "Value"));
 
-        validator3.Mode = ValidationMode.BreakOnFirstError;
+        validator3.Mode = CompositeMode.FailFast;
         Assert.Throws<ValidationException>(() => validator3.Validate("凯文·杜兰特", "Value"));
 
-        validator3.Mode = ValidationMode.BreakOnFirstSuccess;
+        validator3.Mode = CompositeMode.Any;
         validator3.Validate("凯文·杜兰特", "Value");
     }
 
@@ -283,9 +283,9 @@ public class CompositeValidatorTests
     public void UseMode_ReturnOK()
     {
         var validator = new CompositeValidator(new ChineseValidator());
-        Assert.Equal(ValidationMode.ValidateAll, validator.Mode);
-        validator.UseMode(ValidationMode.BreakOnFirstError);
-        Assert.Equal(ValidationMode.BreakOnFirstError, validator.Mode);
+        Assert.Equal(CompositeMode.All, validator.Mode);
+        validator.UseMode(CompositeMode.FailFast);
+        Assert.Equal(CompositeMode.FailFast, validator.Mode);
     }
 
     [Fact]

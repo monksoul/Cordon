@@ -154,12 +154,12 @@ public static class Validators
     /// </summary>
     /// <param name="validators">验证器列表</param>
     /// <param name="mode">
-    ///     <see cref="ValidationMode" />
+    ///     <see cref="CompositeMode" />
     /// </param>
     /// <returns>
     ///     <see cref="CompositeValidator" />
     /// </returns>
-    public static CompositeValidator Composite(ValidatorBase[] validators, ValidationMode mode) =>
+    public static CompositeValidator Composite(ValidatorBase[] validators, CompositeMode mode) =>
         new(validators) { Mode = mode };
 
     /// <summary>
@@ -170,12 +170,12 @@ public static class Validators
     /// <returns>
     ///     <see cref="CompositeValidator" />
     /// </returns>
-    public static CompositeValidator ValidateAll(Action<FluentValidatorBuilder<object>> configure)
+    public static CompositeValidator All(Action<FluentValidatorBuilder<object>> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
-        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], ValidationMode.ValidateAll);
+        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], CompositeMode.All);
     }
 
     /// <summary>
@@ -186,12 +186,12 @@ public static class Validators
     /// <returns>
     ///     <see cref="CompositeValidator" />
     /// </returns>
-    public static CompositeValidator BreakOnFirstSuccess(Action<FluentValidatorBuilder<object>> configure)
+    public static CompositeValidator Any(Action<FluentValidatorBuilder<object>> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
-        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], ValidationMode.BreakOnFirstSuccess);
+        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], CompositeMode.Any);
     }
 
     /// <summary>
@@ -202,12 +202,12 @@ public static class Validators
     /// <returns>
     ///     <see cref="CompositeValidator" />
     /// </returns>
-    public static CompositeValidator BreakOnFirstError(Action<FluentValidatorBuilder<object>> configure)
+    public static CompositeValidator FailFast(Action<FluentValidatorBuilder<object>> configure)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
-        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], ValidationMode.BreakOnFirstError);
+        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], CompositeMode.FailFast);
     }
 
     /// <summary>
@@ -220,6 +220,118 @@ public static class Validators
     /// </returns>
     public static ConditionalValidator<T> Conditional<T>(Action<ConditionBuilder<T>> buildConditions) =>
         new(buildConditions);
+
+    /// <summary>
+    ///     创建条件验证器
+    /// </summary>
+    /// <remarks>定义满足指定条件时执行的验证规则。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="thenConfigure">验证器配置委托</param>
+    /// <param name="otherwiseConfigure">验证器配置委托</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="ConditionalValidator{T}" />
+    /// </returns>
+    public static ConditionalValidator<T> WhenMatch<T>(Func<T, bool> condition,
+        Action<FluentValidatorBuilder<T>> thenConfigure,
+        Action<FluentValidatorBuilder<T>>? otherwiseConfigure = null) =>
+        Conditional<T>(builder =>
+        {
+            // 构建 ConditionBuilder<T> 实例
+            var conditionBuilder = builder.When(condition).Then(thenConfigure);
+
+            // 空检查
+            if (otherwiseConfigure is not null)
+            {
+                conditionBuilder.Otherwise(otherwiseConfigure);
+            }
+        });
+
+    /// <summary>
+    ///     创建条件验证器
+    /// </summary>
+    /// <remarks>定义满足指定条件时返回指定的错误消息。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="errorMessage">错误消息</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="ConditionalValidator{T}" />
+    /// </returns>
+    public static ConditionalValidator<T> WhenMatch<T>(Func<T, bool> condition, string? errorMessage) =>
+        Conditional<T>(builder => builder.When(condition).ThenErrorMessage(errorMessage));
+
+    /// <summary>
+    ///     创建条件验证器
+    /// </summary>
+    /// <remarks>定义满足指定条件时返回指定的错误消息。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="ConditionalValidator{T}" />
+    /// </returns>
+    public static ConditionalValidator<T> WhenMatch<T>(Func<T, bool> condition,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName) =>
+        Conditional<T>(builder => builder.When(condition).ThenErrorMessage(resourceType, resourceName));
+
+    /// <summary>
+    ///     创建条件验证器
+    /// </summary>
+    /// <remarks>定义不满足指定条件时执行的验证规则。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="thenConfigure">验证器配置委托</param>
+    /// <param name="otherwiseConfigure">验证器配置委托</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="ConditionalValidator{T}" />
+    /// </returns>
+    public static ConditionalValidator<T> UnlessMatch<T>(Func<T, bool> condition,
+        Action<FluentValidatorBuilder<T>> thenConfigure,
+        Action<FluentValidatorBuilder<T>>? otherwiseConfigure = null) =>
+        Conditional<T>(builder =>
+        {
+            // 构建 ConditionBuilder<T> 实例
+            var conditionBuilder = builder.Unless(condition).Then(thenConfigure);
+
+            // 空检查
+            if (otherwiseConfigure is not null)
+            {
+                conditionBuilder.Otherwise(otherwiseConfigure);
+            }
+        });
+
+    /// <summary>
+    ///     创建条件验证器
+    /// </summary>
+    /// <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="errorMessage">错误消息</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="ConditionalValidator{T}" />
+    /// </returns>
+    public static ConditionalValidator<T> UnlessMatch<T>(Func<T, bool> condition, string? errorMessage) =>
+        Conditional<T>(builder => builder.Unless(condition).ThenErrorMessage(errorMessage));
+
+    /// <summary>
+    ///     创建条件验证器
+    /// </summary>
+    /// <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="ConditionalValidator{T}" />
+    /// </returns>
+    public static ConditionalValidator<T> UnlessMatch<T>(Func<T, bool> condition,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName) =>
+        Conditional<T>(builder => builder.Unless(condition).ThenErrorMessage(resourceType, resourceName));
 
     /// <summary>
     ///     创建 <see cref="System.DateOnly" /> 验证器
@@ -349,6 +461,14 @@ public static class Validators
     ///     <see cref="EqualToValidator" />
     /// </returns>
     public static EqualToValidator EqualTo(object? compareValue) => new(compareValue);
+
+    /// <summary>
+    ///     创建固定失败验证器
+    /// </summary>
+    /// <returns>
+    ///     <see cref="FailureValidator" />
+    /// </returns>
+    public static FailureValidator Failure() => new();
 
     /// <summary>
     ///     创建大于等于验证器
@@ -507,6 +627,26 @@ public static class Validators
         ArgumentNullException.ThrowIfNull(condition);
 
         return new MustValidator<T>(u => enumerable.Any(x => condition(u, x)));
+    }
+
+    /// <summary>
+    ///     创建自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="enumerable">集合</param>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <typeparam name="TElement">元素类型</typeparam>
+    /// <returns>
+    ///     <see cref="MustValidator{T}" />
+    /// </returns>
+    public static MustValidator<T> MustAll<T, TElement>(IEnumerable<TElement> enumerable,
+        Func<T, TElement, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(enumerable);
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return new MustValidator<T>(u => enumerable.All(x => condition(u, x)));
     }
 
     /// <summary>

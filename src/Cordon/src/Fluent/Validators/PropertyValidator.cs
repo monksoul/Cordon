@@ -40,6 +40,11 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     internal readonly Expression<Func<T, TProperty?>> _selector;
 
     /// <summary>
+    ///     是否允许空字符串
+    /// </summary>
+    internal bool? _allowEmptyStrings;
+
+    /// <summary>
     ///     属性验证前的预处理器
     /// </summary>
     /// <remarks>该预处理器仅用于验证，不会修改原始属性的值。</remarks>
@@ -125,8 +130,11 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
 
+        // 获取用于验证的属性值
+        var propertyValue = GetValueForValidation(instance);
+
         // 检查是否应该对该属性执行验证
-        if (!ShouldValidate(instance, ruleSets))
+        if (!ShouldValidate(instance, propertyValue, ruleSets))
         {
             return true;
         }
@@ -136,9 +144,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         {
             return false;
         }
-
-        // 获取用于验证的属性值
-        var propertyValue = GetValueForValidation(instance);
 
         // 检查是否设置了属性级别对象验证器
         if (propertyValue is not null && _propertyValidator is not null &&
@@ -156,8 +161,11 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
 
+        // 获取用于验证的属性值
+        var propertyValue = GetValueForValidation(instance);
+
         // 检查是否应该对该属性执行验证
-        if (!ShouldValidate(instance, ruleSets))
+        if (!ShouldValidate(instance, propertyValue, ruleSets))
         {
             return null;
         }
@@ -172,9 +180,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             validationResults.AddRange(_annotationValidator.GetValidationResults(instance, displayName, [memberPath]) ??
                                        []);
         }
-
-        // 获取用于验证的属性值
-        var propertyValue = GetValueForValidation(instance);
 
         // 检查是否设置了属性级别对象验证器
         if (propertyValue is not null && _propertyValidator is not null)
@@ -195,8 +200,11 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
 
+        // 获取用于验证的属性值
+        var propertyValue = GetValueForValidation(instance);
+
         // 检查是否应该对该属性执行验证
-        if (!ShouldValidate(instance, ruleSets))
+        if (!ShouldValidate(instance, propertyValue, ruleSets))
         {
             return;
         }
@@ -209,9 +217,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         {
             _annotationValidator.Validate(instance, displayName, [memberPath]);
         }
-
-        // 获取用于验证的属性值
-        var propertyValue = GetValueForValidation(instance);
 
         // 检查是否设置了属性级别对象验证器
         if (propertyValue is not null && _propertyValidator is not null)
@@ -590,11 +595,12 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     ///     检查是否应该对该属性执行验证
     /// </summary>
     /// <param name="instance">对象</param>
+    /// <param name="propertyValue">属性值</param>
     /// <param name="ruleSets">规则集</param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    internal bool ShouldValidate(T instance, string?[]? ruleSets = null)
+    internal bool ShouldValidate(T instance, TProperty propertyValue, string?[]? ruleSets = null)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
@@ -606,16 +612,21 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         }
 
         // 检查正向条件（When）
-        if (WhenCondition is not null &&
-            !WhenCondition(GetValueForValidation(instance), CreateValidationContext(instance)))
+        if (WhenCondition is not null && !WhenCondition(propertyValue, CreateValidationContext(instance)))
         {
             return false;
         }
 
         // 检查逆向条件（Unless）
         // ReSharper disable once ConvertIfStatementToReturnStatement
-        if (UnlessCondition is not null &&
-            UnlessCondition(GetValueForValidation(instance), CreateValidationContext(instance)))
+        if (UnlessCondition is not null && UnlessCondition(propertyValue, CreateValidationContext(instance)))
+        {
+            return false;
+        }
+
+        // 处理空字符串验证问题
+        // ReSharper disable once ConvertIfStatementToReturnStatement
+        if (_allowEmptyStrings == true && propertyValue is string { Length: 0 })
         {
             return false;
         }
