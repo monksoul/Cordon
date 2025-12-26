@@ -95,13 +95,13 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
                 // 追加验证结果集合
                 validationResults.AddRange(results);
 
-                // 检查验证器模式是否是首个验证失败则停止验证
+                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
                 if (Mode is CompositeMode.FailFast)
                 {
                     break;
                 }
             }
-            // 检查验证器模式是否是首个验证成功则视为通过
+            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
             else if (Mode is CompositeMode.Any)
             {
                 // 清空验证结果集合
@@ -136,13 +136,13 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
                 // 缓存首个验证无效的验证器
                 firstFailedValidator ??= validator;
 
-                // 检查验证器模式是否是验证所有或首个验证失败则停止验证
+                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
                 if (Mode is CompositeMode.All or CompositeMode.FailFast)
                 {
                     ThrowValidationException(value, name, validator, memberNameList);
                 }
             }
-            // 检查验证器模式是否是首个验证成功则视为通过
+            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
             else if (Mode is CompositeMode.Any)
             {
                 return;

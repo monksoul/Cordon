@@ -1774,6 +1774,9 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1783,11 +1786,8 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
-            <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
-        </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
+            <summary>Supports searching for characters in or not           <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -2781,7 +2781,7 @@
             </summary>
             <param name="condition">条件委托</param>
             <returns>
-                <typeparamref name="TSelf" />
+                <typame="TSelf" />
             </returns>
         </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.Predicate(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
@@ -3487,7 +3487,7 @@
         </member>
         <member name="M:Cordon.ValidationExtensions.ContinueWith``1(System.ComponentModel.DataAnnotations.ValidationContext)">
             <summary>
-                创建对象验证器用于在 <see cref="M:System.ComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)" /> 方法中内联配置验证规则
+                创建对象验证器用于在 <see cref="M:System.ComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DatntModel.DataAnnotations.ValidationContext)" /> 方法中内联配置验证规则
             </summary>
             <remarks>配置完成后，请调用无参的 <see cref="M:Cordon.ObjectValidator`1.ToResults(System.Boolean)" /> 方法获取验证结果。</remarks>
             <param name="validationContext">
@@ -4203,7 +4203,7 @@
             <summary>
                 检查是否应该对该对象执行验证
             </summary>
-            <param name="instance">对象</param>
+            <param name="instance">对�
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
@@ -4662,7 +4662,7 @@
             </returns>
         </member>
         <member name="M:Cordon.PropertyValidator`3.CustomOnly">
-            <summary>
+            <summary   <summary>
                 配置跳过该属性上的验证特性验证
             </summary>
             <remarks>仅验证自定义规则。</remarks>
