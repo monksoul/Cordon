@@ -94,7 +94,7 @@ public class CompareValidator<T, TProperty> : ValidatorBase<T>
     }
 
     /// <summary>
-    ///     根据属性名创建 <![CDATA[Expression<Func<T, object?>>]]> 表达式
+    ///     为指定属性创建属性选择器表达式
     /// </summary>
     /// <param name="propertyName">属性名</param>
     /// <returns>
@@ -105,14 +105,13 @@ public class CompareValidator<T, TProperty> : ValidatorBase<T>
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
+        // 创建 Lambda 表达式的参数
         var parameter = Expression.Parameter(typeof(T), "u");
 
-        // 尝试获取公共实例属性
-        var property = Expression.Property(parameter, propertyName);
+        // 尝试从类型 T 中获取指定属性并将其值转换为 object?
+        var converted = Expression.Convert(Expression.Property(parameter, propertyName), typeof(object));
 
-        // 将属性值统一转换为 object?
-        var converted = Expression.Convert(property, typeof(object));
-
+        // 构建 Lambda 表达式：u => (object?)u.PropertyName
         return Expression.Lambda<Func<T, object?>>(converted, parameter);
     }
 }
