@@ -246,6 +246,66 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <summary>
     ///     添加自定义条件成立时委托验证器
     /// </summary>
+    /// <remarks>仅当被验证的值不为 <c>null</c> 时才执行验证逻辑。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustIfNotNull(Func<TProperty, ValidationContext<T>, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return ValidatorProxy<MustValidator<TProperty>>(context =>
+            [new Func<TProperty, bool>(u => u is null || condition(u, context))]);
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <remarks>仅当被验证的值不为 <c>null</c> 时才执行验证逻辑。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustIfNotNull_(Func<TProperty, ValidationContext<T>, bool> condition) =>
+        MustIfNotNull(condition);
+
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <remarks>仅当被验证的值不为 <c>null</c>、非空集合、数组和字符串时才执行验证逻辑。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustIfNotNullOrEmpty(Func<TProperty, ValidationContext<T>, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return ValidatorProxy<MustValidator<TProperty>>(context =>
+        [
+            new Func<TProperty, bool>(u =>
+                u is null || (u.TryGetCount(out var count) && count == 0) || condition(u, context))
+        ]);
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <remarks>仅当被验证的值不为 <c>null</c>、非空集合、数组和字符串时才执行验证逻辑。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustIfNotNullOrEmpty_(Func<TProperty, ValidationContext<T>, bool> condition) =>
+        MustIfNotNullOrEmpty(condition);
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
     /// <param name="enumerable">集合</param>
     /// <param name="condition">条件委托</param>
     /// <typeparam name="TElement">元素类型</typeparam>

@@ -336,6 +336,13 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void HaveLength_ReturnOK()
+    {
+        var validator = Validators.HaveLength(2);
+        Assert.Equal(2, validator.Length);
+    }
+
+    [Fact]
     public void IDCard_ReturnOK()
     {
         var validator = Validators.IDCard();
@@ -433,6 +440,20 @@ public class ValidatorsTests
     public void Must_ReturnOK()
     {
         var validator = Validators.Must<int>(u => u > 10);
+        Assert.NotNull(validator.Condition);
+    }
+
+    [Fact]
+    public void MustIfNotNull_ReturnOK()
+    {
+        var validator = Validators.MustIfNotNull<string>(u => u != "furion");
+        Assert.NotNull(validator.Condition);
+    }
+
+    [Fact]
+    public void MustIfNotNullOrEmpty_ReturnOK()
+    {
+        var validator = Validators.MustIfNotNullOrEmpty<string>(u => u != "furion");
         Assert.NotNull(validator.Condition);
     }
 

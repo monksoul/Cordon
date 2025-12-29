@@ -942,6 +942,22 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void HaveLength_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .HaveLength(2);
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as HaveLengthValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = new[] { "fur", "furion" } }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "fur" }));
+    }
+
+    [Fact]
     public void IDCard_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
@@ -1305,6 +1321,117 @@ public class PropertyValidatorValidationTests
 
         Assert.True(propertyValidator3.IsValid(new ValidationModel { Number1 = 11 }));
         Assert.False(propertyValidator3.IsValid(new ValidationModel { Number1 = 9 }));
+    }
+
+    [Fact]
+    public void MustIfNotNull_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
+                .MustIfNotNull((Func<string?, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
+                .MustIfNotNull(null!));
+    }
+
+    [Fact]
+    public void MustIfNotNull_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .MustIfNotNull(u => u != "furion");
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { String1 = null }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { String1 = "furion" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .MustIfNotNull((_, ctx) => ctx.Instance.String1 != "furion");
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator2 =
+            propertyValidator2._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<string>>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { String1 = null }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { String1 = "furion" }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .MustIfNotNull_((_, ctx) => ctx.Instance.String1 != "furion");
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 =
+            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<string>>;
+        Assert.NotNull(addedValidator3);
+
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = null }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { String1 = "furion" }));
+    }
+
+    [Fact]
+    public void MustIfNotNullOrEmpty_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
+                .MustIfNotNullOrEmpty((Func<string?, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
+                .MustIfNotNullOrEmpty(null!));
+    }
+
+    [Fact]
+    public void MustIfNotNullOrEmpty_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .MustIfNotNullOrEmpty(u => u != "furion");
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { String1 = null }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { String1 = string.Empty }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { String1 = "furion" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .MustIfNotNullOrEmpty((_, ctx) => ctx.Instance.String1 != "furion");
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator2 =
+            propertyValidator2._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<string>>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { String1 = null }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { String1 = string.Empty }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { String1 = "furion" }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.String1)
+            .MustIfNotNullOrEmpty_((_, ctx) => ctx.Instance.String1 != "furion");
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 =
+            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<string>>;
+        Assert.NotNull(addedValidator3);
+
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = null }));
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = string.Empty }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { String1 = "furion" }));
     }
 
     [Fact]

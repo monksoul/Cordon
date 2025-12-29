@@ -315,4 +315,7 @@
     <data name="EnumValidator_ValidationError_SupportFlags" xml:space="preserve">
         <value>The field {0} must be a valid combination of values defined in enum {1}.</value>
     </data>
+    <data name="HaveLengthValidator_ValidationError" xml:space="preserve">
+        <value>The field {0} must be a string or collection type with a length of exactly '{1}'.</value>
+    </data>
 </root>

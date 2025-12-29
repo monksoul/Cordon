@@ -19,6 +19,7 @@ public class DecimalPlacesValidatorTests
     {
         var validator = new DecimalPlacesValidator(1);
         Assert.Equal(1, validator.MaxDecimalPlaces);
+        Assert.False(validator.AllowStringValues);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must not have more than '{1}' decimal places.",

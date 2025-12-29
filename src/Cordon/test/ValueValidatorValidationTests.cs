@@ -664,6 +664,20 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void HaveLength_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().HaveLength(2);
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as HaveLengthValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid(new[] { "fur", "furion" }));
+        Assert.False(valueValidator.IsValid("fur"));
+    }
+
+    [Fact]
     public void IDCard_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().IDCard();
@@ -923,6 +937,73 @@ public class ValueValidatorValidationTests
 
         Assert.True(valueValidator2.IsValid(11));
         Assert.False(valueValidator2.IsValid(9));
+    }
+
+    [Fact]
+    public void MustIfNotNull_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => new ValueValidator<int>().MustIfNotNull((Func<int, bool>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<int>().MustIfNotNull((Func<int, ValidationContext<int>, bool>)null!));
+    }
+
+    [Fact]
+    public void MustIfNotNull_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().MustIfNotNull(u => u != "furion");
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid(null));
+        Assert.False(valueValidator.IsValid("furion"));
+
+        var valueValidator2 = new ValueValidator<string>().MustIfNotNull((_, ctx) => ctx.Instance != "furion");
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator2 = valueValidator2._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.True(valueValidator2.IsValid(null));
+        Assert.False(valueValidator2.IsValid("furion"));
+    }
+
+    [Fact]
+    public void MustIfNotNullOrEmpty_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<int>().MustIfNotNullOrEmpty((Func<int, bool>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<int>().MustIfNotNullOrEmpty((Func<int, ValidationContext<int>, bool>)null!));
+    }
+
+    [Fact]
+    public void MustIfNotNullOrEmpty_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().MustIfNotNullOrEmpty(u => u != "furion");
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid(null));
+        Assert.True(valueValidator.IsValid(string.Empty));
+        Assert.False(valueValidator.IsValid("furion"));
+
+        var valueValidator2 = new ValueValidator<string>().MustIfNotNullOrEmpty((_, ctx) => ctx.Instance != "furion");
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator2 = valueValidator2._lastAddedValidator as MustValidator<string>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.True(valueValidator2.IsValid(null));
+        Assert.True(valueValidator2.IsValid(string.Empty));
+        Assert.False(valueValidator2.IsValid("furion"));
     }
 
     [Fact]

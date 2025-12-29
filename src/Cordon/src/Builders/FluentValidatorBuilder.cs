@@ -670,6 +670,15 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf GreaterThan(IComparable compareValue) => AddValidator(new GreaterThanValidator(compareValue));
 
     /// <summary>
+    ///     添加固定长度验证器
+    /// </summary>
+    /// <param name="length">长度</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf HaveLength(int length) => AddValidator(new HaveLengthValidator(length));
+
+    /// <summary>
     ///     添加身份证号验证器
     /// </summary>
     /// <returns>
@@ -896,6 +905,72 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
 
         return AddValidator(new MustValidator<T>(u =>
             enumerable.All(x => condition(u, CreateValidationContext(u), x))));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <remarks>仅当被验证的值不为 <c>null</c> 时才执行验证逻辑。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustIfNotNull(Func<T, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u => u is null || condition(u)));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <remarks>仅当被验证的值不为 <c>null</c> 时才执行验证逻辑。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustIfNotNull(Func<T, ValidationContext<T>, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u => u is null || condition(u, CreateValidationContext(u))));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <remarks>仅当被验证的值不为 <c>null</c>、非空集合、数组和字符串时才执行验证逻辑。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustIfNotNullOrEmpty(Func<T, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u =>
+            u is null || (u.TryGetCount(out var count) && count == 0) || condition(u)));
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <remarks>仅当被验证的值不为 <c>null</c>、非空集合、数组和字符串时才执行验证逻辑。</remarks>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf MustIfNotNullOrEmpty(Func<T, ValidationContext<T>, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return AddValidator(new MustValidator<T>(u =>
+            u is null || (u.TryGetCount(out var count) && count == 0) || condition(u, CreateValidationContext(u))));
     }
 
     /// <summary>
