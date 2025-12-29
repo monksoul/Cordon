@@ -25,7 +25,7 @@ public class PropertyValidator<T, TProperty> : PropertyValidator<T, TProperty, P
 /// <typeparam name="TProperty">属性类型</typeparam>
 /// <typeparam name="TSelf">派生类型自身类型</typeparam>
 public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentValidatorBuilder<TProperty, TSelf>,
-    IObjectValidator<T>, IMemberPathRepairable, IValidationAnnotationsConfigurable
+    IPropertyValidator<T>
     where TSelf : PropertyValidator<T, TProperty, TSelf>
 {
     /// <inheritdoc cref="PropertyAnnotationValidator{T,TProperty}" />
@@ -90,29 +90,29 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     ///     默认值为：<c>null</c>。当此值为 <c>null</c> 时，是否启用注解验证将由 <see cref="ObjectValidator{T}.Options" /> 中的
     ///     <see cref="ValidatorOptions.SuppressAnnotationValidation" /> 配置项决定。
     /// </remarks>
-    internal bool? SuppressAnnotationValidation { get; private set; }
+    internal bool? SuppressAnnotationValidation { get; set; }
 
     /// <summary>
     ///     显示名称
     /// </summary>
-    internal string? DisplayName { get; private set; }
+    internal string? DisplayName { get; set; }
 
     /// <summary>
     ///     成员名称
     /// </summary>
-    internal string? MemberName { get; private set; }
+    internal string? MemberName { get; set; }
 
     /// <summary>
     ///     验证条件
     /// </summary>
     /// <remarks>当条件满足时才进行验证。</remarks>
-    internal Func<TProperty, ValidationContext<T>, bool>? WhenCondition { get; private set; }
+    internal Func<TProperty, ValidationContext<T>, bool>? WhenCondition { get; set; }
 
     /// <summary>
     ///     逆向验证条件
     /// </summary>
     /// <remarks>当条件不满足时才进行验证。</remarks>
-    internal Func<TProperty, ValidationContext<T>, bool>? UnlessCondition { get; private set; }
+    internal Func<TProperty, ValidationContext<T>, bool>? UnlessCondition { get; set; }
 
     /// <inheritdoc />
     void IMemberPathRepairable.RepairMemberPaths() => RepairMemberPaths();
@@ -246,6 +246,10 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     void IObjectValidator.Validate(object? instance, string?[]? ruleSets) => Validate((T?)instance, ruleSets);
 
     /// <inheritdoc />
+    IPropertyValidator<T> IPropertyValidatorCloneable<T>.Clone(ObjectValidator<T> objectValidator) =>
+        Clone(objectValidator);
+
+    /// <inheritdoc />
     void IValidationAnnotationsConfigurable.UseAnnotationValidation(bool enabled) => UseAnnotationValidation(enabled);
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
@@ -374,11 +378,12 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
                 $"The property '{GetMemberPath()}' does not implement IEnumerable<{typeof(TElement).Name}>. Use {nameof(ObjectValidator<T>.RuleForEach)} instead, or ensure the property type implements IEnumerable<{typeof(TElement).Name}>.");
         }
 
-        // 强制 Each 方法必须在 ChildRules/SetValidator/When/Unless 方法前调用
-        if (_propertyValidator is not null || WhenCondition is not null || UnlessCondition is not null)
+        // 强制 Each 方法必须在 ChildRules/SetValidator/When/Unless/PreProcess 方法前调用
+        if (_propertyValidator is not null || WhenCondition is not null || UnlessCondition is not null ||
+            _preProcessor is not null)
         {
             throw new InvalidOperationException(
-                $".{nameof(Each)}() must be called immediately after {nameof(ObjectValidator<T>.RuleFor)}(). Do not call {nameof(ChildRules)}, {nameof(SetValidator)}, {nameof(When)}, or {nameof(Unless)} before {nameof(Each)}. To validate the entire collection, use {nameof(ObjectValidator<T>.RuleForEach)}() instead.");
+                $".{nameof(Each)}() must be called immediately after {nameof(ObjectValidator<T>.RuleFor)}(). Do not call {nameof(ChildRules)}, {nameof(SetValidator)}, {nameof(When)}, {nameof(Unless)}, or {nameof(PreProcess)} before {nameof(Each)}. To validate the entire collection, use {nameof(ObjectValidator<T>.RuleForEach)}() instead.");
         }
 
         // 从父对象验证器中移除当前实例
@@ -396,6 +401,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             DisplayName = DisplayName,
             MemberName = MemberName
         };
+
+        // 同步字段
+        collectionValidator._allowEmptyStrings = _allowEmptyStrings;
 
         // 同步已设置的验证器
         collectionValidator.AddValidators(Validators);
@@ -799,5 +807,36 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             // 修复验证器及其子验证器的成员路径
             repairable.RepairMemberPaths();
         }
+    }
+
+    /// <inheritdoc cref="IPropertyValidatorCloneable{T}.Clone" />
+    internal IPropertyValidator<T> Clone(ObjectValidator<T> objectValidator)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(objectValidator);
+
+        // 初始化 PropertyValidator 实例
+        var propertyValidator = new PropertyValidator<T, TProperty>(_selector, objectValidator)
+        {
+            RuleSets = RuleSets,
+            SuppressAnnotationValidation = SuppressAnnotationValidation,
+            DisplayName = DisplayName,
+            MemberName = MemberName,
+            WhenCondition = WhenCondition,
+            UnlessCondition = UnlessCondition
+        };
+
+        // 同步字段
+        propertyValidator._allowEmptyStrings = _allowEmptyStrings;
+        propertyValidator._preProcessor = _preProcessor;
+        propertyValidator._propertyValidator = _propertyValidator;
+
+        // 同步已设置的验证器
+        propertyValidator.AddValidators(Validators);
+
+        // 同步 IServiceProvider 委托
+        propertyValidator.InitializeServiceProvider(objectValidator._serviceProvider);
+
+        return propertyValidator;
     }
 }

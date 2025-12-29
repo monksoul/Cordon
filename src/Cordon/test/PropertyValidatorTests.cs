@@ -843,7 +843,7 @@ public class PropertyValidatorTests
             Assert.Throws<InvalidOperationException>(() =>
                 propertyValidator.When(u => u.Count > 0).Each<Child>(_ => { }));
         Assert.Equal(
-            ".Each() must be called immediately after RuleFor(). Do not call ChildRules, SetValidator, When, or Unless before Each. To validate the entire collection, use RuleForEach() instead.",
+            ".Each() must be called immediately after RuleFor(). Do not call ChildRules, SetValidator, When, Unless, or PreProcess before Each. To validate the entire collection, use RuleForEach() instead.",
             exception2.Message);
     }
 
@@ -856,7 +856,7 @@ public class PropertyValidatorTests
             .Each<Child>(u =>
             {
                 u.RuleFor(c => c.Id).Min(10);
-            }).Must(d => d?.Any() == true);
+            }).Must(d => d?.Any() == true).AllowEmptyStrings();
 
         Assert.Single(objectValidator.Validators);
         var collectionPropertyValidator =
@@ -867,6 +867,7 @@ public class PropertyValidatorTests
         Assert.Equal("DisChildren", collectionPropertyValidator.DisplayName);
         Assert.Equal("MbChildren", collectionPropertyValidator.MemberName);
         Assert.NotNull(collectionPropertyValidator._elementValidator);
+        Assert.True(collectionPropertyValidator._allowEmptyStrings);
     }
 
     [Fact]
@@ -1259,6 +1260,29 @@ public class PropertyValidatorTests
         Assert.True(propertyValidator._allowEmptyStrings);
         propertyValidator.AllowEmptyStrings(false);
         Assert.False(propertyValidator._allowEmptyStrings);
+    }
+
+    [Fact]
+    public void Clone_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.Clone(null!));
+    }
+
+    [Fact]
+    public void Clone_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).Required().MinLength(3)
+            .PreProcess(u => u.Trim()).AllowEmptyStrings();
+
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var cloned = propertyValidator.Clone(objectValidator) as PropertyValidator<ObjectModel, string?>;
+        Assert.NotNull(cloned);
+        Assert.Equal(2, cloned.Validators.Count);
+        Assert.NotNull(cloned._preProcessor);
+        Assert.True(cloned._allowEmptyStrings);
     }
 
     public class ObjectModel

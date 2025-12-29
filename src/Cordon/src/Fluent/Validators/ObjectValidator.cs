@@ -109,7 +109,7 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     /// <summary>
     ///     属性验证器集合
     /// </summary>
-    internal List<IObjectValidator<T>> Validators { get; }
+    internal List<IPropertyValidator<T>> Validators { get; }
 
     /// <summary>
     ///     当前验证器在对象图中的属性路径（如 "User.Address"）
@@ -447,6 +447,52 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
 
         return this;
     }
+
+    /// <summary>
+    ///     包含（组合）其他对象验证器
+    /// </summary>
+    /// <param name="validatorFactory">
+    ///     <see cref="ObjectValidator{T}" /> 工厂委托
+    /// </param>
+    /// <returns>
+    ///     <see cref="ObjectValidator{T}" />
+    /// </returns>
+    public ObjectValidator<T> Include(
+        Func<IDictionary<object, object?>?, ValidatorOptions, ObjectValidator<T>> validatorFactory)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validatorFactory);
+
+        // 调用工厂方法，传入当前 _items 和 Options
+        var objectValidator = validatorFactory(_items, Options);
+
+        // 空检查
+        ArgumentNullException.ThrowIfNull(objectValidator);
+
+        // 遍历所有属性验证器
+        foreach (var propertyValidator in objectValidator.Validators)
+        {
+            // 检查是否实现 IPropertyValidatorCloneable<T> 接口
+            if (propertyValidator is IPropertyValidatorCloneable<T> cloneable)
+            {
+                // 添加至集合中
+                Validators.Add(cloneable.Clone(this));
+            }
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    ///     包含（组合）其他对象验证器
+    /// </summary>
+    /// <param name="validator">
+    ///     <see cref="ObjectValidator{T}" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="ObjectValidator{T}" />
+    /// </returns>
+    public ObjectValidator<T> Include(ObjectValidator<T> validator) => Include((_, _) => validator);
 
     /// <summary>
     ///     配置 <see cref="ValidatorOptions" /> 示例

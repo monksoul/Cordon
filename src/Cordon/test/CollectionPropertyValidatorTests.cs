@@ -15,7 +15,7 @@ public class CollectionPropertyValidatorTests
         Assert.Null(propertyValidator._elementValidator);
         Assert.NotNull(propertyValidator._objectValidator);
         Assert.NotNull(propertyValidator._annotationValidator);
-        Assert.Null(propertyValidator.ElementFilter);
+        Assert.Null(propertyValidator._elementFilter);
     }
 
     [Fact]
@@ -36,12 +36,12 @@ public class CollectionPropertyValidatorTests
         var propertyValidator = new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator);
 
         propertyValidator.Where(u => u.Name is not null);
-        Assert.NotNull(propertyValidator.ElementFilter);
+        Assert.NotNull(propertyValidator._elementFilter);
 
         var propertyValidator2 = new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator);
 
         propertyValidator2.Where((_, ctx) => ctx.Instance.Children?.All(c => c.Name is not null) == true);
-        Assert.NotNull(propertyValidator2.ElementFilter);
+        Assert.NotNull(propertyValidator2._elementFilter);
     }
 
     [Fact]
@@ -411,6 +411,21 @@ public class CollectionPropertyValidatorTests
             propertyValidator._elementValidator.Validators[0] as PropertyValidator<Child, string>;
         Assert.NotNull(subPropertyValidator);
         Assert.Equal("Children.Name", subPropertyValidator.GetMemberPath());
+    }
+
+    [Fact]
+    public void Clone_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ObjectModel>().RuleForEach(u => u.Children).Required().MinLength(3)
+            .PreProcess(u => u).Where(u => u.Name is not null).AllowEmptyStrings();
+
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var cloned = propertyValidator.Clone(objectValidator) as CollectionPropertyValidator<ObjectModel, Child>;
+        Assert.NotNull(cloned);
+        Assert.Equal(2, cloned.Validators.Count);
+        Assert.NotNull(cloned._preProcessor);
+        Assert.True(cloned._allowEmptyStrings);
+        Assert.NotNull(cloned._elementFilter);
     }
 
     public class ObjectModel

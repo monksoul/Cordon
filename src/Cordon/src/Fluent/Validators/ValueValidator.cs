@@ -8,8 +8,7 @@ namespace Cordon;
 ///     单个值验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, IValueValidator<T>, IObjectValidator<T>,
-    IRuleSetContextProvider
+public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, IValueValidator<T>
 {
     /// <summary>
     ///     当前规则集上下文栈

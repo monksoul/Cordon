@@ -1011,6 +1011,29 @@ public class ObjectValidatorTests
         Assert.Equal("Sub.FirstName", propertyValidator3.GetEffectiveMemberName());
     }
 
+    [Fact]
+    public void Include_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).NotEqualTo("Fur").End()
+            .SetValidator(new ObjectModelValidator());
+
+        Assert.Throws<ArgumentNullException>(() =>
+            objectValidator.Include(
+                (Func<IDictionary<object, object?>?, ValidatorOptions, ObjectValidator<ObjectModel>>)null!));
+    }
+
+    [Fact]
+    public void Include_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).NotEqualTo("Fur").End();
+
+        using var objectValidator2 = new ObjectValidator<ObjectModel>().RuleFor(u => u.Id).Min(1)
+            .RuleForEach(u => u.Children).MinLength(1).RuleFor(u => u.Address).Required().End();
+
+        objectValidator.Include(objectValidator2);
+        Assert.Equal(4, objectValidator.Validators.Count);
+    }
+
     public class ObjectModel
     {
         [Range(1, int.MaxValue)] public int Id { get; set; }

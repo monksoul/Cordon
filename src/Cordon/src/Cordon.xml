@@ -3651,6 +3651,106 @@
                 修复验证器及其子验证器的成员路径
             </summary>
         </member>
+        <member name="T:Cordon.IObjectValidator">
+            <summary>
+                对象验证器服务
+            </summary>
+        </member>
+        <member name="M:Cordon.IObjectValidator.IsValid(System.Object,System.String[])">
+            <summary>
+                检查对象合法性
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:System.Boolean" />
+            </returns>
+        </member>
+        <member name="M:Cordon.IObjectValidator.GetValidationResults(System.Object,System.String[])">
+            <summary>
+                获取对象验证结果集合
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:System.Collections.Generic.List`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.IObjectValidator.Validate(System.Object,System.String[])">
+            <summary>
+                验证指定的对象
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+        </member>
+        <member name="M:Cordon.IObjectValidator.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
+            <summary>
+                获取对象验证结果集合
+            </summary>
+            <param name="validationContext">
+                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
+            </param>
+            <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>
+            <returns>
+                <see cref="T:System.Collections.Generic.List`1" />
+            </returns>
+        </member>
+        <member name="T:Cordon.IObjectValidator`1">
+            <summary>
+                <inheritdoc cref="T:Cordon.IObjectValidator" />
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="M:Cordon.IObjectValidator`1.IsValid(`0,System.String[])">
+            <summary>
+                检查对象合法性
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:System.Boolean" />
+            </returns>
+        </member>
+        <member name="M:Cordon.IObjectValidator`1.GetValidationResults(`0,System.String[])">
+            <summary>
+                获取对象验证结果集合
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:System.Collections.Generic.List`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.IObjectValidator`1.Validate(`0,System.String[])">
+            <summary>
+                验证指定的对象
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+        </member>
+        <member name="T:Cordon.IPropertyValidator`1">
+            <summary>
+                属性验证器服务
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="T:Cordon.IPropertyValidatorCloneable`1">
+            <summary>
+                定义属性验证器可克隆行为
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="M:Cordon.IPropertyValidatorCloneable`1.Clone(Cordon.ObjectValidator{`0})">
+            <summary>
+                克隆
+            </summary>
+            <param name="objectValidator">
+                <see cref="T:Cordon.ObjectValidator`1" />
+            </param>
+            <returns>
+                <see cref="T:Cordon.IPropertyValidator`1" />
+            </returns>
+        </member>
         <member name="T:Cordon.IRuleSetContextProvider">
             <summary>
                 规则集上下文提供器
@@ -3672,6 +3772,17 @@
                 配置是否启用对象属性验证特性验证
             </summary>
             <param name="enabled">是否启用</param>
+        </member>
+        <member name="T:Cordon.IValueValidator">
+            <summary>
+                单个值验证器服务
+            </summary>
+        </member>
+        <member name="T:Cordon.IValueValidator`1">
+            <summary>
+                <inheritdoc cref="T:Cordon.IValueValidator" />
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="T:Cordon.ValidationOptionsMetadata">
             <summary>
@@ -3709,17 +3820,17 @@
             <typeparam name="T">对象类型</typeparam>
             <typeparam name="TElement">元素类型</typeparam>
         </member>
+        <member name="F:Cordon.CollectionPropertyValidator`2._elementFilter">
+            <summary>
+                元素过滤委托
+            </summary>
+        </member>
         <member name="F:Cordon.CollectionPropertyValidator`2._elementValidator">
             <inheritdoc cref="T:Cordon.ObjectValidator`1" />
             <remarks>集合元素对象验证器。</remarks>
         </member>
         <member name="M:Cordon.CollectionPropertyValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{`1}}},Cordon.ObjectValidator{`0})">
             <inheritdoc />
-        </member>
-        <member name="P:Cordon.CollectionPropertyValidator`2.ElementFilter">
-            <summary>
-                元素过滤委托
-            </summary>
         </member>
         <member name="M:Cordon.CollectionPropertyValidator`2.IsValid(`0,System.String[])">
             <inheritdoc />
@@ -3814,93 +3925,8 @@
         <member name="M:Cordon.CollectionPropertyValidator`2.RepairMemberPaths">
             <inheritdoc cref="M:Cordon.IMemberPathRepairable.RepairMemberPaths" />
         </member>
-        <member name="T:Cordon.IObjectValidator">
-            <summary>
-                对象验证器服务
-            </summary>
-        </member>
-        <member name="M:Cordon.IObjectValidator.IsValid(System.Object,System.String[])">
-            <summary>
-                检查对象合法性
-            </summary>
-            <param name="instance">对象</param>
-            <param name="ruleSets">规则集</param>
-            <returns>
-                <see cref="T:System.Boolean" />
-            </returns>
-        </member>
-        <member name="M:Cordon.IObjectValidator.GetValidationResults(System.Object,System.String[])">
-            <summary>
-                获取对象验证结果集合
-            </summary>
-            <param name="instance">对象</param>
-            <param name="ruleSets">规则集</param>
-            <returns>
-                <see cref="T:System.Collections.Generic.List`1" />
-            </returns>
-        </member>
-        <member name="M:Cordon.IObjectValidator.Validate(System.Object,System.String[])">
-            <summary>
-                验证指定的对象
-            </summary>
-            <param name="instance">对象</param>
-            <param name="ruleSets">规则集</param>
-        </member>
-        <member name="M:Cordon.IObjectValidator.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
-            <summary>
-                获取对象验证结果集合
-            </summary>
-            <param name="validationContext">
-                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
-            </param>
-            <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>
-            <returns>
-                <see cref="T:System.Collections.Generic.List`1" />
-            </returns>
-        </member>
-        <member name="T:Cordon.IObjectValidator`1">
-            <summary>
-                <inheritdoc cref="T:Cordon.IObjectValidator" />
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-        </member>
-        <member name="M:Cordon.IObjectValidator`1.IsValid(`0,System.String[])">
-            <summary>
-                检查对象合法性
-            </summary>
-            <param name="instance">对象</param>
-            <param name="ruleSets">规则集</param>
-            <returns>
-                <see cref="T:System.Boolean" />
-            </returns>
-        </member>
-        <member name="M:Cordon.IObjectValidator`1.GetValidationResults(`0,System.String[])">
-            <summary>
-                获取对象验证结果集合
-            </summary>
-            <param name="instance">对象</param>
-            <param name="ruleSets">规则集</param>
-            <returns>
-                <see cref="T:System.Collections.Generic.List`1" />
-            </returns>
-        </member>
-        <member name="M:Cordon.IObjectValidator`1.Validate(`0,System.String[])">
-            <summary>
-                验证指定的对象
-            </summary>
-            <param name="instance">对象</param>
-            <param name="ruleSets">规则集</param>
-        </member>
-        <member name="T:Cordon.IValueValidator">
-            <summary>
-                单个值验证器服务
-            </summary>
-        </member>
-        <member name="T:Cordon.IValueValidator`1">
-            <summary>
-                <inheritdoc cref="T:Cordon.IValueValidator" />
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
+        <member name="M:Cordon.CollectionPropertyValidator`2.Clone(Cordon.ObjectValidator{`0})">
+            <inheritdoc cref="M:Cordon.IPropertyValidatorCloneable`1.Clone(Cordon.ObjectValidator{`0})" />
         </member>
         <member name="T:Cordon.ObjectValidator`1">
             <summary>
@@ -4082,6 +4108,28 @@
             </summary>
             <param name="ruleSets">规则集</param>
             <param name="setAction">自定义配置委托</param>
+            <returns>
+                <see cref="T:Cordon.ObjectValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.ObjectValidator`1.Include(System.Func{System.Collections.Generic.IDictionary{System.Object,System.Object},Cordon.ValidatorOptions,Cordon.ObjectValidator{`0}})">
+            <summary>
+                包含（组合）其他对象验证器
+            </summary>
+            <param name="validatorFactory">
+                <see cref="T:Cordon.ObjectValidator`1" /> 工厂委托
+            </param>
+            <returns>
+                <see cref="T:Cordon.ObjectValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.ObjectValidator`1.Include(Cordon.ObjectValidator{`0})">
+            <summary>
+                包含（组合）其他对象验证器
+            </summary>
+            <param name="validator">
+                <see cref="T:Cordon.ObjectValidator`1" />
+            </param>
             <returns>
                 <see cref="T:Cordon.ObjectValidator`1" />
             </returns>
@@ -4362,6 +4410,9 @@
         <member name="M:Cordon.PropertyValidator`3.Cordon#IObjectValidator#Validate(System.Object,System.String[])">
             <inheritdoc />
         </member>
+        <member name="M:Cordon.PropertyValidator`3.Cordon#IPropertyValidatorCloneable{T}#Clone(Cordon.ObjectValidator{`0})">
+            <inheritdoc />
+        </member>
         <member name="M:Cordon.PropertyValidator`3.Cordon#IValidationAnnotationsConfigurable#UseAnnotationValidation(System.Boolean)">
             <inheritdoc />
         </member>
@@ -4623,6 +4674,9 @@
         </member>
         <member name="M:Cordon.PropertyValidator`3.RepairMemberPaths">
             <inheritdoc cref="M:Cordon.IMemberPathRepairable.RepairMemberPaths" />
+        </member>
+        <member name="M:Cordon.PropertyValidator`3.Clone(Cordon.ObjectValidator{`0})">
+            <inheritdoc cref="M:Cordon.IPropertyValidatorCloneable`1.Clone(Cordon.ObjectValidator{`0})" />
         </member>
         <member name="M:Cordon.PropertyValidator`3.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
             <inheritdoc />
@@ -6733,7 +6787,7 @@
             <summary>
                 <inheritdoc cref="T:Cordon.AllowedValuesValidator" />
             </summary>
-            <param n">允许的值列表</param>
+            <param name="values">允许的值列表</param>
         </member>
         <member name="P:Cordon.AllowedValuesValidator.Values">
             <summary>
@@ -6903,8 +6957,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a hexadecimal digit exactly 3 times.<br/>
-                        ○ Match a hexadecimal digit exactly 8 times.<br/>
+                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -6926,7 +6980,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character atomically any number of times.<br/>
+                            ○ Match a whitespace character greedily any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -6951,7 +7005,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character atomically any number of times.<br/>
+                                    ○ Match a whitespace character greedily any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -7012,13 +7066,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7032,13 +7086,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7060,7 +7114,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7085,10 +7139,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit atomically at least once.<br/>
+                                    ○ Match a Unicode digit greedily at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit atomically at least once.<br/>
+                                ○ Match a Unicode digit greedily at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -7587,12 +7641,12 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Loop greedily at least once.<br/>
                 ○ 1st capture group.<br/>
-                    ○ Match an ASCII letter or digit.<br/>
+                    ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Optional (greedy).<br/>
-                        ○ Match a character in the set [\-0-9A-Za-z] greedily at most 61 times.<br/>
-                        ○ Match an ASCII letter or digit.<br/>
+                        ○ Match a character in the set [-0-9A-Za-z] greedily at most 61 times.<br/>
+                        ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Match '.'.<br/>
-            ○ Match an ASCII letter atomically at least twice.<br/>
+            ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -7645,9 +7699,9 @@
                     ○ 7th capture group.<br/>
                         ○ Loop greedily at least once.<br/>
                             ○ 8th capture group.<br/>
-                                ○ Match a character in the set [\-0-9A-Za-z] atomically at least once.<br/>
+                                ○ Match a character in the set [-0-9A-Za-z] atomically at least once.<br/>
                                 ○ Match '.'.<br/>
-                        ○ Match an ASCII letter atomically at least twice.<br/>
+                        ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8193,7 +8247,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a hexadecimal digit exactly 32 times.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8207,8 +8261,8 @@
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
-                    ○ Match a hexadecimal digit exactly 16 times.<br/>
-                    ○ Match a hexadecimal digit exactly 32 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 16 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8493,7 +8547,7 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match an ASCII letter.<br/>
+                ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
                 ○ Match a Unicode digit.<br/>
@@ -9358,12 +9412,12 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match an ASCII letter.<br/>
+            ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [\-_] exactly 2 times.<br/>
-            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match an ASCII letter or digit.<br/>
+                ○ Match a character in the set [-_] exactly 2 times.<br/>
+            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match a character in the set [0-9A-Za-z].<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9920,22 +9974,6 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-       <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>
