@@ -43,7 +43,7 @@ public class User : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext context)
     {
-        return context.ContinueWith<User>()
+        return context.With<User>()
             .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("{0} is not a valid internet username")
             .RuleFor(u => u.Id).Max(int.MaxValue)
             // Support rule sets (scenarios)

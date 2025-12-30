@@ -41,7 +41,7 @@ public class User : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext context)
     {
-        return context.ContinueWith<User>()
+        return context.With<User>()
             .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("{0} 不是有效的互联网用户名")
             .RuleFor(u => u.Id).Max(int.MaxValue)
             // 支持规则集（场景）

@@ -121,6 +121,9 @@ public sealed class ValidationBuilder
         // 注册验证数据上下文服务
         services.TryAddScoped<IValidationDataContext, ValidationDataContext>();
 
+        // 注册数据验证服务
+        services.TryAddTransient(typeof(IValidationService<>), typeof(ValidationService<>));
+
         // 构建验证器服务
         BuildValidatorServices(services);
     }

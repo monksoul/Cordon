@@ -60,7 +60,7 @@ public static class ValidationExtensions
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public static ObjectValidator<T> ContinueWith<T>(this ValidationContext validationContext)
+    public static ObjectValidator<T> With<T>(this ValidationContext validationContext)
         where T : class
     {
         // 空检查
@@ -92,18 +92,19 @@ public static class ValidationExtensions
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
-    public static IEnumerable<ValidationResult> ValidateUsing<T>(this ValidationContext validationContext,
-        Action<ObjectValidator<T>>? configure = null)
+    public static IEnumerable<ValidationResult> ValidateWith<T>(this ValidationContext validationContext,
+        Action<ObjectValidator<T>> configure)
         where T : class
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(validationContext);
+        ArgumentNullException.ThrowIfNull(configure);
 
         // 初始化 ObjectValidator<T> 实例
         var objectValidator = new ObjectValidator<T>(new Dictionary<object, object?>(validationContext.Items));
 
         // 调用自定义配置委托
-        configure?.Invoke(objectValidator);
+        configure.Invoke(objectValidator);
 
         return validationContext.ValidateWith(objectValidator);
     }

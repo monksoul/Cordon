@@ -886,7 +886,7 @@ public class ObjectValidatorTests
 
         var exception = Assert.Throws<InvalidOperationException>(() => validator.ToResults());
         Assert.Equal(
-            "The parameterless 'ToResults()' method can only be used when the validator is created via 'ValidationContext.ContinueWith<T>()'. Ensure you are calling it inside 'IValidatableObject.Validate' and have used 'ContinueWith' to configure inline validation rules.",
+            "The parameterless 'ToResults()' method can only be used when the validator is created via 'ValidationContext.With<T>()'. Ensure you are calling it inside 'IValidatableObject.Validate' and have used 'With' to configure inline validation rules.",
             exception.Message);
     }
 

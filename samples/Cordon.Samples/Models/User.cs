@@ -27,7 +27,7 @@ public class User : IValidatableObject
         //     !_allowedDomains.Any(domain => EmailAddress.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
         //     yield return new ValidationResult("仅支持 outlook、qq 和 163 邮箱格式。", [nameof(EmailAddress)]);
 
-        // return validationContext.ContinueWith<User>()
+        // return validationContext.With<User>()
         //     .RuleFor(u => u.EmailAddress)
         //     .MustAny(["@outlook.com", "@qq.com", "@163.com"],
         //         (email, domain) => email.EndsWith(domain, StringComparison.OrdinalIgnoreCase))

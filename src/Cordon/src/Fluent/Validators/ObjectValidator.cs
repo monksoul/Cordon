@@ -15,7 +15,7 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     ///     验证上下文键
     /// </summary>
     /// <remarks>
-    ///     用于使用 <![CDATA[ValidationContext.ContinueWith<T>()]]> 时设置。
+    ///     用于使用 <![CDATA[ValidationContext.With<T>()]]> 时设置。
     /// </remarks>
     internal static readonly object ValidationContextsKey = new();
 
@@ -681,7 +681,7 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
         }
 
         throw new InvalidOperationException(
-            "The parameterless 'ToResults()' method can only be used when the validator is created via 'ValidationContext.ContinueWith<T>()'. Ensure you are calling it inside 'IValidatableObject.Validate' and have used 'ContinueWith' to configure inline validation rules.");
+            "The parameterless 'ToResults()' method can only be used when the validator is created via 'ValidationContext.With<T>()'. Ensure you are calling it inside 'IValidatableObject.Validate' and have used 'With' to configure inline validation rules.");
     }
 
     /// <summary>

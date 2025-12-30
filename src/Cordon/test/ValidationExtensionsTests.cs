@@ -36,14 +36,14 @@ public class ValidationExtensionsTests
         Assert.Throws<ArgumentNullException>(() => ValidationExtensions.WithRuleSets(null!));
 
     [Fact]
-    public void ContinueWith_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => ValidationExtensions.ContinueWith<ObjectModel>(null!));
+    public void With_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => ValidationExtensions.With<ObjectModel>(null!));
 
     [Fact]
     public void ContinueWith_ReturnOK()
     {
         var validationContext = new ValidationContext(new ObjectModel(), null, null);
-        var objectValidator = validationContext.ContinueWith<Tests.ObjectModel>();
+        var objectValidator = validationContext.With<Tests.ObjectModel>();
         Assert.NotNull(objectValidator);
         Assert.NotNull(objectValidator._items);
         Assert.Single(objectValidator._items);
@@ -73,15 +73,17 @@ public class ValidationExtensionsTests
     }
 
     [Fact]
-    public void ValidateUsing_Invalid_Parameters()
+    public void ValidateWith_WithAction_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => ValidationExtensions.ValidateUsing<ObjectModel>(null!));
+        Assert.Throws<ArgumentNullException>(() => ValidationExtensions.ValidateWith<ObjectModel>(null!, null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValidationContext(new ObjectModel()).ValidateWith<ObjectModel>(null!));
         Assert.Throws<InvalidCastException>(() =>
-            new ValidationContext(new object(), null, null).ValidateUsing<ObjectModel>());
+            new ValidationContext(new object(), null, null).ValidateWith<ObjectModel>(_ => { }));
     }
 
     [Fact]
-    public void ValidateUsing_ReturnOK()
+    public void ValidateWith_WithAction_ReturnOK()
     {
         var model1 = new ObjectModel();
         var exception = Assert.Throws<ValidationException>(() =>
@@ -169,7 +171,7 @@ public class ValidationExtensionsTests
 
         /// <inheritdoc />
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
-            validationContext.ValidateUsing<ObjectModel>(validator =>
+            validationContext.ValidateWith<ObjectModel>(validator =>
             {
                 validator.RuleFor(u => u.Name).MinLength(3).UserName()
                     .RuleSet("email", () => validator.RuleFor(u => u.Name).EmailAddress());

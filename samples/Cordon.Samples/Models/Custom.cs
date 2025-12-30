@@ -13,7 +13,7 @@ public class Custom : IValidatableObject
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        return validationContext.ContinueWith<Custom>()
+        return validationContext.With<Custom>()
             .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
             .RuleFor(u => u.Id).Max(int.MaxValue)
             .RuleForEach(u => u.Addresses).NotEmpty().ChildRules(u =>
@@ -25,7 +25,7 @@ public class Custom : IValidatableObject
 
         // return validationContext.ValidateWith(new UserValidator());
 
-        // return validationContext.ValidateUsing<Custom>(validator =>
+        // return validationContext.ValidateWith<Custom>(validator =>
         // {
         //     validator.RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
         //         .RuleFor(u => u.Id).Max(int.MaxValue)
