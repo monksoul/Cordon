@@ -92,19 +92,21 @@ public class ValidationBuilderTests
         var services = new ServiceCollection();
         builder.Build(services);
 
-        Assert.Equal(5, services.Count);
+        Assert.Equal(6, services.Count);
         Assert.Contains(services, u => u.ServiceType == typeof(IValidationDataContext));
         Assert.Contains(services, u => u.ServiceType == typeof(IObjectValidator<ObjectModel>));
         Assert.Contains(services, u => u.ServiceType == typeof(ObjectModelValidator1));
+        Assert.Contains(services, u => u.ServiceType == typeof(IValidationService));
         Assert.Contains(services, u => u.ServiceType == typeof(IValidationService<>));
         Assert.DoesNotContain(services, u => u.ServiceType == typeof(AbstractValidator<ObjectModel>));
 
         // 支持重复构建
         builder.Build(services);
-        Assert.Equal(5, services.Count);
+        Assert.Equal(6, services.Count);
         Assert.Contains(services, u => u.ServiceType == typeof(IValidationDataContext));
         Assert.Contains(services, u => u.ServiceType == typeof(IObjectValidator<ObjectModel>));
         Assert.Contains(services, u => u.ServiceType == typeof(ObjectModelValidator1));
+        Assert.Contains(services, u => u.ServiceType == typeof(IValidationService));
         Assert.Contains(services, u => u.ServiceType == typeof(IValidationService<>));
         Assert.DoesNotContain(services, u => u.ServiceType == typeof(AbstractValidator<ObjectModel>));
     }

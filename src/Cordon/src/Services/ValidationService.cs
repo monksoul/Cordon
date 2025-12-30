@@ -5,6 +5,31 @@
 namespace Cordon;
 
 /// <inheritdoc />
+internal sealed class ValidationService : IValidationService
+{
+    /// <inheritdoc cref="IServiceProvider" />
+    internal readonly IServiceProvider _serviceProvider;
+
+    /// <summary>
+    ///     <inheritdoc cref="ValidationService{T}" />
+    /// </summary>
+    /// <param name="serviceProvider">
+    ///     <see cref="IServiceProvider" />
+    /// </param>
+    public ValidationService(IServiceProvider serviceProvider)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(serviceProvider);
+
+        _serviceProvider = serviceProvider;
+    }
+
+    /// <inheritdoc />
+    public IValidationService<T> For<T>() where T : class =>
+        _serviceProvider.GetRequiredService<IValidationService<T>>();
+}
+
+/// <inheritdoc />
 internal sealed class ValidationService<T> : IValidationService<T>
     where T : class
 {

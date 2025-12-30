@@ -7,8 +7,11 @@ namespace Cordon.Tests;
 public class ValidationServiceTests
 {
     [Fact]
-    public void New_Invalid_Parameters() =>
+    public void New_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => new ValidationService(null!));
         Assert.Throws<ArgumentNullException>(() => new ValidationService<ObjectModel>(null!));
+    }
 
     [Fact]
     public void New_ReturnOK()
@@ -16,9 +19,26 @@ public class ValidationServiceTests
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
 
-        var validationService = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService = new ValidationService(serviceProvider);
         Assert.NotNull(validationService);
         Assert.NotNull(validationService._serviceProvider);
+
+        var validationService2 = new ValidationService<ObjectModel>(serviceProvider);
+        Assert.NotNull(validationService2);
+        Assert.NotNull(validationService2._serviceProvider);
+    }
+
+    [Fact]
+    public void For_ReturnOK()
+    {
+        var services = new ServiceCollection();
+        services.AddTransient(typeof(IValidationService<>), typeof(ValidationService<>));
+        using var serviceProvider = services.BuildServiceProvider();
+
+        var validationService = new ValidationService(serviceProvider);
+
+        var validationService2 = validationService.For<ObjectModel>();
+        Assert.NotNull(validationService2);
     }
 
     [Fact]

@@ -7,6 +7,21 @@ namespace Cordon;
 /// <summary>
 ///     数据验证服务
 /// </summary>
+public interface IValidationService
+{
+    /// <summary>
+    ///     创建指定对象类型的数据验证服务
+    /// </summary>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="IValidationService{T}" />
+    /// </returns>
+    IValidationService<T> For<T>() where T : class;
+}
+
+/// <summary>
+///     数据验证服务
+/// </summary>
 /// <typeparam name="T">对象类型</typeparam>
 public interface IValidationService<in T>
     where T : class
