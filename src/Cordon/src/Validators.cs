@@ -492,10 +492,12 @@ public static class Validators
     ///     创建固定长度验证器
     /// </summary>
     /// <param name="length">长度</param>
+    /// <param name="allowEmpty">是否允许空集合、数组和字符串，默认值为：<c>false</c>。</param>
     /// <returns>
     ///     <see cref="HaveLengthValidator" />
     /// </returns>
-    public static HaveLengthValidator HaveLength(int length) => new(length);
+    public static HaveLengthValidator HaveLength(int length, bool allowEmpty = false) =>
+        new(length) { AllowEmpty = allowEmpty };
 
     /// <summary>
     ///     创建身份证号验证器

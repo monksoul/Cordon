@@ -285,6 +285,15 @@ namespace Cordon.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The field {0} must be empty or have a length of exactly &apos;{1}&apos;..
+        /// </summary>
+        internal static string HaveLengthValidator_ValidationError_AllowEmpty {
+            get {
+                return ResourceManager.GetString("HaveLengthValidator_ValidationError_AllowEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The field {0} is not a valid Id card number format..
         /// </summary>
         internal static string IDCardValidator_ValidationError {

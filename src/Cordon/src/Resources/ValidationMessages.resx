@@ -318,4 +318,7 @@
     <data name="HaveLengthValidator_ValidationError" xml:space="preserve">
         <value>The field {0} must be a string or collection type with a length of exactly '{1}'.</value>
     </data>
+    <data name="HaveLengthValidator_ValidationError_AllowEmpty" xml:space="preserve">
+        <value>The field {0} must be empty or have a length of exactly '{1}'.</value>
+    </data>
 </root>

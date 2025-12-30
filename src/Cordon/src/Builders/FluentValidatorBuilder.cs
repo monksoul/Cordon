@@ -673,10 +673,12 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     添加固定长度验证器
     /// </summary>
     /// <param name="length">长度</param>
+    /// <param name="allowEmpty">是否允许空集合、数组和字符串，默认值为：<c>false</c>。</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf HaveLength(int length) => AddValidator(new HaveLengthValidator(length));
+    public virtual TSelf HaveLength(int length, bool allowEmpty = false) =>
+        AddValidator(new HaveLengthValidator(length) { AllowEmpty = allowEmpty });
 
     /// <summary>
     ///     添加身份证号验证器

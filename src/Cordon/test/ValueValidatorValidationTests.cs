@@ -672,9 +672,23 @@ public class ValueValidatorValidationTests
 
         var addedValidator = valueValidator._lastAddedValidator as HaveLengthValidator;
         Assert.NotNull(addedValidator);
+        Assert.False(addedValidator.AllowEmpty);
 
         Assert.True(valueValidator.IsValid(new[] { "fur", "furion" }));
+        Assert.False(valueValidator.IsValid(Array.Empty<string>()));
         Assert.False(valueValidator.IsValid("fur"));
+
+        var valueValidator2 = new ValueValidator<object>().HaveLength(2, true);
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator2 = valueValidator2._lastAddedValidator as HaveLengthValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.True(addedValidator2.AllowEmpty);
+
+        Assert.True(valueValidator2.IsValid(new[] { "fur", "furion" }));
+        Assert.True(valueValidator2.IsValid(Array.Empty<string>()));
+        Assert.False(valueValidator2.IsValid("fur"));
     }
 
     [Fact]

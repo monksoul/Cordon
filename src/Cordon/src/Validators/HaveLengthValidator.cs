@@ -17,7 +17,7 @@ public class HaveLengthValidator : ValidatorBase
     {
         Length = length;
 
-        UseResourceKey(() => nameof(ValidationMessages.HaveLengthValidator_ValidationError));
+        UseResourceKey(GetResourceKey);
     }
 
     /// <summary>
@@ -25,11 +25,28 @@ public class HaveLengthValidator : ValidatorBase
     /// </summary>
     public int Length { get; }
 
+    /// <summary>
+    ///     是否允许空集合、数组和字符串
+    /// </summary>
+    /// <remarks>默认值为：<c>false</c>。</remarks>
+    public bool AllowEmpty { get; set; }
+
     /// <inheritdoc />
     public override bool IsValid(object? value) =>
-        value is null || (value.TryGetCount(out var count) && count == Length);
+        value is null || (value.TryGetCount(out var count) && ((AllowEmpty && count == 0) || count == Length));
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>
         string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, Length);
+
+    /// <summary>
+    ///     获取错误信息对应的资源键
+    /// </summary>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    internal string GetResourceKey() =>
+        AllowEmpty
+            ? nameof(ValidationMessages.HaveLengthValidator_ValidationError_AllowEmpty)
+            : nameof(ValidationMessages.HaveLengthValidator_ValidationError);
 }

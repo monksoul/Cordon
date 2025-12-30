@@ -25,10 +25,21 @@ public class HaveLengthAttributeTests
     {
         var attribute = new HaveLengthAttribute(2);
         Assert.Equal(2, attribute.Length);
+        Assert.False(attribute.AllowEmpty);
         Assert.Null(attribute.ErrorMessage);
         var validator = Helpers.GetValidator(attribute) as HaveLengthValidator;
         Assert.NotNull(validator);
         Assert.Equal(2, validator.Length);
+        Assert.False(validator.AllowEmpty);
+
+        var attribute2 = new HaveLengthAttribute(2) { AllowEmpty = true };
+        Assert.Equal(2, attribute2.Length);
+        Assert.True(attribute2.AllowEmpty);
+        Assert.Null(attribute2.ErrorMessage);
+        var validator2 = Helpers.GetValidator(attribute2) as HaveLengthValidator;
+        Assert.NotNull(validator2);
+        Assert.Equal(2, validator2.Length);
+        Assert.True(validator2.AllowEmpty);
     }
 
     [Fact]
@@ -107,12 +118,27 @@ public class HaveLengthAttributeTests
             exception3.ValidationResult.ErrorMessage);
     }
 
+
     [Fact]
     public void FormatErrorMessage_ReturnOK()
     {
         var attribute = new HaveLengthAttribute(2);
         Assert.Equal("The field data must be a string or collection type with a length of exactly '2'.",
             attribute.FormatErrorMessage("data"));
+
+        var attribute2 = new HaveLengthAttribute(2) { AllowEmpty = true };
+        Assert.Equal("The field data must be empty or have a length of exactly '2'.",
+            attribute2.FormatErrorMessage("data"));
+    }
+
+    [Fact]
+    public void GetResourceKey_ReturnOK()
+    {
+        var attribute = new HaveLengthAttribute(2);
+        Assert.Equal("HaveLengthValidator_ValidationError", attribute.GetResourceKey());
+
+        var attribute2 = new HaveLengthAttribute(2) { AllowEmpty = true };
+        Assert.Equal("HaveLengthValidator_ValidationError_AllowEmpty", attribute2.GetResourceKey());
     }
 
     public class TestModel

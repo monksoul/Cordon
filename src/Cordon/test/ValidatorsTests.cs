@@ -340,6 +340,11 @@ public class ValidatorsTests
     {
         var validator = Validators.HaveLength(2);
         Assert.Equal(2, validator.Length);
+        Assert.False(validator.AllowEmpty);
+
+        var validator2 = Validators.HaveLength(2, true);
+        Assert.Equal(2, validator2.Length);
+        Assert.True(validator2.AllowEmpty);
     }
 
     [Fact]

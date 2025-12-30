@@ -952,9 +952,25 @@ public class PropertyValidatorValidationTests
 
         var addedValidator = propertyValidator._lastAddedValidator as HaveLengthValidator;
         Assert.NotNull(addedValidator);
+        Assert.False(addedValidator.AllowEmpty);
 
         Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = new[] { "fur", "furion" } }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = Array.Empty<string>() }));
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "fur" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .HaveLength(2, true);
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator2 = propertyValidator2._lastAddedValidator as HaveLengthValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.True(addedValidator2.AllowEmpty);
+
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = new[] { "fur", "furion" } }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = Array.Empty<string>() }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = "fur" }));
     }
 
     [Fact]
