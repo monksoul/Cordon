@@ -377,14 +377,14 @@ public abstract class ValidatorBase
         if ((resourceNameSet && errorMessageSet) || !(resourceNameSet || errorMessageSet))
         {
             throw new InvalidOperationException(
-                "Either ErrorMessageString or ErrorMessageResourceName must be set, but not both.");
+                $"Either {nameof(ErrorMessageString)} or {nameof(ErrorMessageResourceName)} must be set, but not both.");
         }
 
         // 必须同时设置或都不设置 ErrorMessageResourceType 和 ErrorMessageResourceName 属性
         if (resourceTypeSet != resourceNameSet)
         {
             throw new InvalidOperationException(
-                "Both ErrorMessageResourceType and ErrorMessageResourceName need to be set on this validator.");
+                $"Both {nameof(ErrorMessageResourceType)} and {nameof(ErrorMessageResourceName)} need to be set on this validator.");
         }
 
         // 如果设置了错误信息资源类型及其资源名称，那么就去查找该资源对应的值并设置错误信息资源访问器
