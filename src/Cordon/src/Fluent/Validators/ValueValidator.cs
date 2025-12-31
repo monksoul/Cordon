@@ -64,6 +64,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     internal string? DisplayName { get; private set; }
 
     /// <summary>
+    ///     成员名称
+    /// </summary>
+    internal string? MemberName { get; set; }
+
+    /// <summary>
     ///     验证条件
     /// </summary>
     /// <remarks>当条件满足时才进行验证。</remarks>
@@ -74,6 +79,12 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// </summary>
     /// <remarks>当条件不满足时才进行验证。</remarks>
     internal Func<T, bool>? UnlessCondition { get; private set; }
+
+    /// <summary>
+    ///     当前验证器在对象图中的属性路径（如 "User.Address"）
+    /// </summary>
+    /// <remarks>仅在作为嵌套验证器时由父验证器设置。</remarks>
+    internal string? MemberPath { get; set; }
 
     /// <inheritdoc />
     public void Dispose()
@@ -122,8 +133,8 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 解析验证时使用的规则集
         var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
 
-        // 获取显示名称和初始化验证结果集合
-        var displayName = GetDisplayName();
+        // 获取显示名称、成员名称和初始化验证结果集合
+        var (displayName, memberPath) = (GetDisplayName(), GetEffectiveMemberName());
         var validationResults = new List<ValidationResult>();
 
         // 检查是否设置单个值级别验证器
@@ -134,7 +145,8 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
 
         // 获取所有验证器验证结果集合
         validationResults.AddRange(Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets))
-            .SelectMany(u => u.GetValidationResults(resolvedValue, displayName) ?? []));
+            .SelectMany(u =>
+                u.GetValidationResults(resolvedValue, displayName, memberPath is null ? null : [memberPath]) ?? []));
 
         return validationResults.ToResults();
     }
@@ -154,8 +166,8 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 解析验证时使用的规则集
         var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
 
-        // 获取显示名称
-        var displayName = GetDisplayName();
+        // 获取显示名称和成员名称
+        var (displayName, memberPath) = (GetDisplayName(), GetEffectiveMemberName());
 
         // 检查是否设置单个值级别验证器
         // ReSharper disable once UseNullPropagation
@@ -167,7 +179,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 遍历验证器集合
         foreach (var validator in Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets)))
         {
-            validator.Validate(resolvedValue, displayName);
+            validator.Validate(resolvedValue, displayName, memberPath is null ? null : [memberPath]);
         }
     }
 
@@ -438,6 +450,29 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <summary>
+    ///     设置成员名称
+    /// </summary>
+    /// <param name="memberName">成员名称</param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public virtual ValueValidator<T> WithMemberName(string? memberName)
+    {
+        MemberName = memberName;
+
+        return This;
+    }
+
+    /// <summary>
+    ///     设置成员名称
+    /// </summary>
+    /// <param name="memberName">成员名称</param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public virtual ValueValidator<T> WithName(string? memberName) => WithMemberName(memberName);
+
+    /// <summary>
     ///     配置是否允许空字符串
     /// </summary>
     /// <param name="allowEmptyStrings">是否允许空字符串，默认值为：<c>true</c>。</param>
@@ -525,7 +560,15 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <returns>
     ///     <see cref="string" />
     /// </returns>
-    internal string GetDisplayName() => DisplayName ?? typeof(T).Name;
+    internal string GetDisplayName() => DisplayName ?? MemberName ?? typeof(T).Name;
+
+    /// <summary>
+    ///     获取用于 <see cref="ValidationResult.MemberNames" /> 的最终成员名称
+    /// </summary>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    internal string? GetEffectiveMemberName() => MemberName ?? MemberPath;
 
     /// <summary>
     ///     解析验证时使用的规则集

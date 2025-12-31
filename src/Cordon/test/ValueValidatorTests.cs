@@ -26,6 +26,8 @@ public class ValueValidatorTests
         Assert.NotNull(valueValidator.This);
         Assert.Equal(valueValidator.This, valueValidator);
         Assert.Null(valueValidator._allowEmptyStrings);
+        Assert.Null(valueValidator.MemberPath);
+        Assert.Null(valueValidator.MemberName);
 
         var valueValidator2 = new ValueValidator<string>(new Dictionary<object, object?>());
         Assert.Null(valueValidator2._serviceProvider);
@@ -160,12 +162,35 @@ public class ValueValidatorTests
         Assert.Single(validationResults);
         Assert.Equal(["The MyFirstName field is required."],
             validationResults.Select(u => u.ErrorMessage));
+        Assert.Empty(validationResults.First().MemberNames);
 
         var validationResults2 = valueValidator.GetValidationResults("Fu");
         Assert.NotNull(validationResults2);
         Assert.Single(validationResults2);
         Assert.Equal(["The field MyFirstName must be a string or array type with a minimum length of '3'."],
             validationResults2.Select(u => u.ErrorMessage));
+        Assert.Empty(validationResults2.First().MemberNames);
+    }
+
+    [Fact]
+    public void GetValidationResults_WithMemberName_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName").WithMemberName("MName");
+
+        var validationResults = valueValidator.GetValidationResults(null);
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The MyFirstName field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+        Assert.Equal("MName", validationResults.First().MemberNames.First());
+
+        var validationResults2 = valueValidator.GetValidationResults("Fu");
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field MyFirstName must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+        Assert.Equal("MName", validationResults2.First().MemberNames.First());
     }
 
     [Fact]
@@ -271,6 +296,23 @@ public class ValueValidatorTests
         Assert.Equal("The field MyFirstName must be a string or array type with a minimum length of '3'.",
             exception2.Message);
         Assert.Empty(exception2.ValidationResult.MemberNames);
+    }
+
+    [Fact]
+    public void Validate_WithDisplayName_WithMemberName_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName").WithMemberName("MName");
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.Validate(null));
+        Assert.Equal("The MyFirstName field is required.", exception.Message);
+        Assert.Equal(["MName"], exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.Validate("Fu"));
+        Assert.Equal("The field MyFirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal(["MName"], exception2.ValidationResult.MemberNames);
     }
 
     [Fact]
@@ -579,6 +621,12 @@ public class ValueValidatorTests
 
         var valueValidator2 = new ValueValidator<string>().WithDisplayName("Field");
         Assert.Equal("Field", valueValidator2.GetDisplayName());
+
+        var valueValidator3 = new ValueValidator<string>().WithName("MName");
+        Assert.Equal("MName", valueValidator3.GetDisplayName());
+
+        var valueValidator4 = new ValueValidator<string>().WithDisplayName("Field").WithName("MName");
+        Assert.Equal("Field", valueValidator4.GetDisplayName());
     }
 
     [Fact]
@@ -701,6 +749,20 @@ public class ValueValidatorTests
         Assert.True(valueValidator._allowEmptyStrings);
         valueValidator.AllowEmptyStrings(false);
         Assert.False(valueValidator._allowEmptyStrings);
+    }
+
+    [Fact]
+    public void GetEffectiveMemberName_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+        Assert.Null(valueValidator.GetEffectiveMemberName());
+
+        valueValidator.WithName("MName");
+        Assert.Equal("MName", valueValidator.GetEffectiveMemberName());
+
+        valueValidator.WithName(null);
+        valueValidator.MemberPath = "Names";
+        Assert.Equal("Names", valueValidator.GetEffectiveMemberName());
     }
 
     public class StringValueValidator : AbstractValueValidator<string>

@@ -16,6 +16,7 @@ public class CollectionPropertyValidatorTests
         Assert.NotNull(propertyValidator._objectValidator);
         Assert.NotNull(propertyValidator._annotationValidator);
         Assert.Null(propertyValidator._elementFilter);
+        Assert.Null(propertyValidator._valueValidator);
     }
 
     [Fact]
@@ -259,6 +260,15 @@ public class CollectionPropertyValidatorTests
         Assert.Equal(
             "An object validator has already been assigned to this element. Only one object validator is allowed per element. To define nested rules, use `ChildRules` within a single validator.",
             exception.Message);
+
+        var propertyValidator2 =
+            new CollectionPropertyValidator<ObjectModel, string?>(u => u.Names, objectValidator);
+        var exception2 =
+            Assert.Throws<InvalidOperationException>(() =>
+                propertyValidator2.SetValidator(new ObjectValidator<string?>()));
+        Assert.Equal(
+            "Collection element type 'System.String' is not a reference type. `SetValidator` (object validator) and `ChildRules` are only supported for class types. For value types, use `EachRules` or `SetValidator` (value validator) instead.",
+            exception2.Message);
     }
 
     [Fact]
@@ -286,6 +296,16 @@ public class CollectionPropertyValidatorTests
         Assert.NotNull(propertyValidator2._elementValidator);
         Assert.NotNull(propertyValidator2._elementValidator.InheritedRuleSets);
         Assert.Equal(["login"], (string[]?)propertyValidator2._elementValidator.InheritedRuleSets!);
+
+        var propertyValidator3 =
+            new CollectionPropertyValidator<ObjectModel, string?>(u => u.Names, objectValidator).SetValidator(
+                new StringValidator());
+        Assert.NotNull(propertyValidator3._valueValidator);
+
+        var propertyValidator4 =
+            new CollectionPropertyValidator<ObjectModel, string?>(u => u.Names, objectValidator).SetValidator(_ =>
+                new StringValidator());
+        Assert.NotNull(propertyValidator4._valueValidator);
     }
 
     [Fact]
@@ -299,7 +319,7 @@ public class CollectionPropertyValidatorTests
 
         var exception = Assert.Throws<InvalidOperationException>(() => propertyValidator.ChildRules(_ => { }));
         Assert.Equal(
-            "An object validator has already been assigned to this element. `ChildRules` cannot be applied after `SetValidator` or another `ChildRules` call.",
+            "An object validator has already been assigned to this element. `ChildRules` cannot be applied after `SetValidator` (object validator) or another `ChildRules` call.",
             exception.Message);
     }
 
@@ -327,13 +347,59 @@ public class CollectionPropertyValidatorTests
     }
 
     [Fact]
+    public void EachRules_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.EachRules(null!));
+
+        var exception = Assert.Throws<InvalidOperationException>(() => propertyValidator.EachRules(_ => { }));
+        Assert.Equal(
+            "Collection element type 'Cordon.Tests.CollectionPropertyValidatorTests+Child' is a reference type. `SetValidator` (value validator) and `EachRules` are only supported for value types or string. For class types, use `ChildRules` or `SetValidator` (object validator) instead.",
+            exception.Message);
+
+        var propertyValidator2 =
+            new CollectionPropertyValidator<ObjectModel, string?>(u => u.Names, objectValidator).EachRules(_ => { });
+        var exception2 = Assert.Throws<InvalidOperationException>(() => propertyValidator2.EachRules(_ => { }));
+        Assert.Equal(
+            "A value validator has already been assigned to this element. `EachRules` cannot be applied after `SetValidator` (value validator) or another `EachRules` call.",
+            exception2.Message);
+    }
+
+    [Fact]
+    public void EachRules_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new CollectionPropertyValidator<ObjectModel, string?>(u => u.Names, objectValidator).EachRules(u =>
+                u.Required().MinLength(3));
+
+        Assert.NotNull(propertyValidator._valueValidator);
+        Assert.Equal(2, propertyValidator._valueValidator.Validators.Count);
+        Assert.Null(propertyValidator._valueValidator._serviceProvider);
+        Assert.NotNull(propertyValidator._valueValidator.MemberPath);
+        Assert.Equal("Names", propertyValidator._valueValidator.MemberPath);
+
+        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
+        Assert.NotNull(propertyValidator._valueValidator._serviceProvider);
+    }
+
+    [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var subValidator = new ChildValidator();
+
         var propertyValidator =
             new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator)
                 .SetValidator(subValidator)
+                .AddAnnotations(new RequiredAttribute());
+
+        var propertyValidator2 =
+            new CollectionPropertyValidator<ObjectModel, string?>(u => u.Names, objectValidator)
+                .EachRules(u => u.Required().MinLength(3))
                 .AddAnnotations(new RequiredAttribute());
 
         Assert.Null(propertyValidator._serviceProvider);
@@ -343,14 +409,21 @@ public class CollectionPropertyValidatorTests
         Assert.NotNull(valueValidator);
         Assert.Null(valueValidator._serviceProvider);
 
+        Assert.NotNull(propertyValidator2._valueValidator);
+        Assert.Null(propertyValidator2._valueValidator._serviceProvider);
+
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
+        propertyValidator2.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(propertyValidator._serviceProvider);
         Assert.NotNull(propertyValidator._annotationValidator._serviceProvider);
         Assert.NotNull(subValidator._serviceProvider);
         Assert.NotNull(valueValidator);
         Assert.NotNull(valueValidator._serviceProvider);
+
+        Assert.NotNull(propertyValidator2._valueValidator);
+        Assert.NotNull(propertyValidator2._valueValidator._serviceProvider);
     }
 
     [Fact]
@@ -381,7 +454,7 @@ public class CollectionPropertyValidatorTests
     public void ForEachValidatedElement_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = objectValidator.RuleForEach(u => u.Children)
+        var propertyValidator = objectValidator.RuleForCollection(u => u.Children)
             .ChildRules(c => c.RuleFor(b => b.Nest).ChildRules(d => d.RuleFor(z => z.Id)));
 
         Assert.Equal("Children", propertyValidator._elementValidator!.MemberPath);
@@ -416,7 +489,8 @@ public class CollectionPropertyValidatorTests
     [Fact]
     public void Clone_ReturnOK()
     {
-        var propertyValidator = new ObjectValidator<ObjectModel>().RuleForEach(u => u.Children).Required().MinLength(3)
+        var propertyValidator = new ObjectValidator<ObjectModel>().RuleForCollection(u => u.Children).Required()
+            .MinLength(3)
             .PreProcess(u => u).Where(u => u.Name is not null).AllowEmptyStrings();
 
         using var objectValidator = new ObjectValidator<ObjectModel>();
@@ -431,6 +505,8 @@ public class CollectionPropertyValidatorTests
     public class ObjectModel
     {
         public List<Child>? Children { get; set; }
+
+        public List<string?>? Names { get; set; }
     }
 
     public class Child
@@ -446,4 +522,6 @@ public class CollectionPropertyValidatorTests
     }
 
     public class ChildValidator : AbstractValidator<Child>;
+
+    public class StringValidator : AbstractValueValidator<string?>;
 }

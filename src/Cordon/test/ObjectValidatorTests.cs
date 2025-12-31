@@ -519,18 +519,18 @@ public class ObjectValidatorTests
     }
 
     [Fact]
-    public void RuleForEach_Invalid_Parameters()
+    public void RuleForCollection_Invalid_Parameters()
     {
         using var validator = new ObjectValidator<ObjectModel>();
-        Assert.Throws<ArgumentNullException>(() => validator.RuleForEach<Child>(null!));
+        Assert.Throws<ArgumentNullException>(() => validator.RuleForCollection<Child>(null!));
     }
 
     [Fact]
-    public void RuleForEach_ReturnOK()
+    public void RuleForCollection_ReturnOK()
     {
         using var validator = new ObjectValidator<ObjectModel>();
 
-        validator.RuleForEach(u => u.Children);
+        validator.RuleForCollection(u => u.Children);
         Assert.Single(validator.Validators);
         var propertyValidator =
             validator.Validators.LastOrDefault() as CollectionPropertyValidator<ObjectModel, Child>;
@@ -539,13 +539,13 @@ public class ObjectValidatorTests
     }
 
     [Fact]
-    public void RuleForEach_InRuleSet_ReturnOK()
+    public void RuleForCollection_InRuleSet_ReturnOK()
     {
         var validator = new ObjectValidator<ObjectModel>();
 
         validator.RuleSet([], () =>
         {
-            validator.RuleForEach(u => u.Children);
+            validator.RuleForCollection(u => u.Children);
         });
         Assert.Single(validator.Validators);
         var propertyValidator =
@@ -557,7 +557,7 @@ public class ObjectValidatorTests
         validator.Validators.Clear();
         validator.RuleSet(["login", "register"], () =>
         {
-            validator.RuleForEach(u => u.Children);
+            validator.RuleForCollection(u => u.Children);
         });
         Assert.Equal(2, validator.Validators.Count);
 
@@ -576,7 +576,7 @@ public class ObjectValidatorTests
         validator.Validators.Clear();
         validator.RuleSet(["login", "register"], chain =>
         {
-            chain.RuleForEach(u => u.Children);
+            chain.RuleForCollection(u => u.Children);
         });
         Assert.Equal(2, validator.Validators.Count);
 
@@ -595,20 +595,20 @@ public class ObjectValidatorTests
         validator.Validators.Clear();
         validator.RuleSet("login", () =>
         {
-            validator.RuleForEach(x => x.Children);
+            validator.RuleForCollection(x => x.Children);
             validator.RuleSet("register", () =>
             {
-                validator.RuleForEach(x => x.Children);
+                validator.RuleForCollection(x => x.Children);
             });
         });
         Assert.Equal(2, validator.Validators.Count);
     }
 
     [Fact]
-    public void RuleForEach_InitializeServiceProvider_ReturnOK()
+    public void RuleForCollection_InitializeServiceProvider_ReturnOK()
     {
         var validator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = validator.RuleForEach(u => u.Children);
+        var propertyValidator = validator.RuleForCollection(u => u.Children);
 
         Assert.Null(propertyValidator._serviceProvider);
         Assert.Null(propertyValidator._annotationValidator._serviceProvider);
@@ -619,7 +619,7 @@ public class ObjectValidatorTests
         Assert.NotNull(propertyValidator._serviceProvider);
         Assert.NotNull(propertyValidator._annotationValidator._serviceProvider);
 
-        var propertyValidator2 = validator.RuleForEach(u => u.Children);
+        var propertyValidator2 = validator.RuleForCollection(u => u.Children);
         Assert.NotNull(propertyValidator2._serviceProvider);
         Assert.NotNull(propertyValidator2._annotationValidator._serviceProvider);
     }
@@ -1028,7 +1028,7 @@ public class ObjectValidatorTests
         using var objectValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).NotEqualTo("Fur").End();
 
         using var objectValidator2 = new ObjectValidator<ObjectModel>().RuleFor(u => u.Id).Min(1)
-            .RuleForEach(u => u.Children).MinLength(1).RuleFor(u => u.Address).Required().End();
+            .RuleForCollection(u => u.Children).MinLength(1).RuleFor(u => u.Address).Required().End();
 
         objectValidator.Include(objectValidator2);
         Assert.Equal(4, objectValidator.Validators.Count);

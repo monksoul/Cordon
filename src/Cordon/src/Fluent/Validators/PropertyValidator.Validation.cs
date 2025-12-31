@@ -486,9 +486,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <see cref="CollectionPropertyValidator{T,TElement}" />
     /// </returns>
-    public CollectionPropertyValidator<T, TElement>
-        RuleForEach<TElement>(Expression<Func<T, IEnumerable<TElement?>?>> selector) where TElement : class =>
-        _objectValidator.RuleForEach(selector);
+    public CollectionPropertyValidator<T, TElement> RuleForCollection<TElement>(
+        Expression<Func<T, IEnumerable<TElement?>?>> selector) => _objectValidator.RuleForCollection(selector);
 
     /// <summary>
     ///     在指定规则集上下文中为指定属性配置验证规则

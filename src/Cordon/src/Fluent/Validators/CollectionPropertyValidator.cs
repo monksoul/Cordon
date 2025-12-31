@@ -12,7 +12,6 @@ namespace Cordon;
 public sealed class
     CollectionPropertyValidator<T, TElement> : PropertyValidator<T, IEnumerable<TElement>?,
     CollectionPropertyValidator<T, TElement>>
-    where TElement : class
 {
     /// <summary>
     ///     元素过滤委托
@@ -22,6 +21,10 @@ public sealed class
     /// <inheritdoc cref="ObjectValidator{T}" />
     /// <remarks>集合元素对象验证器。</remarks>
     internal ObjectValidator<TElement>? _elementValidator;
+
+    /// <inheritdoc cref="ObjectValidator{T}" />
+    /// <remarks>集合元素值验证器。</remarks>
+    internal ValueValidator<TElement>? _valueValidator;
 
     /// <inheritdoc />
     internal CollectionPropertyValidator(Expression<Func<T, IEnumerable<TElement?>?>> selector,
@@ -37,7 +40,23 @@ public sealed class
 
         // 调用基类 IsValid 方法
         return base.IsValid(instance, ruleSets) &&
-               ForEachValidatedElement(instance, element => _elementValidator!.IsValid(element, ruleSets));
+               ForEachValidatedElement(instance, element =>
+               {
+                   // 检查是否设置了集合元素对象验证器
+                   if (_elementValidator is not null)
+                   {
+                       return _elementValidator.IsValid(element, ruleSets);
+                   }
+
+                   // 检查是否设置了集合元素值验证器
+                   // ReSharper disable once ConvertIfStatementToReturnStatement
+                   if (_valueValidator is not null)
+                   {
+                       return _valueValidator.IsValid(element, ruleSets);
+                   }
+
+                   return true;
+               });
     }
 
     /// <inheritdoc />
@@ -55,7 +74,17 @@ public sealed class
         // 获取集合并遍历用于验证的元素
         ForEachValidatedElement(instance, element =>
         {
-            validationResults.AddRange(_elementValidator!.GetValidationResults(element, ruleSets) ?? []);
+            // 检查是否设置了集合元素对象验证器
+            if (_elementValidator is not null)
+            {
+                validationResults.AddRange(_elementValidator.GetValidationResults(element, ruleSets) ?? []);
+            }
+            // 检查是否设置了集合元素值验证器
+            else if (_valueValidator is not null)
+            {
+                validationResults.AddRange(_valueValidator.GetValidationResults(element, ruleSets) ?? []);
+            }
+
             return true;
         });
 
@@ -74,7 +103,18 @@ public sealed class
         // 获取集合并遍历用于验证的元素
         ForEachValidatedElement(instance, element =>
         {
-            _elementValidator!.Validate(element, ruleSets);
+            // 检查是否设置了集合元素对象验证器
+            if (_elementValidator is not null)
+            {
+                _elementValidator.Validate(element, ruleSets);
+            }
+            // 检查是否设置了集合元素值验证器
+            // ReSharper disable once UseNullPropagation
+            else if (_valueValidator is not null)
+            {
+                _valueValidator.Validate(element, ruleSets);
+            }
+
             return true;
         });
     }
@@ -129,11 +169,25 @@ public sealed class
         // 空检查
         ArgumentNullException.ThrowIfNull(validatorFactory);
 
+        // 检查集合元素是否是类类型
+        if (!typeof(TElement).IsClass || typeof(TElement) == typeof(string))
+        {
+            throw new InvalidOperationException(
+                $"Collection element type '{typeof(TElement)}' is not a reference type. `{nameof(SetValidator)}` (object validator) and `{nameof(ChildRules)}` are only supported for class types. For value types, use `{nameof(EachRules)}` or `{nameof(SetValidator)}` (value validator) instead.");
+        }
+
         // 空检查
         if (_elementValidator is not null)
         {
             throw new InvalidOperationException(
                 $"An object validator has already been assigned to this element. Only one object validator is allowed per element. To define nested rules, use `{nameof(ChildRules)}` within a single validator.");
+        }
+
+        // 互斥检查
+        if (_valueValidator is not null)
+        {
+            throw new InvalidOperationException(
+                $"Cannot configure object validator because a value validator has already been configured via `{nameof(EachRules)}` or `{nameof(SetValidator)}` (value validator).");
         }
 
         // 调用工厂方法，传入当前 RuleSets、_items 和 Options
@@ -187,7 +241,7 @@ public sealed class
         if (_elementValidator is not null)
         {
             throw new InvalidOperationException(
-                $"An object validator has already been assigned to this element. `{nameof(ChildRules)}` cannot be applied after `{nameof(SetValidator)}` or another `{nameof(ChildRules)}` call.");
+                $"An object validator has already been assigned to this element. `{nameof(ChildRules)}` cannot be applied after `{nameof(SetValidator)}` (object validator) or another `{nameof(ChildRules)}` call.");
         }
 
         return SetValidator((ruleSets, items, options) =>
@@ -203,6 +257,106 @@ public sealed class
         });
     }
 
+    /// <summary>
+    ///     设置集合元素值验证器
+    /// </summary>
+    /// <param name="validatorFactory">
+    ///     <see cref="ValueValidator{T}" /> 工厂委托
+    /// </param>
+    /// <returns>
+    ///     <see cref="CollectionPropertyValidator{T,TElement}" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public CollectionPropertyValidator<T, TElement> SetValidator(
+        Func<IDictionary<object, object?>?, ValueValidator<TElement>?> validatorFactory)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validatorFactory);
+
+        // 检查 TElement 是否是值类型或可空值类型
+        if (typeof(TElement).IsClass && typeof(TElement) != typeof(string))
+        {
+            throw new InvalidOperationException(
+                $"Collection element type '{typeof(TElement)}' is a reference type. `{nameof(SetValidator)}` (value validator) and `{nameof(EachRules)}` are only supported for value types or string. For class types, use `{nameof(ChildRules)}` or `{nameof(SetValidator)}` (object validator) instead.");
+        }
+
+        // 空检查
+        if (_valueValidator is not null)
+        {
+            throw new InvalidOperationException(
+                $"A value validator has already been assigned to this element. Only one value validator is allowed per element. To define custom rules, use `{nameof(EachRules)}` within a single validator.");
+        }
+
+        // 互斥检查
+        if (_elementValidator is not null)
+        {
+            throw new InvalidOperationException(
+                $"Cannot configure value validator because an object validator has already been configured via `{nameof(ChildRules)}` or `{nameof(SetValidator)}` (object validator).");
+        }
+
+        // 调用工厂方法，传入当前 _items 
+        _valueValidator = validatorFactory(_objectValidator._items);
+
+        // 空检查
+        if (_valueValidator is null)
+        {
+            return this;
+        }
+
+        // 同步 IServiceProvider 委托
+        _valueValidator.InitializeServiceProvider(_serviceProvider);
+
+        // 修复整个子验证器树的成员路径
+        RepairMemberPaths();
+
+        return this;
+    }
+
+    /// <summary>
+    ///     设置集合元素值验证器
+    /// </summary>
+    /// <param name="validator">
+    ///     <see cref="ValueValidator{T}" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="CollectionPropertyValidator{T,TElement}" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public CollectionPropertyValidator<T, TElement> SetValidator(ValueValidator<TElement>? validator) =>
+        SetValidator(_ => validator);
+
+    /// <summary>
+    ///     为集合元素继续配置规则
+    /// </summary>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <see cref="CollectionPropertyValidator{T,TElement}" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public CollectionPropertyValidator<T, TElement> EachRules(Action<ValueValidator<TElement>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        // 空检查
+        if (_valueValidator is not null)
+        {
+            throw new InvalidOperationException(
+                $"A value validator has already been assigned to this element. `{nameof(EachRules)}` cannot be applied after `{nameof(SetValidator)}` (value validator) or another `{nameof(EachRules)}` call.");
+        }
+
+        return SetValidator(items =>
+        {
+            // 初始化集合元素值验证器实例
+            var valueValidator = new ValueValidator<TElement>(items);
+
+            // 调用自定义配置委托
+            configure(valueValidator);
+
+            return valueValidator;
+        });
+    }
+
     /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
@@ -213,6 +367,12 @@ public sealed class
         if (_elementValidator is IDisposable disposable)
         {
             disposable.Dispose();
+        }
+
+        // 释放集合元素值验证器资源
+        if (_valueValidator is IDisposable valueValidatorDisposable)
+        {
+            valueValidatorDisposable.Dispose();
         }
     }
 
@@ -255,8 +415,8 @@ public sealed class
         ArgumentNullException.ThrowIfNull(instance);
         ArgumentNullException.ThrowIfNull(action);
 
-        // 检查是否设置了集合元素对象验证器
-        if (_elementValidator is null)
+        // 检查是否设置了任一类型的元素验证器
+        if (_elementValidator is null && _valueValidator is null)
         {
             return true;
         }
@@ -268,32 +428,61 @@ public sealed class
             return true;
         }
 
-        // 获取原始属性路径
-        var originalPath = _elementValidator.MemberPath;
-        var baseMemberName = originalPath ?? GetEffectiveMemberName();
+        // 获取基础成员名称
+        var baseMemberName = GetEffectiveMemberName();
 
-        try
+        // 遍历用于验证的集合元素
+        var index = 0;
+        foreach (var element in GetValidatedElements(propertyValue, instance))
         {
-            // 遍历用于验证的集合元素
-            var index = 0;
-            foreach (var element in GetValidatedElements(propertyValue, instance))
+            // 检查是否设置了集合元素对象验证器
+            if (_elementValidator is not null)
             {
+                // 获取原始属性路径
+                var originalPath = _elementValidator.MemberPath;
+
                 // 设置当前属性路径
                 _elementValidator.MemberPath = $"{baseMemberName}[{index}]";
 
-                // 调用元素处理委托
-                if (!action(element))
+                try
                 {
-                    return false;
+                    // 调用元素处理委托
+                    if (!action(element))
+                    {
+                        return false;
+                    }
                 }
-
-                index++;
+                finally
+                {
+                    // 恢复原始属性路径
+                    _elementValidator.MemberPath = originalPath;
+                }
             }
-        }
-        finally
-        {
-            // 恢复原始属性路径
-            _elementValidator.MemberPath = originalPath;
+            // 检查是否设置了集合元素值验证器
+            else if (_valueValidator is not null)
+            {
+                // 获取原始属性路径
+                var originalPath = _valueValidator.MemberPath;
+
+                // 设置当前属性路径
+                _valueValidator.MemberPath = $"{baseMemberName}[{index}]";
+
+                try
+                {
+                    // 调用元素处理委托
+                    if (!action(element))
+                    {
+                        return false;
+                    }
+                }
+                finally
+                {
+                    // 恢复原始属性路径
+                    _valueValidator.MemberPath = originalPath;
+                }
+            }
+
+            index++;
         }
 
         return true;
@@ -307,25 +496,34 @@ public sealed class
 
         // 同步 _elementValidator 实例 IServiceProvider 委托
         _elementValidator?.InitializeServiceProvider(serviceProvider);
+
+        // 同步 _valueValidator 实例 IServiceProvider 委托
+        _valueValidator?.InitializeServiceProvider(serviceProvider);
     }
 
     /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
     internal new void RepairMemberPaths()
     {
-        // 空检查
-        if (_elementValidator is null)
+        // 检查是否设置了集合元素对象验证器
+        if (_elementValidator is not null)
         {
-            return;
+            // 设置元素验证器的基础路径
+            _elementValidator.MemberPath = GetEffectiveMemberName();
+
+            // 检查集合元素对象验证器是否实现 IMemberPathRepairable 接口
+            if (_elementValidator is IMemberPathRepairable repairable)
+            {
+                // 修复验证器及其子验证器的成员路径
+                repairable.RepairMemberPaths();
+            }
         }
 
-        // 设置元素验证器的基础路径
-        _elementValidator.MemberPath = GetEffectiveMemberName();
-
-        // 检查集合元素对象验证器是否实现 IMemberPathRepairable 接口
-        if (_elementValidator is IMemberPathRepairable repairable)
+        // 检查是否设置了集合元素值验证器
+        // ReSharper disable once UseNullPropagation
+        if (_valueValidator is not null)
         {
-            // 修复验证器及其子验证器的成员路径
-            repairable.RepairMemberPaths();
+            // 设置元素验证器的基础路径
+            _valueValidator.MemberPath = GetEffectiveMemberName();
         }
     }
 
@@ -352,6 +550,7 @@ public sealed class
         propertyValidator._preProcessor = _preProcessor;
         propertyValidator._propertyValidator = _propertyValidator;
         propertyValidator._elementValidator = _elementValidator;
+        propertyValidator._valueValidator = _valueValidator;
 
         // 同步已设置的验证器
         propertyValidator.AddValidators(Validators);

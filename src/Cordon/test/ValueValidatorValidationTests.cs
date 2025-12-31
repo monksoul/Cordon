@@ -83,6 +83,32 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void WithMemberName_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>();
+        Assert.Null(valueValidator.DisplayName);
+        Assert.Null(valueValidator.MemberName);
+
+        valueValidator.WithMemberName("MyName");
+        Assert.Equal("MyName", valueValidator.MemberName);
+        valueValidator.WithMemberName(null);
+        Assert.Null(valueValidator.MemberName);
+    }
+
+    [Fact]
+    public void WithName_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>();
+        Assert.Null(valueValidator.DisplayName);
+        Assert.Null(valueValidator.MemberName);
+
+        valueValidator.WithName("MyName");
+        Assert.Equal("MyName", valueValidator.MemberName);
+        valueValidator.WithName(null);
+        Assert.Null(valueValidator.MemberName);
+    }
+
+    [Fact]
     public void Age_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().Age();

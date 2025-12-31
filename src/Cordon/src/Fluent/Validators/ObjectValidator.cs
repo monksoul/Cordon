@@ -339,9 +339,8 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     /// <returns>
     ///     <see cref="CollectionPropertyValidator{T,TElement}" />
     /// </returns>
-    public CollectionPropertyValidator<T, TElement> RuleForEach<TElement>(
+    public CollectionPropertyValidator<T, TElement> RuleForCollection<TElement>(
         Expression<Func<T, IEnumerable<TElement?>?>> selector)
-        where TElement : class
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(selector);

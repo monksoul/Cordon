@@ -27,6 +27,12 @@ public class GetStartController
     {
         return Task.FromResult(user);
     }
+
+    [HttpPost]
+    public Task<Test> Post4(Test test)
+    {
+        return Task.FromResult(test);
+    }
 }
 
 public class NameValidator : AbstractValueValidator<string>
@@ -35,4 +41,28 @@ public class NameValidator : AbstractValueValidator<string>
     {
         Rule().Required().MinLength(3);
     }
+}
+
+public class Test : IValidatableObject
+{
+    public int Id { get; set; }
+    public List<string>? Names { get; set; }
+
+    public Test2? Test2 { get; set; }
+
+    /// <inheritdoc />
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        return validationContext.With<Test>()
+            .RuleFor(u => u.Id).Min(1)
+            .RuleForCollection(u => u.Names).EachRules(u => u.Required().MinLength(3)).MinLength(1)
+            .RuleFor(u => u.Test2).ChildRules(u =>
+                u.RuleForCollection(d => d.Names).EachRules(d => d.Required().MinLength(3)).MinLength(1))
+            .ToResults();
+    }
+}
+
+public class Test2
+{
+    public List<string>? Names { get; set; }
 }

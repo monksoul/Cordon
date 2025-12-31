@@ -16,7 +16,7 @@ public class Custom : IValidatableObject
         return validationContext.With<Custom>()
             .RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
             .RuleFor(u => u.Id).Max(int.MaxValue)
-            .RuleForEach(u => u.Addresses).NotEmpty().ChildRules(u =>
+            .RuleForCollection(u => u.Addresses).NotEmpty().ChildRules(u =>
             {
                 u.RuleFor(c => c.Country).Required()
                     .RuleFor(c => c.Province).Required()
@@ -29,7 +29,7 @@ public class Custom : IValidatableObject
         // {
         //     validator.RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
         //         .RuleFor(u => u.Id).Max(int.MaxValue)
-        //         .RuleForEach(u => u.Addresses).ChildRules(u =>
+        //         .RuleForCollection(u => u.Addresses).ChildRules(u =>
         //         {
         //             u.RuleFor(c => c.Country).Required()
         //                 .RuleFor(c => c.Province).Required()
@@ -52,7 +52,7 @@ public class CustomValidator : AbstractValidator<Custom>
     {
         RuleFor(u => u.Name).NotBlank().MinLength(3).UserName().WithMessage("不是有效的互联网用户名")
             .RuleFor(u => u.Id).Max(int.MaxValue)
-            .RuleForEach(u => u.Addresses).ChildRules(u =>
+            .RuleForCollection(u => u.Addresses).ChildRules(u =>
             {
                 u.RuleFor(c => c.Country).Required()
                     .RuleFor(c => c.Province).Required()

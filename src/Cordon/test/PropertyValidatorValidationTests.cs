@@ -2312,10 +2312,10 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
-    public void RuleForEach_ReturnOK()
+    public void RuleForCollection_ReturnOK()
     {
-        using var objectValidator = new ObjectValidator<ObjectModel>().RuleForEach(u => u.Children)
-            .RuleForEach(u => u.Children).End();
+        using var objectValidator = new ObjectValidator<ObjectModel>().RuleForCollection(u => u.Children)
+            .RuleForCollection(u => u.Children).End();
         Assert.Equal(2, objectValidator.Validators.Count);
     }
 

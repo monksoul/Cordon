@@ -826,51 +826,6 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void Each_Invalid_Parameters()
-    {
-        using var objectValidator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = new PropertyValidator<ObjectModel, List<Child>>(u => u.Children, objectValidator);
-
-        Assert.Throws<ArgumentNullException>(() => propertyValidator.Each<Child>(null!));
-
-        var propertyValidator2 = new PropertyValidator<ObjectModel, List<Child>>(u => u.Children, objectValidator);
-        var exception = Assert.Throws<InvalidOperationException>(() => propertyValidator2.Each<Nested>(_ => { }));
-        Assert.Equal(
-            "The property 'Children' does not implement IEnumerable<Nested>. Use RuleForEach instead, or ensure the property type implements IEnumerable<Nested>.",
-            exception.Message);
-
-        var exception2 =
-            Assert.Throws<InvalidOperationException>(() =>
-                propertyValidator.When(u => u.Count > 0).Each<Child>(_ => { }));
-        Assert.Equal(
-            ".Each() must be called immediately after RuleFor(). Do not call ChildRules, SetValidator, When, Unless, or PreProcess before Each. To validate the entire collection, use RuleForEach() instead.",
-            exception2.Message);
-    }
-
-    [Fact]
-    public void Each_ReturnOK()
-    {
-        using var objectValidator = new ObjectValidator<ObjectModel>();
-        _ = new PropertyValidator<ObjectModel, List<Child>>(u => u.Children, objectValidator) { RuleSets = ["email"] }
-            .NotNull().NotEmpty().WithDisplayName("DisChildren").WithMemberName("MbChildren").CustomOnly()
-            .Each<Child>(u =>
-            {
-                u.RuleFor(c => c.Id).Min(10);
-            }).Must(d => d?.Any() == true).AllowEmptyStrings();
-
-        Assert.Single(objectValidator.Validators);
-        var collectionPropertyValidator =
-            objectValidator.Validators[0] as CollectionPropertyValidator<ObjectModel, Child>;
-        Assert.NotNull(collectionPropertyValidator);
-        Assert.Equal(3, collectionPropertyValidator.Validators.Count);
-        Assert.True(collectionPropertyValidator.SuppressAnnotationValidation);
-        Assert.Equal("DisChildren", collectionPropertyValidator.DisplayName);
-        Assert.Equal("MbChildren", collectionPropertyValidator.MemberName);
-        Assert.NotNull(collectionPropertyValidator._elementValidator);
-        Assert.True(collectionPropertyValidator._allowEmptyStrings);
-    }
-
-    [Fact]
     public void When_Invalid_Parameters()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
