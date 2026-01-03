@@ -26,7 +26,7 @@ public partial class PasswordValidator : ValidatorBase
     public bool Strong { get; set; }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         value switch
         {
             null => true,

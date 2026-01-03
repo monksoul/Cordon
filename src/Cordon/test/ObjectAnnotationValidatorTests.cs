@@ -11,7 +11,7 @@ public class ObjectAnnotationValidatorTests
     {
         var validator = new ObjectAnnotationValidator();
         Assert.True(validator.ValidateAllProperties);
-        Assert.Null(validator._items);
+        Assert.Empty(validator.Items);
         Assert.Null(validator._serviceProvider);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
@@ -19,8 +19,8 @@ public class ObjectAnnotationValidatorTests
 
         var validator2 = new ObjectAnnotationValidator(new Dictionary<object, object?> { { "id", 1 } });
         Assert.Null(validator2._serviceProvider);
-        Assert.NotNull(validator2._items);
-        Assert.Single(validator2._items);
+        Assert.NotNull(validator2.Items);
+        Assert.Single(validator2.Items);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
@@ -28,8 +28,8 @@ public class ObjectAnnotationValidatorTests
         var validator3 =
             new ObjectAnnotationValidator(serviceProvider, new Dictionary<object, object?> { { "id", 1 } });
         Assert.NotNull(validator3._serviceProvider);
-        Assert.NotNull(validator3._items);
-        Assert.Single(validator3._items);
+        Assert.NotNull(validator3.Items);
+        Assert.Single(validator3.Items);
     }
 
     [Fact]

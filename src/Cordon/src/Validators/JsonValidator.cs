@@ -22,7 +22,7 @@ public class JsonValidator : ValidatorBase
     public bool AllowTrailingCommas { get; set; }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value)
+    public override bool IsValid(object? value, IValidationContext? validationContext)
     {
         // 空检查
         if (value is null)

@@ -19,7 +19,7 @@ public partial class BankCardValidator : ValidatorBase
     public BankCardValidator() => UseResourceKey(() => nameof(ValidationMessages.BankCardValidator_ValidationError));
 
     /// <inheritdoc />
-    public override bool IsValid(object? value)
+    public override bool IsValid(object? value, IValidationContext? validationContext)
     {
         // 空检查
         if (value is null)

@@ -35,5 +35,6 @@ public class DeniedValuesValidator : ValidatorBase
     public object?[] Values { get; }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) => _validator.IsValid(value);
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
+        _validator.IsValid(value, validationContext);
 }

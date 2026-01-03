@@ -8,7 +8,7 @@ public class Custom : IValidatableObject
 
     [GreaterThanOrEqualTo(18)] public int Age { get; set; }
 
-    public List<Address>? Addresses { get; set; }
+    public List<CustomAddress>? Addresses { get; set; }
 
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
@@ -39,7 +39,7 @@ public class Custom : IValidatableObject
     }
 }
 
-public class Address
+public class CustomAddress
 {
     public string? Country { get; set; }
     public string? Province { get; set; }

@@ -7,32 +7,46 @@ namespace Cordon.Tests;
 public class ValidationContextTests
 {
     [Fact]
-    public void New_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new ValidationContext<ObjectModel>(null!, null, null));
-
-    [Fact]
     public void New_ReturnOK()
     {
-        var context = new ValidationContext<ObjectModel>(new ObjectModel(), null, null);
-        Assert.NotNull(context.Instance);
-        Assert.Null(context._serviceProvider);
-        Assert.NotNull(context.Items);
-        Assert.Empty(context.Items);
+        var validationContext = new ValidationContext<ObjectModel>(null!);
+        Assert.Null(validationContext.Instance);
+        Assert.Null(validationContext.DisplayName);
+        Assert.Null(validationContext.MemberNames);
+        Assert.Null(validationContext.RuleSets);
+        Assert.Empty(validationContext.Items);
+        Assert.Null(validationContext._serviceProvider);
+
+        var validationContext2 = new ValidationContext<ObjectModel>(new ObjectModel());
+        Assert.NotNull(validationContext2.Instance);
+
+        var validationContext3 =
+            new ValidationContext<ObjectModel>(new ObjectModel(),
+                new Dictionary<object, object?> { { "name", "Furion" } });
+        Assert.NotNull(validationContext3.Instance);
+        Assert.Single(validationContext3.Items);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        var context2 =
+
+        var validationContext4 =
             new ValidationContext<ObjectModel>(new ObjectModel(), serviceProvider,
                 new Dictionary<object, object?> { { "name", "Furion" } });
-        Assert.NotNull(context2.Instance);
-        Assert.NotNull(context2._serviceProvider);
-        Assert.NotNull(context2.Items);
-        Assert.Single(context2.Items);
+        Assert.NotNull(validationContext4.Instance);
+        Assert.Single(validationContext4.Items);
+        Assert.NotNull(validationContext4._serviceProvider);
+
+        var validationContext5 =
+            new ValidationContext<ObjectModel>(new ObjectModel(), serviceProvider.GetService,
+                new Dictionary<object, object?> { { "name", "Furion" } });
+        Assert.NotNull(validationContext5.Instance);
+        Assert.Single(validationContext5.Items);
+        Assert.NotNull(validationContext5._serviceProvider);
     }
 
     [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
-        var context = new ValidationContext<ObjectModel>(new ObjectModel(), null, null);
+        var context = new ValidationContext<ObjectModel>(new ObjectModel(), (IServiceProvider?)null, null);
         Assert.Null(context._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();

@@ -63,7 +63,7 @@ public class CompareValidator<T, TProperty> : ValidatorBase<T>
     public PropertyInfo OtherProperty { get; }
 
     /// <inheritdoc />
-    public override bool IsValid(T? instance)
+    public override bool IsValid(T? instance, ValidationContext<T> validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);

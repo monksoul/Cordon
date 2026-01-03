@@ -15,7 +15,7 @@ public class NotBlankValidator : ValidatorBase
     public NotBlankValidator() => UseResourceKey(() => nameof(ValidationMessages.NotBlankValidator_ValidationError));
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         value switch
         {
             null => true,

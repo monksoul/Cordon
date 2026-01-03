@@ -19,14 +19,27 @@ public class PredicateValidator<T> : ValidatorBase<T>
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
+        Condition = (instance, _) => condition(instance);
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="PredicateValidator{T}" />
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    public PredicateValidator(Func<T, ValidationContext<T>, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
         Condition = condition;
     }
 
     /// <summary>
     ///     条件委托
     /// </summary>
-    public Func<T, bool> Condition { get; }
+    public Func<T, ValidationContext<T>, bool> Condition { get; }
 
     /// <inheritdoc />
-    public override bool IsValid(T? instance) => Condition(instance!);
+    public override bool IsValid(T? instance, ValidationContext<T> validationContext) =>
+        Condition(instance!, validationContext);
 }

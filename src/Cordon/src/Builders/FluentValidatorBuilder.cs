@@ -19,11 +19,6 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     where TSelf : FluentValidatorBuilder<T, TSelf>
 {
     /// <summary>
-    ///     验证上下文数据
-    /// </summary>
-    internal readonly IDictionary<object, object?>? _items;
-
-    /// <summary>
     ///     高优先级验证器区域的结束索引（同时也是普通验证器区域的起始索引）
     /// </summary>
     /// <remarks>
@@ -54,7 +49,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     <inheritdoc cref="FluentValidatorBuilder{T,TSelf}" />
     /// </summary>
-    /// <param name="items">验证上下文数据</param>
+    /// <param name="items">共享数据</param>
     internal FluentValidatorBuilder(IDictionary<object, object?>? items)
         : this(null, items)
     {
@@ -66,7 +61,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
     /// </param>
-    /// <param name="items">验证上下文数据</param>
+    /// <param name="items">共享数据</param>
     internal FluentValidatorBuilder(IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
     {
         // 空检查
@@ -75,14 +70,19 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
             _serviceProvider = serviceProvider.GetService;
         }
 
-        _items = items;
+        Items = items is not null ? new Dictionary<object, object?>(items) : new Dictionary<object, object?>();
         Validators = [];
     }
 
     /// <summary>
     ///     派生类型自身引用
     /// </summary>
-    internal TSelf This => (TSelf)this;
+    public TSelf This => (TSelf)this;
+
+    /// <summary>
+    ///     共享数据
+    /// </summary>
+    public IDictionary<object, object?> Items { get; }
 
     /// <summary>
     ///     验证器集合
@@ -138,11 +138,18 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         // 空检查 
         ArgumentNullException.ThrowIfNull(validator);
 
-        // 检查派生类型是否实现 IRuleSetContextProvider 接口
+        // 检查派生类型 this 是否实现 IRuleSetContextProvider 接口
         if (this is IRuleSetContextProvider ruleSetProvider)
         {
             // 获取当前上下文中的规则集并设置
             validator.RuleSets = ruleSetProvider.GetCurrentRuleSets();
+        }
+
+        // 检查验证器是否实现 IValidatorInitializer 接口
+        if (validator is IValidatorInitializer initializer)
+        {
+            // 同步 IServiceProvider 委托
+            initializer.InitializeServiceProvider(_serviceProvider);
         }
 
         // 检查是否是高优先级验证器
@@ -176,13 +183,6 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
 
         // 记录最新添加的验证器实例
         _lastAddedValidator = validator;
-
-        // 检查验证器是否实现 IValidatorInitializer 接口
-        if (validator is IValidatorInitializer initializer)
-        {
-            // 同步 IServiceProvider 委托
-            initializer.InitializeServiceProvider(_serviceProvider);
-        }
 
         return This;
     }
@@ -785,31 +785,6 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf Min(IComparable minimum) => AddValidator(new MinValidator(minimum));
 
     /// <summary>
-    ///     添加自定义条件不成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf MustUnless(Func<T, bool> condition) =>
-        AddValidator(new MustUnlessValidator<T>(condition));
-
-    /// <summary>
-    ///     添加自定义条件不成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf MustUnless(Func<T, ValidationContext<T>, bool> condition)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(condition);
-
-        return AddValidator(new MustUnlessValidator<T>(u => condition(u, CreateValidationContext(u))));
-    }
-
-    /// <summary>
     ///     添加自定义条件成立时委托验证器
     /// </summary>
     /// <param name="condition">条件委托</param>
@@ -825,13 +800,8 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf Must(Func<T, ValidationContext<T>, bool> condition)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(condition);
-
-        return AddValidator(new MustValidator<T>(u => condition(u, CreateValidationContext(u))));
-    }
+    public virtual TSelf Must(Func<T, ValidationContext<T>, bool> condition) =>
+        AddValidator(new MustValidator<T>(condition));
 
     /// <summary>
     ///     添加自定义条件成立时委托验证器
@@ -861,14 +831,13 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf MustAny<TElement>(IEnumerable<TElement> enumerable,
-        Func<T, ValidationContext<T>, TElement, bool> condition)
+        Func<T, TElement, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(enumerable);
         ArgumentNullException.ThrowIfNull(condition);
 
-        return AddValidator(new MustValidator<T>(u =>
-            enumerable.Any(x => condition(u, CreateValidationContext(u), x))));
+        return AddValidator(new MustValidator<T>((u, c) => enumerable.Any(x => condition(u, x, c))));
     }
 
     /// <summary>
@@ -899,14 +868,13 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf MustAll<TElement>(IEnumerable<TElement> enumerable,
-        Func<T, ValidationContext<T>, TElement, bool> condition)
+        Func<T, TElement, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(enumerable);
         ArgumentNullException.ThrowIfNull(condition);
 
-        return AddValidator(new MustValidator<T>(u =>
-            enumerable.All(x => condition(u, CreateValidationContext(u), x))));
+        return AddValidator(new MustValidator<T>((u, c) => enumerable.All(x => condition(u, x, c))));
     }
 
     /// <summary>
@@ -938,7 +906,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
-        return AddValidator(new MustValidator<T>(u => u is null || condition(u, CreateValidationContext(u))));
+        return AddValidator(new MustValidator<T>((u, c) => u is null || condition(u, c)));
     }
 
     /// <summary>
@@ -971,8 +939,8 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
-        return AddValidator(new MustValidator<T>(u =>
-            u is null || (u.TryGetCount(out var count) && count == 0) || condition(u, CreateValidationContext(u))));
+        return AddValidator(new MustValidator<T>((u, c) =>
+            u is null || (u.TryGetCount(out var count) && count == 0) || condition(u, c)));
     }
 
     /// <summary>
@@ -1057,13 +1025,8 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf Predicate(Func<T, ValidationContext<T>, bool> condition)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(condition);
-
-        return AddValidator(new PredicateValidator<T>(u => condition(u, CreateValidationContext(u))));
-    }
+    public virtual TSelf Predicate(Func<T, ValidationContext<T>, bool> condition) =>
+        AddValidator(new PredicateValidator<T>(condition));
 
     /// <summary>
     ///     添加指定数值范围约束验证器
@@ -1328,7 +1291,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf AddAnnotations(params ValidationAttribute[] attributes) =>
-        AddValidator(new ValueAnnotationValidator(attributes, null, _items));
+        AddValidator(new ValueAnnotationValidator(attributes, null, Items));
 
     /// <summary>
     ///     构建验证器集合
@@ -1337,30 +1300,12 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <returns>
     ///     <see cref="IReadOnlyList{T}" />
     /// </returns>
-    internal IReadOnlyList<ValidatorBase> Build(Action<TSelf>? configure = null)
+    public IReadOnlyList<ValidatorBase> Build(Action<TSelf>? configure = null)
     {
         // 调用验证器配置委托
-        configure?.Invoke((TSelf)this);
+        configure?.Invoke(This);
 
         return Validators;
-    }
-
-    /// <summary>
-    ///     创建 <see cref="ValidationContext{T}" /> 实例
-    /// </summary>
-    /// <param name="value">对象</param>
-    /// <returns>
-    ///     <see cref="ValidationContext{T}" />
-    /// </returns>
-    internal ValidationContext<T> CreateValidationContext(T value)
-    {
-        // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext<T>(value, null, _items);
-
-        // 同步 IServiceProvider 委托
-        validationContext.InitializeServiceProvider(_serviceProvider);
-
-        return validationContext;
     }
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />

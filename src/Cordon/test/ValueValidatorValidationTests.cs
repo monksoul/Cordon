@@ -916,38 +916,6 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
-    public void MustUnless_Invalid_Parameters()
-    {
-        Assert.Throws<ArgumentNullException>(() => new ValueValidator<int>().MustUnless((Func<int, bool>)null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            new ValueValidator<int>().MustUnless((Func<int, ValidationContext<int>, bool>)null!));
-    }
-
-    [Fact]
-    public void MustUnless_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<int>().MustUnless(u => u <= 10);
-
-        Assert.Single(valueValidator.Validators);
-
-        var addedValidator = valueValidator._lastAddedValidator as MustUnlessValidator<int>;
-        Assert.NotNull(addedValidator);
-
-        Assert.True(valueValidator.IsValid(11));
-        Assert.False(valueValidator.IsValid(9));
-
-        var valueValidator2 = new ValueValidator<int>().MustUnless((_, ctx) => ctx.Instance <= 10);
-
-        Assert.Single(valueValidator2.Validators);
-
-        var addedValidator2 = valueValidator2._lastAddedValidator as MustUnlessValidator<int>;
-        Assert.NotNull(addedValidator2);
-
-        Assert.True(valueValidator2.IsValid(11));
-        Assert.False(valueValidator2.IsValid(9));
-    }
-
-    [Fact]
     public void Must_Invalid_Parameters()
     {
         Assert.Throws<ArgumentNullException>(() => new ValueValidator<int>().Must((Func<int, bool>)null!));
@@ -1059,11 +1027,11 @@ public class ValueValidatorValidationTests
 
         Assert.Throws<ArgumentNullException>(() =>
             new ValueValidator<string>()
-                .MustAny(null!, (Func<string, ValidationContext<string>, string, bool>)null!));
+                .MustAny(null!, (Func<string, string, ValidationContext<string>, bool>)null!));
 
         Assert.Throws<ArgumentNullException>(() =>
             new ValueValidator<string>()
-                .MustAny([], (Func<string, ValidationContext<string>, string, bool>)null!));
+                .MustAny([], (Func<string, string, ValidationContext<string>, bool>)null!));
     }
 
     [Fact]
@@ -1083,7 +1051,7 @@ public class ValueValidatorValidationTests
         Assert.False(valueValidator.IsValid("monksoul@gmail.com"));
 
         var valueValidator2 = new ValueValidator<string>().MustAny(allowedDomains,
-            (_, ctx, x) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+            (_, x, ctx) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         Assert.Single(valueValidator2.Validators);
 
@@ -1108,11 +1076,11 @@ public class ValueValidatorValidationTests
 
         Assert.Throws<ArgumentNullException>(() =>
             new ValueValidator<string>()
-                .MustAll(null!, (Func<string, ValidationContext<string>, string, bool>)null!));
+                .MustAll(null!, (Func<string, string, ValidationContext<string>, bool>)null!));
 
         Assert.Throws<ArgumentNullException>(() =>
             new ValueValidator<string>()
-                .MustAll([], (Func<string, ValidationContext<string>, string, bool>)null!));
+                .MustAll([], (Func<string, string, ValidationContext<string>, bool>)null!));
     }
 
     [Fact]
@@ -1132,7 +1100,7 @@ public class ValueValidatorValidationTests
         Assert.False(valueValidator.IsValid("monksoul@gmail.com"));
 
         var valueValidator2 = new ValueValidator<string>().MustAll(allowedDomains,
-            (_, ctx, x) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+            (_, x, ctx) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         Assert.Single(valueValidator2.Validators);
 

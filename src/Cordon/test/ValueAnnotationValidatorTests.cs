@@ -24,7 +24,7 @@ public class ValueAnnotationValidatorTests
         Assert.NotNull(validator.Attributes);
         Assert.Equal(2, validator.Attributes.Length);
         Assert.Null(validator._serviceProvider);
-        Assert.Null(validator._items);
+        Assert.Empty(validator.Items);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Null(validator._errorMessageResourceAccessor());
@@ -32,8 +32,8 @@ public class ValueAnnotationValidatorTests
         var validator2 = new ValueAnnotationValidator([new RequiredAttribute(), new StringLengthAttribute(3)],
             new Dictionary<object, object?> { { "id", 1 } });
         Assert.Null(validator2._serviceProvider);
-        Assert.NotNull(validator2._items);
-        Assert.Single(validator2._items);
+        Assert.NotNull(validator2.Items);
+        Assert.Single(validator2.Items);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
@@ -41,8 +41,8 @@ public class ValueAnnotationValidatorTests
         var validator3 = new ValueAnnotationValidator([new RequiredAttribute(), new StringLengthAttribute(3)],
             serviceProvider, new Dictionary<object, object?> { { "id", 1 } });
         Assert.NotNull(validator3._serviceProvider);
-        Assert.NotNull(validator3._items);
-        Assert.Single(validator3._items);
+        Assert.NotNull(validator3.Items);
+        Assert.Single(validator3.Items);
     }
 
     [Fact]

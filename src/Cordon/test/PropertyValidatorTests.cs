@@ -25,7 +25,7 @@ public class PropertyValidatorTests
         Assert.Equal(objectValidator, propertyValidator._objectValidator);
         Assert.NotNull(propertyValidator._annotationValidator);
         Assert.Null(propertyValidator._annotationValidator._serviceProvider);
-        Assert.Null(propertyValidator._annotationValidator._items);
+        Assert.Empty(propertyValidator._annotationValidator.Items);
         Assert.NotNull(propertyValidator.Validators);
         Assert.Null(propertyValidator._propertyValidator);
         Assert.Null(propertyValidator._lastAddedValidator);
@@ -37,7 +37,6 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator.MemberName);
         Assert.Null(propertyValidator.SuppressAnnotationValidation);
         Assert.Null(propertyValidator.WhenCondition);
-        Assert.Null(propertyValidator.UnlessCondition);
         Assert.NotNull(propertyValidator.This);
         Assert.Equal(propertyValidator.This, propertyValidator);
         Assert.Null(propertyValidator._allowEmptyStrings);
@@ -53,7 +52,7 @@ public class PropertyValidatorTests
         Assert.Equal(objectValidator2, propertyValidator2._objectValidator);
         Assert.NotNull(propertyValidator2._annotationValidator);
         Assert.Null(propertyValidator2._annotationValidator._serviceProvider); // RuleFor 时同步
-        Assert.NotNull(propertyValidator2._annotationValidator._items);
+        Assert.NotNull(propertyValidator2._annotationValidator.Items);
     }
 
     [Fact]
@@ -845,52 +844,18 @@ public class PropertyValidatorTests
         propertyValidator.When(u => u is not null);
         Assert.NotNull(propertyValidator.WhenCondition);
         Assert.False(propertyValidator.WhenCondition(null,
-            new ValidationContext<ObjectModel>(new ObjectModel(), null, null)));
+            new ValidationContext<ObjectModel>(new ObjectModel(), (IServiceProvider?)null, null)));
         Assert.True(propertyValidator.WhenCondition("Furion",
-            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, null, null)));
+            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, (IServiceProvider?)null, null)));
 
         var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
 
         propertyValidator2.When((_, ctx) => ctx.Instance.Name is not null);
         Assert.NotNull(propertyValidator2.WhenCondition);
         Assert.False(propertyValidator2.WhenCondition(null,
-            new ValidationContext<ObjectModel>(new ObjectModel(), null, null)));
+            new ValidationContext<ObjectModel>(new ObjectModel(), (IServiceProvider?)null, null)));
         Assert.True(propertyValidator2.WhenCondition("Furion",
-            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, null, null)));
-    }
-
-    [Fact]
-    public void Unless_Invalid_Parameters()
-    {
-        using var objectValidator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
-
-        Assert.Throws<ArgumentNullException>(() => propertyValidator.Unless((Func<string?, bool>)null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            propertyValidator.Unless((Func<string?, ValidationContext<ObjectModel>, bool>)null!));
-    }
-
-    [Fact]
-    public void Unless_ReturnOK()
-    {
-        using var objectValidator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
-
-        propertyValidator.Unless(u => u is null);
-        Assert.NotNull(propertyValidator.UnlessCondition);
-        Assert.True(propertyValidator.UnlessCondition(null,
-            new ValidationContext<ObjectModel>(new ObjectModel(), null, null)));
-        Assert.False(propertyValidator.UnlessCondition("Furion",
-            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, null, null)));
-
-        var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
-
-        propertyValidator2.Unless((_, ctx) => ctx.Instance.Name is null);
-        Assert.NotNull(propertyValidator2.UnlessCondition);
-        Assert.True(propertyValidator2.UnlessCondition(null,
-            new ValidationContext<ObjectModel>(new ObjectModel(), null, null)));
-        Assert.False(propertyValidator2.UnlessCondition("Furion",
-            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, null, null)));
+            new ValidationContext<ObjectModel>(new ObjectModel { Name = "Furion" }, (IServiceProvider?)null, null)));
     }
 
     [Fact]
@@ -912,7 +877,12 @@ public class PropertyValidatorTests
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
 
-        Assert.Throws<ArgumentNullException>(() => propertyValidator.ShouldValidate(null!, null));
+        Assert.Throws<ArgumentNullException>(() =>
+            propertyValidator.ShouldValidate(null!, null, null!, null));
+
+        var validationContext = new ValidationContext<ObjectModel>(new ObjectModel());
+        Assert.Throws<ArgumentNullException>(() =>
+            propertyValidator.ShouldValidate(null!, null, validationContext, null));
     }
 
     [Fact]
@@ -922,18 +892,20 @@ public class PropertyValidatorTests
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
         var model = new ObjectModel();
 
-        Assert.True(propertyValidator.ShouldValidate(model, null));
-        Assert.True(propertyValidator.ShouldValidate(model, null, ["*"]));
+        var validationContext = new ValidationContext<ObjectModel>(model);
+
+        Assert.True(propertyValidator.ShouldValidate(model, null, validationContext, null));
+        Assert.True(propertyValidator.ShouldValidate(model, null, validationContext, ["*"]));
 
         var propertyValidator2 = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator)
         {
             RuleSets = ["login", "register"]
         };
-        Assert.False(propertyValidator2.ShouldValidate(model, null));
-        Assert.True(propertyValidator2.ShouldValidate(model, null, ["*"]));
-        Assert.True(propertyValidator2.ShouldValidate(model, null, ["login"]));
-        Assert.True(propertyValidator2.ShouldValidate(model, null, ["register"]));
-        Assert.False(propertyValidator2.ShouldValidate(model, null, ["other"]));
+        Assert.False(propertyValidator2.ShouldValidate(model, null, validationContext, null));
+        Assert.True(propertyValidator2.ShouldValidate(model, null, validationContext, ["*"]));
+        Assert.True(propertyValidator2.ShouldValidate(model, null, validationContext, ["login"]));
+        Assert.True(propertyValidator2.ShouldValidate(model, null, validationContext, ["register"]));
+        Assert.False(propertyValidator2.ShouldValidate(model, null, validationContext, ["other"]));
     }
 
     [Fact]
@@ -941,16 +913,15 @@ public class PropertyValidatorTests
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator)
-            .When(u => u is not null).Unless(u => u?.Equals("Fur") == true);
+            .When(u => u is not null);
         var model = new ObjectModel();
 
-        Assert.False(propertyValidator.ShouldValidate(model, null));
+        var validationContext = new ValidationContext<ObjectModel>(model);
+
+        Assert.False(propertyValidator.ShouldValidate(model, null, validationContext, null));
 
         model.Name = "Furion";
-        Assert.True(propertyValidator.ShouldValidate(model, "Furion"));
-
-        model.Name = "Fur";
-        Assert.False(propertyValidator.ShouldValidate(model, "Fur"));
+        Assert.True(propertyValidator.ShouldValidate(model, "Furion", validationContext, null));
     }
 
     [Fact]
@@ -960,20 +931,22 @@ public class PropertyValidatorTests
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
         var model = new ObjectModel();
 
+        var validationContext = new ValidationContext<ObjectModel>(model);
+
         model.Name = null;
-        Assert.True(propertyValidator.ShouldValidate(model, null));
+        Assert.True(propertyValidator.ShouldValidate(model, null, validationContext, null));
         model.Name = string.Empty;
-        Assert.True(propertyValidator.ShouldValidate(model, string.Empty));
+        Assert.True(propertyValidator.ShouldValidate(model, string.Empty, validationContext, null));
         model.Name = "Furion";
-        Assert.True(propertyValidator.ShouldValidate(model, "Furion"));
+        Assert.True(propertyValidator.ShouldValidate(model, "Furion", validationContext, null));
 
         propertyValidator.AllowEmptyStrings();
         model.Name = null;
-        Assert.True(propertyValidator.ShouldValidate(model, null));
+        Assert.True(propertyValidator.ShouldValidate(model, null, validationContext, null));
         model.Name = string.Empty;
-        Assert.False(propertyValidator.ShouldValidate(model, string.Empty));
+        Assert.False(propertyValidator.ShouldValidate(model, string.Empty, validationContext, null));
         model.Name = "Furion";
-        Assert.True(propertyValidator.ShouldValidate(model, "Furion"));
+        Assert.True(propertyValidator.ShouldValidate(model, "Furion", validationContext, null));
     }
 
     [Fact]
@@ -990,28 +963,6 @@ public class PropertyValidatorTests
         objectValidator.Options.SuppressAnnotationValidation = false;
         propertyValidator.SkipAnnotationValidation();
         Assert.False(propertyValidator.ShouldRunAnnotationValidation());
-    }
-
-    [Fact]
-    public void GetValidatedObject_Invalid_Parameters()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            PropertyValidator<ObjectModel, string?>.GetValidatedObject(null!, null!, null));
-        Assert.Throws<ArgumentNullException>(() =>
-            PropertyValidator<ObjectModel, string?>.GetValidatedObject(new ObjectModel(), null!, null));
-    }
-
-    [Fact]
-    public void GetValidatedObject_ReturnOK()
-    {
-        var model = new ObjectModel { Name = "Furion" };
-
-        Assert.True(
-            PropertyValidator<ObjectModel, string?>.GetValidatedObject(model, new AgeValidator(), model.Name) is not
-                ObjectModel);
-        Assert.True(PropertyValidator<ObjectModel, string?>.GetValidatedObject(model,
-            new ValidatorProxy<ObjectModel, EqualToValidator>(u => u.Name, _ => ["Furion"]),
-            model.Name) is ObjectModel);
     }
 
     [Fact]
@@ -1166,46 +1117,6 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void CreateValidationContext_ReturnOK()
-    {
-        using var objectValidator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
-        var validationContext = propertyValidator.CreateValidationContext(new ObjectModel());
-
-        Assert.Null(propertyValidator._serviceProvider);
-        Assert.Null(validationContext._serviceProvider);
-
-        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
-        Assert.NotNull(propertyValidator._serviceProvider);
-
-        var validationContext2 = propertyValidator.CreateValidationContext(new ObjectModel());
-        Assert.NotNull(propertyValidator._serviceProvider);
-        Assert.NotNull(validationContext2._serviceProvider);
-    }
-
-    [Fact]
-    public void CreateValidationContext2_ReturnOK()
-    {
-        using var objectValidator = new ObjectValidator<ObjectModel>();
-        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
-        FluentValidatorBuilder<string?, PropertyValidator<ObjectModel, string?>> fluentValidatorBuilder =
-            propertyValidator;
-        var validationContext = fluentValidatorBuilder.CreateValidationContext("Furion");
-
-        Assert.Null(propertyValidator._serviceProvider);
-        Assert.Null(validationContext._serviceProvider);
-
-        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
-        Assert.NotNull(propertyValidator._serviceProvider);
-
-        var validationContext2 = fluentValidatorBuilder.CreateValidationContext("百小僧");
-        Assert.NotNull(propertyValidator._serviceProvider);
-        Assert.NotNull(validationContext2._serviceProvider);
-    }
-
-    [Fact]
     public void AllowEmptyStrings_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
@@ -1238,6 +1149,34 @@ public class PropertyValidatorTests
         Assert.Equal(2, cloned.Validators.Count);
         Assert.NotNull(cloned._preProcessor);
         Assert.True(cloned._allowEmptyStrings);
+    }
+
+    [Fact]
+    public void CreateValidationContext_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        var validationContext = propertyValidator.CreateValidationContext("Furion", null);
+        Assert.NotNull(validationContext);
+        Assert.Equal("Furion", validationContext.Instance);
+        Assert.Equal("Name", validationContext.DisplayName);
+        Assert.Equal(["Name"], validationContext.MemberNames);
+        Assert.Null(validationContext.RuleSets);
+        Assert.Empty(validationContext.Items);
+
+        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
+        Assert.NotNull(propertyValidator._serviceProvider);
+
+        var validationContext2 = propertyValidator.CreateValidationContext("Furion", ["Login"]);
+        Assert.NotNull(validationContext2);
+        Assert.Equal("Furion", validationContext2.Instance);
+        Assert.Equal("Name", validationContext2.DisplayName);
+        Assert.Equal(["Name"], validationContext2.MemberNames);
+        Assert.Equal<string>(["Login"], validationContext2.RuleSets!);
+        Assert.Empty(validationContext2.Items);
+        Assert.NotNull(validationContext2._serviceProvider);
     }
 
     public class ObjectModel

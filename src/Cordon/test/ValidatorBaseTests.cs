@@ -16,6 +16,7 @@ public class ValidatorBaseTests
         Assert.Null(validator._errorMessageResourceName);
         Assert.Null(validator._errorMessageResourceType);
         Assert.False(validator.SupportsAsync);
+        Assert.False(validator.IsTypedProxy);
 
         Assert.Null(validator.ErrorMessage);
         Assert.Null(validator.ErrorMessageResourceName);
@@ -433,7 +434,7 @@ public class ValidatorBaseTests
 
         var validator2 = new TestOfTValidator();
         Assert.Null(validator2.GetValidationResults("Furion", "data"));
-        var validationResult2 = validator2.GetValidationResults((object)"Validation", "data");
+        var validationResult2 = validator2.GetValidationResults("Validation", "data");
         Assert.NotNull(validationResult2);
         Assert.Equal("单元测试data错误信息", validationResult2.First().ErrorMessage);
         var validationResult3 = validator2.GetValidationResults("Validation", "data");
@@ -458,7 +459,7 @@ public class ValidatorBaseTests
 
         var validator2 = new TestOfTValidator();
         validator2.Validate("Furion", "data");
-        var exception2 = Assert.Throws<ValidationException>(() => validator2.Validate((object)"Validation", "data"));
+        var exception2 = Assert.Throws<ValidationException>(() => validator2.Validate("Validation", "data"));
         Assert.Equal("单元测试data错误信息", exception2.Message);
         var exception3 = Assert.Throws<ValidationException>(() => validator2.Validate("Validation", "data"));
         Assert.Equal("单元测试data错误信息", exception3.Message);
@@ -484,16 +485,46 @@ public class ValidatorBaseTests
         Assert.Null(TestOfTValidator.ConvertValue(null));
         Assert.Equal("Furion", TestOfTValidator.ConvertValue("Furion"));
     }
+
+    [Fact]
+    public void CreateValidationContext_ReturnOK()
+    {
+        var validationContext = ValidatorBase<string>.CreateValidationContext(null, null);
+        Assert.NotNull(validationContext);
+        Assert.Null(validationContext.Instance);
+        Assert.Null(validationContext.DisplayName);
+        Assert.Null(validationContext.MemberNames);
+        Assert.Null(validationContext.RuleSets);
+        Assert.Empty(validationContext.Items);
+        Assert.Null(validationContext._serviceProvider);
+
+        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        var validationContext2 = ValidatorBase<string>.CreateValidationContext("Furion",
+            new ValidationContext<string>("Furion", serviceProvider, new Dictionary<object, object?>())
+            {
+                DisplayName = "Name", MemberNames = ["Name"], RuleSets = ["Login"]
+            });
+
+        Assert.NotNull(validationContext2);
+        Assert.NotNull(validationContext2.Instance);
+        Assert.Equal("Furion", validationContext2.Instance);
+        Assert.Equal("Name", validationContext2.DisplayName);
+        Assert.Equal(["Name"], validationContext2.MemberNames);
+        Assert.Empty(validationContext2.Items);
+        Assert.NotNull(validationContext2.RuleSets);
+        Assert.Equal<string>(["Login"], validationContext2.RuleSets!);
+        Assert.NotNull(validationContext2._serviceProvider);
+    }
 }
 
 public class TestValidator() : ValidatorBase(TestValidationMessages.TestValidator_ValidationError)
 {
     /// <inheritdoc />
-    public override bool IsValid(object? value) => value?.ToString() == "Furion";
+    public override bool IsValid(object? value, IValidationContext? validationContext) => value?.ToString() == "Furion";
 }
 
 public class TestOfTValidator() : ValidatorBase<string>(TestValidationMessages.TestValidator_ValidationError)
 {
     /// <inheritdoc />
-    public override bool IsValid(string? instance) => instance == "Furion";
+    public override bool IsValid(string? instance, ValidationContext<string> validationContext) => instance == "Furion";
 }

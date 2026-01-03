@@ -40,7 +40,7 @@ public class DecimalPlacesValidator : ValidatorBase
     public bool AllowStringValues { get; set; }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value)
+    public override bool IsValid(object? value, IValidationContext? validationContext)
     {
         // 空检查
         if (value is null)

@@ -16,7 +16,7 @@ public partial class ChineseNameValidator : ValidatorBase
         UseResourceKey(() => nameof(ValidationMessages.ChineseNameValidator_ValidationError));
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         value switch
         {
             null => true,

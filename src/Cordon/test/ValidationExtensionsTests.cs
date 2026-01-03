@@ -45,10 +45,10 @@ public class ValidationExtensionsTests
         var validationContext = new ValidationContext(new ObjectModel(), null, null);
         var objectValidator = validationContext.With<Tests.ObjectModel>();
         Assert.NotNull(objectValidator);
-        Assert.NotNull(objectValidator._items);
-        Assert.Single(objectValidator._items);
+        Assert.NotNull(objectValidator.Items);
+        Assert.Single(objectValidator.Items);
         Assert.Equal(validationContext,
-            objectValidator._items[ObjectValidator<Tests.ObjectModel>.ValidationContextsKey]);
+            objectValidator.Items[ObjectValidator<Tests.ObjectModel>.ValidationContextsKey]);
     }
 
     [Fact]

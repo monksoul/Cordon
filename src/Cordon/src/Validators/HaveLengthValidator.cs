@@ -32,7 +32,7 @@ public class HaveLengthValidator : ValidatorBase
     public bool AllowEmpty { get; set; }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         value is null || (value.TryGetCount(out var count) && ((AllowEmpty && count == 0) || count == Length));
 
     /// <inheritdoc />

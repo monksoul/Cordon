@@ -70,27 +70,25 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
         InitializeServiceProvider(serviceProvider);
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         Mode switch
         {
-            CompositeMode.All or CompositeMode.FailFast => Validators.All(u => u.IsValid(value)),
-            CompositeMode.Any => Validators.Any(u => u.IsValid(value)),
+            CompositeMode.All or CompositeMode.FailFast => Validators.All(u => u.IsValid(value, validationContext)),
+            CompositeMode.Any => Validators.Any(u => u.IsValid(value, validationContext)),
             _ => throw new NotSupportedException()
         };
 
     /// <inheritdoc />
-    public override List<ValidationResult>? GetValidationResults(object? value, string name,
-        IEnumerable<string>? memberNames = null)
+    public override List<ValidationResult>? GetValidationResults(object? value, IValidationContext? validationContext)
     {
-        // 初始化验证结果集合和成员名称列表
+        // 初始化验证结果集合
         var validationResults = new List<ValidationResult>();
-        var memberNameList = memberNames?.ToList();
 
         // 遍历验证器集合
         foreach (var validator in Validators)
         {
             // 获取对象验证结果集合
-            if (validator.GetValidationResults(value, name, memberNameList) is { Count: > 0 } results)
+            if (validator.GetValidationResults(value, validationContext) is { Count: > 0 } results)
             {
                 // 追加验证结果集合
                 validationResults.AddRange(results);
@@ -114,24 +112,25 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
         {
-            validationResults.Insert(0, new ValidationResult(FormatErrorMessage(name), memberNameList));
+            validationResults.Insert(0,
+                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
+                    validationContext?.MemberNames));
         }
 
         return validationResults.ToResults();
     }
 
     /// <inheritdoc />
-    public override void Validate(object? value, string name, IEnumerable<string>? memberNames = null)
+    public override void Validate(object? value, IValidationContext? validationContext)
     {
-        // 初始化首个验证无效的验证器和成员名称列表
+        // 初始化首个验证无效的验证器
         ValidatorBase? firstFailedValidator = null;
-        var memberNameList = memberNames?.ToList();
 
         // 遍历验证器集合
         foreach (var validator in Validators)
         {
             // 检查对象合法性
-            if (!validator.IsValid(value))
+            if (!validator.IsValid(value, validationContext))
             {
                 // 缓存首个验证无效的验证器
                 firstFailedValidator ??= validator;
@@ -139,7 +138,7 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
                 // 检查验证器模式是否是遇到首个验证失败即停止后续验证
                 if (Mode is CompositeMode.All or CompositeMode.FailFast)
                 {
-                    ThrowValidationException(value, name, validator, memberNameList);
+                    ThrowValidationException(value, validator, validationContext);
                 }
             }
             // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
@@ -152,7 +151,7 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
         // 空检查
         if (firstFailedValidator is not null)
         {
-            ThrowValidationException(value, name, firstFailedValidator, memberNameList);
+            ThrowValidationException(value, firstFailedValidator, validationContext);
         }
     }
 
@@ -203,14 +202,15 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     ///     抛出验证异常
     /// </summary>
     /// <param name="value">对象</param>
-    /// <param name="name">显示名称</param>
     /// <param name="validator">
     ///     <see cref="ValidatorBase" />
     /// </param>
-    /// <param name="memberNames">成员名称列表</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
     /// <exception cref="ValidationException"></exception>
-    internal void ThrowValidationException(object? value, string name, ValidatorBase validator,
-        IEnumerable<string>? memberNames = null)
+    internal void ThrowValidationException(object? value, ValidatorBase validator,
+        IValidationContext? validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(validator);
@@ -218,12 +218,13 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
         // 检查是否配置了自定义错误信息
         if ((string?)ErrorMessageString is null)
         {
-            validator.Validate(value, name, memberNames);
+            validator.Validate(value, validationContext);
         }
         else
         {
-            throw new ValidationException(new ValidationResult(FormatErrorMessage(name), memberNames), null,
-                value);
+            throw new ValidationException(
+                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
+                    validationContext?.MemberNames), null, value);
         }
     }
 

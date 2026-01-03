@@ -70,7 +70,8 @@ public class RegularExpressionValidator : ValidatorBase, IDisposable
     }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) => _validator.IsValid(value);
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
+        _validator.IsValid(value, validationContext);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>

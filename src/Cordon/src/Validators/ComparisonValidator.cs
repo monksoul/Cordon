@@ -48,17 +48,20 @@ public abstract class ComparisonValidator : ValidatorBase
     ///     检查对象合法性
     /// </summary>
     /// <param name="value">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    protected abstract bool IsValid(IComparable value);
+    protected abstract bool IsValid(IComparable value, IValidationContext? validationContext);
 
     /// <inheritdoc />
-    public sealed override bool IsValid(object? value) =>
+    public sealed override bool IsValid(object? value, IValidationContext? validationContext) =>
         value switch
         {
             null => true,
-            IComparable val => IsValid(val),
+            IComparable val => IsValid(val, validationContext),
             _ => false
         };
 

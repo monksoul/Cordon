@@ -11,8 +11,8 @@ public class ValidationDataContextTest
     {
         var context = new ValidationDataContext();
         Assert.NotNull(context);
-        Assert.NotNull(context._items);
-        Assert.Empty(context._items);
+        Assert.NotNull(context.Items);
+        Assert.Empty(context.Items);
         Assert.NotNull(context.Items);
         Assert.Empty(context.Items);
         Assert.NotNull(ValidationDataContext.ValidationOptionsKey);

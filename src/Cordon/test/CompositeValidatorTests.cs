@@ -308,11 +308,13 @@ public class CompositeValidatorTests
         var validator = new CompositeValidator(new RequiredValidator(), new ChineseValidator());
 
         var exception = Assert.Throws<ValidationException>(() =>
-            validator.ThrowValidationException(null, "Value", validator.Validators.First()));
+            validator.ThrowValidationException(null, validator.Validators.First(),
+                new LegacyValidationContext { DisplayName = "Value" }));
         Assert.Equal("The Value field is required.", exception.Message);
 
         var exception2 = Assert.Throws<ValidationException>(() =>
-            validator.ThrowValidationException("Furion", "Value", validator.Validators.Last()));
+            validator.ThrowValidationException("Furion", validator.Validators.Last(),
+                new LegacyValidationContext { DisplayName = "Value" }));
         Assert.Equal("The field Value contains invalid Chinese characters.", exception2.Message);
     }
 

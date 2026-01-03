@@ -15,5 +15,6 @@ public class EmptyValidator : ValidatorBase
     public EmptyValidator() => UseResourceKey(() => nameof(ValidationMessages.EmptyValidator_ValidationError));
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) => value is null || (value.TryGetCount(out var count) && count == 0);
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
+        value is null || (value.TryGetCount(out var count) && count == 0);
 }

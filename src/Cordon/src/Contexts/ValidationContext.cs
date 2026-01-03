@@ -4,11 +4,9 @@
 
 namespace Cordon;
 
-/// <summary>
-///     验证上下文
-/// </summary>
+/// <inheritdoc cref="IValidationContext" />
 /// <typeparam name="T">对象类型</typeparam>
-public sealed class ValidationContext<T> : IValidatorInitializer, IServiceProvider
+public sealed class ValidationContext<T> : IValidationContext, IValidatorInitializer
 {
     /// <summary>
     ///     <see cref="IServiceProvider" /> 委托
@@ -19,43 +17,69 @@ public sealed class ValidationContext<T> : IValidatorInitializer, IServiceProvid
     ///     <inheritdoc cref="ValidationContext{T}" />
     /// </summary>
     /// <param name="instance">对象</param>
-    /// <param name="serviceProvider">
-    ///     <see cref="IServiceProvider" />
-    /// </param>
-    /// <param name="items">验证上下文数据</param>
-    internal ValidationContext(T instance, IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
+    public ValidationContext(T instance)
+        // ReSharper disable once IntroduceOptionalParameters.Global
+        : this(instance, (Func<Type, object?>?)null, null)
     {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(instance);
-
-        Instance = instance;
-
-        // 空检查
-        if (serviceProvider is not null)
-        {
-            _serviceProvider = serviceProvider.GetService;
-        }
-
-        Items = items is not null ? new Dictionary<object, object?>(items) : new Dictionary<object, object?>();
     }
 
     /// <summary>
-    ///     对象
+    ///     <inheritdoc cref="ValidationContext{T}" />
     /// </summary>
+    /// <param name="instance">对象</param>
+    /// <param name="items">共享数据</param>
+    public ValidationContext(T instance, IDictionary<object, object?>? items)
+        : this(instance, (Func<Type, object?>?)null, items)
+    {
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="ValidationContext{T}" />
+    /// </summary>
+    /// <param name="instance">对象</param>
+    /// <param name="serviceProvider">
+    ///     <see cref="IServiceProvider" />
+    /// </param>
+    /// <param name="items">共享数据</param>
+    public ValidationContext(T instance, IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
+        : this(instance, serviceProvider is null ? null : serviceProvider.GetService, items)
+    {
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="ValidationContext{T}" />
+    /// </summary>
+    /// <param name="instance">对象</param>
+    /// <param name="serviceProvider">
+    ///     <see cref="IServiceProvider" />
+    /// </param>
+    /// <param name="items">共享数据</param>
+    internal ValidationContext(T instance, Func<Type, object?>? serviceProvider, IDictionary<object, object?>? items)
+    {
+        Instance = instance;
+        _serviceProvider = serviceProvider;
+        Items = items is not null ? new Dictionary<object, object?>(items) : new Dictionary<object, object?>();
+    }
+
+    /// <inheritdoc cref="IValidationContext.Instance" />
     public T Instance { get; }
 
-    /// <summary>
-    ///     验证上下文数据
-    /// </summary>
-    public IReadOnlyDictionary<object, object?> Items { get; }
+    /// <inheritdoc />
+    object? IValidationContext.Instance => Instance;
 
-    /// <summary>
-    ///     解析服务
-    /// </summary>
-    /// <param name="serviceType">服务类型</param>
-    /// <returns>
-    ///     <see cref="object" />
-    /// </returns>
+    /// <inheritdoc />
+    public string DisplayName { get; init; } = null!;
+
+    /// <inheritdoc />
+    public IEnumerable<string>? MemberNames { get; init; }
+
+    /// <inheritdoc />
+    public string?[]? RuleSets { get; init; }
+
+    /// <inheritdoc />
+    public IDictionary<object, object?> Items { get; }
+
+    /// <inheritdoc />
     public object? GetService(Type serviceType) => _serviceProvider?.Invoke(serviceType);
 
     /// <inheritdoc />

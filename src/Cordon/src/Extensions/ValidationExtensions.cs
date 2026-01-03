@@ -66,7 +66,7 @@ public static class ValidationExtensions
         // 空检查
         ArgumentNullException.ThrowIfNull(validationContext);
 
-        // 拷贝一份验证上下文数据配置并追加自身实例
+        // 拷贝一份共享数据并追加自身实例
         var items = new Dictionary<object, object?>(validationContext.Items)
         {
             [ObjectValidator<T>.ValidationContextsKey] = validationContext

@@ -10,19 +10,19 @@ namespace Cordon;
 public interface IValidationDataContext
 {
     /// <summary>
-    ///     存储验证数据的字典
+    ///     共享数据
     /// </summary>
     IDictionary<object, object?> Items { get; }
 
     /// <summary>
-    ///     设置或更新验证数据
+    ///     设置或更新数据
     /// </summary>
     /// <param name="key">键</param>
     /// <param name="value">值</param>
     void SetValue(object key, object? value);
 
     /// <summary>
-    ///     尝试获取验证数据
+    ///     尝试获取数据
     /// </summary>
     /// <param name="key">键</param>
     /// <param name="value">值</param>

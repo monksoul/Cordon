@@ -19,6 +19,6 @@ public class MaxValidator : ComparisonValidator
     }
 
     /// <inheritdoc />
-    protected override bool IsValid(IComparable value) =>
+    protected override bool IsValid(IComparable value, IValidationContext? validationContext) =>
         IsTypeMatchedToCompareValue(value) && value.CompareTo(CompareValue) <= 0;
 }

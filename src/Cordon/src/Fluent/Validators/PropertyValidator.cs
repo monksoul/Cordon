@@ -62,7 +62,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     ///     <see cref="ObjectValidator{T}" />
     /// </param>
     internal PropertyValidator(Expression<Func<T, TProperty?>> selector, ObjectValidator<T> objectValidator)
-        : base(null, (objectValidator ?? throw new ArgumentNullException(nameof(objectValidator)))._items)
+        : base(null, (objectValidator ?? throw new ArgumentNullException(nameof(objectValidator))).Items)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(selector);
@@ -72,7 +72,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         _objectValidator = objectValidator;
 
         // 初始化 PropertyAnnotationValidator 实例
-        _annotationValidator = new PropertyAnnotationValidator<T, TProperty>(selector!, null, objectValidator._items);
+        _annotationValidator = new PropertyAnnotationValidator<T, TProperty>(selector!, null, objectValidator.Items);
 
         // 同步 IServiceProvider 委托（已在 RuleFor 创建时同步）
         // InitializeServiceProvider(objectValidator._serviceProvider);
@@ -108,12 +108,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     /// <remarks>当条件满足时才进行验证。</remarks>
     internal Func<TProperty, ValidationContext<T>, bool>? WhenCondition { get; set; }
 
-    /// <summary>
-    ///     逆向验证条件
-    /// </summary>
-    /// <remarks>当条件不满足时才进行验证。</remarks>
-    internal Func<TProperty, ValidationContext<T>, bool>? UnlessCondition { get; set; }
-
     /// <inheritdoc />
     void IMemberPathRepairable.RepairMemberPaths() => RepairMemberPaths();
 
@@ -133,14 +127,17 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 获取用于验证的属性值
         var propertyValue = GetValueForValidation(instance);
 
+        // 创建 ValidationContext 实例
+        var validationContext = CreateValidationContext(instance, ruleSets);
+
         // 检查是否应该对该属性执行验证
-        if (!ShouldValidate(instance, propertyValue, ruleSets))
+        if (!ShouldValidate(instance, propertyValue, validationContext, ruleSets))
         {
             return true;
         }
 
         // 检查是否启用属性验证特性验证
-        if (ShouldRunAnnotationValidation() && !_annotationValidator.IsValid(instance))
+        if (ShouldRunAnnotationValidation() && !_annotationValidator.IsValid(instance, validationContext))
         {
             return false;
         }
@@ -152,7 +149,12 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             return false;
         }
 
-        return Validators.All(u => u.IsValid(GetValidatedObject(instance, u, propertyValue)));
+        // 创建 ValidationContext 实例（属性）
+        var validationContextForProperty = CreateValidationContext(propertyValue, ruleSets);
+
+        // 对于 ValidatorProxy<T, TValidator>（对象级代理），传入整个对象；否则传入属性值
+        return Validators.All(u => u.IsValid(u.IsTypedProxy ? instance : propertyValue,
+            u.IsTypedProxy ? validationContext : validationContextForProperty));
     }
 
     /// <inheritdoc />
@@ -164,21 +166,22 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 获取用于验证的属性值
         var propertyValue = GetValueForValidation(instance);
 
+        // 创建 ValidationContext 实例
+        var validationContext = CreateValidationContext(instance, ruleSets);
+
         // 检查是否应该对该属性执行验证
-        if (!ShouldValidate(instance, propertyValue, ruleSets))
+        if (!ShouldValidate(instance, propertyValue, validationContext, ruleSets))
         {
             return null;
         }
 
-        // 获取显示名称、属性路径和初始化验证结果集合
-        var (displayName, memberPath) = (GetDisplayName(), GetEffectiveMemberName());
+        // 初始化验证结果集合
         var validationResults = new List<ValidationResult>();
 
         // 检查是否启用属性验证特性验证
         if (ShouldRunAnnotationValidation())
         {
-            validationResults.AddRange(_annotationValidator.GetValidationResults(instance, displayName, [memberPath]) ??
-                                       []);
+            validationResults.AddRange(_annotationValidator.GetValidationResults(instance, validationContext) ?? []);
         }
 
         // 检查是否设置了属性级别对象验证器
@@ -187,9 +190,14 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             validationResults.AddRange(_propertyValidator.GetValidationResults(propertyValue, ruleSets) ?? []);
         }
 
+        // 创建 ValidationContext 实例（属性）
+        var validationContextForProperty = CreateValidationContext(propertyValue, ruleSets);
+
         // 获取所有验证器验证结果集合
+        // 对于 ValidatorProxy<T, TValidator>（对象级代理），传入整个对象；否则传入属性值
         validationResults.AddRange(Validators.SelectMany(u =>
-            u.GetValidationResults(GetValidatedObject(instance, u, propertyValue), displayName, [memberPath]) ?? []));
+            u.GetValidationResults(u.IsTypedProxy ? instance : propertyValue,
+                u.IsTypedProxy ? validationContext : validationContextForProperty) ?? []));
 
         return validationResults.ToResults();
     }
@@ -203,19 +211,19 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 获取用于验证的属性值
         var propertyValue = GetValueForValidation(instance);
 
+        // 创建 ValidationContext 实例
+        var validationContext = CreateValidationContext(instance, ruleSets);
+
         // 检查是否应该对该属性执行验证
-        if (!ShouldValidate(instance, propertyValue, ruleSets))
+        if (!ShouldValidate(instance, propertyValue, validationContext, ruleSets))
         {
             return;
         }
 
-        // 获取显示名称和属性路径
-        var (displayName, memberPath) = (GetDisplayName(), GetEffectiveMemberName());
-
         // 检查是否启用属性验证特性验证
         if (ShouldRunAnnotationValidation())
         {
-            _annotationValidator.Validate(instance, displayName, [memberPath]);
+            _annotationValidator.Validate(instance, validationContext);
         }
 
         // 检查是否设置了属性级别对象验证器
@@ -224,10 +232,15 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             _propertyValidator.Validate(propertyValue, ruleSets);
         }
 
+        // 创建 ValidationContext 实例（属性）
+        var validationContextForProperty = CreateValidationContext(propertyValue, ruleSets);
+
         // 遍历验证器集合
         foreach (var validator in Validators)
         {
-            validator.Validate(GetValidatedObject(instance, validator, propertyValue), displayName, [memberPath]);
+            // 对于 ValidatorProxy<T, TValidator>（对象级代理），传入整个对象；否则传入属性值
+            validator.Validate(validator.IsTypedProxy ? instance : propertyValue,
+                validator.IsTypedProxy ? validationContext : validationContextForProperty);
         }
     }
 
@@ -288,8 +301,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
                 $"An object validator has already been assigned to this property. Only one object validator is allowed per property. To define nested rules, use `{nameof(ChildRules)}` within a single validator.");
         }
 
-        // 调用工厂方法，传入当前 RuleSets、_items 和 Options
-        _propertyValidator = validatorFactory(RuleSets, _objectValidator._items, _objectValidator.Options);
+        // 调用工厂方法，传入当前 RuleSets、Items 和 Options
+        _propertyValidator = validatorFactory(RuleSets, _objectValidator.Items, _objectValidator.Options);
 
         // 空检查
         if (_propertyValidator is null)
@@ -374,24 +387,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     }
 
     /// <summary>
-    ///     设置逆向验证条件
-    /// </summary>
-    /// <remarks>当条件不满足时才验证。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf Unless(Func<TProperty, bool> condition)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(condition);
-
-        UnlessCondition = (p, _) => condition(p);
-
-        return This;
-    }
-
-    /// <summary>
     ///     设置验证条件
     /// </summary>
     /// <remarks>当条件满足时才验证。</remarks>
@@ -405,24 +400,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         ArgumentNullException.ThrowIfNull(condition);
 
         WhenCondition = condition;
-
-        return This;
-    }
-
-    /// <summary>
-    ///     设置逆向验证条件
-    /// </summary>
-    /// <remarks>当条件不满足时才验证。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf Unless(Func<TProperty, ValidationContext<T>, bool> condition)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(condition);
-
-        UnlessCondition = condition;
 
         return This;
     }
@@ -542,14 +519,19 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     /// </summary>
     /// <param name="instance">对象</param>
     /// <param name="propertyValue">属性值</param>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
     /// <param name="ruleSets">规则集</param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    internal bool ShouldValidate(T instance, TProperty propertyValue, string?[]? ruleSets = null)
+    internal bool ShouldValidate(T instance, TProperty propertyValue, ValidationContext<T> validationContext,
+        string?[]? ruleSets)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
+        ArgumentNullException.ThrowIfNull(validationContext);
 
         // 检查传入的规则集是否与指定的规则集匹配
         if (!RuleSetMatcher.Matches(RuleSets, ruleSets))
@@ -558,14 +540,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         }
 
         // 检查正向条件（When）
-        if (WhenCondition is not null && !WhenCondition(propertyValue, CreateValidationContext(instance)))
-        {
-            return false;
-        }
-
-        // 检查逆向条件（Unless）
-        // ReSharper disable once ConvertIfStatementToReturnStatement
-        if (UnlessCondition is not null && UnlessCondition(propertyValue, CreateValidationContext(instance)))
+        if (WhenCondition is not null && !WhenCondition(propertyValue, validationContext))
         {
             return false;
         }
@@ -595,36 +570,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         }
 
         return !_objectValidator.Options.SuppressAnnotationValidation;
-    }
-
-    /// <summary>
-    ///     获取用于验证的对象
-    /// </summary>
-    /// <remarks>用于确定在 <see cref="ValidatorBase" /> 中实际被验证的对象（即验证的主体）。</remarks>
-    /// <param name="instance">对象</param>
-    /// <param name="validator">
-    ///     <see cref="ValidatorBase" />
-    /// </param>
-    /// <param name="propertyValue">属性值</param>
-    /// <returns>
-    ///     <see cref="object" />
-    /// </returns>
-    internal static object? GetValidatedObject(T instance, ValidatorBase validator, TProperty propertyValue)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(instance);
-        ArgumentNullException.ThrowIfNull(validator);
-
-        // 获取验证器类型
-        var validatorType = validator.GetType();
-
-        // 检查验证器类型是否是验证器代理类型
-        if (validatorType.IsGenericType && validatorType.GetGenericTypeDefinition() == typeof(ValidatorProxy<,>))
-        {
-            return instance;
-        }
-
-        return propertyValue;
     }
 
     /// <summary>
@@ -681,24 +626,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     ///     <see cref="string" />
     /// </returns>
     internal string GetEffectiveMemberName() => MemberName ?? GetMemberPath();
-
-    /// <summary>
-    ///     创建 <see cref="ValidationContext{T}" /> 实例
-    /// </summary>
-    /// <param name="value">对象</param>
-    /// <returns>
-    ///     <see cref="ValidationContext{T}" />
-    /// </returns>
-    internal ValidationContext<T> CreateValidationContext(T value)
-    {
-        // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext<T>(value, null, _items);
-
-        // 同步 IServiceProvider 委托
-        validationContext.InitializeServiceProvider(_serviceProvider);
-
-        return validationContext;
-    }
 
     /// <summary>
     ///     释放资源
@@ -760,8 +687,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             SuppressAnnotationValidation = SuppressAnnotationValidation,
             DisplayName = DisplayName,
             MemberName = MemberName,
-            WhenCondition = WhenCondition,
-            UnlessCondition = UnlessCondition
+            WhenCondition = WhenCondition
         };
 
         // 同步字段
@@ -776,5 +702,26 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         propertyValidator.InitializeServiceProvider(objectValidator._serviceProvider);
 
         return propertyValidator;
+    }
+
+    /// <summary>
+    ///     创建 <see cref="ValidationContext{T}" /> 实例
+    /// </summary>
+    /// <param name="instance">对象</param>
+    /// <param name="ruleSets">规则集</param>
+    /// <typeparam name="TInstance">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="ValidationContext{T}" />
+    /// </returns>
+    internal ValidationContext<TInstance> CreateValidationContext<TInstance>(TInstance instance, string?[]? ruleSets)
+    {
+        // 获取显示名称和成员名称
+        var displayName = GetDisplayName();
+        var memberPath = GetEffectiveMemberName();
+
+        return new ValidationContext<TInstance>(instance, _serviceProvider, Items)
+        {
+            DisplayName = displayName, MemberNames = [memberPath], RuleSets = ruleSets
+        };
     }
 }

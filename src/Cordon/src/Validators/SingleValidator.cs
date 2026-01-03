@@ -15,5 +15,6 @@ public class SingleValidator : ValidatorBase
     public SingleValidator() => UseResourceKey(() => nameof(ValidationMessages.SingleValidator_ValidationError));
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) => value is null || (value.TryGetCount(out var count) && count == 1);
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
+        value is null || (value.TryGetCount(out var count) && count == 1);
 }

@@ -15,7 +15,7 @@ public partial class TelephoneValidator : ValidatorBase
     public TelephoneValidator() => UseResourceKey(() => nameof(ValidationMessages.TelephoneValidator_ValidationError));
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         value switch
         {
             null => true,

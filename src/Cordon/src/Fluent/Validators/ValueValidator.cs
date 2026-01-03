@@ -41,7 +41,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <summary>
     ///     <inheritdoc cref="ValueValidator{T}" />
     /// </summary>
-    /// <param name="items">验证上下文数据</param>
+    /// <param name="items">共享数据</param>
     public ValueValidator(IDictionary<object, object?>? items)
         : this(null, items)
     {
@@ -53,7 +53,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
     /// </param>
-    /// <param name="items">验证上下文数据</param>
+    /// <param name="items">共享数据</param>
     public ValueValidator(IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
         : base(serviceProvider, items) =>
         _ruleSetStack = new Stack<string?>();
@@ -72,13 +72,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     ///     验证条件
     /// </summary>
     /// <remarks>当条件满足时才进行验证。</remarks>
-    internal Func<T, bool>? WhenCondition { get; private set; }
-
-    /// <summary>
-    ///     逆向验证条件
-    /// </summary>
-    /// <remarks>当条件不满足时才进行验证。</remarks>
-    internal Func<T, bool>? UnlessCondition { get; private set; }
+    internal Func<T, ValidationContext<T>, bool>? WhenCondition { get; private set; }
 
     /// <summary>
     ///     当前验证器在对象图中的属性路径（如 "User.Address"）
@@ -99,14 +93,17 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 获取用于验证的值
         var resolvedValue = GetValueForValidation(value!);
 
+        // 解析验证时使用的规则集
+        var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
+
+        // 创建 ValidationContext 实例
+        var validationContext = CreateValidationContext(resolvedValue, resolvedRuleSets);
+
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(resolvedValue))
+        if (!ShouldValidate(resolvedValue, validationContext))
         {
             return true;
         }
-
-        // 解析验证时使用的规则集
-        var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
 
         // 检查是否设置单个值级别验证器
         if (_valueValidator is not null && !_valueValidator.IsValid(resolvedValue, resolvedRuleSets))
@@ -115,7 +112,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         }
 
         return Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets))
-            .All(u => u.IsValid(resolvedValue));
+            .All(u => u.IsValid(resolvedValue, validationContext));
     }
 
     /// <inheritdoc />
@@ -124,17 +121,19 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 获取用于验证的值
         var resolvedValue = GetValueForValidation(value!);
 
+        // 解析验证时使用的规则集
+        var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
+
+        // 创建 ValidationContext 实例
+        var validationContext = CreateValidationContext(resolvedValue, resolvedRuleSets);
+
         // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(resolvedValue))
+        if (!ShouldValidate(resolvedValue, validationContext))
         {
             return null;
         }
 
-        // 解析验证时使用的规则集
-        var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
-
-        // 获取显示名称、成员名称和初始化验证结果集合
-        var (displayName, memberPath) = (GetDisplayName(), GetEffectiveMemberName());
+        // 初始化验证结果集合
         var validationResults = new List<ValidationResult>();
 
         // 检查是否设置单个值级别验证器
@@ -145,8 +144,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
 
         // 获取所有验证器验证结果集合
         validationResults.AddRange(Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets))
-            .SelectMany(u =>
-                u.GetValidationResults(resolvedValue, displayName, memberPath is null ? null : [memberPath]) ?? []));
+            .SelectMany(u => u.GetValidationResults(resolvedValue, validationContext) ?? []));
 
         return validationResults.ToResults();
     }
@@ -157,17 +155,17 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 获取用于验证的值
         var resolvedValue = GetValueForValidation(value!);
 
-        // 检查是否应该对该对象执行验证
-        if (!ShouldValidate(resolvedValue))
-        {
-            return;
-        }
-
         // 解析验证时使用的规则集
         var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
 
-        // 获取显示名称和成员名称
-        var (displayName, memberPath) = (GetDisplayName(), GetEffectiveMemberName());
+        // 创建 ValidationContext 实例
+        var validationContext = CreateValidationContext(resolvedValue, resolvedRuleSets);
+
+        // 检查是否应该对该对象执行验证
+        if (!ShouldValidate(resolvedValue, validationContext))
+        {
+            return;
+        }
 
         // 检查是否设置单个值级别验证器
         // ReSharper disable once UseNullPropagation
@@ -179,7 +177,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 遍历验证器集合
         foreach (var validator in Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets)))
         {
-            validator.Validate(resolvedValue, displayName, memberPath is null ? null : [memberPath]);
+            validator.Validate(resolvedValue, validationContext);
         }
     }
 
@@ -346,25 +344,25 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
-        WhenCondition = condition;
+        WhenCondition = (u, _) => condition(u);
 
         return this;
     }
 
     /// <summary>
-    ///     设置逆向验证条件
+    ///     设置验证条件
     /// </summary>
-    /// <remarks>当条件不满足时才验证。</remarks>
+    /// <remarks>当条件满足时才验证。</remarks>
     /// <param name="condition">条件委托</param>
     /// <returns>
     ///     <see cref="ValueValidator{T}" />
     /// </returns>
-    public virtual ValueValidator<T> Unless(Func<T, bool> condition)
+    public virtual ValueValidator<T> When(Func<T, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
-        UnlessCondition = condition;
+        WhenCondition = condition;
 
         return this;
     }
@@ -407,8 +405,8 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
                 "An value validator has already been assigned to this value. Only one value validator is allowed per value.");
         }
 
-        // 调用工厂方法，传入当前 _items
-        _valueValidator = validatorFactory(_items);
+        // 调用工厂方法，传入当前 Items
+        _valueValidator = validatorFactory(Items);
 
         // 空检查
         if (_valueValidator is null)
@@ -517,20 +515,19 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     ///     检查是否应该对该对象执行验证
     /// </summary>
     /// <param name="value">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    internal bool ShouldValidate(T? value)
+    internal bool ShouldValidate(T? value, ValidationContext<T> validationContext)
     {
-        // 检查正向条件（When）
-        if (WhenCondition is not null && !WhenCondition(value!))
-        {
-            return false;
-        }
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validationContext);
 
-        // 检查逆向条件（Unless）
-        // ReSharper disable once ConvertIfStatementToReturnStatement
-        if (UnlessCondition is not null && UnlessCondition(value!))
+        // 检查正向条件（When）
+        if (WhenCondition is not null && !WhenCondition(value!, validationContext))
         {
             return false;
         }
@@ -592,4 +589,24 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
 
     /// <inheritdoc cref="IRuleSetContextProvider.GetCurrentRuleSets" />
     internal string?[]? GetCurrentRuleSets() => _ruleSetStack is { Count: > 0 } ? [_ruleSetStack.Peek()] : null;
+
+    /// <summary>
+    ///     创建 <see cref="ValidationContext{T}" /> 实例
+    /// </summary>
+    /// <param name="value">对象</param>
+    /// <param name="ruleSets">规则集</param>
+    /// <returns>
+    ///     <see cref="ValidationContext{T}" />
+    /// </returns>
+    internal ValidationContext<T> CreateValidationContext(T value, string?[]? ruleSets)
+    {
+        // 获取显示名称和成员名称
+        var displayName = GetDisplayName();
+        var memberPath = GetEffectiveMemberName();
+
+        return new ValidationContext<T>(value, _serviceProvider, Items)
+        {
+            DisplayName = displayName, MemberNames = memberPath is null ? null : [memberPath], RuleSets = ruleSets
+        };
+    }
 }

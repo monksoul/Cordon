@@ -1815,6 +1815,9 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1824,11 +1827,8 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
-        </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -2106,11 +2106,6 @@
             <typeparam name="T">对象类型</typeparam>
             <typeparam name="TSelf">派生类型自身类型</typeparam>
         </member>
-        <member name="F:Cordon.FluentValidatorBuilder`2._items">
-            <summary>
-                验证上下文数据
-            </summary>
-        </member>
         <member name="F:Cordon.FluentValidatorBuilder`2._highPriorityEndIndex">
             <summary>
                 高优先级验证器区域的结束索引（同时也是普通验证器区域的起始索引）
@@ -2140,7 +2135,7 @@
             <summary>
                 <inheritdoc cref="T:Cordon.FluentValidatorBuilder`2" />
             </summary>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.#ctor(System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
@@ -2149,11 +2144,16 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="P:Cordon.FluentValidatorBuilder`2.This">
             <summary>
                 派生类型自身引用
+            </summary>
+        </member>
+        <member name="P:Cordon.FluentValidatorBuilder`2.Items">
+            <summary>
+                共享数据
             </summary>
         </member>
         <member name="P:Cordon.FluentValidatorBuilder`2.Validators">
@@ -2680,24 +2680,6 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.MustUnless(System.Func{`0,System.Boolean})">
-            <summary>
-                添加自定义条件不成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf" />
-            </returns>
-        </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.MustUnless(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
-            <summary>
-                添加自定义条件不成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf" />
-            </returns>
-        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.Must(System.Func{`0,System.Boolean})">
             <summary>
                 添加自定义条件成立时委托验证器
@@ -2727,7 +2709,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.MustAny``1(System.Collections.Generic.IEnumerable{``0},System.Func{`0,Cordon.ValidationContext{`0},``0,System.Boolean})">
+        <member name="M:Cordon.FluentValidatorBuilder`2.MustAny``1(System.Collections.Generic.IEnumerable{``0},System.Func{`0,``0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 添加自定义条件成立时委托验证器
             </summary>
@@ -2749,7 +2731,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.MustAll``1(System.Collections.Generic.IEnumerable{``0},System.Func{`0,Cordon.ValidationContext{`0},``0,System.Boolean})">
+        <member name="M:Cordon.FluentValidatorBuilder`2.MustAll``1(System.Collections.Generic.IEnumerable{``0},System.Func{`0,``0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 添加自定义条件成立时委托验证器
             </summary>
@@ -3122,15 +3104,6 @@
                 <see cref="T:System.Collections.Generic.IReadOnlyList`1" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.CreateValidationContext(`0)">
-            <summary>
-                创建 <see cref="T:Cordon.ValidationContext`1" /> 实例
-            </summary>
-            <param name="value">对象</param>
-            <returns>
-                <see cref="T:Cordon.ValidationContext`1" />
-            </returns>
-        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
@@ -3238,6 +3211,36 @@
                 遇到首个验证失败即停止后续验证
             </summary>
         </member>
+        <member name="T:Cordon.IValidationContext">
+            <summary>
+                验证上下文
+            </summary>
+        </member>
+        <member name="P:Cordon.IValidationContext.Instance">
+            <summary>
+                对象
+            </summary>
+        </member>
+        <member name="P:Cordon.IValidationContext.DisplayName">
+            <summary>
+                显示名称
+            </summary>
+        </member>
+        <member name="P:Cordon.IValidationContext.MemberNames">
+            <summary>
+                成员名称列表
+            </summary>
+        </member>
+        <member name="P:Cordon.IValidationContext.RuleSets">
+            <summary>
+                规则集
+            </summary>
+        </member>
+        <member name="P:Cordon.IValidationContext.Items">
+            <summary>
+                共享数据
+            </summary>
+        </member>
         <member name="T:Cordon.IValidationDataContext">
             <summary>
                 验证数据上下文服务
@@ -3245,19 +3248,19 @@
         </member>
         <member name="P:Cordon.IValidationDataContext.Items">
             <summary>
-                存储验证数据的字典
+                共享数据
             </summary>
         </member>
         <member name="M:Cordon.IValidationDataContext.SetValue(System.Object,System.Object)">
             <summary>
-                设置或更新验证数据
+                设置或更新数据
             </summary>
             <param name="key">键</param>
             <param name="value">值</param>
         </member>
         <member name="M:Cordon.IValidationDataContext.TryGetValue(System.Object,System.Object@)">
             <summary>
-                尝试获取验证数据
+                尝试获取数据
             </summary>
             <param name="key">键</param>
             <param name="value">值</param>
@@ -3301,16 +3304,62 @@
                 <see cref="T:System.Boolean" />
             </remarks>
         </member>
-        <member name="T:Cordon.ValidationContext`1">
+        <member name="T:Cordon.LegacyValidationContext">
+            <inheritdoc />
+            <remarks>用于兼容旧版本 <see cref="T:Cordon.ValidatorBase" /> 相关方法。</remarks>
+        </member>
+        <member name="M:Cordon.LegacyValidationContext.#ctor">
             <summary>
-                验证上下文
+                <inheritdoc cref="T:Cordon.LegacyValidationContext" />
             </summary>
+        </member>
+        <member name="M:Cordon.LegacyValidationContext.#ctor(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                <inheritdoc cref="T:Cordon.LegacyValidationContext" />
+            </summary>
+            <param name="instance">对象</param>
+            <param name="displayName">显示名称</param>
+            <param name="memberNames">成员名称列表</param>
+        </member>
+        <member name="P:Cordon.LegacyValidationContext.Instance">
+            <inheritdoc />
+        </member>
+        <member name="P:Cordon.LegacyValidationContext.DisplayName">
+            <inheritdoc />
+        </member>
+        <member name="P:Cordon.LegacyValidationContext.MemberNames">
+            <inheritdoc />
+        </member>
+        <member name="P:Cordon.LegacyValidationContext.RuleSets">
+            <inheritdoc />
+        </member>
+        <member name="P:Cordon.LegacyValidationContext.Items">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.LegacyValidationContext.GetService(System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="T:Cordon.ValidationContext`1">
+            <inheritdoc cref="T:Cordon.IValidationContext" />
             <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="F:Cordon.ValidationContext`1._serviceProvider">
             <summary>
                 <see cref="T:System.IServiceProvider" /> 委托
             </summary>
+        </member>
+        <member name="M:Cordon.ValidationContext`1.#ctor(`0)">
+            <summary>
+                <inheritdoc cref="T:Cordon.ValidationContext`1" />
+            </summary>
+            <param name="instance">对象</param>
+        </member>
+        <member name="M:Cordon.ValidationContext`1.#ctor(`0,System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.ValidationContext`1" />
+            </summary>
+            <param name="instance">对象</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="M:Cordon.ValidationContext`1.#ctor(`0,System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
@@ -3320,26 +3369,38 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="M:Cordon.ValidationContext`1.#ctor(`0,System.Func{System.Type,System.Object},System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.ValidationContext`1" />
+            </summary>
+            <param name="instance">对象</param>
+            <param name="serviceProvider">
+                <see cref="T:System.IServiceProvider" />
+            </param>
+            <param name="items">共享数据</param>
         </member>
         <member name="P:Cordon.ValidationContext`1.Instance">
-            <summary>
-                对象
-            </summary>
+            <inheritdoc cref="P:Cordon.IValidationContext.Instance" />
+        </member>
+        <member name="P:Cordon.ValidationContext`1.Cordon#IValidationContext#Instance">
+            <inheritdoc />
+        </member>
+        <member name="P:Cordon.ValidationContext`1.DisplayName">
+            <inheritdoc />
+        </member>
+        <member name="P:Cordon.ValidationContext`1.MemberNames">
+            <inheritdoc />
+        </member>
+        <member name="P:Cordon.ValidationContext`1.RuleSets">
+            <inheritdoc />
         </member>
         <member name="P:Cordon.ValidationContext`1.Items">
-            <summary>
-                验证上下文数据
-            </summary>
+            <inheritdoc />
         </member>
         <member name="M:Cordon.ValidationContext`1.GetService(System.Type)">
-            <summary>
-                解析服务
-            </summary>
-            <param name="serviceType">服务类型</param>
-            <returns>
-                <see cref="T:System.Object" />
-            </returns>
+            <inheritdoc />
         </member>
         <member name="M:Cordon.ValidationContext`1.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
@@ -3355,11 +3416,6 @@
                 验证选项键
             </summary>
             <remarks>用于 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 或 <c>ValidationOptionsModelValidator</c> 中写入规则集配置。</remarks>
-        </member>
-        <member name="F:Cordon.ValidationDataContext._items">
-            <summary>
-                存储验证数据的内部字典
-            </summary>
         </member>
         <member name="P:Cordon.ValidationDataContext.Items">
             <inheritdoc />
@@ -3535,11 +3591,13 @@
         </member>
         <member name="M:Cordon.ObjectValidatorEnumerableExtensions.Validate``1(System.Collections.Generic.IEnumerable{Cordon.IObjectValidator{``0}},``0,System.String[])">
             <summary>
-                验证指定的对象
+                验证对象
             </summary>
+            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="validators"><see cref="T:Cordon.IObjectValidator`1" /> 集合</param>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
         <member name="T:Cordon.ValidationExtensions">
             <summary>
@@ -3769,10 +3827,12 @@
         </member>
         <member name="M:Cordon.IObjectValidator.Validate(System.Object,System.String[])">
             <summary>
-                验证指定的对象
+                验证对象
             </summary>
+            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
         <member name="M:Cordon.IObjectValidator.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
             <summary>
@@ -3814,10 +3874,12 @@
         </member>
         <member name="M:Cordon.IObjectValidator`1.Validate(`0,System.String[])">
             <summary>
-                验证指定的对象
+                验证对象
             </summary>
+            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
         <member name="T:Cordon.IPropertyValidator`1">
             <summary>
@@ -3891,6 +3953,50 @@
             <summary>
                 规则集
             </summary>
+        </member>
+        <member name="T:Cordon.Fluent.Proxies.ObjectValidatorProxy`1">
+            <summary>
+                对象验证器代理
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="F:Cordon.Fluent.Proxies.ObjectValidatorProxy`1._validator">
+            <inheritdoc cref="T:Cordon.ObjectValidator`1" />
+        </member>
+        <member name="M:Cordon.Fluent.Proxies.ObjectValidatorProxy`1.#ctor(Cordon.ObjectValidator{`0})">
+            <summary>
+                <inheritdoc cref="T:Cordon.Fluent.Proxies.ObjectValidatorProxy`1" />
+            </summary>
+            <param name="validator">
+                <see cref="T:Cordon.ObjectValidator`1" />
+            </param>
+        </member>
+        <member name="M:Cordon.Fluent.Proxies.ObjectValidatorProxy`1.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.Fluent.Proxies.ObjectValidatorProxy`1.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.Fluent.Proxies.ObjectValidatorProxy`1.Dispose(System.Boolean)">
+            <summary>
+                释放资源
+            </summary>
+            <param name="disposing">是否释放托管资源</param>
+        </member>
+        <member name="M:Cordon.Fluent.Proxies.ObjectValidatorProxy`1.IsValid(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.Fluent.Proxies.ObjectValidatorProxy`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.Fluent.Proxies.ObjectValidatorProxy`1.Validate(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.Fluent.Proxies.ObjectValidatorProxy`1.FormatErrorMessage(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.Fluent.Proxies.ObjectValidatorProxy`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
         <member name="T:Cordon.AbstractValidator`1">
             <summary>
@@ -4025,25 +4131,28 @@
         <member name="M:Cordon.CollectionPropertyValidator`2.Dispose(System.Boolean)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.CollectionPropertyValidator`2.GetValidatedElements(System.Collections.Generic.IEnumerable{`1},`0)">
+        <member name="M:Cordon.CollectionPropertyValidator`2.GetValidatedElements(System.Collections.Generic.IEnumerable{`1},Cordon.ValidationContext{`0})">
             <summary>
                 筛选用于验证的集合元素
             </summary>
             <param name="elements">
                 <see cref="T:System.Collections.Generic.IEnumerable`1" />
             </param>
-            <param name="instance">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <returns>
                 <see cref="T:System.Collections.Generic.IEnumerable`1" />
             </returns>
         </member>
-        <member name="M:Cordon.CollectionPropertyValidator`2.ForEachValidatedElement(`0,System.Func{`1,System.Boolean})">
+        <member name="M:Cordon.CollectionPropertyValidator`2.ForEachValidatedElement(`0,System.Func{`1,System.Boolean},System.String[])">
             <summary>
                 获取集合并遍历用于验证的元素
             </summary>
             <remarks>内部为每个元素设置带索引的成员路径（如 "Addresses[0]"），然后执行验证操作。支持短路退出：若操作返回 <c>false</c>，则立即终止遍历。</remarks>
             <param name="instance">对象</param>
             <param name="action">元素处理委托</param>
+            <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
@@ -4074,11 +4183,6 @@
         <member name="F:Cordon.ObjectValidator`1._annotationValidator">
             <inheritdoc cref="T:Cordon.ObjectAnnotationValidator" />
         </member>
-        <member name="F:Cordon.ObjectValidator`1._items">
-            <summary>
-                验证上下文数据
-            </summary>
-        </member>
         <member name="F:Cordon.ObjectValidator`1._ruleSetStack">
             <summary>
                 当前规则集上下文栈
@@ -4102,7 +4206,7 @@
             <summary>
                 <inheritdoc cref="T:Cordon.ObjectValidator`1" />
             </summary>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="M:Cordon.ObjectValidator`1.#ctor(System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
@@ -4111,7 +4215,12 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="P:Cordon.ObjectValidator`1.Items">
+            <summary>
+                共享数据
+            </summary>
         </member>
         <member name="P:Cordon.ObjectValidator`1.Options">
             <inheritdoc cref="T:Cordon.ValidatorOptions" />
@@ -4121,12 +4230,6 @@
                 验证条件
             </summary>
             <remarks>当条件满足时才进行验证。</remarks>
-        </member>
-        <member name="P:Cordon.ObjectValidator`1.UnlessCondition">
-            <summary>
-                逆向验证条件
-            </summary>
-            <remarks>当条件不满足时才进行验证。</remarks>
         </member>
         <member name="P:Cordon.ObjectValidator`1.Validators">
             <summary>
@@ -4293,11 +4396,11 @@
                 <see cref="T:Cordon.ObjectValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ObjectValidator`1.Unless(System.Func{`0,System.Boolean})">
+        <member name="M:Cordon.ObjectValidator`1.When(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
-                设置逆向验证条件
+                设置验证条件
             </summary>
-            <remarks>当条件不满足时才验证。</remarks>
+            <remarks>当条件满足时才验证。</remarks>
             <param name="condition">条件委托</param>
             <returns>
                 <see cref="T:Cordon.ObjectValidator`1" />
@@ -4376,11 +4479,14 @@
             </summary>
             <param name="disposing">是否释放托管资源</param>
         </member>
-        <member name="M:Cordon.ObjectValidator`1.ShouldValidate(`0)">
+        <member name="M:Cordon.ObjectValidator`1.ShouldValidate(`0,Cordon.ValidationContext{`0})">
             <summary>
                 检查是否应该对该对象执行验证
             </summary>
             <param name="instance">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
@@ -4421,6 +4527,16 @@
         </member>
         <member name="M:Cordon.ObjectValidator`1.RepairMemberPaths">
             <inheritdoc cref="M:Cordon.IMemberPathRepairable.RepairMemberPaths" />
+        </member>
+        <member name="M:Cordon.ObjectValidator`1.CreateValidationContext(`0,System.String[])">
+            <summary>
+                创建 <see cref="T:Cordon.ValidationContext`1" /> 实例
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:Cordon.ValidationContext`1" />
+            </returns>
         </member>
         <member name="T:Cordon.PropertyValidator`2">
             <summary>
@@ -4506,12 +4622,6 @@
             </summary>
             <remarks>当条件满足时才进行验证。</remarks>
         </member>
-        <member name="P:Cordon.PropertyValidator`3.UnlessCondition">
-            <summary>
-                逆向验证条件
-            </summary>
-            <remarks>当条件不满足时才进行验证。</remarks>
-        </member>
         <member name="M:Cordon.PropertyValidator`3.Cordon#IMemberPathRepairable#RepairMemberPaths">
             <inheritdoc />
         </member>
@@ -4592,31 +4702,11 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.Unless(System.Func{`1,System.Boolean})">
-            <summary>
-                设置逆向验证条件
-            </summary>
-            <remarks>当条件不满足时才验证。</remarks>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf" />
-            </returns>
-        </member>
         <member name="M:Cordon.PropertyValidator`3.When(System.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 设置验证条件
             </summary>
             <remarks>当条件满足时才验证。</remarks>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf" />
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyValidator`3.Unless(System.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
-            <summary>
-                设置逆向验证条件
-            </summary>
-            <remarks>当条件不满足时才验证。</remarks>
             <param name="condition">条件委托</param>
             <returns>
                 <typeparamref name="TSelf" />
@@ -4699,12 +4789,15 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.ShouldValidate(`0,`1,System.String[])">
+        <member name="M:Cordon.PropertyValidator`3.ShouldValidate(`0,`1,Cordon.ValidationContext{`0},System.String[])">
             <summary>
                 检查是否应该对该属性执行验证
             </summary>
             <param name="instance">对象</param>
             <param name="propertyValue">属性值</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.Boolean" />
@@ -4716,20 +4809,6 @@
             </summary>
             <returns>
                 <see cref="T:System.Boolean" />
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyValidator`3.GetValidatedObject(`0,Cordon.ValidatorBase,`1)">
-            <summary>
-                获取用于验证的对象
-            </summary>
-            <remarks>用于确定在 <see cref="T:Cordon.ValidatorBase" /> 中实际被验证的对象（即验证的主体）。</remarks>
-            <param name="instance">对象</param>
-            <param name="validator">
-                <see cref="T:Cordon.ValidatorBase" />
-            </param>
-            <param name="propertyValue">属性值</param>
-            <returns>
-                <see cref="T:System.Object" />
             </returns>
         </member>
         <member name="M:Cordon.PropertyValidator`3.GetValue(`0)">
@@ -4774,15 +4853,6 @@
                 <see cref="T:System.String" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.CreateValidationContext(`0)">
-            <summary>
-                创建 <see cref="T:Cordon.ValidationContext`1" /> 实例
-            </summary>
-            <param name="value">对象</param>
-            <returns>
-                <see cref="T:Cordon.ValidationContext`1" />
-            </returns>
-        </member>
         <member name="M:Cordon.PropertyValidator`3.Dispose(System.Boolean)">
             <summary>
                 释放资源
@@ -4794,6 +4864,17 @@
         </member>
         <member name="M:Cordon.PropertyValidator`3.Clone(Cordon.ObjectValidator{`0})">
             <inheritdoc cref="M:Cordon.IPropertyValidatorCloneable`1.Clone(Cordon.ObjectValidator{`0})" />
+        </member>
+        <member name="M:Cordon.PropertyValidator`3.CreateValidationContext``1(``0,System.String[])">
+            <summary>
+                创建 <see cref="T:Cordon.ValidationContext`1" /> 实例
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+            <typeparam name="TInstance">对象类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.ValidationContext`1" />
+            </returns>
         </member>
         <member name="M:Cordon.PropertyValidator`3.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
             <inheritdoc />
@@ -4913,24 +4994,6 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.MustUnless(System.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
-            <summary>
-                添加自定义条件不成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf" />
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyValidator`3.MustUnless_(System.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
-            <summary>
-                添加自定义条件不成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf" />
-            </returns>
-        </member>
         <member name="M:Cordon.PropertyValidator`3.Must(System.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 添加自定义条件成立时委托验证器
@@ -4989,7 +5052,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.MustAny``1(System.Collections.Generic.IEnumerable{``0},System.Func{`1,Cordon.ValidationContext{`0},``0,System.Boolean})">
+        <member name="M:Cordon.PropertyValidator`3.MustAny``1(System.Collections.Generic.IEnumerable{``0},System.Func{`1,``0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 添加自定义条件成立时委托验证器
             </summary>
@@ -5000,7 +5063,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.MustAny_``1(System.Collections.Generic.IEnumerable{``0},System.Func{`1,Cordon.ValidationContext{`0},``0,System.Boolean})">
+        <member name="M:Cordon.PropertyValidator`3.MustAny_``1(System.Collections.Generic.IEnumerable{``0},System.Func{`1,``0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 添加自定义条件成立时委托验证器
             </summary>
@@ -5011,7 +5074,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.MustAll``1(System.Collections.Generic.IEnumerable{``0},System.Func{`1,Cordon.ValidationContext{`0},``0,System.Boolean})">
+        <member name="M:Cordon.PropertyValidator`3.MustAll``1(System.Collections.Generic.IEnumerable{``0},System.Func{`1,``0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 添加自定义条件成立时委托验证器
             </summary>
@@ -5022,7 +5085,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.MustAll_``1(System.Collections.Generic.IEnumerable{``0},System.Func{`1,Cordon.ValidationContext{`0},``0,System.Boolean})">
+        <member name="M:Cordon.PropertyValidator`3.MustAll_``1(System.Collections.Generic.IEnumerable{``0},System.Func{`1,``0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 添加自定义条件成立时委托验证器
             </summary>
@@ -5202,7 +5265,7 @@
             <summary>
                 <inheritdoc cref="T:Cordon.ValueValidator`1" />
             </summary>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="M:Cordon.ValueValidator`1.#ctor(System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
@@ -5211,7 +5274,7 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="P:Cordon.ValueValidator`1.DisplayName">
             <summary>
@@ -5228,12 +5291,6 @@
                 验证条件
             </summary>
             <remarks>当条件满足时才进行验证。</remarks>
-        </member>
-        <member name="P:Cordon.ValueValidator`1.UnlessCondition">
-            <summary>
-                逆向验证条件
-            </summary>
-            <remarks>当条件不满足时才进行验证。</remarks>
         </member>
         <member name="P:Cordon.ValueValidator`1.MemberPath">
             <summary>
@@ -5329,11 +5386,11 @@
                 <see cref="T:Cordon.ValueValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ValueValidator`1.Unless(System.Func{`0,System.Boolean})">
+        <member name="M:Cordon.ValueValidator`1.When(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
-                设置逆向验证条件
+                设置验证条件
             </summary>
-            <remarks>当条件不满足时才验证。</remarks>
+            <remarks>当条件满足时才验证。</remarks>
             <param name="condition">条件委托</param>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
@@ -5415,11 +5472,14 @@
             </summary>
             <param name="disposing">是否释放托管资源</param>
         </member>
-        <member name="M:Cordon.ValueValidator`1.ShouldValidate(`0)">
+        <member name="M:Cordon.ValueValidator`1.ShouldValidate(`0,Cordon.ValidationContext{`0})">
             <summary>
                 检查是否应该对该对象执行验证
             </summary>
             <param name="value">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
@@ -5462,43 +5522,59 @@
         <member name="M:Cordon.ValueValidator`1.GetCurrentRuleSets">
             <inheritdoc cref="M:Cordon.IRuleSetContextProvider.GetCurrentRuleSets" />
         </member>
+        <member name="M:Cordon.ValueValidator`1.CreateValidationContext(`0,System.String[])">
+            <summary>
+                创建 <see cref="T:Cordon.ValidationContext`1" /> 实例
+            </summary>
+            <param name="value">对象</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:Cordon.ValidationContext`1" />
+            </returns>
+        </member>
         <member name="T:Cordon.IAsyncValidator">
             <summary>
                 异步验证器接口
             </summary>
         </member>
-        <member name="M:Cordon.IAsyncValidator.IsValidAsync(System.Object)">
+        <member name="M:Cordon.IAsyncValidator.IsValidAsync(System.Object,Cordon.IValidationContext)">
             <summary>
                 检查对象合法性
             </summary>
             <param name="value">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Cordon.IAsyncValidator.GetValidationResultsAsync(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.IAsyncValidator.GetValidationResultsAsync(System.Object,Cordon.IValidationContext)">
             <summary>
                 获取对象验证结果集合
             </summary>
             <param name="value">对象</param>
-            <param name="name">显示名称</param>
-            <param name="memberNames">成员名称列表</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
             <returns>
                 <see cref="T:System.Collections.Generic.List`1" />
             </returns>
         </member>
-        <member name="M:Cordon.IAsyncValidator.Validate(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.IAsyncValidator.ValidateAsync(System.Object,Cordon.IValidationContext)">
             <summary>
-                验证指定的对象
+                验证对象
             </summary>
+            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="value">对象</param>
-            <param name="name">显示名称</param>
-            <param name="memberNames">成员名称列表</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
         <member name="T:Cordon.IHighPriorityValidator">
             <summary>
-                标记为高优先级的验证器
+                高优先级的验证器接口
             </summary>
             <remarks>会在验证流程中优先执行。</remarks>
         </member>
@@ -5981,10 +6057,12 @@
         </member>
         <member name="M:Cordon.IValidationService`1.Validate(`0,System.String[])">
             <summary>
-                验证指定的对象
+                验证对象
             </summary>
+            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
         <member name="T:Cordon.ValidationService">
             <inheritdoc />
@@ -6054,7 +6132,7 @@
             <summary>
                 创建对象验证器
             </summary>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
                 <see cref="T:Cordon.ObjectValidator`1" />
@@ -6067,7 +6145,7 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
                 <see cref="T:Cordon.ObjectValidator`1" />
@@ -6086,7 +6164,7 @@
             <summary>
                 创建单个值验证器
             </summary>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
@@ -6099,7 +6177,7 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
@@ -6561,17 +6639,17 @@
                 <see cref="T:Cordon.MinValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.MustUnless``1(System.Func{``0,System.Boolean})">
+        <member name="M:Cordon.Validators.Must``1(System.Func{``0,System.Boolean})">
             <summary>
-                创建自定义条件不成立时委托验证器
+                创建自定义条件成立时委托验证器
             </summary>
             <param name="condition">条件委托</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
-                <see cref="T:Cordon.MustUnlessValidator`1" />
+                <see cref="T:Cordon.MustValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.Must``1(System.Func{``0,System.Boolean})">
+        <member name="M:Cordon.Validators.Must``1(System.Func{``0,Cordon.ValidationContext{``0},System.Boolean})">
             <summary>
                 创建自定义条件成立时委托验证器
             </summary>
@@ -6592,7 +6670,29 @@
                 <see cref="T:Cordon.MustValidator`1" />
             </returns>
         </member>
+        <member name="M:Cordon.Validators.MustIfNotNull``1(System.Func{``0,Cordon.ValidationContext{``0},System.Boolean})">
+            <summary>
+                创建自定义条件成立时委托验证器
+            </summary>
+            <remarks>仅当被验证的值不为 <c>null</c> 时才执行验证逻辑。</remarks>
+            <param name="condition">条件委托</param>
+            <typeparam name="T">对象类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.MustValidator`1" />
+            </returns>
+        </member>
         <member name="M:Cordon.Validators.MustIfNotNullOrEmpty``1(System.Func{``0,System.Boolean})">
+            <summary>
+                创建自定义条件成立时委托验证器
+            </summary>
+            <remarks>仅当被验证的值不为 <c>null</c>、非空集合、数组和字符串时才执行验证逻辑。</remarks>
+            <param name="condition">条件委托</param>
+            <typeparam name="T">对象类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.MustValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.MustIfNotNullOrEmpty``1(System.Func{``0,Cordon.ValidationContext{``0},System.Boolean})">
             <summary>
                 创建自定义条件成立时委托验证器
             </summary>
@@ -6615,7 +6715,31 @@
                 <see cref="T:Cordon.MustValidator`1" />
             </returns>
         </member>
+        <member name="M:Cordon.Validators.MustAny``2(System.Collections.Generic.IEnumerable{``1},System.Func{``0,``1,Cordon.ValidationContext{``0},System.Boolean})">
+            <summary>
+                创建自定义条件成立时委托验证器
+            </summary>
+            <param name="enumerable">集合</param>
+            <param name="condition">条件委托</param>
+            <typeparam name="T">对象类型</typeparam>
+            <typeparam name="TElement">元素类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.MustValidator`1" />
+            </returns>
+        </member>
         <member name="M:Cordon.Validators.MustAll``2(System.Collections.Generic.IEnumerable{``1},System.Func{``0,``1,System.Boolean})">
+            <summary>
+                创建自定义条件成立时委托验证器
+            </summary>
+            <param name="enumerable">集合</param>
+            <param name="condition">条件委托</param>
+            <typeparam name="T">对象类型</typeparam>
+            <typeparam name="TElement">元素类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.MustValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.MustAll``2(System.Collections.Generic.IEnumerable{``1},System.Func{``0,``1,Cordon.ValidationContext{``0},System.Boolean})">
             <summary>
                 创建自定义条件成立时委托验证器
             </summary>
@@ -6682,7 +6806,7 @@
                 创建对象验证特性验证器
             </summary>
             <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <returns>
                 <see cref="T:Cordon.ObjectAnnotationValidator" />
             </returns>
@@ -6695,7 +6819,7 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <returns>
                 <see cref="T:Cordon.ObjectAnnotationValidator" />
             </returns>
@@ -6735,6 +6859,16 @@
                 <see cref="T:Cordon.PredicateValidator`1" />
             </returns>
         </member>
+        <member name="M:Cordon.Validators.Predicate``1(System.Func{``0,Cordon.ValidationContext{``0},System.Boolean})">
+            <summary>
+                创建自定义条件成立时委托验证器
+            </summary>
+            <param name="condition">条件委托</param>
+            <typeparam name="T">对象类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.PredicateValidator`1" />
+            </returns>
+        </member>
         <member name="M:Cordon.Validators.PropertyAnnotation``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}})">
             <summary>
                 创建属性验证特性验证器
@@ -6750,7 +6884,7 @@
                 创建属性验证特性验证器
             </summary>
             <param name="selector">属性选择器</param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
                 <see cref="T:Cordon.PropertyAnnotationValidator`1" />
@@ -6764,7 +6898,7 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
                 <see cref="T:Cordon.PropertyAnnotationValidator`1" />
@@ -6786,7 +6920,7 @@
                 创建属性验证特性验证器
             </summary>
             <param name="selector">属性选择器</param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <typeparam name="TProperty">属性类型</typeparam>
             <returns>
@@ -6801,7 +6935,7 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <typeparam name="TProperty">属性类型</typeparam>
             <returns>
@@ -7027,7 +7161,7 @@
                 <see cref="M:Cordon.Validators.ValidatorProxy``1(System.Object[])" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.ValidatorProxy``2(System.Func{``0,System.Object},System.Func{``0,System.Object[]})">
+        <member name="M:Cordon.Validators.ValidatorProxy``2(System.Func{``0,System.Object},System.Func{``0,Cordon.ValidationContext{``0},System.Object[]})">
             <summary>
                 创建验证器代理
             </summary>
@@ -7038,7 +7172,7 @@
                 <see cref="T:Cordon.ValidatorBase" />
             </typeparam>
             <returns>
-                <see cref="M:Cordon.Validators.ValidatorProxy``2(System.Func{``0,System.Object},System.Func{``0,System.Object[]})" />
+                <see cref="M:Cordon.Validators.ValidatorProxy``2(System.Func{``0,System.Object},System.Func{``0,Cordon.ValidationContext{``0},System.Object[]})" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.ValueAnnotation(System.ComponentModel.DataAnnotations.ValidationAttribute[])">
@@ -7055,7 +7189,7 @@
                 创建单个值验证特性验证器
             </summary>
             <param name="attributes">验证特性列表</param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <returns>
                 <see cref="T:Cordon.ValueAnnotationValidator" />
             </returns>
@@ -7068,7 +7202,7 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
             <returns>
                 <see cref="T:Cordon.ValueAnnotationValidator" />
             </returns>
@@ -7095,7 +7229,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.AgeValidator.IsValid(System.Object)">
+        <member name="M:Cordon.AgeValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.AgeValidator.GetResourceKey">
@@ -7127,7 +7261,7 @@
                 允许的值列表
             </summary>
         </member>
-        <member name="M:Cordon.AllowedValuesValidator.IsValid(System.Object)">
+        <member name="M:Cordon.AllowedValuesValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.BankCardValidator">
@@ -7144,7 +7278,7 @@
                 <inheritdoc cref="T:Cordon.BankCardValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.BankCardValidator.IsValid(System.Object)">
+        <member name="M:Cordon.BankCardValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.BankCardValidator.CheckLuhn(System.String)">
@@ -7184,7 +7318,7 @@
                 <inheritdoc cref="T:Cordon.Base64StringValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.Base64StringValidator.IsValid(System.Object)">
+        <member name="M:Cordon.Base64StringValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.ChineseNameValidator">
@@ -7197,7 +7331,7 @@
                 <inheritdoc cref="T:Cordon.ChineseNameValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.ChineseNameValidator.IsValid(System.Object)">
+        <member name="M:Cordon.ChineseNameValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ChineseNameValidator.Regex">
@@ -7222,7 +7356,7 @@
                 <inheritdoc cref="T:Cordon.ChineseValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.ChineseValidator.IsValid(System.Object)">
+        <member name="M:Cordon.ChineseValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ChineseValidator.Regex">
@@ -7273,7 +7407,7 @@
             </summary>
             <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA。若未启用，则仅支持：十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.ColorValueValidator.IsValid(System.Object)">
+        <member name="M:Cordon.ColorValueValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ColorValueValidator.Regex">
@@ -7290,8 +7424,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
+                            ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7313,7 +7447,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character greedily any number of times.<br/>
+                            ○ Match a whitespace character atomically any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -7338,7 +7472,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character greedily any number of times.<br/>
+                                    ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -7399,13 +7533,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7419,13 +7553,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7447,7 +7581,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7472,10 +7606,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit greedily at least once.<br/>
+                                    ○ Match a Unicode digit atomically at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit greedily at least once.<br/>
+                                ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -7522,7 +7656,7 @@
                 <inheritdoc cref="T:System.Reflection.PropertyInfo" />
             </summary>
         </member>
-        <member name="M:Cordon.CompareValidator`2.IsValid(`0)">
+        <member name="M:Cordon.CompareValidator`2.IsValid(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
         <member name="M:Cordon.CompareValidator`2.FormatErrorMessage(System.String)">
@@ -7572,16 +7706,19 @@
                 比较的值
             </summary>
         </member>
-        <member name="M:Cordon.ComparisonValidator.IsValid(System.IComparable)">
+        <member name="M:Cordon.ComparisonValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <summary>
                 检查对象合法性
             </summary>
             <param name="value">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Cordon.ComparisonValidator.IsValid(System.Object)">
+        <member name="M:Cordon.ComparisonValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ComparisonValidator.FormatErrorMessage(System.String)">
@@ -7642,13 +7779,13 @@
         <member name="M:Cordon.CompositeValidator.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.CompositeValidator.IsValid(System.Object)">
+        <member name="M:Cordon.CompositeValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.CompositeValidator.GetValidationResults(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.CompositeValidator.GetValidationResults(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.CompositeValidator.Validate(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.CompositeValidator.Validate(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.CompositeValidator.FormatErrorMessage(System.String)">
@@ -7676,16 +7813,17 @@
                 <see cref="T:Cordon.CompositeValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.CompositeValidator.ThrowValidationException(System.Object,System.String,Cordon.ValidatorBase,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.CompositeValidator.ThrowValidationException(System.Object,Cordon.ValidatorBase,Cordon.IValidationContext)">
             <summary>
                 抛出验证异常
             </summary>
             <param name="value">对象</param>
-            <param name="name">显示名称</param>
             <param name="validator">
                 <see cref="T:Cordon.ValidatorBase" />
             </param>
-            <param name="memberNames">成员名称列表</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
         <member name="M:Cordon.CompositeValidator.Dispose(System.Boolean)">
@@ -7734,28 +7872,29 @@
         <member name="M:Cordon.ConditionalValidator`1.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ConditionalValidator`1.IsValid(`0)">
+        <member name="M:Cordon.ConditionalValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ConditionalValidator`1.GetValidationResults(`0,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ConditionalValidator`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ConditionalValidator`1.Validate(`0,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ConditionalValidator`1.Validate(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ConditionalValidator`1.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ConditionalValidator`1.ThrowValidationException(System.Object,System.String,Cordon.ValidatorBase,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ConditionalValidator`1.ThrowValidationException(System.Object,Cordon.ValidatorBase,Cordon.IValidationContext)">
             <summary>
                 抛出验证异常
             </summary>
             <param name="value">对象</param>
-            <param name="name">显示名称</param>
             <param name="validator">
                 <see cref="T:Cordon.ValidatorBase" />
             </param>
-            <param name="memberNames">成员名称列表</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
         <member name="M:Cordon.ConditionalValidator`1.Dispose(System.Boolean)">
@@ -7804,7 +7943,7 @@
             </summary>
             <remarks>需与 <see cref="P:Cordon.DateOnlyValidator.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
         </member>
-        <member name="M:Cordon.DateOnlyValidator.IsValid(System.Object)">
+        <member name="M:Cordon.DateOnlyValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.DateOnlyValidator.FormatErrorMessage(System.String)">
@@ -7855,7 +7994,7 @@
             </summary>
             <remarks>需与 <see cref="P:Cordon.DateTimeValidator.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
         </member>
-        <member name="M:Cordon.DateTimeValidator.IsValid(System.Object)">
+        <member name="M:Cordon.DateTimeValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.DateTimeValidator.FormatErrorMessage(System.String)">
@@ -7900,7 +8039,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.DecimalPlacesValidator.IsValid(System.Object)">
+        <member name="M:Cordon.DecimalPlacesValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.DecimalPlacesValidator.FormatErrorMessage(System.String)">
@@ -7936,7 +8075,7 @@
                 不允许的值列表
             </summary>
         </member>
-        <member name="M:Cordon.DeniedValuesValidator.IsValid(System.Object)">
+        <member name="M:Cordon.DeniedValuesValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.DomainValidator">
@@ -7953,7 +8092,7 @@
                 <inheritdoc cref="T:Cordon.DomainValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.DomainValidator.IsValid(System.Object)">
+        <member name="M:Cordon.DomainValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.DomainValidator.ValidateDomain(System.String)">
@@ -7974,12 +8113,12 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Loop greedily at least once.<br/>
                 ○ 1st capture group.<br/>
-                    ○ Match a character in the set [0-9A-Za-z].<br/>
+                    ○ Match an ASCII letter or digit.<br/>
                     ○ Optional (greedy).<br/>
-                        ○ Match a character in the set [-0-9A-Za-z] greedily at most 61 times.<br/>
-                        ○ Match a character in the set [0-9A-Za-z].<br/>
+                        ○ Match a character in the set [\-0-9A-Za-z] greedily at most 61 times.<br/>
+                        ○ Match an ASCII letter or digit.<br/>
                     ○ Match '.'.<br/>
-            ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
+            ○ Match an ASCII letter atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -7994,7 +8133,7 @@
                 <inheritdoc cref="T:Cordon.EmailAddressValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.EmailAddressValidator.IsValid(System.Object)">
+        <member name="M:Cordon.EmailAddressValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.EmailAddressValidator.Regex">
@@ -8032,9 +8171,9 @@
                     ○ 7th capture group.<br/>
                         ○ Loop greedily at least once.<br/>
                             ○ 8th capture group.<br/>
-                                ○ Match a character in the set [-0-9A-Za-z] atomically at least once.<br/>
+                                ○ Match a character in the set [\-0-9A-Za-z] atomically at least once.<br/>
                                 ○ Match '.'.<br/>
-                        ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
+                        ○ Match an ASCII letter atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8049,7 +8188,7 @@
                 <inheritdoc cref="T:Cordon.EmptyValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.EmptyValidator.IsValid(System.Object)">
+        <member name="M:Cordon.EmptyValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.EndsWithValidator">
@@ -8080,7 +8219,7 @@
             </summary>
             <remarks>默认值为：<see cref="F:System.StringComparison.Ordinal" />。</remarks>
         </member>
-        <member name="M:Cordon.EndsWithValidator.IsValid(System.Object)">
+        <member name="M:Cordon.EndsWithValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.EndsWithValidator.FormatErrorMessage(System.String)">
@@ -8118,7 +8257,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.EnumValidator.IsValid(System.Object)">
+        <member name="M:Cordon.EnumValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.EnumValidator.FormatErrorMessage(System.String)">
@@ -8158,7 +8297,7 @@
                 比较的值
             </summary>
         </member>
-        <member name="M:Cordon.EqualToValidator.IsValid(System.Object)">
+        <member name="M:Cordon.EqualToValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.EqualToValidator.FormatErrorMessage(System.String)">
@@ -8170,7 +8309,7 @@
             </summary>
             <remarks>仅用于输出指定错误消息。</remarks>
         </member>
-        <member name="M:Cordon.FailureValidator.IsValid(System.Object)">
+        <member name="M:Cordon.FailureValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.GreaterThanOrEqualToValidator">
@@ -8184,7 +8323,7 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="M:Cordon.GreaterThanOrEqualToValidator.IsValid(System.IComparable)">
+        <member name="M:Cordon.GreaterThanOrEqualToValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.GreaterThanValidator">
@@ -8198,7 +8337,7 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="M:Cordon.GreaterThanValidator.IsValid(System.IComparable)">
+        <member name="M:Cordon.GreaterThanValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.HaveLengthValidator">
@@ -8223,7 +8362,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.HaveLengthValidator.IsValid(System.Object)">
+        <member name="M:Cordon.HaveLengthValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.HaveLengthValidator.FormatErrorMessage(System.String)">
@@ -8247,7 +8386,7 @@
                 <inheritdoc cref="T:Cordon.IDCardValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.IDCardValidator.IsValid(System.Object)">
+        <member name="M:Cordon.IDCardValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.IDCardValidator.Regex">
@@ -8273,18 +8412,18 @@
                                     ○ 7th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 8th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [12].<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 9th capture group.<br/>
@@ -8297,10 +8436,10 @@
                                     ○ 12th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ Match a sequence of expressions.<br/>
@@ -8314,13 +8453,13 @@
                                     ○ 15th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '2'.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 16th capture group.<br/>
                                     ○ 17th capture group.<br/>
@@ -8333,13 +8472,13 @@
                                                 ○ 20th capture group.<br/>
                                                     ○ Match with 3 alternative expressions.<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match a character in the set [13579].<br/>
                                                             ○ Match a character in the set [26].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match a character in the set [2468].<br/>
                                                             ○ Match a character in the set [048].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match '0'.<br/>
                                                             ○ Match a character in the set [48].<br/>
                                             ○ 21st capture group.<br/>
                                                 ○ Match the string "2000".<br/>
@@ -8354,18 +8493,18 @@
                                     ○ 26th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 27th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [12].<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 28th capture group.<br/>
@@ -8374,10 +8513,10 @@
                                     ○ 30th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ 31st capture group.<br/>
@@ -8387,25 +8526,25 @@
                                     ○ 33rd capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '2'.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 34th capture group.<br/>
                                     ○ 35th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [13579].<br/>
                                                 ○ Match a character in the set [26].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [2468].<br/>
                                                 ○ Match a character in the set [048].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                     ○ Match the string "0229".<br/>
                         ○ Match a Unicode digit exactly 2 times.<br/>
@@ -8431,7 +8570,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.IpAddressValidator.IsValid(System.Object)">
+        <member name="M:Cordon.IpAddressValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.IpAddressValidator.CheckIpAddress(System.String,System.Boolean)">
@@ -8484,7 +8623,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.JsonValidator.IsValid(System.Object)">
+        <member name="M:Cordon.JsonValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.LengthValidator">
@@ -8514,7 +8653,7 @@
                 最大允许长度
             </summary>
         </member>
-        <member name="M:Cordon.LengthValidator.IsValid(System.Object)">
+        <member name="M:Cordon.LengthValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.LengthValidator.FormatErrorMessage(System.String)">
@@ -8531,7 +8670,7 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="M:Cordon.LessThanOrEqualToValidator.IsValid(System.IComparable)">
+        <member name="M:Cordon.LessThanOrEqualToValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.LessThanValidator">
@@ -8545,7 +8684,7 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="M:Cordon.LessThanValidator.IsValid(System.IComparable)">
+        <member name="M:Cordon.LessThanValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.MaxLengthValidator">
@@ -8569,7 +8708,7 @@
                 最大允许长度
             </summary>
         </member>
-        <member name="M:Cordon.MaxLengthValidator.IsValid(System.Object)">
+        <member name="M:Cordon.MaxLengthValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.MaxLengthValidator.FormatErrorMessage(System.String)">
@@ -8586,7 +8725,7 @@
             </summary>
             <param name="maximum">允许的最大字段值</param>
         </member>
-        <member name="M:Cordon.MaxValidator.IsValid(System.IComparable)">
+        <member name="M:Cordon.MaxValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.MD5StringValidator">
@@ -8606,7 +8745,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.MD5StringValidator.IsValid(System.Object)">
+        <member name="M:Cordon.MD5StringValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.MD5StringValidator.Regex32">
@@ -8616,7 +8755,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
+            ○ Match a hexadecimal digit exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8630,8 +8769,8 @@
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
-                    ○ Match a character in the set [0-9A-Fa-f] exactly 16 times.<br/>
-                    ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
+                    ○ Match a hexadecimal digit exactly 16 times.<br/>
+                    ○ Match a hexadecimal digit exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8657,7 +8796,7 @@
                 最小允许长度
             </summary>
         </member>
-        <member name="M:Cordon.MinLengthValidator.IsValid(System.Object)">
+        <member name="M:Cordon.MinLengthValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.MinLengthValidator.FormatErrorMessage(System.String)">
@@ -8674,16 +8813,7 @@
             </summary>
             <param name="minimum">允许的最小字段值</param>
         </member>
-        <member name="M:Cordon.MinValidator.IsValid(System.IComparable)">
-            <inheritdoc />
-        </member>
-        <member name="T:Cordon.MustUnlessValidator`1">
-            <summary>
-                自定义条件不成立时委托验证器
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-        </member>
-        <member name="M:Cordon.MustUnlessValidator`1.#ctor(System.Func{`0,System.Boolean})">
+        <member name="M:Cordon.MinValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.MustValidator`1">
@@ -8693,6 +8823,9 @@
             <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="M:Cordon.MustValidator`1.#ctor(System.Func{`0,System.Boolean})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.MustValidator`1.#ctor(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
             <inheritdoc />
         </member>
         <member name="T:Cordon.NotBlankValidator">
@@ -8705,7 +8838,7 @@
                 <inheritdoc cref="T:Cordon.NotBlankValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.NotBlankValidator.IsValid(System.Object)">
+        <member name="M:Cordon.NotBlankValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.NotEmptyValidator">
@@ -8718,7 +8851,7 @@
                 <inheritdoc cref="T:Cordon.NotEmptyValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.NotEmptyValidator.IsValid(System.Object)">
+        <member name="M:Cordon.NotEmptyValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.NotEqualToValidator">
@@ -8737,7 +8870,7 @@
                 比较的值
             </summary>
         </member>
-        <member name="M:Cordon.NotEqualToValidator.IsValid(System.Object)">
+        <member name="M:Cordon.NotEqualToValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.NotEqualToValidator.FormatErrorMessage(System.String)">
@@ -8757,7 +8890,7 @@
             <inheritdoc />
             <remarks>默认值为：0。</remarks>
         </member>
-        <member name="M:Cordon.NotNullValidator.IsValid(System.Object)">
+        <member name="M:Cordon.NotNullValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.NullValidator">
@@ -8774,7 +8907,7 @@
             <inheritdoc />
             <remarks>默认值为：0。</remarks>
         </member>
-        <member name="M:Cordon.NullValidator.IsValid(System.Object)">
+        <member name="M:Cordon.NullValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.NumericComparisonValidator">
@@ -8788,7 +8921,7 @@
         <member name="M:Cordon.NumericComparisonValidator.#ctor(System.IComparable,System.Func{System.String})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.NumericComparisonValidator.IsValid(System.IComparable)">
+        <member name="M:Cordon.NumericComparisonValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.NumericComparisonValidator.IsValid(System.Decimal,System.Decimal)">
@@ -8807,11 +8940,6 @@
             </summary>
             <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
         </member>
-        <member name="F:Cordon.ObjectAnnotationValidator._items">
-            <summary>
-                验证上下文数据
-            </summary>
-        </member>
         <member name="F:Cordon.ObjectAnnotationValidator._serviceProvider">
             <summary>
                 <see cref="T:System.IServiceProvider" /> 委托
@@ -8826,7 +8954,7 @@
             <summary>
                 <inheritdoc cref="T:Cordon.ObjectAnnotationValidator" />
             </summary>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="M:Cordon.ObjectAnnotationValidator.#ctor(System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
@@ -8835,7 +8963,7 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="P:Cordon.ObjectAnnotationValidator.ValidateAllProperties">
             <summary>
@@ -8847,16 +8975,21 @@
                 若设置为 <c>false</c>，则仅验证 <see cref="M:System.ComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)" /> 方法。
             </remarks>
         </member>
+        <member name="P:Cordon.ObjectAnnotationValidator.Items">
+            <summary>
+                共享数据
+            </summary>
+        </member>
         <member name="M:Cordon.ObjectAnnotationValidator.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.IsValid(System.Object)">
+        <member name="M:Cordon.ObjectAnnotationValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.GetValidationResults(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ObjectAnnotationValidator.GetValidationResults(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.Validate(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ObjectAnnotationValidator.Validate(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectAnnotationValidator.FormatErrorMessage(System.String)">
@@ -8896,7 +9029,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.PasswordValidator.IsValid(System.Object)">
+        <member name="M:Cordon.PasswordValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.PasswordValidator.GetResourceKey">
@@ -8916,7 +9049,7 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [A-Za-z].<br/>
+                ○ Match an ASCII letter.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
                 ○ Match a Unicode digit.<br/>
@@ -8960,7 +9093,7 @@
                 <inheritdoc cref="T:Cordon.PhoneNumberValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.PhoneNumberValidator.IsValid(System.Object)">
+        <member name="M:Cordon.PhoneNumberValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.PhoneNumberValidator.Regex">
@@ -8978,25 +9111,25 @@
             ○ Match '1'.<br/>
             ○ Match with 7 alternative expressions.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '3'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '4'.<br/>
                     ○ Match a character in the set [579].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '5'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '6'.<br/>
                     ○ Match a character in the set [6-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '7'.<br/>
                     ○ Match a character in the set [0-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '8'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '9'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
             ○ Match a Unicode digit exactly 8 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -9013,7 +9146,7 @@
                 <inheritdoc cref="T:Cordon.PostalCodeValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.PostalCodeValidator.IsValid(System.Object)">
+        <member name="M:Cordon.PostalCodeValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.PostalCodeValidator.Regex">
@@ -9026,31 +9159,31 @@
             ○ 1st capture group.<br/>
                 ○ Match with 9 alternative expressions.<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '0'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '1'.<br/>
                         ○ Match a character in the set [0-356].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '2'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '3'.<br/>
                         ○ Match a character in the set [0-6].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '4'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '5'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '6'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '7'.<br/>
                         ○ Match a character in the set [0-5].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '8'.<br/>
                         ○ Match a character in the set [013-6].<br/>
             ○ Match a Unicode digit exactly 4 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -9069,12 +9202,18 @@
             </summary>
             <param name="condition">条件委托</param>
         </member>
+        <member name="M:Cordon.PredicateValidator`1.#ctor(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
+            <summary>
+                <inheritdoc cref="T:Cordon.PredicateValidator`1" />
+            </summary>
+            <param name="condition">条件委托</param>
+        </member>
         <member name="P:Cordon.PredicateValidator`1.Condition">
             <summary>
                 条件委托
             </summary>
         </member>
-        <member name="M:Cordon.PredicateValidator`1.IsValid(`0)">
+        <member name="M:Cordon.PredicateValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
         <member name="T:Cordon.PropertyAnnotationValidator`2">
@@ -9095,7 +9234,7 @@
                 <inheritdoc cref="T:Cordon.PropertyAnnotationValidator`2" />
             </summary>
             <param name="selector">属性选择器</param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="M:Cordon.PropertyAnnotationValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
@@ -9105,7 +9244,7 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="M:Cordon.PropertyAnnotationValidator`2.ConvertExpression(System.Linq.Expressions.Expression{System.Func{`0,`1}})">
             <summary>
@@ -9136,11 +9275,6 @@
                 属性值访问器
             </summary>
         </member>
-        <member name="F:Cordon.PropertyAnnotationValidator`1._items">
-            <summary>
-                验证上下文数据
-            </summary>
-        </member>
         <member name="F:Cordon.PropertyAnnotationValidator`1._serviceProvider">
             <summary>
                 <see cref="T:System.IServiceProvider" /> 委托
@@ -9157,7 +9291,7 @@
                 <inheritdoc cref="T:Cordon.PropertyAnnotationValidator`1" />
             </summary>
             <param name="selector">属性选择器</param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="M:Cordon.PropertyAnnotationValidator`1.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Object}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
@@ -9167,23 +9301,28 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="P:Cordon.PropertyAnnotationValidator`1.Property">
             <summary>
                 <inheritdoc cref="T:System.Reflection.PropertyInfo" />
             </summary>
         </member>
+        <member name="P:Cordon.PropertyAnnotationValidator`1.Items">
+            <summary>
+                共享数据
+            </summary>
+        </member>
         <member name="M:Cordon.PropertyAnnotationValidator`1.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.IsValid(`0)">
+        <member name="M:Cordon.PropertyAnnotationValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.GetValidationResults(`0,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.PropertyAnnotationValidator`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.Validate(`0,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.PropertyAnnotationValidator`1.Validate(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
         <member name="M:Cordon.PropertyAnnotationValidator`1.FormatErrorMessage(System.String)">
@@ -9308,7 +9447,7 @@
         <member name="M:Cordon.RangeValidator.Dispose">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.RangeValidator.IsValid(System.Object)">
+        <member name="M:Cordon.RangeValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.RangeValidator.FormatErrorMessage(System.String)">
@@ -9377,7 +9516,7 @@
         <member name="M:Cordon.RegularExpressionValidator.Dispose">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.RegularExpressionValidator.IsValid(System.Object)">
+        <member name="M:Cordon.RegularExpressionValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.RegularExpressionValidator.FormatErrorMessage(System.String)">
@@ -9431,7 +9570,7 @@
             <inheritdoc />
             <remarks>默认值为：10。</remarks>
         </member>
-        <member name="M:Cordon.RequiredValidator.IsValid(System.Object)">
+        <member name="M:Cordon.RequiredValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.RequiredValidator.Dispose(System.Boolean)">
@@ -9459,7 +9598,7 @@
                 <inheritdoc cref="T:Cordon.SingleValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.SingleValidator.IsValid(System.Object)">
+        <member name="M:Cordon.SingleValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.StartsWithValidator">
@@ -9490,7 +9629,7 @@
             </summary>
             <remarks>默认值为：<see cref="F:System.StringComparison.Ordinal" />。</remarks>
         </member>
-        <member name="M:Cordon.StartsWithValidator.IsValid(System.Object)">
+        <member name="M:Cordon.StartsWithValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.StartsWithValidator.FormatErrorMessage(System.String)">
@@ -9524,7 +9663,7 @@
             </summary>
             <remarks>默认值为：<see cref="F:System.StringComparison.Ordinal" />。</remarks>
         </member>
-        <member name="M:Cordon.StringContainsValidator.IsValid(System.Object)">
+        <member name="M:Cordon.StringContainsValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.StringContainsValidator.FormatErrorMessage(System.String)">
@@ -9564,7 +9703,7 @@
         <member name="M:Cordon.StringLengthValidator.Dispose">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.StringLengthValidator.IsValid(System.Object)">
+        <member name="M:Cordon.StringLengthValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.StringLengthValidator.FormatErrorMessage(System.String)">
@@ -9613,7 +9752,7 @@
             </summary>
             <remarks>默认值为：<see cref="F:System.StringComparison.Ordinal" />。</remarks>
         </member>
-        <member name="M:Cordon.StringNotContainsValidator.IsValid(System.Object)">
+        <member name="M:Cordon.StringNotContainsValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.StringNotContainsValidator.FormatErrorMessage(System.String)">
@@ -9642,7 +9781,7 @@
                 <inheritdoc cref="T:Cordon.TelephoneValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.TelephoneValidator.IsValid(System.Object)">
+        <member name="M:Cordon.TelephoneValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.TelephoneValidator.Regex">
@@ -9698,7 +9837,7 @@
             </summary>
             <remarks>需与 <see cref="P:Cordon.TimeOnlyValidator.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
         </member>
-        <member name="M:Cordon.TimeOnlyValidator.IsValid(System.Object)">
+        <member name="M:Cordon.TimeOnlyValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.TimeOnlyValidator.FormatErrorMessage(System.String)">
@@ -9737,7 +9876,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.UrlValidator.IsValid(System.Object)">
+        <member name="M:Cordon.UrlValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.UrlValidator.ValidateUrl(System.String)">
@@ -9771,7 +9910,7 @@
                 <inheritdoc cref="T:Cordon.UserNameValidator" />
             </summary>
         </member>
-        <member name="M:Cordon.UserNameValidator.IsValid(System.Object)">
+        <member name="M:Cordon.UserNameValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.UserNameValidator.Regex">
@@ -9781,12 +9920,12 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a character in the set [A-Za-z].<br/>
+            ○ Match an ASCII letter.<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [-_] exactly 2 times.<br/>
-            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match a character in the set [0-9A-Za-z].<br/>
+                ○ Match a character in the set [\-_] exactly 2 times.<br/>
+            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match an ASCII letter or digit.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9814,51 +9953,69 @@
             </summary>
             <param name="errorMessageResourceAccessor">错误信息资源访问器</param>
         </member>
-        <member name="M:Cordon.ValidatorBase`1.IsValid(`0)">
+        <member name="M:Cordon.ValidatorBase`1.IsValid(`0,Cordon.ValidationContext{`0})">
             <summary>
                 检查对象合法性
             </summary>
             <param name="instance">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Cordon.ValidatorBase`1.GetValidationResults(`0,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValidatorBase`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
             <summary>
                 获取对象验证结果集合
             </summary>
             <param name="instance">对象</param>
-            <param name="name">显示名称</param>
-            <param name="memberNames">成员名称列表</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <returns>
                 <see cref="T:System.Collections.Generic.List`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ValidatorBase`1.Validate(`0,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValidatorBase`1.Validate(`0,Cordon.ValidationContext{`0})">
             <summary>
-                验证指定的对象
+                验证对象
             </summary>
+            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="instance">对象</param>
-            <param name="name">显示名称</param>
-            <param name="memberNames">成员名称列表</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
-        <member name="M:Cordon.ValidatorBase`1.IsValid(System.Object)">
+        <member name="M:Cordon.ValidatorBase`1.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidatorBase`1.GetValidationResults(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValidatorBase`1.GetValidationResults(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidatorBase`1.Validate(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValidatorBase`1.Validate(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValidatorBase`1.ConvertValue(System.Object)">
             <summary>
-                将 <see cref="T:System.Object" /> 类型对象转换为 <typeparamref name="T" /> 类型对象
+                将 <see cref="T:System.Object" /> 对象转换为 <typeparamref name="T" /> 对象
             </summary>
             <param name="value">对象</param>
             <returns>
                 <typeparamref name="T" />
+            </returns>
+        </member>
+        <member name="M:Cordon.ValidatorBase`1.CreateValidationContext(`0,Cordon.IValidationContext)">
+            <summary>
+                创建 <see cref="T:Cordon.ValidationContext`1" /> 实例
+            </summary>
+            <param name="instance">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
+            <returns>
+                <see cref="T:Cordon.ValidationContext`1" />
             </returns>
         </member>
         <member name="T:Cordon.ValidatorBase">
@@ -9870,7 +10027,6 @@
             <summary>
                 外部程序集用于覆盖默认验证消息的【强制约定类型全名】
             </summary>
-            <remarks>TODO: 未来可考虑使用 <see cref="T:System.AppContext" /> 配置。</remarks>
         </member>
         <member name="F:Cordon.ValidatorBase._errorMessage">
             <summary>
@@ -9909,12 +10065,6 @@
             </summary>
             <param name="errorMessageResourceAccessor">错误信息资源访问器</param>
         </member>
-        <member name="P:Cordon.ValidatorBase.RuleSets">
-            <summary>
-                规则集
-            </summary>
-            <remarks>实现内部规则集功能。</remarks>
-        </member>
         <member name="P:Cordon.ValidatorBase.ErrorMessage">
             <summary>
                 错误信息
@@ -9929,6 +10079,12 @@
             <summary>
                 错误信息资源类型
             </summary>
+        </member>
+        <member name="P:Cordon.ValidatorBase.RuleSets">
+            <summary>
+                规则集
+            </summary>
+            <remarks>实现内部规则集功能。</remarks>
         </member>
         <member name="P:Cordon.ValidatorBase.ErrorMessageResourceAccessor">
             <summary>
@@ -9951,6 +10107,12 @@
             </summary>
             <remarks>实现 <see cref="T:Cordon.IAsyncValidator" /> 接口。</remarks>
         </member>
+        <member name="P:Cordon.ValidatorBase.IsTypedProxy">
+            <summary>
+                是否是验证器代理类型
+            </summary>
+            <remarks>验证器类型定义与 <see cref="T:Cordon.ValidatorProxy`2" /> 泛型定义一致。</remarks>
+        </member>
         <member name="E:Cordon.ValidatorBase.PropertyChanged">
             <summary>
                 属性变更事件
@@ -9961,6 +10123,18 @@
                 检查对象合法性
             </summary>
             <param name="value">对象</param>
+            <returns>
+                <see cref="T:System.Boolean" />
+            </returns>
+        </member>
+        <member name="M:Cordon.ValidatorBase.IsValid(System.Object,Cordon.IValidationContext)">
+            <summary>
+                检查对象合法性
+            </summary>
+            <param name="value">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
@@ -9976,13 +10150,37 @@
                 <see cref="T:System.Collections.Generic.List`1" />
             </returns>
         </member>
+        <member name="M:Cordon.ValidatorBase.GetValidationResults(System.Object,Cordon.IValidationContext)">
+            <summary>
+                获取对象验证结果集合
+            </summary>
+            <param name="value">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
+            <returns>
+                <see cref="T:System.Collections.Generic.List`1" />
+            </returns>
+        </member>
         <member name="M:Cordon.ValidatorBase.Validate(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
             <summary>
-                验证指定的对象
+                验证对象
             </summary>
+            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="value">对象</param>
             <param name="name">显示名称</param>
             <param name="memberNames">成员名称列表</param>
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
+        </member>
+        <member name="M:Cordon.ValidatorBase.Validate(System.Object,Cordon.IValidationContext)">
+            <summary>
+                验证对象
+            </summary>
+            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <param name="value">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
         <member name="M:Cordon.ValidatorBase.FormatErrorMessage(System.String)">
@@ -10088,13 +10286,13 @@
                 <see cref="T:Cordon.ValidatorProxy`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ValidatorProxy`1.IsValid(System.Object)">
+        <member name="M:Cordon.ValidatorProxy`1.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidatorProxy`1.GetValidationResults(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValidatorProxy`1.GetValidationResults(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidatorProxy`1.Validate(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValidatorProxy`1.Validate(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValidatorProxy`1.FormatErrorMessage(System.String)">
@@ -10152,7 +10350,7 @@
                 验证器实例配置委托集合
             </summary>
         </member>
-        <member name="M:Cordon.ValidatorProxy`2.#ctor(System.Func{`0,System.Object},System.Func{`0,System.Object[]})">
+        <member name="M:Cordon.ValidatorProxy`2.#ctor(System.Func{`0,System.Object},System.Func{`0,Cordon.ValidationContext{`0},System.Object[]})">
             <summary>
                 <inheritdoc cref="T:Cordon.ValidatorProxy`1" />
             </summary>
@@ -10174,34 +10372,40 @@
                 <see cref="T:Cordon.ValidatorProxy`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ValidatorProxy`2.IsValid(`0)">
+        <member name="M:Cordon.ValidatorProxy`2.IsValid(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidatorProxy`2.GetValidationResults(`0,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValidatorProxy`2.GetValidationResults(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidatorProxy`2.Validate(`0,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValidatorProxy`2.Validate(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValidatorProxy`2.FormatErrorMessage(System.String)">
             <inheritdoc />
             <exception cref="T:System.NotSupportedException"></exception>
         </member>
-        <member name="M:Cordon.ValidatorProxy`2.FormatErrorMessage(System.String,`0)">
+        <member name="M:Cordon.ValidatorProxy`2.FormatErrorMessage(System.String,`0,Cordon.ValidationContext{`0})">
             <summary>
                 错误信息格式化设置
             </summary>
             <param name="name">显示名称</param>
             <param name="instance">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <returns>
                 <see cref="T:System.String" />
             </returns>
         </member>
-        <member name="M:Cordon.ValidatorProxy`2.GetValidator(`0)">
+        <member name="M:Cordon.ValidatorProxy`2.GetValidator(`0,Cordon.ValidationContext{`0})">
             <summary>
                 获取或创建被代理的验证器实例
             </summary>
             <param name="instance">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <returns>
                 <typeparamref name="TValidator" />
             </returns>
@@ -10252,11 +10456,6 @@
                 用于值验证的 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 占位对象
             </summary>
         </member>
-        <member name="F:Cordon.ValueAnnotationValidator._items">
-            <summary>
-                验证上下文数据
-            </summary>
-        </member>
         <member name="F:Cordon.ValueAnnotationValidator._serviceProvider">
             <summary>
                 <see cref="T:System.IServiceProvider" /> 委托
@@ -10274,7 +10473,7 @@
                 <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
             </summary>
             <param name="attributes">验证特性列表</param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="M:Cordon.ValueAnnotationValidator.#ctor(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
@@ -10284,23 +10483,28 @@
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <param name="items">验证上下文数据</param>
+            <param name="items">共享数据</param>
         </member>
         <member name="P:Cordon.ValueAnnotationValidator.Attributes">
             <summary>
                 验证特性列表
             </summary>
         </member>
+        <member name="P:Cordon.ValueAnnotationValidator.Items">
+            <summary>
+                共享数据
+            </summary>
+        </member>
         <member name="M:Cordon.ValueAnnotationValidator.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValueAnnotationValidator.IsValid(System.Object)">
+        <member name="M:Cordon.ValueAnnotationValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValueAnnotationValidator.GetValidationResults(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValueAnnotationValidator.GetValidationResults(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValueAnnotationValidator.Validate(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+        <member name="M:Cordon.ValueAnnotationValidator.Validate(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValueAnnotationValidator.FormatErrorMessage(System.String)">
@@ -10339,6 +10543,20 @@
         <member name="M:Microsoft.Extensions.DependencyInjection.ValidationCoreServiceCollectionExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
             <summary>
                 添加数据验证服务
+            </summary>
+            <param name="services">
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+据验证服务
             </summary>
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />

@@ -11,11 +11,6 @@ namespace Cordon;
 public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
 {
     /// <summary>
-    ///     验证上下文数据
-    /// </summary>
-    internal readonly IDictionary<object, object?>? _items;
-
-    /// <summary>
     ///     <see cref="IServiceProvider" /> 委托
     /// </summary>
     internal Func<Type, object?>? _serviceProvider;
@@ -31,7 +26,7 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
     /// <summary>
     ///     <inheritdoc cref="ObjectAnnotationValidator" />
     /// </summary>
-    /// <param name="items">验证上下文数据</param>
+    /// <param name="items">共享数据</param>
     public ObjectAnnotationValidator(IDictionary<object, object?>? items)
         : this(null, items)
     {
@@ -43,7 +38,7 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
     /// </param>
-    /// <param name="items">验证上下文数据</param>
+    /// <param name="items">共享数据</param>
     public ObjectAnnotationValidator(IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
     {
         // 空检查
@@ -52,7 +47,7 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
             _serviceProvider = serviceProvider.GetService;
         }
 
-        _items = items;
+        Items = items is not null ? new Dictionary<object, object?>(items) : new Dictionary<object, object?>();
 
         ErrorMessageResourceAccessor = () => null!;
     }
@@ -67,23 +62,27 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
     /// </remarks>
     public bool ValidateAllProperties { get; set; } = true;
 
+    /// <summary>
+    ///     共享数据
+    /// </summary>
+    public IDictionary<object, object?> Items { get; }
+
     /// <inheritdoc />
     void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
         InitializeServiceProvider(serviceProvider);
 
     /// <inheritdoc />
-    public override bool IsValid(object? value)
+    public override bool IsValid(object? value, IValidationContext? validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(value);
 
-        return Validator.TryValidateObject(value, CreateValidationContext(value, null), null,
+        return Validator.TryValidateObject(value, CreateValidationContext(value, validationContext?.DisplayName), null,
             ValidateAllProperties);
     }
 
     /// <inheritdoc />
-    public override List<ValidationResult>? GetValidationResults(object? value, string name,
-        IEnumerable<string>? memberNames = null)
+    public override List<ValidationResult>? GetValidationResults(object? value, IValidationContext? validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(value);
@@ -98,33 +97,37 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
          * 参考源码：
          * https://github.com/dotnet/runtime/blob/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.ComponentModel.Annotations/src/System/ComponentModel/DataAnnotations/Validator.cs#L423-L430
          */
-        Validator.TryValidateObject(value, CreateValidationContext(value, name), validationResults,
-            ValidateAllProperties);
+        Validator.TryValidateObject(value, CreateValidationContext(value, validationContext?.DisplayName),
+            validationResults, ValidateAllProperties);
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
         {
-            validationResults.Insert(0, new ValidationResult(FormatErrorMessage(name), memberNames));
+            validationResults.Insert(0,
+                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
+                    validationContext?.MemberNames));
         }
 
         return validationResults.ToResults();
     }
 
     /// <inheritdoc />
-    public override void Validate(object? value, string name, IEnumerable<string>? memberNames = null)
+    public override void Validate(object? value, IValidationContext? validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(value);
 
         try
         {
-            Validator.ValidateObject(value, CreateValidationContext(value, name),
+            Validator.ValidateObject(value, CreateValidationContext(value, validationContext?.DisplayName),
                 ValidateAllProperties);
         }
         // 如果验证未通过且配置了自定义错误信息，则重新抛出异常
         catch (ValidationException e) when (ErrorMessageString is not null)
         {
-            throw new ValidationException(new ValidationResult(FormatErrorMessage(name), memberNames),
+            throw new ValidationException(
+                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
+                    validationContext?.MemberNames),
                 e.ValidationAttribute, e.Value) { Source = e.Source };
         }
     }
@@ -144,7 +147,7 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
     internal ValidationContext CreateValidationContext(object value, string? name)
     {
         // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext(value, _items);
+        var validationContext = new ValidationContext(value, Items);
 
         // 空检查
         if (name is not null)

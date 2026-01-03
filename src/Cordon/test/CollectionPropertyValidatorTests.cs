@@ -354,17 +354,12 @@ public class CollectionPropertyValidatorTests
 
         Assert.Throws<ArgumentNullException>(() => propertyValidator.EachRules(null!));
 
-        var exception = Assert.Throws<InvalidOperationException>(() => propertyValidator.EachRules(_ => { }));
-        Assert.Equal(
-            "Collection element type 'Cordon.Tests.CollectionPropertyValidatorTests+Child' is a reference type. `SetValidator` (value validator) and `EachRules` are only supported for value types or string. For class types, use `ChildRules` or `SetValidator` (object validator) instead.",
-            exception.Message);
-
         var propertyValidator2 =
             new CollectionPropertyValidator<ObjectModel, string?>(u => u.Names, objectValidator).EachRules(_ => { });
-        var exception2 = Assert.Throws<InvalidOperationException>(() => propertyValidator2.EachRules(_ => { }));
+        var exception = Assert.Throws<InvalidOperationException>(() => propertyValidator2.EachRules(_ => { }));
         Assert.Equal(
             "A value validator has already been assigned to this element. `EachRules` cannot be applied after `SetValidator` (value validator) or another `EachRules` call.",
-            exception2.Message);
+            exception.Message);
     }
 
     [Fact]
@@ -427,16 +422,27 @@ public class CollectionPropertyValidatorTests
     }
 
     [Fact]
+    public void GetValidatedElements_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator);
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.GetValidatedElements([], null!));
+    }
+
+    [Fact]
     public void GetValidatedElements_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator);
 
+        var model = new ObjectModel();
+        var validationContext = new ValidationContext<ObjectModel>(model);
+
         List<Child?> children = [new(), new(), null];
-        Assert.Equal(3, propertyValidator.GetValidatedElements(children!, new ObjectModel()).Count());
+        Assert.Equal(3, propertyValidator.GetValidatedElements(children!, validationContext).Count());
 
         Assert.Equal(2,
-            propertyValidator.Where(u => (Child?)u is not null).GetValidatedElements(children!, new ObjectModel())
+            propertyValidator.Where(u => (Child?)u is not null).GetValidatedElements(children!, validationContext)
                 .Count());
     }
 
@@ -446,8 +452,9 @@ public class CollectionPropertyValidatorTests
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator);
 
-        Assert.Throws<ArgumentNullException>(() => propertyValidator.ForEachValidatedElement(null!, null!));
-        Assert.Throws<ArgumentNullException>(() => propertyValidator.ForEachValidatedElement(new ObjectModel(), null!));
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.ForEachValidatedElement(null!, null!, null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            propertyValidator.ForEachValidatedElement(new ObjectModel(), null!, null!));
     }
 
     [Fact]

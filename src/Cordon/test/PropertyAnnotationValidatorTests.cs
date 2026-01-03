@@ -16,7 +16,7 @@ public class PropertyAnnotationValidatorTests
         var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
         Assert.NotNull(validator.Property);
         Assert.Equal("Name", validator.Property.Name);
-        Assert.Null(validator._items);
+        Assert.Empty(validator.Items);
         Assert.Null(validator._serviceProvider);
 
         Assert.NotNull(validator._getter);
@@ -34,15 +34,15 @@ public class PropertyAnnotationValidatorTests
             new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name,
                 new Dictionary<object, object?> { { "id", 1 } });
         Assert.Null(validator3._serviceProvider);
-        Assert.NotNull(validator3._items);
-        Assert.Single(validator3._items);
+        Assert.NotNull(validator3.Items);
+        Assert.Single(validator3.Items);
 
         var validator4 =
             new PropertyAnnotationValidator<PropertyClassTest, string?>(u => u.Name,
                 new Dictionary<object, object?> { { "id", 1 } });
         Assert.Null(validator4._serviceProvider);
-        Assert.NotNull(validator4._items);
-        Assert.Single(validator4._items);
+        Assert.NotNull(validator4.Items);
+        Assert.Single(validator4.Items);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
@@ -51,15 +51,15 @@ public class PropertyAnnotationValidatorTests
             new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name, serviceProvider,
                 new Dictionary<object, object?> { { "id", 1 } });
         Assert.NotNull(validator5._serviceProvider);
-        Assert.NotNull(validator5._items);
-        Assert.Single(validator5._items);
+        Assert.NotNull(validator5.Items);
+        Assert.Single(validator5.Items);
 
         var validator6 =
             new PropertyAnnotationValidator<PropertyClassTest, string?>(u => u.Name, serviceProvider,
                 new Dictionary<object, object?> { { "id", 1 } });
         Assert.NotNull(validator6._serviceProvider);
-        Assert.NotNull(validator6._items);
-        Assert.Single(validator6._items);
+        Assert.NotNull(validator6.Items);
+        Assert.Single(validator6.Items);
     }
 
     [Fact]

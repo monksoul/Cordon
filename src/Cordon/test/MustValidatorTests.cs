@@ -12,6 +12,9 @@ public class MustValidatorTests
         var validator = new MustValidator<int>(u => u > 10);
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} is invalid.", validator._errorMessageResourceAccessor());
+
+        var validator2 = new MustValidator<int>((u, _) => u > 10);
+        Assert.NotNull(validator2.Condition);
     }
 
     [Theory]

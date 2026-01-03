@@ -46,11 +46,13 @@ public static class ObjectValidatorEnumerableExtensions
     }
 
     /// <summary>
-    ///     验证指定的对象
+    ///     验证对象
     /// </summary>
+    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="validators"><see cref="IObjectValidator{T}" /> 集合</param>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
+    /// <exception cref="ValidationException"></exception>
     public static void Validate<T>(this IEnumerable<IObjectValidator<T>> validators, T? instance,
         string?[]? ruleSets = null)
     {

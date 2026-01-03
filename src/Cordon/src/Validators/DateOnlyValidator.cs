@@ -41,7 +41,7 @@ public class DateOnlyValidator : ValidatorBase
     public DateTimeStyles Style { get; set; } = DateTimeStyles.None;
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         value switch
         {
             null => true,

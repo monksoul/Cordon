@@ -10,7 +10,7 @@ namespace Cordon;
 /// <typeparam name="TValidator">
 ///     <see cref="ValidatorBase" />
 /// </typeparam>
-public class ValidatorProxy<TValidator> : ValidatorBase, IDisposable, IValidatorInitializer
+public class ValidatorProxy<TValidator> : ValidatorBase, IValidatorInitializer, IDisposable
     where TValidator : ValidatorBase
 {
     /// <summary>
@@ -61,16 +61,17 @@ public class ValidatorProxy<TValidator> : ValidatorBase, IDisposable, IValidator
     }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
+        Validator.IsValid(value, validationContext);
 
     /// <inheritdoc />
-    public override List<ValidationResult>? GetValidationResults(object? value, string name,
-        IEnumerable<string>? memberNames = null) =>
-        Validator.GetValidationResults(value, name, memberNames);
+    public override List<ValidationResult>?
+        GetValidationResults(object? value, IValidationContext? validationContext) =>
+        Validator.GetValidationResults(value, validationContext);
 
     /// <inheritdoc />
-    public override void Validate(object? value, string name, IEnumerable<string>? memberNames = null) =>
-        Validator.Validate(value, name, memberNames);
+    public override void Validate(object? value, IValidationContext? validationContext) =>
+        Validator.Validate(value, validationContext);
 
     /// <inheritdoc />
     public override string? FormatErrorMessage(string name) => Validator.FormatErrorMessage(name);
@@ -138,13 +139,13 @@ public class ValidatorProxy<TValidator> : ValidatorBase, IDisposable, IValidator
 /// <typeparam name="TValidator">
 ///     <see cref="ValidatorBase" />
 /// </typeparam>
-public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IValidatorInitializer
+public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitializer, IDisposable
     where TValidator : ValidatorBase
 {
     /// <summary>
     ///     <typeparamref name="TValidator" /> 构造函数参数工厂
     /// </summary>
-    internal readonly Func<T, object?[]?>? _constructorArgsFactory;
+    internal readonly Func<T, ValidationContext<T>, object?[]?>? _constructorArgsFactory;
 
     /// <summary>
     ///     属性变更字典
@@ -171,7 +172,8 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IVal
     /// </summary>
     /// <param name="validatedObjectProvider">被验证对象的提供器</param>
     /// <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
-    public ValidatorProxy(Func<T, object?> validatedObjectProvider, Func<T, object?[]?>? constructorArgsFactory = null)
+    public ValidatorProxy(Func<T, object?> validatedObjectProvider,
+        Func<T, ValidationContext<T>, object?[]?>? constructorArgsFactory = null)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(validatedObjectProvider);
@@ -217,16 +219,16 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IVal
     }
 
     /// <inheritdoc />
-    public override bool IsValid(T? instance) => GetValidator(instance).IsValid(GetValidatedObject(instance));
+    public override bool IsValid(T? instance, ValidationContext<T> validationContext) =>
+        GetValidator(instance, validationContext).IsValid(GetValidatedObject(instance), validationContext);
 
     /// <inheritdoc />
-    public override List<ValidationResult>? GetValidationResults(T? instance, string name,
-        IEnumerable<string>? memberNames = null) =>
-        GetValidator(instance).GetValidationResults(GetValidatedObject(instance), name, memberNames);
+    public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext) =>
+        GetValidator(instance, validationContext).GetValidationResults(GetValidatedObject(instance), validationContext);
 
     /// <inheritdoc />
-    public override void Validate(T? instance, string name, IEnumerable<string>? memberNames = null) =>
-        GetValidator(instance).Validate(GetValidatedObject(instance), name, memberNames);
+    public override void Validate(T? instance, ValidationContext<T> validationContext) =>
+        GetValidator(instance, validationContext).Validate(GetValidatedObject(instance), validationContext);
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException"></exception>
@@ -238,20 +240,26 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IVal
     /// </summary>
     /// <param name="name">显示名称</param>
     /// <param name="instance">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
     /// <returns>
     ///     <see cref="string" />
     /// </returns>
-    public virtual string? FormatErrorMessage(string name, T? instance) =>
-        GetValidator(instance).FormatErrorMessage(name);
+    public virtual string? FormatErrorMessage(string name, T? instance, ValidationContext<T> validationContext) =>
+        GetValidator(instance, validationContext).FormatErrorMessage(name);
 
     /// <summary>
     ///     获取或创建被代理的验证器实例
     /// </summary>
     /// <param name="instance">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
     /// <returns>
     ///     <typeparamref name="TValidator" />
     /// </returns>
-    protected TValidator GetValidator(T? instance)
+    protected TValidator GetValidator(T? instance, ValidationContext<T> validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
@@ -261,7 +269,8 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IDisposable, IVal
             // 反射创建验证器实例
             var validator = _constructorArgsFactory is null
                 ? Activator.CreateInstance<TValidator>()
-                : (TValidator)Activator.CreateInstance(typeof(TValidator), _constructorArgsFactory.Invoke(instance))!;
+                : (TValidator)Activator.CreateInstance(typeof(TValidator),
+                    _constructorArgsFactory.Invoke(instance, validationContext))!;
 
             // 应用属性变更到验证器
             ApplyPropertyChanges(validator);

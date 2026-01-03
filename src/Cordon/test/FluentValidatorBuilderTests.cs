@@ -11,12 +11,12 @@ public class FluentValidatorBuilderTests
     {
         var builder = new TestValidatorBuilder<int>();
         Assert.NotNull(builder);
-        Assert.Null(builder._items);
+        Assert.Empty(builder.Items);
 
         var builder2 = new TestValidatorBuilder<int>(new Dictionary<object, object?>());
         Assert.NotNull(builder2);
-        Assert.NotNull(builder2._items);
-        Assert.Empty(builder2._items);
+        Assert.NotNull(builder2.Items);
+        Assert.Empty(builder2.Items);
 
         var builder3 = new FluentValidatorBuilder<int>();
         Assert.NotNull(builder3);

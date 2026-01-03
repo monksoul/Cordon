@@ -44,7 +44,7 @@ public class StringNotContainsValidator : ValidatorBase
     public StringComparison Comparison { get; set; } = StringComparison.Ordinal;
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         value switch
         {
             null => true,

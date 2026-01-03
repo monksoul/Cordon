@@ -25,5 +25,6 @@ public class Base64StringValidator : ValidatorBase
     }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) => _validator.IsValid(value);
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
+        _validator.IsValid(value, validationContext);
 }

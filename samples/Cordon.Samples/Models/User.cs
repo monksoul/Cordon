@@ -1,81 +1,54 @@
 ﻿namespace Cordon.Samples.Models;
 
-public class User : IValidatableObject
+public class Address : IValidatableObject
 {
-    [Required(ErrorMessage = "名字不能为空")]
-    [MinLength(2, ErrorMessage = "名字不能少于 2 个字符")]
-    public string? Name { get; set; }
-
-    [Min(18, ErrorMessage = "年龄不能小于 18 岁")]
-    public int Age { get; set; }
-
-    [Required(ErrorMessage = "密码不能为空")]
-    [Compare(nameof(ConfirmPassword), ErrorMessage = "两次输入的密码不一致")]
-    public string? Password { get; set; }
-
-    public string? ConfirmPassword { get; set; }
-
-    [Required]
-    [EmailAddress]
-    // [AllowedEmailDomains]
-    public string? EmailAddress { get; set; }
+    public string? City { get; set; }
+    public string? Street { get; set; }
 
     /// <inheritdoc />
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        // if (EmailAddress is not null &&
-        //     !_allowedDomains.Any(domain => EmailAddress.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
-        //     yield return new ValidationResult("仅支持 outlook、qq 和 163 邮箱格式。", [nameof(EmailAddress)]);
-
-        // return validationContext.With<User>()
-        //     .RuleFor(u => u.EmailAddress)
-        //     .MustAny(["@outlook.com", "@qq.com", "@163.com"],
-        //         (email, domain) => email.EndsWith(domain, StringComparison.OrdinalIgnoreCase))
-        //     // .MustAny(["@outlook.com", "@qq.com", "@163.com"], BeAValidEmailAddress)
-        //     .WithMessage("仅支持 outlook、qq 和 163 邮箱格式。")
-        //     .ToResults();
-
-        return validationContext.ValidateWith<UserValidator>();
-    }
-
-    private static bool BeAValidEmailAddress(string email, string domain)
-    {
-        return email.EndsWith(domain, StringComparison.OrdinalIgnoreCase);
+        return validationContext.With<Address>()
+            .RuleFor(u => u.City).Required()
+            .RuleFor(u => u.Street).Required()
+            .ToResults();
     }
 }
 
-public class AllowedEmailDomainsAttribute : ValidationAttribute
+public class WorkExperience : IValidatableObject
 {
-    private readonly string[] _allowedDomains = ["@outlook.com", "@qq.com", "@163.com"];
-
-    public string GetErrorMessage()
-    {
-        return "仅支持 outlook、qq 和 163 邮箱格式。";
-    }
+    public string? Company { get; set; }
+    public string? Position { get; set; }
+    public int Years { get; set; }
 
     /// <inheritdoc />
-    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (value is not string email) return ValidationResult.Success;
-
-        if (!_allowedDomains.Any(domain => email.EndsWith(domain, StringComparison.OrdinalIgnoreCase)))
-            return new ValidationResult(GetErrorMessage());
-
-        return base.IsValid(value, validationContext);
+        return validationContext.With<WorkExperience>()
+            .RuleFor(u => u.Company).Required()
+            .RuleFor(u => u.Position).Required()
+            .RuleFor(u => u.Years).Range(1900, 2026)
+            .ToResults();
     }
 }
 
-public class UserValidator : AbstractValidator<User>
+public class User : IValidatableObject
 {
-    public UserValidator()
-    {
-        RuleFor(u => u.EmailAddress)
-            .MustAny(["@outlook.com", "@qq.com", "@163.com"], BeAValidEmailAddress)
-            .WithMessage("仅支持 outlook、qq 和 163 邮箱格式。");
-    }
+    public string? Name { get; set; }
+    public int Age { get; set; }
 
-    private static bool BeAValidEmailAddress(string email, string domain)
+    public Address? Address { get; set; }
+
+    public List<WorkExperience>? WorkExperiences { get; set; }
+
+    /// <inheritdoc />
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        return email.EndsWith(domain, StringComparison.OrdinalIgnoreCase);
+        return validationContext.With<User>()
+            .RuleFor(u => u.Name).Required().MinLength(3)
+            .RuleFor(u => u.Age).Age(true)
+            .RuleFor(u => u.Address).Required()
+            .RuleForCollection(u => u.WorkExperiences).MaxLength(5)
+            .ToResults();
     }
 }

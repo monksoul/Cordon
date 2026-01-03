@@ -1232,60 +1232,6 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
-    public void MustUnless_Invalid_Parameters()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            new ObjectValidator<ValidationModel>().RuleFor(u => u.Number1)
-                .MustUnless((Func<int, bool>)null!));
-
-        Assert.Throws<ArgumentNullException>(() =>
-            new ObjectValidator<ValidationModel>().RuleFor(u => u.Number1)
-                .MustUnless(null!));
-    }
-
-    [Fact]
-    public void MustUnless_ReturnOK()
-    {
-        var propertyValidator = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Number1)
-            .MustUnless(u => u <= 10);
-
-        Assert.Single(propertyValidator.Validators);
-
-        var addedValidator = propertyValidator._lastAddedValidator as MustUnlessValidator<int>;
-        Assert.NotNull(addedValidator);
-
-        Assert.True(propertyValidator.IsValid(new ValidationModel { Number1 = 11 }));
-        Assert.False(propertyValidator.IsValid(new ValidationModel { Number1 = 9 }));
-
-        var propertyValidator2 = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Number1)
-            .MustUnless((_, ctx) => ctx.Instance.Number1 <= 10);
-
-        Assert.Single(propertyValidator2.Validators);
-
-        var addedValidator2 =
-            propertyValidator2._lastAddedValidator as ValidatorProxy<ValidationModel, MustUnlessValidator<int>>;
-        Assert.NotNull(addedValidator2);
-
-        Assert.True(propertyValidator2.IsValid(new ValidationModel { Number1 = 11 }));
-        Assert.False(propertyValidator2.IsValid(new ValidationModel { Number1 = 9 }));
-
-        var propertyValidator3 = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Number1)
-            .MustUnless_((_, ctx) => ctx.Instance.Number1 <= 10);
-
-        Assert.Single(propertyValidator3.Validators);
-
-        var addedValidator3 =
-            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustUnlessValidator<int>>;
-        Assert.NotNull(addedValidator3);
-
-        Assert.True(propertyValidator3.IsValid(new ValidationModel { Number1 = 11 }));
-        Assert.False(propertyValidator3.IsValid(new ValidationModel { Number1 = 9 }));
-    }
-
-    [Fact]
     public void Must_Invalid_Parameters()
     {
         Assert.Throws<ArgumentNullException>(() =>
@@ -1463,11 +1409,11 @@ public class PropertyValidatorValidationTests
 
         Assert.Throws<ArgumentNullException>(() =>
             new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
-                .MustAny(null!, (Func<string, ValidationContext<string>, string, bool>)null!));
+                .MustAny(null!, (Func<string, string, ValidationContext<string>, bool>)null!));
 
         Assert.Throws<ArgumentNullException>(() =>
             new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
-                .MustAny([], (Func<string, ValidationContext<string>, string, bool>)null!));
+                .MustAny([], (Func<string, string, ValidationContext<string>, bool>)null!));
     }
 
     [Fact]
@@ -1490,7 +1436,7 @@ public class PropertyValidatorValidationTests
         var propertyValidator2 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
             .MustAny(allowedDomains,
-                (_, ctx, x) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+                (_, x, ctx) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         Assert.Single(propertyValidator2.Validators);
 
@@ -1504,7 +1450,7 @@ public class PropertyValidatorValidationTests
         var propertyValidator3 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
             .MustAny_(allowedDomains,
-                (_, ctx, x) => ctx.Instance.String1!.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+                (_, x, ctx) => ctx.Instance.String1!.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         Assert.Single(propertyValidator3.Validators);
 
@@ -1529,11 +1475,11 @@ public class PropertyValidatorValidationTests
 
         Assert.Throws<ArgumentNullException>(() =>
             new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
-                .MustAll(null!, (Func<string, ValidationContext<string>, string, bool>)null!));
+                .MustAll(null!, (Func<string, string, ValidationContext<string>, bool>)null!));
 
         Assert.Throws<ArgumentNullException>(() =>
             new ObjectValidator<ValidationModel>().RuleFor(u => u.String1)
-                .MustAll([], (Func<string, ValidationContext<string>, string, bool>)null!));
+                .MustAll([], (Func<string, string, ValidationContext<string>, bool>)null!));
     }
 
     [Fact]
@@ -1556,7 +1502,7 @@ public class PropertyValidatorValidationTests
         var propertyValidator2 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
             .MustAll(allowedDomains,
-                (_, ctx, x) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+                (_, x, ctx) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         Assert.Single(propertyValidator2.Validators);
 
@@ -1570,7 +1516,7 @@ public class PropertyValidatorValidationTests
         var propertyValidator3 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
             .MustAll_(allowedDomains,
-                (_, ctx, x) => ctx.Instance.String1!.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+                (_, x, ctx) => ctx.Instance.String1!.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         Assert.Single(propertyValidator3.Validators);
 
@@ -2382,8 +2328,8 @@ public class PropertyValidatorValidationTests
         Assert.Equal(["The Name field is required.", "The Name field is required.", "The Name field is required."],
             validator.ToResults(validationContext).Select(u => u.ErrorMessage!).ToArray());
 
-        Assert.NotNull(validator._items);
-        Assert.Empty(validator._items);
+        Assert.NotNull(validator.Items);
+        Assert.Single(validator.Items);
     }
 
     [Fact]

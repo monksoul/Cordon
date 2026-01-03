@@ -13,6 +13,9 @@ public class PredicateValidatorTests
         Assert.NotNull(validator.Condition);
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} is invalid.", validator._errorMessageResourceAccessor());
+
+        var validator2 = new PredicateValidator<int>((u, _) => u > 10);
+        Assert.NotNull(validator2.Condition);
     }
 
     [Theory]

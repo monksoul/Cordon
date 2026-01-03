@@ -22,7 +22,7 @@ public partial class ColorValueValidator : ValidatorBase
     public bool FullMode { get; set; }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         value switch
         {
             null => true,

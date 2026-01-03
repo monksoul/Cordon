@@ -192,32 +192,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     }
 
     /// <summary>
-    ///     添加自定义条件不成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf MustUnless(Func<TProperty, ValidationContext<T>, bool> condition)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(condition);
-
-        return ValidatorProxy<MustUnlessValidator<TProperty>>(context =>
-            [new Func<TProperty, bool>(u => condition(u, context))]);
-    }
-
-    /// <summary>
-    ///     添加自定义条件不成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf MustUnless_(Func<TProperty, ValidationContext<T>, bool> condition) =>
-        MustUnless(condition);
-
-    /// <summary>
     ///     添加自定义条件成立时委托验证器
     /// </summary>
     /// <param name="condition">条件委托</param>
@@ -313,14 +287,14 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf MustAny<TElement>(IEnumerable<TElement> enumerable,
-        Func<TProperty, ValidationContext<T>, TElement, bool> condition)
+        Func<TProperty, TElement, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(enumerable);
         ArgumentNullException.ThrowIfNull(condition);
 
         return ValidatorProxy<MustValidator<TProperty>>(context =>
-            [new Func<TProperty, bool>(u => enumerable.Any(x => condition(u, context, x)))]);
+            [new Func<TProperty, bool>(u => enumerable.Any(x => condition(u, x, context)))]);
     }
 
     /// <summary>
@@ -333,7 +307,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf MustAny_<TElement>(IEnumerable<TElement> enumerable,
-        Func<TProperty, ValidationContext<T>, TElement, bool> condition) =>
+        Func<TProperty, TElement, ValidationContext<T>, bool> condition) =>
         MustAny(enumerable, condition);
 
     /// <summary>
@@ -346,14 +320,14 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf MustAll<TElement>(IEnumerable<TElement> enumerable,
-        Func<TProperty, ValidationContext<T>, TElement, bool> condition)
+        Func<TProperty, TElement, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(enumerable);
         ArgumentNullException.ThrowIfNull(condition);
 
         return ValidatorProxy<MustValidator<TProperty>>(context =>
-            [new Func<TProperty, bool>(u => enumerable.All(x => condition(u, context, x)))]);
+            [new Func<TProperty, bool>(u => enumerable.All(x => condition(u, x, context)))]);
     }
 
     /// <summary>
@@ -366,7 +340,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf MustAll_<TElement>(IEnumerable<TElement> enumerable,
-        Func<TProperty, ValidationContext<T>, TElement, bool> condition) =>
+        Func<TProperty, TElement, ValidationContext<T>, bool> condition) =>
         MustAll(enumerable, condition);
 
     /// <summary>
@@ -432,7 +406,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
             validatedObjectProvider ?? (instance => GetValueForValidation(instance)),
             constructorArgsFactory is null
                 ? null
-                : instance => constructorArgsFactory(CreateValidationContext(instance)));
+                : (_, context) => constructorArgsFactory(context));
 
         // 空检查
         if (configure is not null)

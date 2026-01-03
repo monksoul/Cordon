@@ -30,10 +30,12 @@ public interface IObjectValidator : IValidatorInitializer, IDisposable
     List<ValidationResult>? GetValidationResults(object? instance, string?[]? ruleSets = null);
 
     /// <summary>
-    ///     验证指定的对象
+    ///     验证对象
     /// </summary>
+    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
+    /// <exception cref="ValidationException"></exception>
     void Validate(object? instance, string?[]? ruleSets = null);
 
     /// <summary>
@@ -76,9 +78,11 @@ public interface IObjectValidator<in T> : IObjectValidator
     List<ValidationResult>? GetValidationResults(T? instance, string?[]? ruleSets = null);
 
     /// <summary>
-    ///     验证指定的对象
+    ///     验证对象
     /// </summary>
+    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
+    /// <exception cref="ValidationException"></exception>
     void Validate(T? instance, string?[]? ruleSets = null);
 }

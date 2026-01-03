@@ -39,54 +39,122 @@ public abstract class ValidatorBase<T> : ValidatorBase
     ///     检查对象合法性
     /// </summary>
     /// <param name="instance">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    public abstract bool IsValid(T? instance);
+    public abstract bool IsValid(T? instance, ValidationContext<T> validationContext);
 
     /// <summary>
     ///     获取对象验证结果集合
     /// </summary>
     /// <param name="instance">对象</param>
-    /// <param name="name">显示名称</param>
-    /// <param name="memberNames">成员名称列表</param>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
     /// <returns>
     ///     <see cref="List{T}" />
     /// </returns>
-    public virtual List<ValidationResult>? GetValidationResults(T? instance, string name,
-        IEnumerable<string>? memberNames = null) =>
-        base.GetValidationResults(instance, name, memberNames);
+    public virtual List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext) =>
+        IsValid(instance, validationContext)
+            ? null
+            : [new ValidationResult(FormatErrorMessage(validationContext.DisplayName), validationContext.MemberNames)];
 
     /// <summary>
-    ///     验证指定的对象
+    ///     验证对象
     /// </summary>
+    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="instance">对象</param>
-    /// <param name="name">显示名称</param>
-    /// <param name="memberNames">成员名称列表</param>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
     /// <exception cref="ValidationException"></exception>
-    public virtual void Validate(T? instance, string name, IEnumerable<string>? memberNames = null) =>
-        base.Validate(instance, name, memberNames);
+    public virtual void Validate(T? instance, ValidationContext<T> validationContext)
+    {
+        // 检查对象合法性
+        if (!IsValid(instance, validationContext))
+        {
+            throw new ValidationException(
+                new ValidationResult(FormatErrorMessage(validationContext.DisplayName), validationContext.MemberNames),
+                null, instance);
+        }
+    }
 
     /// <inheritdoc />
-    public sealed override bool IsValid(object? value) => IsValid(ConvertValue(value));
+    public sealed override bool IsValid(object? value, IValidationContext? validationContext)
+    {
+        // 将 value 转换为 T
+        var instance = ConvertValue(value);
+
+        // 检查 validationContext 是否是 ValidationContext<T> 类型
+        if (validationContext is ValidationContext<T> typedValidationContext)
+        {
+            return IsValid(instance, typedValidationContext);
+        }
+
+        return IsValid(instance, CreateValidationContext(instance, validationContext));
+    }
 
     /// <inheritdoc />
-    public sealed override List<ValidationResult>? GetValidationResults(object? value, string name,
-        IEnumerable<string>? memberNames = null) =>
-        GetValidationResults(ConvertValue(value), name, memberNames);
+    public sealed override List<ValidationResult>? GetValidationResults(object? value,
+        IValidationContext? validationContext)
+    {
+        // 将 value 转换为 T
+        var instance = ConvertValue(value);
+
+        // 检查 validationContext 是否是 ValidationContext<T> 类型
+        if (validationContext is ValidationContext<T> typedValidationContext)
+        {
+            return GetValidationResults(instance, typedValidationContext);
+        }
+
+        return GetValidationResults(instance, CreateValidationContext(instance, validationContext));
+    }
 
     /// <inheritdoc />
-    public sealed override void Validate(object? value, string name, IEnumerable<string>? memberNames = null) =>
-        Validate(ConvertValue(value), name, memberNames);
+    public sealed override void Validate(object? value, IValidationContext? validationContext)
+    {
+        // 将 value 转换为 T
+        var instance = ConvertValue(value);
+
+        // 检查 validationContext 是否是 ValidationContext<T> 类型
+        if (validationContext is ValidationContext<T> typedValidationContext)
+        {
+            Validate(instance, typedValidationContext);
+        }
+
+        Validate(instance, CreateValidationContext(instance, validationContext));
+    }
 
     /// <summary>
-    ///     将 <see cref="object" /> 类型对象转换为 <typeparamref name="T" /> 类型对象
+    ///     将 <see cref="object" /> 对象转换为 <typeparamref name="T" /> 对象
     /// </summary>
     /// <param name="value">对象</param>
     /// <returns>
     ///     <typeparamref name="T" />
     /// </returns>
     internal static T? ConvertValue(object? value) => (T?)value;
+
+    /// <summary>
+    ///     创建 <see cref="ValidationContext{T}" /> 实例
+    /// </summary>
+    /// <param name="instance">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="ValidationContext{T}" />
+    /// </returns>
+    internal static ValidationContext<T> CreateValidationContext(T? instance, IValidationContext? validationContext) =>
+        new(instance!, validationContext is null ? null : validationContext.GetService,
+            validationContext?.Items)
+        {
+            DisplayName = validationContext?.DisplayName!,
+            MemberNames = validationContext?.MemberNames,
+            RuleSets = validationContext?.RuleSets
+        };
 }
 
 /// <summary>
@@ -97,7 +165,6 @@ public abstract class ValidatorBase
     /// <summary>
     ///     外部程序集用于覆盖默认验证消息的【强制约定类型全名】
     /// </summary>
-    /// <remarks>TODO: 未来可考虑使用 <see cref="AppContext" /> 配置。</remarks>
     internal const string ExternalValidationMessagesFullTypeName = "Cordon.Resources.Overrides.ValidationMessages";
 
     /// <summary>
@@ -140,29 +207,8 @@ public abstract class ValidatorBase
     ///     <inheritdoc cref="ValidatorBase" />
     /// </summary>
     /// <param name="errorMessageResourceAccessor">错误信息资源访问器</param>
-    protected ValidatorBase(Func<string> errorMessageResourceAccessor)
-    {
+    protected ValidatorBase(Func<string> errorMessageResourceAccessor) =>
         _errorMessageResourceAccessor = errorMessageResourceAccessor;
-
-        // ReSharper disable once SuspiciousTypeConversion.Global
-        SupportsAsync = this is IAsyncValidator;
-    }
-
-    /// <summary>
-    ///     规则集
-    /// </summary>
-    /// <remarks>实现内部规则集功能。</remarks>
-    internal string?[]? RuleSets
-    {
-        get;
-        set
-        {
-            field = value;
-
-            // 触发属性变更事件
-            OnPropertyChanged(value);
-        }
-    }
 
     /// <summary>
     ///     错误信息
@@ -218,6 +264,22 @@ public abstract class ValidatorBase
     }
 
     /// <summary>
+    ///     规则集
+    /// </summary>
+    /// <remarks>实现内部规则集功能。</remarks>
+    public string?[]? RuleSets
+    {
+        get;
+        set
+        {
+            field = value;
+
+            // 触发属性变更事件
+            OnPropertyChanged(value);
+        }
+    }
+
+    /// <summary>
     ///     错误信息资源访问器
     /// </summary>
     private protected Func<string> ErrorMessageResourceAccessor
@@ -248,7 +310,15 @@ public abstract class ValidatorBase
     ///     是否支持异步操作
     /// </summary>
     /// <remarks>实现 <see cref="IAsyncValidator" /> 接口。</remarks>
-    internal bool SupportsAsync { get; }
+    // ReSharper disable once SuspiciousTypeConversion.Global
+    internal bool SupportsAsync => this is IAsyncValidator;
+
+    /// <summary>
+    ///     是否是验证器代理类型
+    /// </summary>
+    /// <remarks>验证器类型定义与 <see cref="ValidatorProxy{T,TValidator}" /> 泛型定义一致。</remarks>
+    internal bool IsTypedProxy =>
+        GetType().IsGenericType && GetType().GetGenericTypeDefinition() == typeof(ValidatorProxy<,>);
 
     /// <summary>
     ///     属性变更事件
@@ -262,7 +332,19 @@ public abstract class ValidatorBase
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    public abstract bool IsValid(object? value);
+    public virtual bool IsValid(object? value) => IsValid(value, null);
+
+    /// <summary>
+    ///     检查对象合法性
+    /// </summary>
+    /// <param name="value">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="bool" />
+    /// </returns>
+    public abstract bool IsValid(object? value, IValidationContext? validationContext);
 
     /// <summary>
     ///     获取对象验证结果集合
@@ -275,21 +357,55 @@ public abstract class ValidatorBase
     /// </returns>
     public virtual List<ValidationResult>? GetValidationResults(object? value, string name,
         IEnumerable<string>? memberNames = null) =>
-        IsValid(value) ? null : [new ValidationResult(FormatErrorMessage(name), memberNames)];
+        GetValidationResults(value, new LegacyValidationContext(value, name, memberNames));
 
     /// <summary>
-    ///     验证指定的对象
+    ///     获取对象验证结果集合
     /// </summary>
+    /// <param name="value">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="List{T}" />
+    /// </returns>
+    public virtual List<ValidationResult>? GetValidationResults(object? value, IValidationContext? validationContext) =>
+        IsValid(value, validationContext)
+            ? null
+            :
+            [
+                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
+                    validationContext?.MemberNames)
+            ];
+
+    /// <summary>
+    ///     验证对象
+    /// </summary>
+    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="value">对象</param>
     /// <param name="name">显示名称</param>
     /// <param name="memberNames">成员名称列表</param>
     /// <exception cref="ValidationException"></exception>
-    public virtual void Validate(object? value, string name, IEnumerable<string>? memberNames = null)
+    public virtual void Validate(object? value, string name, IEnumerable<string>? memberNames = null) =>
+        Validate(value, new LegacyValidationContext(value, name, memberNames));
+
+    /// <summary>
+    ///     验证对象
+    /// </summary>
+    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
+    /// <param name="value">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
+    /// <exception cref="ValidationException"></exception>
+    public virtual void Validate(object? value, IValidationContext? validationContext)
     {
         // 检查对象合法性
-        if (!IsValid(value))
+        if (!IsValid(value, validationContext))
         {
-            throw new ValidationException(new ValidationResult(FormatErrorMessage(name), memberNames), null, value);
+            throw new ValidationException(
+                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
+                    validationContext?.MemberNames), null, value);
         }
     }
 
@@ -410,7 +526,7 @@ public abstract class ValidatorBase
         ArgumentException.ThrowIfNullOrWhiteSpace(_errorMessageResourceName);
 
         // 初始化属性对象
-        PropertyInfo? property = null;
+        PropertyInfo? property;
         var propertyName = _errorMessageResourceName;
 
         // 判断是否使用的是默认的 ValidationMessages 类型

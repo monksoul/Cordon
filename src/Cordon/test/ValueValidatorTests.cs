@@ -11,7 +11,7 @@ public class ValueValidatorTests
     {
         var valueValidator = new ValueValidator<string>();
         Assert.Null(valueValidator._serviceProvider);
-        Assert.Null(valueValidator._items);
+        Assert.Empty(valueValidator.Items);
         Assert.NotNull(valueValidator._ruleSetStack);
         Assert.Empty(valueValidator._ruleSetStack);
         Assert.NotNull(valueValidator.Validators);
@@ -22,7 +22,6 @@ public class ValueValidatorTests
         Assert.Null(valueValidator._preProcessor);
         Assert.Null(valueValidator.DisplayName);
         Assert.Null(valueValidator.WhenCondition);
-        Assert.Null(valueValidator.UnlessCondition);
         Assert.NotNull(valueValidator.This);
         Assert.Equal(valueValidator.This, valueValidator);
         Assert.Null(valueValidator._allowEmptyStrings);
@@ -31,13 +30,13 @@ public class ValueValidatorTests
 
         var valueValidator2 = new ValueValidator<string>(new Dictionary<object, object?>());
         Assert.Null(valueValidator2._serviceProvider);
-        Assert.NotNull(valueValidator2._items);
+        Assert.NotNull(valueValidator2.Items);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
         var valueValidator3 = new ValueValidator<string>(serviceProvider, new Dictionary<object, object?>());
         Assert.NotNull(valueValidator3._serviceProvider);
-        Assert.NotNull(valueValidator3._items);
+        Assert.NotNull(valueValidator3.Items);
     }
 
     [Fact]
@@ -505,7 +504,9 @@ public class ValueValidatorTests
     public void When_Invalid_Parameters()
     {
         var valueValidator = new ValueValidator<string>();
-        Assert.Throws<ArgumentNullException>(() => valueValidator.When(null!));
+        Assert.Throws<ArgumentNullException>(() => valueValidator.When((Func<string, bool>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            valueValidator.When((Func<string, ValidationContext<string>, bool>)null!));
     }
 
     [Fact]
@@ -514,25 +515,8 @@ public class ValueValidatorTests
         var valueValidator = new ValueValidator<string>();
         valueValidator.When(u => u != "Fur");
         Assert.NotNull(valueValidator.WhenCondition);
-        Assert.False(valueValidator.WhenCondition("Fur"));
-        Assert.True(valueValidator.WhenCondition("Furion"));
-    }
-
-    [Fact]
-    public void Unless_Invalid_Parameters()
-    {
-        var valueValidator = new ValueValidator<string>();
-        Assert.Throws<ArgumentNullException>(() => valueValidator.Unless(null!));
-    }
-
-    [Fact]
-    public void Unless_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<string>();
-        valueValidator.Unless(u => u != "Fur");
-        Assert.NotNull(valueValidator.UnlessCondition);
-        Assert.False(valueValidator.UnlessCondition("Fur"));
-        Assert.True(valueValidator.UnlessCondition("Furion"));
+        Assert.False(valueValidator.WhenCondition("Fur", new ValidationContext<string>("Fur")));
+        Assert.True(valueValidator.WhenCondition("Furion", new ValidationContext<string>("Furion")));
     }
 
     [Fact]
@@ -575,27 +559,33 @@ public class ValueValidatorTests
     }
 
     [Fact]
+    public void ShouldValidate_Invalid_Parameters()
+    {
+        var valueValidator = new ValueValidator<string>();
+        Assert.Throws<ArgumentNullException>(() => valueValidator.ShouldValidate(null, null!));
+    }
+
+    [Fact]
     public void ShouldValidate_ReturnOK()
     {
         var valueValidator = new ValueValidator<string>();
 
-        Assert.True(valueValidator.ShouldValidate(null));
-        Assert.True(valueValidator.ShouldValidate("Furion"));
-        Assert.True(valueValidator.ShouldValidate("Fur"));
-        Assert.True(valueValidator.ShouldValidate("百小僧"));
-        Assert.True(valueValidator.ShouldValidate("百签"));
+        Assert.True(valueValidator.ShouldValidate(null, new ValidationContext<string>(null!)));
+        Assert.True(valueValidator.ShouldValidate("Furion", new ValidationContext<string>("Furion")));
+        Assert.True(valueValidator.ShouldValidate("Fur", new ValidationContext<string>("Fur")));
+        Assert.True(valueValidator.ShouldValidate("百小僧", new ValidationContext<string>("百小僧")));
+        Assert.True(valueValidator.ShouldValidate("百签", new ValidationContext<string>("百签")));
     }
 
     [Fact]
     public void ShouldValidate_WithCondition_ReturnOK()
     {
         var valueValidator = new ValueValidator<string>()
-            .When(u => u != "Fur").Unless(u => u == "新生帝");
+            .When(u => u != "Fur");
 
-        Assert.True(valueValidator.ShouldValidate(null));
-        Assert.False(valueValidator.ShouldValidate("Fur"));
-        Assert.True(valueValidator.ShouldValidate("Furion"));
-        Assert.False(valueValidator.ShouldValidate("新生帝"));
+        Assert.True(valueValidator.ShouldValidate(null, new ValidationContext<string>(null!)));
+        Assert.False(valueValidator.ShouldValidate("Fur", new ValidationContext<string>("Fur")));
+        Assert.True(valueValidator.ShouldValidate("Furion", new ValidationContext<string>("Furion")));
     }
 
     [Fact]
@@ -603,14 +593,14 @@ public class ValueValidatorTests
     {
         var valueValidator = new ValueValidator<string?>();
 
-        Assert.True(valueValidator.ShouldValidate(null));
-        Assert.True(valueValidator.ShouldValidate(string.Empty));
-        Assert.True(valueValidator.ShouldValidate("Furion"));
+        Assert.True(valueValidator.ShouldValidate(null, new ValidationContext<string?>(null)));
+        Assert.True(valueValidator.ShouldValidate(string.Empty, new ValidationContext<string?>(string.Empty)));
+        Assert.True(valueValidator.ShouldValidate("Furion", new ValidationContext<string?>("Furion")));
 
         valueValidator.AllowEmptyStrings();
-        Assert.True(valueValidator.ShouldValidate(null));
-        Assert.False(valueValidator.ShouldValidate(string.Empty));
-        Assert.True(valueValidator.ShouldValidate("Furion"));
+        Assert.True(valueValidator.ShouldValidate(null, new ValidationContext<string?>(null)));
+        Assert.False(valueValidator.ShouldValidate(string.Empty, new ValidationContext<string?>(string.Empty)));
+        Assert.True(valueValidator.ShouldValidate("Furion", new ValidationContext<string?>("Furion")));
     }
 
     [Fact]
@@ -656,24 +646,6 @@ public class ValueValidatorTests
         var valueAnnotationValidator3 = valueValidator.Validators[2] as ValueAnnotationValidator;
         Assert.NotNull(valueAnnotationValidator3);
         Assert.NotNull(valueAnnotationValidator3._serviceProvider);
-    }
-
-    [Fact]
-    public void CreateValidationContext_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<string>();
-        var validationContext = valueValidator.CreateValidationContext("Furion");
-
-        Assert.Null(valueValidator._serviceProvider);
-        Assert.Null(validationContext._serviceProvider);
-
-        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        valueValidator.InitializeServiceProvider(serviceProvider.GetService);
-        Assert.NotNull(valueValidator._serviceProvider);
-
-        var validationContext2 = valueValidator.CreateValidationContext("百小僧");
-        Assert.NotNull(valueValidator._serviceProvider);
-        Assert.NotNull(validationContext2._serviceProvider);
     }
 
     [Fact]
@@ -763,6 +735,32 @@ public class ValueValidatorTests
         valueValidator.WithName(null);
         valueValidator.MemberPath = "Names";
         Assert.Equal("Names", valueValidator.GetEffectiveMemberName());
+    }
+
+    [Fact]
+    public void CreateValidationContext_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+        var validationContext = valueValidator.CreateValidationContext("Furion", null);
+        Assert.NotNull(validationContext);
+        Assert.Equal("Furion", validationContext.Instance);
+        Assert.Equal("String", validationContext.DisplayName);
+        Assert.Null(validationContext.MemberNames);
+        Assert.Null(validationContext.RuleSets);
+        Assert.Empty(validationContext.Items);
+
+        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        valueValidator.InitializeServiceProvider(serviceProvider.GetService);
+        Assert.NotNull(valueValidator._serviceProvider);
+
+        var validationContext2 = valueValidator.CreateValidationContext("Furion", ["Login"]);
+        Assert.NotNull(validationContext2);
+        Assert.Equal("Furion", validationContext2.Instance);
+        Assert.Equal("String", validationContext2.DisplayName);
+        Assert.Null(validationContext2.MemberNames);
+        Assert.Equal<string>(["Login"], validationContext2.RuleSets!);
+        Assert.Empty(validationContext2.Items);
+        Assert.NotNull(validationContext2._serviceProvider);
     }
 
     public class StringValueValidator : AbstractValueValidator<string>

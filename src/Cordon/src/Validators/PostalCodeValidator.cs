@@ -16,7 +16,7 @@ public partial class PostalCodeValidator : ValidatorBase
         UseResourceKey(() => nameof(ValidationMessages.PostalCodeValidator_ValidationError));
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) =>
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
         value switch
         {
             null => true,

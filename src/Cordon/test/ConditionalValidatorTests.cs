@@ -216,11 +216,13 @@ public class ConditionalValidatorTests
             builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
 
         var exception = Assert.Throws<ValidationException>(() =>
-            validator.ThrowValidationException("monk__soul", "Value", validator._conditions.Last().Validators[0]));
+            validator.ThrowValidationException("monk__soul", validator._conditions.Last().Validators[0],
+                new LegacyValidationContext { DisplayName = "Value" }));
         Assert.Equal("The Value field is not a valid e-mail address.", exception.Message);
 
         var exception2 = Assert.Throws<ValidationException>(() =>
-            validator.ThrowValidationException("monksoul@qq", "Value", validator._defaultValidators![0]));
+            validator.ThrowValidationException("monksoul@qq", validator._defaultValidators![0],
+                new LegacyValidationContext { DisplayName = "Value" }));
         Assert.Equal("The field Value is not a valid username.", exception2.Message);
     }
 

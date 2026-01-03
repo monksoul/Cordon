@@ -32,13 +32,13 @@ public class ValidatorsTests
 
         var objectValidator2 = Validators
             .Object<ObjectModel>(new Dictionary<object, object?>());
-        Assert.NotNull(objectValidator2._items);
+        Assert.NotNull(objectValidator2.Items);
         Assert.Null(objectValidator2._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var objectValidator3 = Validators
             .Object<ObjectModel>(serviceProvider, new Dictionary<object, object?>());
-        Assert.NotNull(objectValidator3._items);
+        Assert.NotNull(objectValidator3.Items);
         Assert.NotNull(objectValidator3._serviceProvider);
     }
 
@@ -435,17 +435,13 @@ public class ValidatorsTests
     }
 
     [Fact]
-    public void MustUnless_ReturnOK()
-    {
-        var validator = Validators.MustUnless<int>(u => u > 10);
-        Assert.NotNull(validator.Condition);
-    }
-
-    [Fact]
     public void Must_ReturnOK()
     {
         var validator = Validators.Must<int>(u => u > 10);
         Assert.NotNull(validator.Condition);
+
+        var validator2 = Validators.Must<int>((u, _) => u > 10);
+        Assert.NotNull(validator2.Condition);
     }
 
     [Fact]
@@ -453,6 +449,9 @@ public class ValidatorsTests
     {
         var validator = Validators.MustIfNotNull<string>(u => u != "furion");
         Assert.NotNull(validator.Condition);
+
+        var validator2 = Validators.MustIfNotNull<string>((u, _) => u != "furion");
+        Assert.NotNull(validator2.Condition);
     }
 
     [Fact]
@@ -460,13 +459,17 @@ public class ValidatorsTests
     {
         var validator = Validators.MustIfNotNullOrEmpty<string>(u => u != "furion");
         Assert.NotNull(validator.Condition);
+
+        var validator2 = Validators.MustIfNotNullOrEmpty<string>((u, _) => u != "furion");
+        Assert.NotNull(validator2.Condition);
     }
 
     [Fact]
     public void MustAny_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => Validators.MustAny<int, int>(null!, null!));
-        Assert.Throws<ArgumentNullException>(() => Validators.MustAny<int, int>([], null!));
+        Assert.Throws<ArgumentNullException>(() => Validators.MustAny(null!, (Func<int, int, bool>?)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            Validators.MustAny([], (Func<int, int, ValidationContext<int>, bool>?)null!));
     }
 
     [Fact]
@@ -474,13 +477,17 @@ public class ValidatorsTests
     {
         var validator = Validators.MustAny<int, int>([], (u, _) => u > 10);
         Assert.NotNull(validator.Condition);
+
+        var validator2 = Validators.MustAny<int, int>([], (u, _, _) => u > 10);
+        Assert.NotNull(validator2.Condition);
     }
 
     [Fact]
     public void MustAll_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => Validators.MustAll<int, int>(null!, null!));
-        Assert.Throws<ArgumentNullException>(() => Validators.MustAll<int, int>([], null!));
+        Assert.Throws<ArgumentNullException>(() => Validators.MustAll(null!, (Func<int, int, bool>?)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            Validators.MustAll([], (Func<int, int, ValidationContext<int>, bool>?)null!));
     }
 
     [Fact]
@@ -488,6 +495,9 @@ public class ValidatorsTests
     {
         var validator = Validators.MustAny<int, int>([], (u, _) => u > 10);
         Assert.NotNull(validator.Condition);
+
+        var validator2 = Validators.MustAny<int, int>([], (u, _, _) => u > 10);
+        Assert.NotNull(validator2.Condition);
     }
 
     [Fact]
@@ -530,13 +540,13 @@ public class ValidatorsTests
     {
         var validator = Validators.ObjectAnnotation();
         Assert.Null(validator._serviceProvider);
-        Assert.Null(validator._items);
+        Assert.Empty(validator.Items);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
         var validator2 = Validators.ObjectAnnotation(serviceProvider, new Dictionary<object, object?>());
         Assert.NotNull(validator2._serviceProvider);
-        Assert.NotNull(validator2._items);
+        Assert.NotNull(validator2.Items);
     }
 
     [Fact]
@@ -568,6 +578,9 @@ public class ValidatorsTests
     {
         var validator = Validators.Predicate<int>(u => u > 10);
         Assert.NotNull(validator.Condition);
+
+        var validator2 = Validators.Predicate<int>((u, _) => u > 10);
+        Assert.NotNull(validator2.Condition);
     }
 
     [Fact]
@@ -576,7 +589,7 @@ public class ValidatorsTests
         var validator = Validators.PropertyAnnotation<ObjectModel>(u => u.Name);
         Assert.NotNull(validator.Property);
         Assert.Null(validator._serviceProvider);
-        Assert.Null(validator._items);
+        Assert.Empty(validator.Items);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
@@ -585,31 +598,31 @@ public class ValidatorsTests
             Validators.PropertyAnnotation<ObjectModel>(u => u.Name, new Dictionary<object, object?>());
         Assert.NotNull(validator2.Property);
         Assert.Null(validator2._serviceProvider);
-        Assert.NotNull(validator2._items);
+        Assert.NotNull(validator2.Items);
 
         var validator3 =
             Validators.PropertyAnnotation<ObjectModel>(u => u.Name, serviceProvider, new Dictionary<object, object?>());
         Assert.NotNull(validator3.Property);
         Assert.NotNull(validator3._serviceProvider);
-        Assert.NotNull(validator3._items);
+        Assert.NotNull(validator3.Items);
 
         var validator4 = Validators.PropertyAnnotation<ObjectModel, string?>(u => u.Name);
         Assert.NotNull(validator4.Property);
         Assert.Null(validator4._serviceProvider);
-        Assert.Null(validator4._items);
+        Assert.Empty(validator4.Items);
 
         var validator5 =
             Validators.PropertyAnnotation<ObjectModel, string?>(u => u.Name, new Dictionary<object, object?>());
         Assert.NotNull(validator5.Property);
         Assert.Null(validator5._serviceProvider);
-        Assert.NotNull(validator5._items);
+        Assert.NotNull(validator5.Items);
 
         var validator6 =
             Validators.PropertyAnnotation<ObjectModel, string?>(u => u.Name, serviceProvider,
                 new Dictionary<object, object?>());
         Assert.NotNull(validator6.Property);
         Assert.NotNull(validator6._serviceProvider);
-        Assert.NotNull(validator6._items);
+        Assert.NotNull(validator6.Items);
     }
 
     [Fact]
@@ -900,8 +913,9 @@ public class ValidatorsTests
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
         var validator2 =
-            Validators.ValidatorProxy<ObjectModel, PropertyAnnotationValidator<ObjectModel>>(instance => instance.Name,
-                instance => [services, new Dictionary<object, object?>()]);
+            Validators.ValidatorProxy<ObjectModel, PropertyAnnotationValidator<ObjectModel>>(
+                instance => instance.Name,
+                (_, _) => [services, new Dictionary<object, object?>()]);
         Assert.NotNull(validator2);
     }
 
@@ -911,20 +925,20 @@ public class ValidatorsTests
         var validator = Validators.ValueAnnotation(new ChineseAttribute());
         Assert.Single(validator.Attributes);
         Assert.Null(validator._serviceProvider);
-        Assert.Null(validator._items);
+        Assert.Empty(validator.Items);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
         var validator2 = Validators.ValueAnnotation([new ChineseAttribute()], new Dictionary<object, object?>());
         Assert.Single(validator2.Attributes);
         Assert.Null(validator2._serviceProvider);
-        Assert.NotNull(validator2._items);
+        Assert.NotNull(validator2.Items);
 
         var validator3 = Validators.ValueAnnotation([new ChineseAttribute()], serviceProvider,
             new Dictionary<object, object?>());
         Assert.Single(validator3.Attributes);
         Assert.NotNull(validator3._serviceProvider);
-        Assert.NotNull(validator3._items);
+        Assert.NotNull(validator3.Items);
     }
 
     public class ObjectModel

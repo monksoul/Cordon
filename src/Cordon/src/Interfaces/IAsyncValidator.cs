@@ -13,29 +13,34 @@ public interface IAsyncValidator
     ///     检查对象合法性
     /// </summary>
     /// <param name="value">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    Task<bool> IsValidAsync(object? value);
+    Task<bool> IsValidAsync(object? value, IValidationContext? validationContext);
 
     /// <summary>
     ///     获取对象验证结果集合
     /// </summary>
     /// <param name="value">对象</param>
-    /// <param name="name">显示名称</param>
-    /// <param name="memberNames">成员名称列表</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
     /// <returns>
     ///     <see cref="List{T}" />
     /// </returns>
-    Task<List<ValidationResult>?> GetValidationResultsAsync(object? value, string name,
-        IEnumerable<string>? memberNames = null);
+    Task<List<ValidationResult>?> GetValidationResultsAsync(object? value, IValidationContext? validationContext);
 
     /// <summary>
-    ///     验证指定的对象
+    ///     验证对象
     /// </summary>
+    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="value">对象</param>
-    /// <param name="name">显示名称</param>
-    /// <param name="memberNames">成员名称列表</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
     /// <exception cref="ValidationException"></exception>
-    Task Validate(object? value, string name, IEnumerable<string>? memberNames = null);
+    Task ValidateAsync(object? value, IValidationContext? validationContext);
 }

@@ -26,7 +26,8 @@ public class EqualToValidator : ValidatorBase
     public object? CompareValue { get; }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value) => value is null || Equals(value, CompareValue);
+    public override bool IsValid(object? value, IValidationContext? validationContext) =>
+        value is null || Equals(value, CompareValue);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>

@@ -54,17 +54,17 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         InitializeServiceProvider(serviceProvider);
 
     /// <inheritdoc />
-    public override bool IsValid(T? instance)
+    public override bool IsValid(T? instance, ValidationContext<T> validationContext)
     {
         // 获取匹配到的验证器集合
         var matchedValidators = GetMatchedValidators(instance);
 
-        return matchedValidators is null or { Count: 0 } || matchedValidators.All(u => u.IsValid(instance));
+        return matchedValidators is null or { Count: 0 } ||
+               matchedValidators.All(u => u.IsValid(instance, validationContext));
     }
 
     /// <inheritdoc />
-    public override List<ValidationResult>? GetValidationResults(T? instance, string name,
-        IEnumerable<string>? memberNames = null)
+    public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext)
     {
         // 获取匹配到的验证器集合和成员名称列表
         var matchedValidators = GetMatchedValidators(instance);
@@ -75,24 +75,22 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
             return null;
         }
 
-        // 获取成员名称列表
-        var memberNameList = memberNames?.ToList();
-
         // 获取验证结果集合
         var validationResults = matchedValidators
-            .SelectMany(u => u.GetValidationResults(instance, name, memberNameList) ?? []).ToList();
+            .SelectMany(u => u.GetValidationResults(instance, validationContext) ?? []).ToList();
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
         {
-            validationResults.Insert(0, new ValidationResult(FormatErrorMessage(name), memberNameList));
+            validationResults.Insert(0,
+                new ValidationResult(FormatErrorMessage(validationContext.DisplayName), validationContext.MemberNames));
         }
 
         return validationResults.ToResults();
     }
 
     /// <inheritdoc />
-    public override void Validate(T? instance, string name, IEnumerable<string>? memberNames = null)
+    public override void Validate(T? instance, ValidationContext<T> validationContext)
     {
         // 获取匹配到的验证器集合
         var matchedValidators = GetMatchedValidators(instance);
@@ -103,16 +101,13 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
             return;
         }
 
-        // 获取成员名称列表
-        var memberNameList = memberNames?.ToList();
-
         // 遍历验证器集合
         foreach (var validator in matchedValidators)
         {
             // 检查对象合法性
-            if (!validator.IsValid(instance))
+            if (!validator.IsValid(instance, validationContext))
             {
-                ThrowValidationException(instance, name, validator, memberNameList);
+                ThrowValidationException(instance, validator, validationContext);
             }
         }
     }
@@ -125,14 +120,15 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     ///     抛出验证异常
     /// </summary>
     /// <param name="value">对象</param>
-    /// <param name="name">显示名称</param>
     /// <param name="validator">
     ///     <see cref="ValidatorBase" />
     /// </param>
-    /// <param name="memberNames">成员名称列表</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
     /// <exception cref="ValidationException"></exception>
-    internal void ThrowValidationException(object? value, string name, ValidatorBase validator,
-        IEnumerable<string>? memberNames = null)
+    internal void ThrowValidationException(object? value, ValidatorBase validator,
+        IValidationContext? validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(validator);
@@ -140,12 +136,13 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         // 检查是否配置了自定义错误信息
         if ((string?)ErrorMessageString is null)
         {
-            validator.Validate(value, name, memberNames);
+            validator.Validate(value, validationContext);
         }
         else
         {
-            throw new ValidationException(new ValidationResult(FormatErrorMessage(name), memberNames), null,
-                value);
+            throw new ValidationException(
+                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
+                    validationContext?.MemberNames), null, value);
         }
     }
 
