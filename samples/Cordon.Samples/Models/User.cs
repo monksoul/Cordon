@@ -19,6 +19,7 @@ public class User : IValidatableObject
     public int Age { get; set; }
     public Address? Address { get; set; }
     public List<WorkExperience>? WorkExperiences { get; set; }
+    public List<string>? Hobbies { get; set; }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -36,6 +37,7 @@ public class User : IValidatableObject
                     .RuleFor(e => e.Position).Required()
                     .RuleFor(e => e.Years).Range(1900, 2026);
             })
+            .RuleForCollection(u => u.Hobbies).EachRules(h => h.Required().MinLength(2))
             .ToResults();
     }
 }
