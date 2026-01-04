@@ -283,7 +283,6 @@ public class CollectionPropertyValidatorTests
         Assert.Null(propertyValidator._elementValidator.InheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             propertyValidator.SetValidator((ObjectValidator<Child>?)null));
-        Assert.Equal("Children", propertyValidator._elementValidator.MemberPath);
 
         var propertyValidator2 =
             new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator)
@@ -373,8 +372,6 @@ public class CollectionPropertyValidatorTests
         Assert.NotNull(propertyValidator._valueValidator);
         Assert.Equal(2, propertyValidator._valueValidator.Validators.Count);
         Assert.Null(propertyValidator._valueValidator._serviceProvider);
-        Assert.NotNull(propertyValidator._valueValidator.MemberPath);
-        Assert.Equal("Names", propertyValidator._valueValidator.MemberPath);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
@@ -464,17 +461,13 @@ public class CollectionPropertyValidatorTests
         var propertyValidator = objectValidator.RuleForCollection(u => u.Children)
             .ChildRules(c => c.RuleFor(b => b.Nest).ChildRules(d => d.RuleFor(z => z.Id)));
 
-        Assert.Equal("Children", propertyValidator._elementValidator!.MemberPath);
-
         var subPropertyValidator =
             propertyValidator._elementValidator!.Validators.Last() as PropertyValidator<Child, Nested>;
         Assert.NotNull(subPropertyValidator);
-        Assert.Equal("Children.Nest", subPropertyValidator.GetMemberPath());
 
         var nestedPropertyValidator =
             subPropertyValidator._propertyValidator!.Validators.First() as PropertyValidator<Nested, int>;
         Assert.NotNull(nestedPropertyValidator);
-        Assert.Equal("Children.Nest.Id", nestedPropertyValidator.GetMemberPath());
     }
 
     [Fact]

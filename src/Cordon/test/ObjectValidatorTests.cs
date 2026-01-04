@@ -733,11 +733,9 @@ public class ObjectValidatorTests
         Assert.Null(objectValidator2._objectValidator);
         objectValidator2.SetValidator(new ObjectModelValidator());
         Assert.NotNull(objectValidator2._objectValidator);
-        Assert.Equal("Sub", objectValidator2._objectValidator.MemberPath);
         Assert.Null(objectValidator2._objectValidator.InheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             objectValidator2.SetValidator((ObjectValidator<ObjectModel>?)null));
-        Assert.Equal("Sub", objectValidator2._objectValidator.MemberPath);
     }
 
     [Fact]

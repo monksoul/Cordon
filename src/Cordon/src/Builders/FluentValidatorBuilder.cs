@@ -1309,7 +1309,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     }
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
-    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
+    internal virtual void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
     {
         _serviceProvider = serviceProvider;
 

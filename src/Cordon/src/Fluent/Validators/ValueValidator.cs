@@ -578,7 +578,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         ?.GetValidationOptions()?.RuleSets;
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
-    internal new void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
+    internal override void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
     {
         // 同步基类 IServiceProvider 委托
         base.InitializeServiceProvider(serviceProvider);

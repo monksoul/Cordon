@@ -133,6 +133,9 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
 
+        // 修复验证器及其子验证器的成员路径
+        RepairMemberPaths();
+
         // 解析验证时使用的规则集
         var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
 
@@ -166,6 +169,9 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
+
+        // 修复验证器及其子验证器的成员路径
+        RepairMemberPaths();
 
         // 解析验证时使用的规则集
         var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
@@ -207,6 +213,9 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
+
+        // 修复验证器及其子验证器的成员路径
+        RepairMemberPaths();
 
         // 解析验证时使用的规则集
         var resolvedRuleSets = ResolveValidationRuleSets(ruleSets);
@@ -608,9 +617,6 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
         // 同步 IServiceProvider 委托
         _objectValidator.InitializeServiceProvider(_serviceProvider);
 
-        // 修复整个子验证器树的成员路径
-        RepairMemberPaths();
-
         return this;
     }
 
@@ -791,7 +797,7 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     internal void SetInheritedRuleSetsIfNotSet(string?[]? inheritedRuleSets) => InheritedRuleSets ??= inheritedRuleSets;
 
     /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
-    internal void RepairMemberPaths()
+    internal virtual void RepairMemberPaths()
     {
         // 递归修复所有子属性验证器
         foreach (var childValidator in Validators)

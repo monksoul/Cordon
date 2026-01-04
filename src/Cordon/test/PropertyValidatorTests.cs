@@ -773,11 +773,9 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator._propertyValidator);
         propertyValidator.SetValidator(new SubModelValidator());
         Assert.NotNull(propertyValidator._propertyValidator);
-        Assert.Equal("Sub", propertyValidator._propertyValidator.MemberPath);
         Assert.Null(propertyValidator._propertyValidator.InheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             propertyValidator.SetValidator((ObjectValidator<SubModel>?)null));
-        Assert.Equal("Sub", propertyValidator._propertyValidator.MemberPath);
 
         var propertyValidator2 =
             new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] };
@@ -1043,12 +1041,10 @@ public class PropertyValidatorTests
         var subPropertyValidator =
             propertyValidator._propertyValidator!.Validators.Last() as PropertyValidator<SubModel, Nested>;
         Assert.NotNull(subPropertyValidator);
-        Assert.Equal("Sub.Nest", subPropertyValidator.GetMemberPath());
 
         var nestedPropertyValidator =
             subPropertyValidator._propertyValidator!.Validators.First() as PropertyValidator<Nested, int>;
         Assert.NotNull(nestedPropertyValidator);
-        Assert.Equal("Sub.Nest.Id", nestedPropertyValidator.GetMemberPath());
     }
 
     [Fact]
@@ -1064,12 +1060,10 @@ public class PropertyValidatorTests
         var subPropertyValidator =
             propertyValidator._propertyValidator!.Validators.Last() as PropertyValidator<SubModel, Nested>;
         Assert.NotNull(subPropertyValidator);
-        Assert.Equal("xxx.Nest", subPropertyValidator.GetEffectiveMemberName());
 
         var nestedPropertyValidator =
             subPropertyValidator._propertyValidator!.Validators.First() as PropertyValidator<Nested, int>;
         Assert.NotNull(nestedPropertyValidator);
-        Assert.Equal("xxx.Nest.Id", nestedPropertyValidator.GetEffectiveMemberName());
     }
 
     [Fact]
