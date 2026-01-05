@@ -416,6 +416,12 @@ public class ObjectValidatorTests
         var propertyValidator = validator.Validators.LastOrDefault() as PropertyValidator<ObjectModel, string?>;
         Assert.NotNull(propertyValidator);
         Assert.Null(propertyValidator.RuleSets);
+
+        validator.RuleFor(u => u.Name, u => u.Required().MinLength(3));
+        Assert.Equal(2, validator.Validators.Count);
+        var propertyValidator2 = validator.Validators.LastOrDefault() as PropertyValidator<ObjectModel, string?>;
+        Assert.NotNull(propertyValidator2);
+        Assert.Equal(2, propertyValidator2.Validators.Count);
     }
 
     [Fact]
@@ -521,6 +527,13 @@ public class ObjectValidatorTests
             validator.Validators.LastOrDefault() as CollectionPropertyValidator<ObjectModel, Child>;
         Assert.NotNull(propertyValidator);
         Assert.Null(propertyValidator.RuleSets);
+
+        validator.RuleForCollection(u => u.Children, u => u.HaveLength(2).Required());
+        Assert.Equal(2, validator.Validators.Count);
+        var propertyValidator2 =
+            validator.Validators.LastOrDefault() as CollectionPropertyValidator<ObjectModel, Child>;
+        Assert.NotNull(propertyValidator2);
+        Assert.Equal(2, propertyValidator2.Validators.Count);
     }
 
     [Fact]

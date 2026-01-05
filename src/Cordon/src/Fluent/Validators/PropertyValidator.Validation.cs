@@ -445,23 +445,28 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     ///     为指定属性配置验证规则
     /// </summary>
     /// <param name="selector">属性选择器</param>
+    /// <param name="configure">自定义配置委托</param>
     /// <typeparam name="TProperty1">属性类型</typeparam>
     /// <returns>
     ///     <see cref="PropertyValidator{T,TProperty1}" />
     /// </returns>
-    public PropertyValidator<T, TProperty1> RuleFor<TProperty1>(Expression<Func<T, TProperty1?>> selector) =>
-        _objectValidator.RuleFor(selector);
+    public PropertyValidator<T, TProperty1> RuleFor<TProperty1>(Expression<Func<T, TProperty1?>> selector,
+        Action<PropertyValidator<T, TProperty1>>? configure = null) =>
+        _objectValidator.RuleFor(selector, configure);
 
     /// <summary>
     ///     为集合类型属性中的每一个元素配置验证规则
     /// </summary>
     /// <param name="selector">属性选择器</param>
+    /// <param name="configure">自定义配置委托</param>
     /// <typeparam name="TElement">元素类型</typeparam>
     /// <returns>
     ///     <see cref="CollectionPropertyValidator{T,TElement}" />
     /// </returns>
     public CollectionPropertyValidator<T, TElement> RuleForCollection<TElement>(
-        Expression<Func<T, IEnumerable<TElement?>?>> selector) => _objectValidator.RuleForCollection(selector);
+        Expression<Func<T, IEnumerable<TElement?>?>> selector,
+        Action<CollectionPropertyValidator<T, TElement>>? configure = null) =>
+        _objectValidator.RuleForCollection(selector, configure);
 
     /// <summary>
     ///     在指定规则集上下文中为指定属性配置验证规则

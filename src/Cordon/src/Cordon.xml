@@ -4284,21 +4284,23 @@
         <member name="M:Cordon.ObjectValidator`1.Cordon#IValidationAnnotationsConfigurable#UseAnnotationValidation(System.Boolean)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ObjectValidator`1.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+        <member name="M:Cordon.ObjectValidator`1.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Action{Cordon.PropertyValidator{`0,``0}})">
             <summary>
                 为指定属性配置验证规则
             </summary>
             <param name="selector">属性选择器</param>
+            <param name="configure">自定义配置委托</param>
             <typeparam name="TProperty">属性类型</typeparam>
             <returns>
                 <see cref="T:Cordon.PropertyValidator`2" />
             </returns>
         </member>
-        <member name="M:Cordon.ObjectValidator`1.RuleForCollection``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}})">
+        <member name="M:Cordon.ObjectValidator`1.RuleForCollection``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}},System.Action{Cordon.CollectionPropertyValidator{`0,``0}})">
             <summary>
                 为集合类型属性中的每一个元素配置验证规则
             </summary>
             <param name="selector">属性选择器</param>
+            <param name="configure">自定义配置委托</param>
             <typeparam name="TElement">元素类型</typeparam>
             <returns>
                 <see cref="T:Cordon.CollectionPropertyValidator`2" />
@@ -5161,21 +5163,23 @@
                 <see cref="T:Cordon.ObjectValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}})">
+        <member name="M:Cordon.PropertyValidator`3.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Action{Cordon.PropertyValidator{`0,``0}})">
             <summary>
                 为指定属性配置验证规则
             </summary>
             <param name="selector">属性选择器</param>
+            <param name="configure">自定义配置委托</param>
             <typeparam name="TProperty1">属性类型</typeparam>
             <returns>
                 <see cref="T:Cordon.PropertyValidator`2" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.RuleForCollection``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}})">
+        <member name="M:Cordon.PropertyValidator`3.RuleForCollection``1(System.Linq.Expressions.Expression{System.Func{`0,System.Collections.Generic.IEnumerable{``0}}},System.Action{Cordon.CollectionPropertyValidator{`0,``0}})">
             <summary>
                 为集合类型属性中的每一个元素配置验证规则
             </summary>
             <param name="selector">属性选择器</param>
+            <param name="configure">自定义配置委托</param>
             <typeparam name="TElement">元素类型</typeparam>
             <returns>
                 <see cref="T:Cordon.CollectionPropertyValidator`2" />
@@ -10547,22 +10551,6 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-       <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>
