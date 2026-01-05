@@ -3562,6 +3562,37 @@
                 <see cref="T:System.Action`2" />
             </returns>
         </member>
+        <member name="T:Cordon.ValidatorException">
+            <summary>
+                验证器异常类
+            </summary>
+        </member>
+        <member name="M:Cordon.ValidatorException.#ctor">
+            <summary>
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ValidationException" />
+            </summary>
+        </member>
+        <member name="M:Cordon.ValidatorException.#ctor(System.String)">
+            <summary>
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ValidationException" />
+            </summary>
+            <param name="message">错误信息</param>
+        </member>
+        <member name="M:Cordon.ValidatorException.#ctor(System.String,System.Exception)">
+            <summary>
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ValidationException" />
+            </summary>
+            <param name="message">错误信息</param>
+            <param name="innerException">
+                <see cref="T:System.Exception" />
+            </param>
+        </member>
+        <member name="M:Cordon.ValidatorException.Throw(System.String)">
+            <summary>
+                抛出 <see cref="T:Cordon.ValidatorException" /> 异常
+            </summary>
+            <param name="message">错误信息</param>
+        </member>
         <member name="T:Cordon.ObjectValidatorEnumerableExtensions">
             <summary>
                 <![CDATA[IEnumerable<IObjectValidator<T>>]]> 拓展类
@@ -8820,6 +8851,25 @@
         <member name="M:Cordon.MinValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
+        <member name="T:Cordon.Must">
+            <summary>
+                <see cref="T:Cordon.MustValidator`1" /> 内部静态类
+            </summary>
+            <remarks>可通过 <see cref="M:Cordon.Must.False(System.String)" /> 设置不满足条件时的异常消息。</remarks>
+        </member>
+        <member name="M:Cordon.Must.False(System.String)">
+            <summary>
+                抛出 <see cref="T:Cordon.ValidatorException" /> 异常
+            </summary>
+            <param name="message">错误消息</param>
+        </member>
+        <member name="M:Cordon.Must.FalseIf(System.Boolean,System.String)">
+            <summary>
+                抛出 <see cref="T:Cordon.ValidatorException" /> 异常
+            </summary>
+            <param name="condition">条件</param>
+            <param name="message">错误消息</param>
+        </member>
         <member name="T:Cordon.MustValidator`1">
             <summary>
                 自定义条件成立时委托验证器
@@ -9218,6 +9268,12 @@
             </summary>
         </member>
         <member name="M:Cordon.PredicateValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.PredicateValidator`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.PredicateValidator`1.Validate(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
         <member name="T:Cordon.PropertyAnnotationValidator`2">

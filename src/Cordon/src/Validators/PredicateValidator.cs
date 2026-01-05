@@ -40,6 +40,67 @@ public class PredicateValidator<T> : ValidatorBase<T>
     public Func<T, ValidationContext<T>, bool> Condition { get; }
 
     /// <inheritdoc />
-    public override bool IsValid(T? instance, ValidationContext<T> validationContext) =>
-        Condition(instance!, validationContext);
+    public override bool IsValid(T? instance, ValidationContext<T> validationContext)
+    {
+        try
+        {
+            return Condition(instance!, validationContext);
+        }
+        // 检查验证器内部是否抛出 ValidatorException 异常
+        catch (ValidatorException)
+        {
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
+    public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext)
+    {
+        try
+        {
+            // 检查条件是否成立
+            if (Condition(instance!, validationContext))
+            {
+                return null;
+            }
+
+            return
+            [
+                new ValidationResult(FormatErrorMessage(validationContext.DisplayName), validationContext.MemberNames)
+            ];
+        }
+        // 检查验证器内部是否抛出 ValidatorException 异常
+        catch (ValidatorException e)
+        {
+            return
+            [
+                new ValidationResult(
+                    string.Format(CultureInfo.CurrentCulture, e.Message, validationContext?.DisplayName),
+                    validationContext?.MemberNames)
+            ];
+        }
+    }
+
+    /// <inheritdoc />
+    public override void Validate(T? instance, ValidationContext<T> validationContext)
+    {
+        try
+        {
+            // 检查条件是否成立
+            if (!Condition(instance!, validationContext))
+            {
+                throw new ValidationException(
+                    new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
+                        validationContext?.MemberNames), null, instance);
+            }
+        }
+        // 检查验证器内部是否抛出 ValidatorException 异常
+        catch (ValidatorException e)
+        {
+            throw new ValidationException(
+                new ValidationResult(
+                    string.Format(CultureInfo.CurrentCulture, e.Message, validationContext?.DisplayName),
+                    validationContext?.MemberNames), null, instance);
+        }
+    }
 }

@@ -245,7 +245,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     public virtual TSelf MustIfNotNull_(Func<TProperty, ValidationContext<T>, bool> condition) =>
         MustIfNotNull(condition);
 
-
     /// <summary>
     ///     添加自定义条件成立时委托验证器
     /// </summary>
