@@ -21,6 +21,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     internal bool? _allowEmptyStrings;
 
     /// <summary>
+    ///     对象图中的属性路径
+    /// </summary>
+    internal string? _memberPath;
+
+    /// <summary>
     ///     值验证前的预处理器
     /// </summary>
     /// <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
@@ -74,10 +79,12 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <remarks>当条件满足时才进行验证。</remarks>
     internal Func<T, ValidationContext<T>, bool>? WhenCondition { get; private set; }
 
-    /// <summary>
-    ///     对象图中的属性路径
-    /// </summary>
-    internal string? MemberPath { get; set; }
+    /// <inheritdoc />
+    string? IMemberPathRepairable.MemberPath
+    {
+        get => _memberPath;
+        set => _memberPath = value;
+    }
 
     /// <inheritdoc />
     public void Dispose()
@@ -564,7 +571,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <returns>
     ///     <see cref="string" />
     /// </returns>
-    internal string? GetEffectiveMemberName() => MemberName ?? MemberPath;
+    internal string? GetEffectiveMemberName() => MemberName ?? _memberPath;
 
     /// <summary>
     ///     解析验证时使用的规则集
@@ -589,6 +596,14 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <inheritdoc cref="IRuleSetContextProvider.GetCurrentRuleSets" />
     internal string?[]? GetCurrentRuleSets() => _ruleSetStack is { Count: > 0 } ? [_ruleSetStack.Peek()] : null;
 
+    /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
+    internal virtual void RepairMemberPaths(string? memberPath)
+    {
+        _memberPath = memberPath;
+
+        _valueValidator?.RepairMemberPaths(memberPath);
+    }
+
     /// <summary>
     ///     创建 <see cref="ValidationContext{T}" /> 实例
     /// </summary>
@@ -607,13 +622,5 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         {
             DisplayName = displayName, MemberNames = memberPath is null ? null : [memberPath], RuleSets = ruleSets
         };
-    }
-
-    /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
-    internal virtual void RepairMemberPaths(string? memberPath)
-    {
-        MemberPath = memberPath;
-
-        _valueValidator?.RepairMemberPaths(memberPath);
     }
 }

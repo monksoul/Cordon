@@ -1815,9 +1815,6 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
-        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1827,8 +1824,11 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -3826,6 +3826,11 @@
                 支持成员路径修复的验证器
             </summary>
         </member>
+        <member name="P:Cordon.IMemberPathRepairable.MemberPath">
+            <summary>
+                对象图中的属性路径
+            </summary>
+        </member>
         <member name="M:Cordon.IMemberPathRepairable.RepairMemberPaths(System.String)">
             <summary>
                 修复验证器及其子验证器的成员路径
@@ -4004,6 +4009,9 @@
             </param>
         </member>
         <member name="M:Cordon.ObjectValidatorProxy`1.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="P:Cordon.ObjectValidatorProxy`1.Cordon#IMemberPathRepairable#MemberPath">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectValidatorProxy`1.Cordon#IMemberPathRepairable#RepairMemberPaths(System.String)">
@@ -4204,6 +4212,70 @@
         <member name="M:Cordon.CollectionPropertyValidator`2.Clone(Cordon.ObjectValidator{`0})">
             <inheritdoc cref="M:Cordon.IPropertyValidatorCloneable`1.Clone(Cordon.ObjectValidator{`0})" />
         </member>
+        <member name="T:Cordon.CollectionValidator`1">
+            <summary>
+                集合验证器
+            </summary>
+            <typeparam name="TElement">元素类型</typeparam>
+        </member>
+        <member name="F:Cordon.CollectionValidator`1._elementValidator">
+            <inheritdoc cref="T:Cordon.ObjectValidator`1" />
+        </member>
+        <member name="F:Cordon.CollectionValidator`1._memberPath">
+            <summary>
+                对象图中的属性路径
+            </summary>
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.#ctor(Cordon.IObjectValidator{`0})">
+            <summary>
+                <inheritdoc cref="T:Cordon.CollectionValidator`1" />
+            </summary>
+            <param name="elementValidator">
+                <see cref="T:Cordon.IObjectValidator`1" />
+            </param>
+        </member>
+        <member name="P:Cordon.CollectionValidator`1.Cordon#IMemberPathRepairable#MemberPath">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.Cordon#IMemberPathRepairable#RepairMemberPaths(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.IsValid(System.Collections.Generic.IEnumerable{`0},System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.GetValidationResults(System.Collections.Generic.IEnumerable{`0},System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.Validate(System.Collections.Generic.IEnumerable{`0},System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.Cordon#IObjectValidator#IsValid(System.Object,System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.Cordon#IObjectValidator#GetValidationResults(System.Object,System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.Cordon#IObjectValidator#Validate(System.Object,System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.Dispose(System.Boolean)">
+            <summary>
+                释放资源
+            </summary>
+            <param name="disposing">是否释放托管资源</param>
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.RepairMemberPaths(System.String)">
+            <inheritdoc cref="M:Cordon.IMemberPathRepairable.RepairMemberPaths(System.String)" />
+        </member>
         <member name="T:Cordon.ObjectValidator`1">
             <summary>
                 对象验证器
@@ -4224,6 +4296,11 @@
         <member name="F:Cordon.ObjectValidator`1._ruleSetStack">
             <summary>
                 当前规则集上下文栈
+            </summary>
+        </member>
+        <member name="F:Cordon.ObjectValidator`1._memberPath">
+            <summary>
+                对象图中的属性路径
             </summary>
         </member>
         <member name="F:Cordon.ObjectValidator`1._objectValidator">
@@ -4274,16 +4351,14 @@
                 属性验证器集合
             </summary>
         </member>
-        <member name="P:Cordon.ObjectValidator`1.MemberPath">
-            <summary>
-                对象图中的属性路径
-            </summary>
-        </member>
         <member name="P:Cordon.ObjectValidator`1.InheritedRuleSets">
             <summary>
                 从父级继承的规则集
             </summary>
             <remarks>用于 <see cref="M:Cordon.PropertyValidator`3.ChildRules(System.Action{Cordon.ObjectValidator{`1}})" /> 场景。</remarks>
+        </member>
+        <member name="P:Cordon.ObjectValidator`1.Cordon#IMemberPathRepairable#MemberPath">
+            <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectValidator`1.Cordon#IMemberPathRepairable#RepairMemberPaths(System.String)">
             <inheritdoc />
@@ -4656,6 +4731,9 @@
                 验证条件
             </summary>
             <remarks>当条件满足时才进行验证。</remarks>
+        </member>
+        <member name="P:Cordon.PropertyValidator`3.Cordon#IMemberPathRepairable#MemberPath">
+            <inheritdoc />
         </member>
         <member name="M:Cordon.PropertyValidator`3.Cordon#IMemberPathRepairable#RepairMemberPaths(System.String)">
             <inheritdoc />
@@ -5283,6 +5361,11 @@
                 是否允许空字符串
             </summary>
         </member>
+        <member name="F:Cordon.ValueValidator`1._memberPath">
+            <summary>
+                对象图中的属性路径
+            </summary>
+        </member>
         <member name="F:Cordon.ValueValidator`1._preProcessor">
             <summary>
                 值验证前的预处理器
@@ -5329,10 +5412,8 @@
             </summary>
             <remarks>当条件满足时才进行验证。</remarks>
         </member>
-        <member name="P:Cordon.ValueValidator`1.MemberPath">
-            <summary>
-                对象图中的属性路径
-            </summary>
+        <member name="P:Cordon.ValueValidator`1.Cordon#IMemberPathRepairable#MemberPath">
+            <inheritdoc />
         </member>
         <member name="M:Cordon.ValueValidator`1.Dispose">
             <inheritdoc />
@@ -5561,6 +5642,9 @@
         <member name="M:Cordon.ValueValidator`1.GetCurrentRuleSets">
             <inheritdoc cref="M:Cordon.IRuleSetContextProvider.GetCurrentRuleSets" />
         </member>
+        <member name="M:Cordon.ValueValidator`1.RepairMemberPaths(System.String)">
+            <inheritdoc cref="M:Cordon.IMemberPathRepairable.RepairMemberPaths(System.String)" />
+        </member>
         <member name="M:Cordon.ValueValidator`1.CreateValidationContext(`0,System.String[])">
             <summary>
                 创建 <see cref="T:Cordon.ValidationContext`1" /> 实例
@@ -5570,9 +5654,6 @@
             <returns>
                 <see cref="T:Cordon.ValidationContext`1" />
             </returns>
-        </member>
-        <member name="M:Cordon.ValueValidator`1.RepairMemberPaths(System.String)">
-            <inheritdoc cref="M:Cordon.IMemberPathRepairable.RepairMemberPaths(System.String)" />
         </member>
         <member name="T:Cordon.IAsyncValidator">
             <summary>
@@ -7466,8 +7547,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a hexadecimal digit exactly 3 times.<br/>
-                        ○ Match a hexadecimal digit exactly 8 times.<br/>
+                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7489,7 +7570,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character atomically any number of times.<br/>
+                            ○ Match a whitespace character greedily any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -7514,7 +7595,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character atomically any number of times.<br/>
+                                    ○ Match a whitespace character greedily any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -7575,13 +7656,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7595,13 +7676,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7623,7 +7704,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7648,10 +7729,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit atomically at least once.<br/>
+                                    ○ Match a Unicode digit greedily at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit atomically at least once.<br/>
+                                ○ Match a Unicode digit greedily at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -8155,12 +8236,12 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Loop greedily at least once.<br/>
                 ○ 1st capture group.<br/>
-                    ○ Match an ASCII letter or digit.<br/>
+                    ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Optional (greedy).<br/>
-                        ○ Match a character in the set [\-0-9A-Za-z] greedily at most 61 times.<br/>
-                        ○ Match an ASCII letter or digit.<br/>
+                        ○ Match a character in the set [-0-9A-Za-z] greedily at most 61 times.<br/>
+                        ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Match '.'.<br/>
-            ○ Match an ASCII letter atomically at least twice.<br/>
+            ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8213,9 +8294,9 @@
                     ○ 7th capture group.<br/>
                         ○ Loop greedily at least once.<br/>
                             ○ 8th capture group.<br/>
-                                ○ Match a character in the set [\-0-9A-Za-z] atomically at least once.<br/>
+                                ○ Match a character in the set [-0-9A-Za-z] atomically at least once.<br/>
                                 ○ Match '.'.<br/>
-                        ○ Match an ASCII letter atomically at least twice.<br/>
+                        ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8797,7 +8878,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a hexadecimal digit exactly 32 times.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8811,8 +8892,8 @@
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
-                    ○ Match a hexadecimal digit exactly 16 times.<br/>
-                    ○ Match a hexadecimal digit exactly 32 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 16 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9110,7 +9191,7 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match an ASCII letter.<br/>
+                ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
                 ○ Match a Unicode digit.<br/>
@@ -9987,12 +10068,12 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match an ASCII letter.<br/>
+            ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [\-_] exactly 2 times.<br/>
-            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match an ASCII letter or digit.<br/>
+                ○ Match a character in the set [-_] exactly 2 times.<br/>
+            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match a character in the set [0-9A-Za-z].<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -10614,6 +10695,16 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

@@ -10,6 +10,11 @@ namespace Cordon;
 public interface IMemberPathRepairable
 {
     /// <summary>
+    ///     对象图中的属性路径
+    /// </summary>
+    string? MemberPath { get; set; }
+
+    /// <summary>
     ///     修复验证器及其子验证器的成员路径
     /// </summary>
     /// <param name="memberPath">对象图中的属性路径</param>

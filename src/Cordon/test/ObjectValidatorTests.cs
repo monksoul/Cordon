@@ -25,7 +25,7 @@ public class ObjectValidatorTests
         Assert.NotNull(validator._ruleSetStack);
         Assert.Empty(validator._ruleSetStack);
         Assert.Null(validator.WhenCondition);
-        Assert.Null(validator.MemberPath);
+        Assert.Null(validator._memberPath);
         Assert.NotNull(ObjectValidator<Tests.ObjectModel>.ValidationContextsKey);
 
         using var validator2 = new ObjectValidator<ObjectModel>(new Dictionary<object, object?>());
@@ -734,13 +734,13 @@ public class ObjectValidatorTests
         Assert.Null(objectValidator._objectValidator);
         objectValidator.SetValidator(new ObjectModelValidator());
         Assert.NotNull(objectValidator._objectValidator);
-        Assert.Null(objectValidator._objectValidator.MemberPath);
+        Assert.Null(objectValidator._objectValidator._memberPath);
         Assert.Null(objectValidator._objectValidator.InheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             objectValidator.SetValidator((ObjectValidator<ObjectModel>?)null));
-        Assert.Null(objectValidator._objectValidator.MemberPath);
+        Assert.Null(objectValidator._objectValidator._memberPath);
 
-        using var objectValidator2 = new ObjectValidator<ObjectModel> { MemberPath = "Sub" }.RuleFor(u => u.Name)
+        using var objectValidator2 = new ObjectValidator<ObjectModel> { _memberPath = "Sub" }.RuleFor(u => u.Name)
             .NotEqualTo("Fur").End();
 
         Assert.Null(objectValidator2._objectValidator);
@@ -1008,7 +1008,7 @@ public class ObjectValidatorTests
         Assert.Equal("Sub.Id", propertyValidator2.GetEffectiveMemberName());
 
         Assert.NotNull(objectValidator._objectValidator);
-        Assert.Equal("Sub", objectValidator._objectValidator.MemberPath);
+        Assert.Equal("Sub", objectValidator._objectValidator._memberPath);
         var propertyValidator3 =
             objectValidator._objectValidator.Validators[0] as PropertyValidator<ObjectModel, string?>;
         Assert.NotNull(propertyValidator3);

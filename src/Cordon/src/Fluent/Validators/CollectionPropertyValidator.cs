@@ -421,10 +421,10 @@ public sealed class
             if (_elementValidator is not null)
             {
                 // 获取原始属性路径
-                var originalPath = _elementValidator.MemberPath;
+                var originalPath = _elementValidator._memberPath;
 
                 // 设置当前属性路径
-                _elementValidator.MemberPath = $"{baseMemberName}[{index}]";
+                _elementValidator._memberPath = $"{baseMemberName}[{index}]";
 
                 try
                 {
@@ -437,17 +437,17 @@ public sealed class
                 finally
                 {
                     // 恢复原始属性路径
-                    _elementValidator.MemberPath = originalPath;
+                    _elementValidator._memberPath = originalPath;
                 }
             }
             // 检查是否设置了集合元素值验证器
             else if (_valueValidator is not null)
             {
                 // 获取原始属性路径
-                var originalPath = _valueValidator.MemberPath;
+                var originalPath = _valueValidator._memberPath;
 
                 // 设置当前属性路径
-                _valueValidator.MemberPath = $"{baseMemberName}[{index}]";
+                _valueValidator._memberPath = $"{baseMemberName}[{index}]";
 
                 try
                 {
@@ -460,7 +460,7 @@ public sealed class
                 finally
                 {
                     // 恢复原始属性路径
-                    _valueValidator.MemberPath = originalPath;
+                    _valueValidator._memberPath = originalPath;
                 }
             }
 

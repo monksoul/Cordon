@@ -1072,7 +1072,7 @@ public class PropertyValidatorTests
         var propertyObjectValidator =
             propertyValidator.Validators.OfType<ObjectValidatorProxy<SubModel>>().First()._validator;
 
-        Assert.Equal("Sub", propertyObjectValidator.MemberPath);
+        Assert.Equal("Sub", propertyObjectValidator._memberPath);
         var subPropertyValidator =
             propertyObjectValidator.Validators[0] as PropertyValidator<SubModel, int>;
         Assert.NotNull(subPropertyValidator);

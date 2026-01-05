@@ -102,6 +102,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     internal Func<TProperty, ValidationContext<T>, bool>? WhenCondition { get; set; }
 
     /// <inheritdoc />
+    string? IMemberPathRepairable.MemberPath { get; set; }
+
+    /// <inheritdoc />
     void IMemberPathRepairable.RepairMemberPaths(string? memberPath) => RepairMemberPaths(memberPath);
 
     /// <inheritdoc />
@@ -591,7 +594,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     {
         // 获取属性（成员）名称和父级属性路径
         var memberName = _annotationValidator.GetMemberName();
-        var parentPath = _objectValidator.MemberPath;
+        var parentPath = _objectValidator._memberPath;
 
         return string.IsNullOrWhiteSpace(parentPath) ? memberName : $"{parentPath}.{memberName}";
     }

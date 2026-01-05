@@ -471,7 +471,7 @@ public class CollectionPropertyValidatorTests
                 c.RuleFor(b => b.Name));
         propertyValidator.RepairMemberPaths("Children");
         Assert.NotNull(propertyValidator._elementValidator);
-        Assert.Equal("Children", propertyValidator._elementValidator.MemberPath);
+        Assert.Equal("Children", propertyValidator._elementValidator._memberPath);
         var subPropertyValidator =
             propertyValidator._elementValidator.Validators[0] as PropertyValidator<Child, string>;
         Assert.NotNull(subPropertyValidator);

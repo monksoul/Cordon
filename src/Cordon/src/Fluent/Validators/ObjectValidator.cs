@@ -27,6 +27,11 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     /// </summary>
     internal readonly Stack<string?> _ruleSetStack;
 
+    /// <summary>
+    ///     对象图中的属性路径
+    /// </summary>
+    internal string? _memberPath;
+
     /// <inheritdoc cref="ObjectValidator{T}" />
     /// <remarks>对象级别验证器。</remarks>
     internal ObjectValidator<T>? _objectValidator;
@@ -106,15 +111,17 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     internal List<IPropertyValidator<T>> Validators { get; }
 
     /// <summary>
-    ///     对象图中的属性路径
-    /// </summary>
-    internal string? MemberPath { get; set; }
-
-    /// <summary>
     ///     从父级继承的规则集
     /// </summary>
     /// <remarks>用于 <see cref="PropertyValidator{T,TProperty,TSelf}.ChildRules" /> 场景。</remarks>
     internal string?[]? InheritedRuleSets { get; set => field = value?.Select(u => u?.Trim()).ToArray(); }
+
+    /// <inheritdoc />
+    string? IMemberPathRepairable.MemberPath
+    {
+        get => _memberPath;
+        set => _memberPath = value;
+    }
 
     /// <inheritdoc />
     void IMemberPathRepairable.RepairMemberPaths(string? memberPath) => RepairMemberPaths(memberPath);
@@ -793,7 +800,7 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
     /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
     internal virtual void RepairMemberPaths(string? memberPath)
     {
-        MemberPath = memberPath;
+        _memberPath = memberPath;
 
         // 递归修复所有子属性验证器
         foreach (var propertyValidator in Validators)

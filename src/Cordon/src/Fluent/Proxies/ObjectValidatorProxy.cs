@@ -37,6 +37,9 @@ public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, 
     }
 
     /// <inheritdoc />
+    string? IMemberPathRepairable.MemberPath { get; set; }
+
+    /// <inheritdoc />
     void IMemberPathRepairable.RepairMemberPaths(string? memberPath) => RepairMemberPaths(memberPath);
 
     /// <inheritdoc />
@@ -82,7 +85,6 @@ public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, 
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
     internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
-        // 同步 IServiceProvider 委托
         _validator.InitializeServiceProvider(serviceProvider);
 
     /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />

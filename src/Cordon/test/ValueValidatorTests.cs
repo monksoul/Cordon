@@ -25,7 +25,7 @@ public class ValueValidatorTests
         Assert.NotNull(valueValidator.This);
         Assert.Equal(valueValidator.This, valueValidator);
         Assert.Null(valueValidator._allowEmptyStrings);
-        Assert.Null(valueValidator.MemberPath);
+        Assert.Null(valueValidator._memberPath);
         Assert.Null(valueValidator.MemberName);
 
         var valueValidator2 = new ValueValidator<string>(new Dictionary<object, object?>());
@@ -733,7 +733,7 @@ public class ValueValidatorTests
         Assert.Equal("MName", valueValidator.GetEffectiveMemberName());
 
         valueValidator.WithName(null);
-        valueValidator.MemberPath = "Names";
+        valueValidator._memberPath = "Names";
         Assert.Equal("Names", valueValidator.GetEffectiveMemberName());
     }
 
