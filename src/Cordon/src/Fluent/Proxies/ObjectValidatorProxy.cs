@@ -52,10 +52,7 @@ public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, 
         }
 
         // 释放验证器资源
-        if (_validator is IDisposable disposable)
-        {
-            disposable.Dispose();
-        }
+        _validator.Dispose();
     }
 
     /// <inheritdoc />
@@ -75,13 +72,7 @@ public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, 
         (string?)ErrorMessageString is null ? null : base.FormatErrorMessage(name);
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
-    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
-    {
-        // 检查验证器是否实现 IValidatorInitializer 接口
-        if (_validator is IValidatorInitializer initializer)
-        {
-            // 同步 IServiceProvider 委托
-            initializer.InitializeServiceProvider(serviceProvider);
-        }
-    }
+    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
+        // 同步 IServiceProvider 委托
+        _validator.InitializeServiceProvider(serviceProvider);
 }

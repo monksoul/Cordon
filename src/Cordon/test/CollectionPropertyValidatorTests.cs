@@ -477,7 +477,7 @@ public class CollectionPropertyValidatorTests
         var propertyValidator =
             new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator).ChildRules(c =>
                 c.RuleFor(b => b.Name));
-        propertyValidator.RepairMemberPaths();
+        propertyValidator.RepairMemberPaths("Children");
         Assert.NotNull(propertyValidator._elementValidator);
         Assert.Equal("Children", propertyValidator._elementValidator.MemberPath);
         var subPropertyValidator =

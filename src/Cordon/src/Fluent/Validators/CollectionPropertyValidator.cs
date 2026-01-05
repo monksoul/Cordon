@@ -351,16 +351,10 @@ public sealed class
         base.Dispose(disposing);
 
         // 释放集合元素对象验证器资源
-        if (_elementValidator is IDisposable disposable)
-        {
-            disposable.Dispose();
-        }
+        _elementValidator?.Dispose();
 
         // 释放集合元素值验证器资源
-        if (_valueValidator is IDisposable valueValidatorDisposable)
-        {
-            valueValidatorDisposable.Dispose();
-        }
+        _valueValidator?.Dispose();
     }
 
     /// <summary>
@@ -490,32 +484,13 @@ public sealed class
     }
 
     /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
-    internal override void RepairMemberPaths()
+    internal override void RepairMemberPaths(string? memberPath)
     {
         // 调用基类的修复验证器及其子验证器的成员路径
-        base.RepairMemberPaths();
+        base.RepairMemberPaths(memberPath);
 
-        // 检查是否设置了集合元素对象验证器
-        if (_elementValidator is not null)
-        {
-            // 设置元素验证器的基础路径
-            _elementValidator.MemberPath = GetEffectiveMemberName();
-
-            // 检查集合元素对象验证器是否实现 IMemberPathRepairable 接口
-            if (_elementValidator is IMemberPathRepairable repairable)
-            {
-                // 修复验证器及其子验证器的成员路径
-                repairable.RepairMemberPaths();
-            }
-        }
-
-        // 检查是否设置了集合元素值验证器
-        // ReSharper disable once UseNullPropagation
-        if (_valueValidator is not null)
-        {
-            // 设置元素验证器的基础路径
-            _valueValidator.MemberPath = GetEffectiveMemberName();
-        }
+        _elementValidator?.RepairMemberPaths(memberPath);
+        _valueValidator?.RepairMemberPaths(memberPath);
     }
 
     /// <inheritdoc cref="IPropertyValidatorCloneable{T}.Clone" />

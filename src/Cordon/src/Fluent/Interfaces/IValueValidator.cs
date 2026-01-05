@@ -13,4 +13,5 @@ public interface IValueValidator;
 ///     <inheritdoc cref="IValueValidator" />
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public interface IValueValidator<in T> : IValueValidator, IObjectValidator<T>, IRuleSetContextProvider;
+public interface IValueValidator<in T> : IValueValidator, IObjectValidator<T>, IMemberPathRepairable,
+    IRuleSetContextProvider;

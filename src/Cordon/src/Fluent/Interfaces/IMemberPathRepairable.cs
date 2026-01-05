@@ -12,5 +12,6 @@ public interface IMemberPathRepairable
     /// <summary>
     ///     修复验证器及其子验证器的成员路径
     /// </summary>
-    void RepairMemberPaths();
+    /// <param name="memberPath">对象图中的属性路径</param>
+    void RepairMemberPaths(string? memberPath);
 }

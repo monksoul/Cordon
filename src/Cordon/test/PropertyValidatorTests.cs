@@ -1075,7 +1075,7 @@ public class PropertyValidatorTests
             {
                 c.RuleFor(u => u.Id).Min(3);
             });
-        propertyValidator.RepairMemberPaths();
+        propertyValidator.RepairMemberPaths("Sub");
         Assert.NotNull(propertyValidator._propertyValidator);
         Assert.Equal("Sub", propertyValidator._propertyValidator.MemberPath);
         var subPropertyValidator =

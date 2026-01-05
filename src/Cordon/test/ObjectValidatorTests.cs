@@ -997,8 +997,7 @@ public class ObjectValidatorTests
     {
         using var objectValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).Required()
             .RuleFor(u => u.Id).Min(1).End().SetValidator(new ObjectModelValidator());
-        objectValidator.MemberPath = "Sub";
-        objectValidator.RepairMemberPaths();
+        objectValidator.RepairMemberPaths("Sub");
 
         var propertyValidator1 = objectValidator.Validators[0] as PropertyValidator<ObjectModel, string?>;
         Assert.NotNull(propertyValidator1);

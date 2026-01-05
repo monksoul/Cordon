@@ -75,9 +75,8 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     internal Func<T, ValidationContext<T>, bool>? WhenCondition { get; private set; }
 
     /// <summary>
-    ///     当前验证器在对象图中的属性路径（如 "User.Address"）
+    ///     对象图中的属性路径
     /// </summary>
-    /// <remarks>仅在作为嵌套验证器时由父验证器设置。</remarks>
     internal string? MemberPath { get; set; }
 
     /// <inheritdoc />
@@ -233,6 +232,9 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
 
     /// <inheritdoc />
     string?[]? IRuleSetContextProvider.GetCurrentRuleSets() => GetCurrentRuleSets();
+
+    /// <inheritdoc />
+    void IMemberPathRepairable.RepairMemberPaths(string? memberPath) => RepairMemberPaths(memberPath);
 
     /// <summary>
     ///     为当前值自身配置验证规则
@@ -505,10 +507,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         }
 
         // 释放单个值级别验证器资源
-        if (_valueValidator is IDisposable valueValidatorDisposable)
-        {
-            valueValidatorDisposable.Dispose();
-        }
+        _valueValidator?.Dispose();
     }
 
     /// <summary>
@@ -608,5 +607,13 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         {
             DisplayName = displayName, MemberNames = memberPath is null ? null : [memberPath], RuleSets = ruleSets
         };
+    }
+
+    /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
+    internal virtual void RepairMemberPaths(string? memberPath)
+    {
+        MemberPath = memberPath;
+
+        _valueValidator?.RepairMemberPaths(memberPath);
     }
 }
