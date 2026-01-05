@@ -8,7 +8,7 @@ namespace Cordon;
 ///     对象验证器代理
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, IDisposable
+public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, IMemberPathRepairable, IDisposable
 {
     /// <inheritdoc cref="ObjectValidator{T}" />
     internal readonly ObjectValidator<T> _validator;
@@ -37,6 +37,9 @@ public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, 
     }
 
     /// <inheritdoc />
+    void IMemberPathRepairable.RepairMemberPaths(string? memberPath) => RepairMemberPaths(memberPath);
+
+    /// <inheritdoc />
     void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
         InitializeServiceProvider(serviceProvider);
 
@@ -57,15 +60,21 @@ public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, 
 
     /// <inheritdoc />
     public override bool IsValid(T? instance, ValidationContext<T> validationContext) =>
-        _validator.IsValid(instance, validationContext.RuleSets);
+        instance is null || _validator.IsValid(instance, validationContext.RuleSets);
 
     /// <inheritdoc />
     public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext) =>
-        _validator.GetValidationResults(instance, validationContext.RuleSets);
+        instance is null ? null : _validator.GetValidationResults(instance, validationContext.RuleSets);
 
     /// <inheritdoc />
-    public override void Validate(T? instance, ValidationContext<T> validationContext) =>
-        _validator.Validate(instance, validationContext.RuleSets);
+    public override void Validate(T? instance, ValidationContext<T> validationContext)
+    {
+        // 空检查
+        if (instance is not null)
+        {
+            _validator.Validate(instance, validationContext.RuleSets);
+        }
+    }
 
     /// <inheritdoc />
     public override string? FormatErrorMessage(string name) =>
@@ -75,4 +84,7 @@ public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, 
     internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
         // 同步 IServiceProvider 委托
         _validator.InitializeServiceProvider(serviceProvider);
+
+    /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
+    internal virtual void RepairMemberPaths(string? memberPath) => _validator.RepairMemberPaths(memberPath);
 }

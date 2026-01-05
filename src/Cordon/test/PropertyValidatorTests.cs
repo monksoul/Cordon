@@ -27,7 +27,6 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator._annotationValidator._serviceProvider);
         Assert.Empty(propertyValidator._annotationValidator.Items);
         Assert.NotNull(propertyValidator.Validators);
-        Assert.Null(propertyValidator._propertyValidator);
         Assert.Null(propertyValidator._lastAddedValidator);
         Assert.Empty(propertyValidator.Validators);
         Assert.Equal(0, propertyValidator._highPriorityEndIndex);
@@ -770,21 +769,27 @@ public class PropertyValidatorTests
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator);
 
-        Assert.Null(propertyValidator._propertyValidator);
+        Assert.False(propertyValidator.Validators.OfType<ObjectValidatorProxy<SubModel>>().Any());
         propertyValidator.SetValidator(new SubModelValidator());
-        Assert.NotNull(propertyValidator._propertyValidator);
-        Assert.Null(propertyValidator._propertyValidator.InheritedRuleSets);
+        Assert.True(propertyValidator.Validators.OfType<ObjectValidatorProxy<SubModel>>().Any());
+
+        var propertyObjectValidator =
+            propertyValidator.Validators.OfType<ObjectValidatorProxy<SubModel>>().First()._validator;
+        Assert.Null(propertyObjectValidator.InheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             propertyValidator.SetValidator((ObjectValidator<SubModel>?)null));
 
         var propertyValidator2 =
             new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] };
 
-        Assert.Null(propertyValidator2._propertyValidator);
+        Assert.False(propertyValidator2.Validators.OfType<ObjectValidatorProxy<SubModel>>().Any());
         propertyValidator2.SetValidator((_, _, _) => new SubModelValidator());
-        Assert.NotNull(propertyValidator2._propertyValidator);
-        Assert.NotNull(propertyValidator2._propertyValidator.InheritedRuleSets);
-        Assert.Equal(["login"], (string[]?)propertyValidator2._propertyValidator.InheritedRuleSets!);
+        Assert.True(propertyValidator2.Validators.OfType<ObjectValidatorProxy<SubModel>>().Any());
+
+        var propertyObjectValidator2 =
+            propertyValidator2.Validators.OfType<ObjectValidatorProxy<SubModel>>().First()._validator;
+        Assert.NotNull(propertyObjectValidator2.InheritedRuleSets);
+        Assert.Equal(["login"], (string[]?)propertyObjectValidator2.InheritedRuleSets!);
     }
 
     [Fact]
@@ -808,18 +813,23 @@ public class PropertyValidatorTests
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator);
         propertyValidator.ChildRules(o => o.RuleFor(u => u.Id).Min(1));
-        Assert.NotNull(propertyValidator._propertyValidator);
-        Assert.Null(propertyValidator._propertyValidator.InheritedRuleSets);
+        Assert.True(propertyValidator.Validators.OfType<ObjectValidatorProxy<SubModel>>().Any());
+        var propertyObjectValidator =
+            propertyValidator.Validators.OfType<ObjectValidatorProxy<SubModel>>().First()._validator;
+        Assert.Null(propertyObjectValidator.InheritedRuleSets);
 
-        Assert.False(propertyValidator._propertyValidator.IsValid(new SubModel()));
-        Assert.True(propertyValidator._propertyValidator.IsValid(new SubModel { Id = 1 }));
+        Assert.False(propertyObjectValidator.IsValid(new SubModel()));
+        Assert.True(propertyObjectValidator.IsValid(new SubModel { Id = 1 }));
 
         var propertyValidator2 =
             new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] };
         propertyValidator2.ChildRules(o => o.RuleFor(u => u.Id).Min(1));
-        Assert.NotNull(propertyValidator2._propertyValidator);
-        Assert.NotNull(propertyValidator2._propertyValidator.InheritedRuleSets);
-        Assert.Equal(["login"], (string[]?)propertyValidator2._propertyValidator.InheritedRuleSets!);
+        Assert.True(propertyValidator2.Validators.OfType<ObjectValidatorProxy<SubModel>>().Any());
+
+        var propertyObjectValidator2 =
+            propertyValidator2.Validators.OfType<ObjectValidatorProxy<SubModel>>().First()._validator;
+        Assert.NotNull(propertyObjectValidator2.InheritedRuleSets);
+        Assert.Equal(["login"], (string[]?)propertyObjectValidator2.InheritedRuleSets!);
     }
 
     [Fact]
@@ -1036,15 +1046,6 @@ public class PropertyValidatorTests
 
         var propertyValidator = new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator);
         Assert.Equal("Sub", propertyValidator.GetMemberPath());
-
-        propertyValidator.SetValidator(new SubModelValidator());
-        var subPropertyValidator =
-            propertyValidator._propertyValidator!.Validators.Last() as PropertyValidator<SubModel, Nested>;
-        Assert.NotNull(subPropertyValidator);
-
-        var nestedPropertyValidator =
-            subPropertyValidator._propertyValidator!.Validators.First() as PropertyValidator<Nested, int>;
-        Assert.NotNull(nestedPropertyValidator);
     }
 
     [Fact]
@@ -1055,15 +1056,6 @@ public class PropertyValidatorTests
         var propertyValidator =
             new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator).WithName("xxx");
         Assert.Equal("xxx", propertyValidator.GetEffectiveMemberName());
-
-        propertyValidator.SetValidator(new SubModelValidator());
-        var subPropertyValidator =
-            propertyValidator._propertyValidator!.Validators.Last() as PropertyValidator<SubModel, Nested>;
-        Assert.NotNull(subPropertyValidator);
-
-        var nestedPropertyValidator =
-            subPropertyValidator._propertyValidator!.Validators.First() as PropertyValidator<Nested, int>;
-        Assert.NotNull(nestedPropertyValidator);
     }
 
     [Fact]
@@ -1076,10 +1068,13 @@ public class PropertyValidatorTests
                 c.RuleFor(u => u.Id).Min(3);
             });
         propertyValidator.RepairMemberPaths("Sub");
-        Assert.NotNull(propertyValidator._propertyValidator);
-        Assert.Equal("Sub", propertyValidator._propertyValidator.MemberPath);
+        Assert.True(propertyValidator.Validators.OfType<ObjectValidatorProxy<SubModel>>().Any());
+        var propertyObjectValidator =
+            propertyValidator.Validators.OfType<ObjectValidatorProxy<SubModel>>().First()._validator;
+
+        Assert.Equal("Sub", propertyObjectValidator.MemberPath);
         var subPropertyValidator =
-            propertyValidator._propertyValidator.Validators[0] as PropertyValidator<SubModel, int>;
+            propertyObjectValidator.Validators[0] as PropertyValidator<SubModel, int>;
         Assert.NotNull(subPropertyValidator);
         Assert.Equal("Sub.Id", subPropertyValidator.GetMemberPath());
     }

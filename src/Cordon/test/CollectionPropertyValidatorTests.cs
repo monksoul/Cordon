@@ -460,14 +460,6 @@ public class CollectionPropertyValidatorTests
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = objectValidator.RuleForCollection(u => u.Children)
             .ChildRules(c => c.RuleFor(b => b.Nest).ChildRules(d => d.RuleFor(z => z.Id)));
-
-        var subPropertyValidator =
-            propertyValidator._elementValidator!.Validators.Last() as PropertyValidator<Child, Nested>;
-        Assert.NotNull(subPropertyValidator);
-
-        var nestedPropertyValidator =
-            subPropertyValidator._propertyValidator!.Validators.First() as PropertyValidator<Nested, int>;
-        Assert.NotNull(nestedPropertyValidator);
     }
 
     [Fact]

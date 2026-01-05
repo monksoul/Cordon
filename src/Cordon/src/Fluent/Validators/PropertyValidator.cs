@@ -50,10 +50,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     /// <remarks>该预处理器仅用于验证，不会修改原始属性的值。</remarks>
     internal Func<TProperty, TProperty>? _preProcessor;
 
-    /// <inheritdoc cref="ObjectValidator{T}" />
-    /// <remarks>属性级别对象验证器。</remarks>
-    internal ObjectValidator<TProperty>? _propertyValidator;
-
     /// <summary>
     ///     <inheritdoc cref="PropertyValidator{T,TProperty}" />
     /// </summary>
@@ -142,13 +138,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             return false;
         }
 
-        // 检查是否设置了属性级别对象验证器
-        if (propertyValue is not null && _propertyValidator is not null &&
-            !_propertyValidator.IsValid(propertyValue, ruleSets))
-        {
-            return false;
-        }
-
         // 创建 ValidationContext 实例（属性）
         var validationContextForProperty = CreateValidationContext(propertyValue, ruleSets);
 
@@ -185,12 +174,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         if (ShouldRunAnnotationValidation())
         {
             validationResults.AddRange(_annotationValidator.GetValidationResults(instance, validationContext) ?? []);
-        }
-
-        // 检查是否设置了属性级别对象验证器
-        if (propertyValue is not null && _propertyValidator is not null)
-        {
-            validationResults.AddRange(_propertyValidator.GetValidationResults(propertyValue, ruleSets) ?? []);
         }
 
         // 创建 ValidationContext 实例（属性）
@@ -230,12 +213,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         if (ShouldRunAnnotationValidation())
         {
             _annotationValidator.Validate(instance, validationContext);
-        }
-
-        // 检查是否设置了属性级别对象验证器
-        if (propertyValue is not null && _propertyValidator is not null)
-        {
-            _propertyValidator.Validate(propertyValue, ruleSets);
         }
 
         // 创建 ValidationContext 实例（属性）
@@ -279,9 +256,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
 
         // 同步 _annotationValidator 实例 IServiceProvider 委托
         _annotationValidator.InitializeServiceProvider(serviceProvider);
-
-        // 同步 _propertyValidator 实例 IServiceProvider 委托
-        _propertyValidator?.InitializeServiceProvider(serviceProvider);
     }
 
     /// <summary>
@@ -301,28 +275,28 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         ArgumentNullException.ThrowIfNull(validatorFactory);
 
         // 空检查
-        if (_propertyValidator is not null)
+        if (Validators.OfType<ObjectValidatorProxy<TProperty>>().Any())
         {
             throw new InvalidOperationException(
                 $"An object validator has already been assigned to this property. Only one object validator is allowed per property. To define nested rules, use `{nameof(ChildRules)}` within a single validator.");
         }
 
         // 调用工厂方法，传入当前 RuleSets、Items 和 Options
-        _propertyValidator = validatorFactory(RuleSets, _objectValidator.Items, _objectValidator.Options);
+        var objectValidator = validatorFactory(RuleSets, _objectValidator.Items, _objectValidator.Options);
 
         // 空检查
-        if (_propertyValidator is null)
+        if (objectValidator is null)
         {
             return This;
         }
 
         // 继承当前规则集
-        _propertyValidator.SetInheritedRuleSetsIfNotSet(RuleSets);
+        objectValidator.SetInheritedRuleSetsIfNotSet(RuleSets);
 
         // 同步 IServiceProvider 委托
-        _propertyValidator.InitializeServiceProvider(_serviceProvider);
+        objectValidator.InitializeServiceProvider(_serviceProvider);
 
-        return This;
+        return AddValidator(new ObjectValidatorProxy<TProperty>(objectValidator));
     }
 
     /// <summary>
@@ -352,7 +326,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         ArgumentNullException.ThrowIfNull(configure);
 
         // 空检查
-        if (_propertyValidator is not null)
+        if (Validators.OfType<ObjectValidatorProxy<TProperty>>().Any())
         {
             throw new InvalidOperationException(
                 $"An object validator has already been assigned to this property. `{nameof(ChildRules)}` cannot be applied after `{nameof(SetValidator)}` or another `{nameof(ChildRules)}` call.");
@@ -641,7 +615,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             return;
         }
 
-        // 释放所有验证器资源
+        // 遍历所有验证器
         foreach (var validator in Validators)
         {
             if (validator is IDisposable disposable)
@@ -649,13 +623,20 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
                 disposable.Dispose();
             }
         }
-
-        // 释放属性级别对象验证器资源
-        _propertyValidator?.Dispose();
     }
 
     /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
-    internal virtual void RepairMemberPaths(string? memberPath) => _propertyValidator?.RepairMemberPaths(memberPath);
+    internal virtual void RepairMemberPaths(string? memberPath)
+    {
+        // 遍历所有验证器
+        foreach (var validator in Validators)
+        {
+            if (validator is IMemberPathRepairable repairable)
+            {
+                repairable.RepairMemberPaths(memberPath);
+            }
+        }
+    }
 
     /// <inheritdoc cref="IPropertyValidatorCloneable{T}.Clone" />
     internal virtual IPropertyValidator<T> Clone(ObjectValidator<T> objectValidator)
@@ -676,7 +657,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 同步字段
         propertyValidator._allowEmptyStrings = _allowEmptyStrings;
         propertyValidator._preProcessor = _preProcessor;
-        propertyValidator._propertyValidator = _propertyValidator;
 
         // 同步已设置的验证器
         propertyValidator.AddValidators(Validators);

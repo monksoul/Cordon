@@ -512,7 +512,6 @@ public sealed class
         // 同步字段
         propertyValidator._allowEmptyStrings = _allowEmptyStrings;
         propertyValidator._preProcessor = _preProcessor;
-        propertyValidator._propertyValidator = _propertyValidator;
 
         propertyValidator._elementValidator = _elementValidator;
         propertyValidator._valueValidator = _valueValidator;
