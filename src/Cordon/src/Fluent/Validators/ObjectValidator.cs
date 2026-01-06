@@ -8,7 +8,7 @@ namespace Cordon;
 ///     对象验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IRuleSetContextProvider,
+public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMemberPathRepairable, IRuleSetContextProvider,
     IValidationAnnotationsConfigurable
 {
     /// <summary>
@@ -89,6 +89,8 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
 
         // 订阅 ValidatorOptions 属性变更事件
         Options.PropertyChanged += OptionsOnPropertyChanged;
+
+        ErrorMessageResourceAccessor = () => null!;
     }
 
     /// <summary>
@@ -314,6 +316,28 @@ public class ObjectValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IR
 
     /// <inheritdoc />
     void IValidationAnnotationsConfigurable.UseAnnotationValidation(bool enabled) => UseAnnotationValidation(enabled);
+
+    /// <inheritdoc />
+    public override bool IsValid(T? instance, ValidationContext<T> validationContext) =>
+        instance is null || IsValid(instance, validationContext.RuleSets);
+
+    /// <inheritdoc />
+    public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext) =>
+        instance is null ? null : GetValidationResults(instance, validationContext.RuleSets);
+
+    /// <inheritdoc />
+    public override void Validate(T? instance, ValidationContext<T> validationContext)
+    {
+        // 空检查
+        if (instance is not null)
+        {
+            Validate(instance, validationContext.RuleSets);
+        }
+    }
+
+    /// <inheritdoc />
+    public override string? FormatErrorMessage(string name) =>
+        (string?)ErrorMessageString is null ? null : base.FormatErrorMessage(name);
 
     /// <summary>
     ///     为指定属性配置验证规则
