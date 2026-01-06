@@ -420,7 +420,7 @@ public class CollectionPropertyValidatorTests
         Assert.Null(propertyValidator._serviceProvider);
         Assert.Null(propertyValidator._annotationValidator._serviceProvider);
         Assert.Null(subValidator._serviceProvider);
-        var valueValidator = propertyValidator.Validators.LastOrDefault() as ValueAnnotationValidator;
+        var valueValidator = propertyValidator.Validators.FirstOrDefault() as ValueAnnotationValidator;
         Assert.NotNull(valueValidator);
         Assert.Null(valueValidator._serviceProvider);
 

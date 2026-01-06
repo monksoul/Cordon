@@ -30,29 +30,6 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
-    public void WithErrorMessage_ReturnOK()
-    {
-        using var objectValidator = new ObjectValidator<ValidationModel>();
-        var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
-
-        propertyValidator.WithErrorMessage("错误消息");
-        propertyValidator.WithErrorMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
-
-        propertyValidator.AddValidator(new MinLengthValidator(3));
-        Assert.NotNull(propertyValidator._lastAddedValidator);
-        propertyValidator.WithErrorMessage("错误信息");
-        Assert.Null(propertyValidator._lastAddedValidator);
-        Assert.Equal("错误信息", propertyValidator.Validators.Last().ErrorMessage);
-
-        propertyValidator.AddValidator(new MaxLengthValidator(10));
-        Assert.NotNull(propertyValidator._lastAddedValidator);
-        propertyValidator.WithErrorMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
-        Assert.Null(propertyValidator._lastAddedValidator);
-        Assert.Equal(typeof(TestValidationMessages), propertyValidator.Validators.Last().ErrorMessageResourceType);
-        Assert.Equal("TestValidator_ValidationError", propertyValidator.Validators.Last().ErrorMessageResourceName);
-    }
-
-    [Fact]
     public void WithMessage_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ValidationModel>();
@@ -89,43 +66,14 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
-    public void WithMemberName_Invalid_Parameters()
-    {
-        using var objectValidator = new ObjectValidator<ValidationModel>();
-        var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
-
-        Assert.Throws<ArgumentNullException>(() => propertyValidator.WithMemberName((JsonNamingPolicy)null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            propertyValidator.WithMemberName((Func<PropertyInfo, string?>)null!));
-    }
-
-    [Fact]
-    public void WithMemberName_ReturnOK()
-    {
-        using var objectValidator = new ObjectValidator<ValidationModel>();
-        var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
-        Assert.Null(propertyValidator.MemberName);
-
-        propertyValidator.WithMemberName("MyName");
-        Assert.Equal("MyName", propertyValidator.MemberName);
-        propertyValidator.WithMemberName((string?)null);
-        Assert.Null(propertyValidator.MemberName);
-
-        propertyValidator.WithMemberName(JsonNamingPolicy.CamelCase);
-        Assert.Equal("data1", propertyValidator.MemberName);
-
-        propertyValidator.WithMemberName(p => p.Name);
-        Assert.Equal("Data1", propertyValidator.MemberName);
-    }
-
-    [Fact]
     public void WithName_Invalid_Parameters()
     {
         using var objectValidator = new ObjectValidator<ValidationModel>();
         var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
 
         Assert.Throws<ArgumentNullException>(() => propertyValidator.WithName((JsonNamingPolicy)null!));
-        Assert.Throws<ArgumentNullException>(() => propertyValidator.WithName((Func<PropertyInfo, string?>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            propertyValidator.WithName((Func<PropertyInfo, string?>)null!));
     }
 
     [Fact]
@@ -486,35 +434,6 @@ public class PropertyValidatorValidationTests
             .WhenMatch(u => u?.Contains('@') == true, typeof(TestValidationMessages), "TestValidator_ValidationError");
         Assert.False(propertyValidator3.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
         Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = "monk__soul" }));
-    }
-
-    [Fact]
-    public void UnlessMatch_ReturnOK()
-    {
-        var propertyValidator = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.String1)
-            .UnlessMatch(u => u?.Contains('@') == true, b => b.UserName(), b => b.EmailAddress());
-
-        Assert.Single(propertyValidator.Validators);
-
-        var addedValidator = propertyValidator._lastAddedValidator as ConditionalValidator<string>;
-        Assert.NotNull(addedValidator);
-
-        Assert.True(propertyValidator.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
-        Assert.False(propertyValidator.IsValid(new ValidationModel { String1 = "monk__soul" }));
-
-        var propertyValidator2 = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.String1)
-            .UnlessMatch(u => u?.Contains('@') == true, "错误消息1");
-        Assert.True(propertyValidator2.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
-        Assert.False(propertyValidator2.IsValid(new ValidationModel { String1 = "monk__soul" }));
-
-        var propertyValidator3 = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.String1)
-            .UnlessMatch(u => u?.Contains('@') == true, typeof(TestValidationMessages),
-                "TestValidator_ValidationError");
-        Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
-        Assert.False(propertyValidator3.IsValid(new ValidationModel { String1 = "monk__soul" }));
     }
 
     [Fact]
@@ -1686,60 +1605,6 @@ public class PropertyValidatorValidationTests
 
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "1001001" }));
         Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "100101" }));
-    }
-
-    [Fact]
-    public void Predicate_Invalid_Parameters()
-    {
-        Assert.Throws<ArgumentNullException>(() =>
-            new ObjectValidator<ValidationModel>().RuleFor(u => u.Number1)
-                .Predicate((Func<int, bool>)null!));
-
-        Assert.Throws<ArgumentNullException>(() =>
-            new ObjectValidator<ValidationModel>().RuleFor(u => u.Number1)
-                .Predicate(null!));
-    }
-
-    [Fact]
-    public void Predicate_ReturnOK()
-    {
-        var propertyValidator = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Number1)
-            .Predicate(u => u > 10);
-
-        Assert.Single(propertyValidator.Validators);
-
-        var addedValidator = propertyValidator._lastAddedValidator as PredicateValidator<int>;
-        Assert.NotNull(addedValidator);
-
-        Assert.True(propertyValidator.IsValid(new ValidationModel { Number1 = 11 }));
-        Assert.False(propertyValidator.IsValid(new ValidationModel { Number1 = 9 }));
-
-        var propertyValidator2 = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Number1)
-            .Predicate((_, ctx) => ctx.Instance.Number1 > 10);
-
-        Assert.Single(propertyValidator2.Validators);
-
-        var addedValidator2 =
-            propertyValidator2._lastAddedValidator as ValidatorProxy<ValidationModel, PredicateValidator<int>>;
-        Assert.NotNull(addedValidator2);
-
-        Assert.True(propertyValidator2.IsValid(new ValidationModel { Number1 = 11 }));
-        Assert.False(propertyValidator2.IsValid(new ValidationModel { Number1 = 9 }));
-
-        var propertyValidator3 = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Number1)
-            .Predicate_((_, ctx) => ctx.Instance.Number1 > 10);
-
-        Assert.Single(propertyValidator3.Validators);
-
-        var addedValidator3 =
-            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, PredicateValidator<int>>;
-        Assert.NotNull(addedValidator3);
-
-        Assert.True(propertyValidator3.IsValid(new ValidationModel { Number1 = 11 }));
-        Assert.False(propertyValidator3.IsValid(new ValidationModel { Number1 = 9 }));
     }
 
     [Fact]

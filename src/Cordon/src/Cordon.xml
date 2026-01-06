@@ -2269,46 +2269,6 @@
                 <see cref="T:Cordon.ConditionThenBuilder`1"/>
             </returns>
         </member>
-        <member name="M:Cordon.ConditionBuilder`1.Unless(System.Func{`0,System.Boolean})">
-            <summary>
-                定义不满足指定的条件委托
-            </summary>
-            <param name="condition">条件委托</param>
-            <returns>
-                <see cref="T:Cordon.ConditionThenBuilder`1"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.ConditionBuilder`1.UnlessMatch(System.Func{`0,System.Boolean},System.Action{Cordon.FluentValidatorBuilder{`0}})">
-            <summary>
-                定义不满足指定条件时执行的验证规则
-            </summary>
-            <param name="condition">条件委托</param>
-            <param name="thenConfigure">验证器配置委托</param>
-            <returns>
-                <see cref="T:Cordon.ConditionThenBuilder`1"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.ConditionBuilder`1.UnlessMatch(System.Func{`0,System.Boolean},System.String)">
-            <summary>
-                定义不满足指定条件时返回指定的错误消息
-            </summary>
-            <param name="condition">条件委托</param>
-            <param name="errorMessage">错误消息</param>
-            <returns>
-                <see cref="T:Cordon.ConditionThenBuilder`1"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.ConditionBuilder`1.UnlessMatch(System.Func{`0,System.Boolean},System.Type,System.String)">
-            <summary>
-                定义不满足指定条件时返回指定的错误消息
-            </summary>
-            <param name="condition">条件委托</param>
-            <param name="resourceType">错误信息资源类型</param>
-            <param name="resourceName">错误信息资源名称</param>
-            <returns>
-                <see cref="T:Cordon.ConditionThenBuilder`1"/>
-            </returns>
-        </member>
         <member name="M:Cordon.ConditionBuilder`1.Otherwise(System.Action{Cordon.FluentValidatorBuilder{`0}})">
             <summary>
                 配置默认验证规则
@@ -2329,28 +2289,7 @@
                 <see cref="T:Cordon.ConditionBuilder`1"/>
             </returns>
         </member>
-        <member name="M:Cordon.ConditionBuilder`1.OtherwiseErrorMessage(System.String)">
-            <summary>
-                配置默认错误消息
-            </summary>
-            <remarks>当所有条件均不满足时直接返回该消息，不执行任何验证逻辑。</remarks>
-            <param name="errorMessage">错误消息</param>
-            <returns>
-                <see cref="T:Cordon.ConditionBuilder`1"/>
-            </returns>
-        </member>
         <member name="M:Cordon.ConditionBuilder`1.OtherwiseMessage(System.Type,System.String)">
-            <summary>
-                配置默认错误消息
-            </summary>
-            <remarks>当所有条件均不满足时直接返回该消息，不执行任何验证逻辑。</remarks>
-            <param name="resourceType">错误信息资源类型</param>
-            <param name="resourceName">错误信息资源名称</param>
-            <returns>
-                <see cref="T:Cordon.ConditionBuilder`1"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.ConditionBuilder`1.OtherwiseErrorMessage(System.Type,System.String)">
             <summary>
                 配置默认错误消息
             </summary>
@@ -2409,28 +2348,7 @@
                 <see cref="T:Cordon.ConditionBuilder`1"/>
             </returns>
         </member>
-        <member name="M:Cordon.ConditionThenBuilder`1.ThenErrorMessage(System.String)">
-            <summary>
-                配置满足条件时直接返回指定的错误消息
-            </summary>
-            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
-            <param name="errorMessage">错误消息</param>
-            <returns>
-                <see cref="T:Cordon.ConditionBuilder`1"/>
-            </returns>
-        </member>
         <member name="M:Cordon.ConditionThenBuilder`1.ThenMessage(System.Type,System.String)">
-            <summary>
-                配置满足条件时直接返回指定的错误消息
-            </summary>
-            <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
-            <param name="resourceType">错误信息资源类型</param>
-            <param name="resourceName">错误信息资源名称</param>
-            <returns>
-                <see cref="T:Cordon.ConditionBuilder`1"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.ConditionThenBuilder`1.ThenErrorMessage(System.Type,System.String)">
             <summary>
                 配置满足条件时直接返回指定的错误消息
             </summary>
@@ -2456,15 +2374,9 @@
         </member>
         <member name="F:Cordon.FluentValidatorBuilder`2._highPriorityEndIndex">
             <summary>
-                高优先级验证器区域的结束索引（同时也是普通验证器区域的起始索引）
+                高优先级验证器区域的结束索引
             </summary>
-            <remarks>
-                该索引将验证器列表划分为两个区域：<c>[0, _highPriorityEndIndex)</c> 为高优先级验证器区域（按
-                <see cref="P:Cordon.IHighPriorityValidator.Priority"/>
-                升序排列），
-                <c>[_highPriorityEndIndex, Count)</c>
-                为普通验证器区域。当添加新验证器时，高优先级验证器会插入到指定位置以维持顺序，普通验证器则直接追加到列表末尾，此索引值会相应更新以维护区域边界。
-            </remarks>
+            <remarks>同时也是普通验证器区域的起始索引。</remarks>
         </member>
         <member name="F:Cordon.FluentValidatorBuilder`2._lastAddedValidator">
             <summary>
@@ -2472,6 +2384,12 @@
                 <see cref="T:Cordon.ValidatorBase"/>
                 实例
             </summary>
+        </member>
+        <member name="F:Cordon.FluentValidatorBuilder`2._objectValidatorStartIndex">
+            <summary>
+                对象验证器区域的起始索引
+            </summary>
+            <remarks>同时也是普通验证器区域结束索引。</remarks>
         </member>
         <member name="F:Cordon.FluentValidatorBuilder`2._serviceProvider">
             <summary>
@@ -2525,27 +2443,6 @@
                 <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.AddValidators(System.Collections.Generic.IEnumerable{Cordon.ValidatorBase})">
-            <summary>
-                批量添加添加验证器
-            </summary>
-            <param name="validators">验证器集合</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.AddValidator``1(``0,System.Action{``0})">
-            <summary>
-                添加验证器
-            </summary>
-            <param name="validator">
-                <see cref="T:Cordon.ValidatorBase"/>
-            </param>
-            <param name="configure">自定义配置委托</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.WithMessage(System.String)">
             <summary>
                 设置错误信息
@@ -2555,26 +2452,7 @@
                 <typeparamref name="TSelf"/>
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.WithErrorMessage(System.String)">
-            <summary>
-                设置错误信息
-            </summary>
-            <param name="errorMessage">错误信息</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.WithMessage(System.Type,System.String)">
-            <summary>
-                设置错误信息
-            </summary>
-            <param name="resourceType">错误信息资源类型</param>
-            <param name="resourceName">错误信息资源名称</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.WithErrorMessage(System.Type,System.String)">
             <summary>
                 设置错误信息
             </summary>
@@ -2740,41 +2618,6 @@
                 添加条件验证器
             </summary>
             <remarks>定义满足指定条件时返回指定的错误消息。</remarks>
-            <param name="condition">条件委托</param>
-            <param name="resourceType">错误信息资源类型</param>
-            <param name="resourceName">错误信息资源名称</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.UnlessMatch(System.Func{`0,System.Boolean},System.Action{Cordon.FluentValidatorBuilder{`0}},System.Action{Cordon.FluentValidatorBuilder{`0}})">
-            <summary>
-                添加条件验证器
-            </summary>
-            <remarks>定义不满足指定条件时执行的验证规则。</remarks>
-            <param name="condition">条件委托</param>
-            <param name="thenConfigure">验证器配置委托</param>
-            <param name="otherwiseConfigure">验证器配置委托</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.UnlessMatch(System.Func{`0,System.Boolean},System.String)">
-            <summary>
-                添加条件验证器
-            </summary>
-            <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
-            <param name="condition">条件委托</param>
-            <param name="errorMessage">错误消息</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.UnlessMatch(System.Func{`0,System.Boolean},System.Type,System.String)">
-            <summary>
-                添加条件验证器
-            </summary>
-            <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
             <param name="condition">条件委托</param>
             <param name="resourceType">错误信息资源类型</param>
             <param name="resourceName">错误信息资源名称</param>
@@ -3242,24 +3085,6 @@
                 <typeparamref name="TSelf"/>
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.Predicate(System.Func{`0,System.Boolean})">
-            <summary>
-                添加自定义条件成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.Predicate(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
-            <summary>
-                添加自定义条件成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.Range(System.Int32,System.Int32,System.Action{Cordon.RangeValidator})">
             <summary>
                 添加指定数值范围约束验证器
@@ -3512,6 +3337,27 @@
                 <typeparamref name="TSelf"/>
             </returns>
         </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.AddValidators(System.Collections.Generic.IEnumerable{Cordon.ValidatorBase})">
+            <summary>
+                批量添加添加验证器
+            </summary>
+            <param name="validators">验证器集合</param>
+            <returns>
+                <typeparamref name="TSelf"/>
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.AddValidator``1(``0,System.Action{``0})">
+            <summary>
+                添加验证器
+            </summary>
+            <param name="validator">
+                <see cref="T:Cordon.ValidatorBase"/>
+            </param>
+            <param name="configure">自定义配置委托</param>
+            <returns>
+                <typeparamref name="TSelf"/>
+            </returns>
+        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.Build(System.Action{`1})">
             <summary>
                 构建验证器集合
@@ -3627,6 +3473,11 @@
                 组合验证器模式
             </summary>
         </member>
+        <member name="F:Cordon.CompositeMode.FailFast">
+            <summary>
+                遇到首个验证失败即停止后续验证
+            </summary>
+        </member>
         <member name="F:Cordon.CompositeMode.All">
             <summary>
                 所有验证器都会执行，且全部必须通过
@@ -3635,11 +3486,6 @@
         <member name="F:Cordon.CompositeMode.Any">
             <summary>
                 任一验证器验证成功，即视为整体验证通过
-            </summary>
-        </member>
-        <member name="F:Cordon.CompositeMode.FailFast">
-            <summary>
-                遇到首个验证失败即停止后续验证
             </summary>
         </member>
         <member name="T:Cordon.IValidationContext">
@@ -4230,38 +4076,7 @@
                 <typeparamref name="TValidator"/>
             </returns>
         </member>
-        <member name="M:Cordon.ValidatorBaseExtensions.WithErrorMessage``1(``0,System.String)">
-            <summary>
-                设置错误信息
-            </summary>
-            <typeparam name="TValidator">
-                <see cref="T:Cordon.ValidatorBase"/>
-            </typeparam>
-            <param name="validator">
-                <typeparamref name="TValidator"/>
-            </param>
-            <param name="errorMessage">错误信息</param>
-            <returns>
-                <typeparamref name="TValidator"/>
-            </returns>
-        </member>
         <member name="M:Cordon.ValidatorBaseExtensions.WithMessage``1(``0,System.Type,System.String)">
-            <summary>
-                设置错误信息资源
-            </summary>
-            <typeparam name="TValidator">
-                <see cref="T:Cordon.ValidatorBase"/>
-            </typeparam>
-            <param name="validator">
-                <typeparamref name="TValidator"/>
-            </param>
-            <param name="resourceType">错误信息资源类型</param>
-            <param name="resourceName">错误信息资源名称</param>
-            <returns>
-                <typeparamref name="TValidator"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.ValidatorBaseExtensions.WithErrorMessage``1(``0,System.Type,System.String)">
             <summary>
                 设置错误信息资源
             </summary>
@@ -5180,6 +4995,13 @@
                 配置项决定。
             </remarks>
         </member>
+        <member name="P:Cordon.PropertyValidator`3.Mode">
+            <summary>
+                <inheritdoc cref="T:Cordon.CompositeMode"/>
+            </summary>
+            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.FailFast"/>。
+            </remarks>
+        </member>
         <member name="P:Cordon.PropertyValidator`3.DisplayName">
             <summary>
                 显示名称
@@ -5310,31 +5132,11 @@
                 <typeparamref name="TSelf"/>
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.WithMemberName(System.String)">
-            <summary>
-                设置成员名称
-            </summary>
-            <param name="memberName">成员名称</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
         <member name="M:Cordon.PropertyValidator`3.WithName(System.String)">
             <summary>
                 设置成员名称
             </summary>
             <param name="memberName">成员名称</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyValidator`3.WithMemberName(System.Text.Json.JsonNamingPolicy)">
-            <summary>
-                设置成员名称
-            </summary>
-            <param name="jsonNamingPolicy">
-                <see cref="T:System.Text.Json.JsonNamingPolicy"/>
-            </param>
             <returns>
                 <typeparamref name="TSelf"/>
             </returns>
@@ -5350,7 +5152,7 @@
                 <typeparamref name="TSelf"/>
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.WithMemberName(System.Func{System.Reflection.PropertyInfo,System.String})">
+        <member name="M:Cordon.PropertyValidator`3.WithName(System.Func{System.Reflection.PropertyInfo,System.String})">
             <summary>
                 设置成员名称
             </summary>
@@ -5359,11 +5161,13 @@
                 <typeparamref name="TSelf"/>
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.WithName(System.Func{System.Reflection.PropertyInfo,System.String})">
+        <member name="M:Cordon.PropertyValidator`3.UseMode(Cordon.CompositeMode)">
             <summary>
-                设置成员名称
+                设置验证模式
             </summary>
-            <param name="memberNameProvider">成员名称获取委托</param>
+            <param name="mode">
+                <see cref="T:Cordon.CompositeMode"/>
+            </param>
             <returns>
                 <typeparamref name="TSelf"/>
             </returns>
@@ -5693,24 +5497,6 @@
                 <typeparamref name="TSelf"/>
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.Predicate(System.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
-            <summary>
-                添加自定义条件成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyValidator`3.Predicate_(System.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
-            <summary>
-                添加自定义条件成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-        </member>
         <member name="M:Cordon.PropertyValidator`3.ValidatorProxy``1(System.Func{Cordon.ValidationContext{`0},System.Object[]},System.Func{`0,System.Object},System.Action{``0})">
             <summary>
                 添加验证器代理
@@ -6036,15 +5822,6 @@
                 设置显示名称
             </summary>
             <param name="displayName">显示名称</param>
-            <returns>
-                <see cref="T:Cordon.ValueValidator`1"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.ValueValidator`1.WithMemberName(System.String)">
-            <summary>
-                设置成员名称
-            </summary>
-            <param name="memberName">成员名称</param>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1"/>
             </returns>
@@ -6997,44 +6774,6 @@
                 <see cref="T:Cordon.ConditionalValidator`1"/>
             </returns>
         </member>
-        <member name="M:Cordon.Validators.UnlessMatch``1(System.Func{``0,System.Boolean},System.Action{Cordon.FluentValidatorBuilder{``0}},System.Action{Cordon.FluentValidatorBuilder{``0}})">
-            <summary>
-                创建条件验证器
-            </summary>
-            <remarks>定义不满足指定条件时执行的验证规则。</remarks>
-            <param name="condition">条件委托</param>
-            <param name="thenConfigure">验证器配置委托</param>
-            <param name="otherwiseConfigure">验证器配置委托</param>
-            <typeparam name="T">对象类型</typeparam>
-            <returns>
-                <see cref="T:Cordon.ConditionalValidator`1"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.Validators.UnlessMatch``1(System.Func{``0,System.Boolean},System.String)">
-            <summary>
-                创建条件验证器
-            </summary>
-            <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
-            <param name="condition">条件委托</param>
-            <param name="errorMessage">错误消息</param>
-            <typeparam name="T">对象类型</typeparam>
-            <returns>
-                <see cref="T:Cordon.ConditionalValidator`1"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.Validators.UnlessMatch``1(System.Func{``0,System.Boolean},System.Type,System.String)">
-            <summary>
-                创建条件验证器
-            </summary>
-            <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
-            <param name="condition">条件委托</param>
-            <param name="resourceType">错误信息资源类型</param>
-            <param name="resourceName">错误信息资源名称</param>
-            <typeparam name="T">对象类型</typeparam>
-            <returns>
-                <see cref="T:Cordon.ConditionalValidator`1"/>
-            </returns>
-        </member>
         <member name="M:Cordon.Validators.DateOnly(System.String[])">
             <summary>
                 创建
@@ -7538,26 +7277,6 @@
             </summary>
             <returns>
                 <see cref="T:Cordon.PostalCodeValidator"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.Validators.Predicate``1(System.Func{``0,System.Boolean})">
-            <summary>
-                创建自定义条件成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <typeparam name="T">对象类型</typeparam>
-            <returns>
-                <see cref="T:Cordon.PredicateValidator`1"/>
-            </returns>
-        </member>
-        <member name="M:Cordon.Validators.Predicate``1(System.Func{``0,Cordon.ValidationContext{``0},System.Boolean})">
-            <summary>
-                创建自定义条件成立时委托验证器
-            </summary>
-            <param name="condition">条件委托</param>
-            <typeparam name="T">对象类型</typeparam>
-            <returns>
-                <see cref="T:Cordon.PredicateValidator`1"/>
             </returns>
         </member>
         <member name="M:Cordon.Validators.PropertyAnnotation``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}})">
@@ -8710,15 +8429,9 @@
         </member>
         <member name="F:Cordon.CompositeValidator._highPriorityEndIndex">
             <summary>
-                高优先级验证器区域的结束索引（同时也是普通验证器区域的起始索引）
+                高优先级验证器区域的结束索引
             </summary>
-            <remarks>
-                该索引将验证器列表划分为两个区域：<c>[0, _highPriorityEndIndex)</c> 为高优先级验证器区域（按
-                <see cref="P:Cordon.IHighPriorityValidator.Priority"/>
-                升序排列），
-                <c>[_highPriorityEndIndex, Count)</c>
-                为普通验证器区域。当添加新验证器时，高优先级验证器会插入到指定位置以维持顺序，普通验证器则直接追加到列表末尾，此索引值会相应更新以维护区域边界。
-            </remarks>
+            <remarks>同时也是普通验证器区域的起始索引。</remarks>
         </member>
         <member name="M:Cordon.CompositeValidator.#ctor(Cordon.ValidatorBase[])">
             <summary>
@@ -8738,7 +8451,7 @@
             <summary>
                 <inheritdoc cref="T:Cordon.CompositeMode"/>
             </summary>
-            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.All"/>。
+            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.FailFast"/>。
             </remarks>
         </member>
         <member name="M:Cordon.CompositeValidator.Dispose">
@@ -10076,9 +9789,29 @@
             <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="M:Cordon.MustValidator`1.#ctor(System.Func{`0,System.Boolean})">
-            <inheritdoc/>
+            <summary>
+                <inheritdoc cref="T:Cordon.MustValidator`1"/>
+            </summary>
+            <param name="condition">条件委托</param>
         </member>
         <member name="M:Cordon.MustValidator`1.#ctor(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
+            <summary>
+                <inheritdoc cref="T:Cordon.MustValidator`1"/>
+            </summary>
+            <param name="condition">条件委托</param>
+        </member>
+        <member name="P:Cordon.MustValidator`1.Condition">
+            <summary>
+                条件委托
+            </summary>
+        </member>
+        <member name="M:Cordon.MustValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Cordon.MustValidator`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:Cordon.MustValidator`1.Validate(`0,Cordon.ValidationContext{`0})">
             <inheritdoc/>
         </member>
         <member name="T:Cordon.NotBlankValidator">
@@ -10553,38 +10286,6 @@
                     <br/>
                 </code>
             </remarks>
-        </member>
-        <member name="T:Cordon.PredicateValidator`1">
-            <summary>
-                自定义条件成立时委托验证器
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-        </member>
-        <member name="M:Cordon.PredicateValidator`1.#ctor(System.Func{`0,System.Boolean})">
-            <summary>
-                <inheritdoc cref="T:Cordon.PredicateValidator`1"/>
-            </summary>
-            <param name="condition">条件委托</param>
-        </member>
-        <member name="M:Cordon.PredicateValidator`1.#ctor(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
-            <summary>
-                <inheritdoc cref="T:Cordon.PredicateValidator`1"/>
-            </summary>
-            <param name="condition">条件委托</param>
-        </member>
-        <member name="P:Cordon.PredicateValidator`1.Condition">
-            <summary>
-                条件委托
-            </summary>
-        </member>
-        <member name="M:Cordon.PredicateValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
-            <inheritdoc/>
-        </member>
-        <member name="M:Cordon.PredicateValidator`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
-            <inheritdoc/>
-        </member>
-        <member name="M:Cordon.PredicateValidator`1.Validate(`0,Cordon.ValidationContext{`0})">
-            <inheritdoc/>
         </member>
         <member name="T:Cordon.PropertyAnnotationValidator`2">
             <summary>

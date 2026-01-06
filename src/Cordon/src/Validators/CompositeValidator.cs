@@ -15,13 +15,9 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     internal readonly List<ValidatorBase> _validators;
 
     /// <summary>
-    ///     高优先级验证器区域的结束索引（同时也是普通验证器区域的起始索引）
+    ///     高优先级验证器区域的结束索引
     /// </summary>
-    /// <remarks>
-    ///     该索引将验证器列表划分为两个区域：<c>[0, _highPriorityEndIndex)</c> 为高优先级验证器区域（按 <see cref="IHighPriorityValidator.Priority" />
-    ///     升序排列），<c>[_highPriorityEndIndex, Count)</c>
-    ///     为普通验证器区域。当添加新验证器时，高优先级验证器会插入到指定位置以维持顺序，普通验证器则直接追加到列表末尾，此索引值会相应更新以维护区域边界。
-    /// </remarks>
+    /// <remarks>同时也是普通验证器区域的起始索引。</remarks>
     internal int _highPriorityEndIndex;
 
     /// <summary>
@@ -55,8 +51,8 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     /// <summary>
     ///     <inheritdoc cref="CompositeMode" />
     /// </summary>
-    /// <remarks>默认值为：<see cref="CompositeMode.All" />。</remarks>
-    public CompositeMode Mode { get; set; } = CompositeMode.All;
+    /// <remarks>默认值为：<see cref="CompositeMode.FailFast" />。</remarks>
+    public CompositeMode Mode { get; set; } = CompositeMode.FailFast;
 
     /// <inheritdoc />
     public void Dispose()
@@ -73,7 +69,7 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     public override bool IsValid(object? value, IValidationContext? validationContext) =>
         Mode switch
         {
-            CompositeMode.All or CompositeMode.FailFast => Validators.All(u => u.IsValid(value, validationContext)),
+            CompositeMode.FailFast or CompositeMode.All => Validators.All(u => u.IsValid(value, validationContext)),
             CompositeMode.Any => Validators.Any(u => u.IsValid(value, validationContext)),
             _ => throw new NotSupportedException()
         };
@@ -136,7 +132,7 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
                 firstFailedValidator ??= validator;
 
                 // 检查验证器模式是否是遇到首个验证失败即停止后续验证
-                if (Mode is CompositeMode.All or CompositeMode.FailFast)
+                if (Mode is CompositeMode.FailFast or CompositeMode.All)
                 {
                     ThrowValidationException(value, validator, validationContext);
                 }

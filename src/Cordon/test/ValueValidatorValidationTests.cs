@@ -27,28 +27,6 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
-    public void WithErrorMessage_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<object>();
-
-        valueValidator.WithErrorMessage("错误消息");
-        valueValidator.WithErrorMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
-
-        valueValidator.AddValidator(new MinLengthValidator(3));
-        Assert.NotNull(valueValidator._lastAddedValidator);
-        valueValidator.WithErrorMessage("错误信息");
-        Assert.Null(valueValidator._lastAddedValidator);
-        Assert.Equal("错误信息", valueValidator.Validators.Last().ErrorMessage);
-
-        valueValidator.AddValidator(new MaxLengthValidator(10));
-        Assert.NotNull(valueValidator._lastAddedValidator);
-        valueValidator.WithErrorMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
-        Assert.Null(valueValidator._lastAddedValidator);
-        Assert.Equal(typeof(TestValidationMessages), valueValidator.Validators.Last().ErrorMessageResourceType);
-        Assert.Equal("TestValidator_ValidationError", valueValidator.Validators.Last().ErrorMessageResourceName);
-    }
-
-    [Fact]
     public void WithMessage_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>();
@@ -80,19 +58,6 @@ public class ValueValidatorValidationTests
         Assert.Equal("MyName", valueValidator.DisplayName);
         valueValidator.WithDisplayName(null);
         Assert.Null(valueValidator.DisplayName);
-    }
-
-    [Fact]
-    public void WithMemberName_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<object>();
-        Assert.Null(valueValidator.DisplayName);
-        Assert.Null(valueValidator.MemberName);
-
-        valueValidator.WithMemberName("MyName");
-        Assert.Equal("MyName", valueValidator.MemberName);
-        valueValidator.WithMemberName(null);
-        Assert.Null(valueValidator.MemberName);
     }
 
     [Fact]
@@ -371,31 +336,6 @@ public class ValueValidatorValidationTests
             typeof(TestValidationMessages), "TestValidator_ValidationError");
         Assert.False(valueValidator3.IsValid("monksoul@outlook.com"));
         Assert.True(valueValidator3.IsValid("monk__soul"));
-    }
-
-    [Fact]
-    public void UnlessMatch_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<string>().UnlessMatch(u => u?.Contains('@') == true, b => b.UserName(),
-            b => b.EmailAddress());
-
-        Assert.Single(valueValidator.Validators);
-
-        var addedValidator = valueValidator._lastAddedValidator as ConditionalValidator<string>;
-        Assert.NotNull(addedValidator);
-
-        Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
-        Assert.False(valueValidator.IsValid("monk__soul"));
-
-        var valueValidator2 = new ValueValidator<string>().UnlessMatch(u => u?.Contains('@') == true, "错误消息1");
-        Assert.True(valueValidator2.IsValid("monksoul@outlook.com"));
-        Assert.False(valueValidator2.IsValid("monk__soul"));
-
-        var valueValidator3 = new ValueValidator<string>().UnlessMatch(u => u?.Contains('@') == true,
-            typeof(TestValidationMessages),
-            "TestValidator_ValidationError");
-        Assert.True(valueValidator3.IsValid("monksoul@outlook.com"));
-        Assert.False(valueValidator3.IsValid("monk__soul"));
     }
 
     [Fact]
@@ -1234,38 +1174,6 @@ public class ValueValidatorValidationTests
 
         Assert.False(valueValidator.IsValid("1001001"));
         Assert.True(valueValidator.IsValid("100101"));
-    }
-
-    [Fact]
-    public void Predicate_Invalid_Parameters()
-    {
-        Assert.Throws<ArgumentNullException>(() => new ValueValidator<int>().Predicate((Func<int, bool>)null!));
-        Assert.Throws<ArgumentNullException>(() =>
-            new ValueValidator<int>().Predicate((Func<int, ValidationContext<int>, bool>)null!));
-    }
-
-    [Fact]
-    public void Predicate_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<int>().Predicate(u => u > 10);
-
-        Assert.Single(valueValidator.Validators);
-
-        var addedValidator = valueValidator._lastAddedValidator as PredicateValidator<int>;
-        Assert.NotNull(addedValidator);
-
-        Assert.True(valueValidator.IsValid(11));
-        Assert.False(valueValidator.IsValid(9));
-
-        var valueValidator2 = new ValueValidator<int>().Predicate((_, ctx) => ctx.Instance > 10);
-
-        Assert.Single(valueValidator2.Validators);
-
-        var addedValidator2 = valueValidator2._lastAddedValidator as PredicateValidator<int>;
-        Assert.NotNull(addedValidator2);
-
-        Assert.True(valueValidator2.IsValid(11));
-        Assert.False(valueValidator2.IsValid(9));
     }
 
     [Fact]

@@ -463,21 +463,12 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <returns>
     ///     <see cref="ValueValidator{T}" />
     /// </returns>
-    public virtual ValueValidator<T> WithMemberName(string? memberName)
+    public virtual ValueValidator<T> WithName(string? memberName)
     {
         MemberName = memberName;
 
         return This;
     }
-
-    /// <summary>
-    ///     设置成员名称
-    /// </summary>
-    /// <param name="memberName">成员名称</param>
-    /// <returns>
-    ///     <see cref="ValueValidator{T}" />
-    /// </returns>
-    public virtual ValueValidator<T> WithName(string? memberName) => WithMemberName(memberName);
 
     /// <summary>
     ///     配置是否允许空字符串

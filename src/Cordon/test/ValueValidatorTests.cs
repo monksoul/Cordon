@@ -172,10 +172,10 @@ public class ValueValidatorTests
     }
 
     [Fact]
-    public void GetValidationResults_WithMemberName_ReturnOK()
+    public void GetValidationResults_WithName_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().AddValidators(
-            new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName").WithMemberName("MName");
+            new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName").WithName("MName");
 
         var validationResults = valueValidator.GetValidationResults(null);
         Assert.NotNull(validationResults);
@@ -298,10 +298,10 @@ public class ValueValidatorTests
     }
 
     [Fact]
-    public void Validate_WithDisplayName_WithMemberName_ReturnOK()
+    public void Validate_WithDisplayName_WithName_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().AddValidators(
-            new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName").WithMemberName("MName");
+            new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName").WithName("MName");
 
         var exception = Assert.Throws<ValidationException>(() => valueValidator.Validate(null));
         Assert.Equal("The MyFirstName field is required.", exception.Message);

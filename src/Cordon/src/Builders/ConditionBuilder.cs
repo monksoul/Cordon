@@ -61,7 +61,7 @@ public class ConditionBuilder<T>
     ///     <see cref="ConditionThenBuilder{T}" />
     /// </returns>
     public ConditionBuilder<T> WhenMatch(Func<T, bool> condition, string? errorMessage) =>
-        When(condition).ThenErrorMessage(errorMessage);
+        When(condition).ThenMessage(errorMessage);
 
     /// <summary>
     ///     定义满足指定条件时返回指定的错误消息
@@ -75,60 +75,7 @@ public class ConditionBuilder<T>
     public ConditionBuilder<T> WhenMatch(Func<T, bool> condition,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName) =>
-        When(condition).ThenErrorMessage(resourceType, resourceName);
-
-    /// <summary>
-    ///     定义不满足指定的条件委托
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <see cref="ConditionThenBuilder{T}" />
-    /// </returns>
-    public ConditionThenBuilder<T> Unless(Func<T, bool> condition)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(condition);
-
-        return new ConditionThenBuilder<T>(this, u => !condition(u));
-    }
-
-    /// <summary>
-    ///     定义不满足指定条件时执行的验证规则
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <param name="thenConfigure">验证器配置委托</param>
-    /// <returns>
-    ///     <see cref="ConditionThenBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> UnlessMatch(Func<T, bool> condition, Action<FluentValidatorBuilder<T>> thenConfigure) =>
-        Unless(condition).Then(thenConfigure);
-
-    /// <summary>
-    ///     定义不满足指定条件时返回指定的错误消息
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <param name="errorMessage">错误消息</param>
-    /// <returns>
-    ///     <see cref="ConditionThenBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> UnlessMatch(Func<T, bool> condition, string? errorMessage) =>
-        Unless(condition).ThenErrorMessage(errorMessage);
-
-    /// <summary>
-    ///     定义不满足指定条件时返回指定的错误消息
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <param name="resourceType">错误信息资源类型</param>
-    /// <param name="resourceName">错误信息资源名称</param>
-    /// <returns>
-    ///     <see cref="ConditionThenBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> UnlessMatch(Func<T, bool> condition,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
-                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName) =>
-        Unless(condition).ThenErrorMessage(resourceType, resourceName);
+        Type resourceType, string resourceName) => When(condition).ThenMessage(resourceType, resourceName);
 
     /// <summary>
     ///     配置默认验证规则
@@ -156,19 +103,9 @@ public class ConditionBuilder<T>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
-    public ConditionBuilder<T> OtherwiseMessage(string? errorMessage) => OtherwiseErrorMessage(errorMessage);
-
-    /// <summary>
-    ///     配置默认错误消息
-    /// </summary>
-    /// <remarks>当所有条件均不满足时直接返回该消息，不执行任何验证逻辑。</remarks>
-    /// <param name="errorMessage">错误消息</param>
-    /// <returns>
-    ///     <see cref="ConditionBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> OtherwiseErrorMessage(string? errorMessage)
+    public ConditionBuilder<T> OtherwiseMessage(string? errorMessage)
     {
-        _defaultValidators = [new FailureValidator().WithErrorMessage(errorMessage)];
+        _defaultValidators = [new FailureValidator().WithMessage(errorMessage)];
 
         return this;
     }
@@ -185,24 +122,9 @@ public class ConditionBuilder<T>
     public ConditionBuilder<T> OtherwiseMessage([DynamicallyAccessedMembers(
             DynamicallyAccessedMemberTypes.PublicProperties |
             DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName) =>
-        OtherwiseErrorMessage(resourceType, resourceName);
-
-    /// <summary>
-    ///     配置默认错误消息
-    /// </summary>
-    /// <remarks>当所有条件均不满足时直接返回该消息，不执行任何验证逻辑。</remarks>
-    /// <param name="resourceType">错误信息资源类型</param>
-    /// <param name="resourceName">错误信息资源名称</param>
-    /// <returns>
-    ///     <see cref="ConditionBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> OtherwiseErrorMessage([DynamicallyAccessedMembers(
-            DynamicallyAccessedMemberTypes.PublicProperties |
-            DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName)
     {
-        _defaultValidators = [new FailureValidator().WithErrorMessage(resourceType, resourceName)];
+        _defaultValidators = [new FailureValidator().WithMessage(resourceType, resourceName)];
 
         return this;
     }
@@ -272,20 +194,10 @@ public sealed class ConditionThenBuilder<T>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
-    public ConditionBuilder<T> ThenMessage(string? errorMessage) => ThenErrorMessage(errorMessage);
-
-    /// <summary>
-    ///     配置满足条件时直接返回指定的错误消息
-    /// </summary>
-    /// <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
-    /// <param name="errorMessage">错误消息</param>
-    /// <returns>
-    ///     <see cref="ConditionBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> ThenErrorMessage(string? errorMessage)
+    public ConditionBuilder<T> ThenMessage(string? errorMessage)
     {
         // 将条件和验证器列表添加到父条件构建器
-        _parent._conditions.Add((_condition, [new FailureValidator().WithErrorMessage(errorMessage)]));
+        _parent._conditions.Add((_condition, [new FailureValidator().WithMessage(errorMessage)]));
 
         return _parent;
     }
@@ -302,25 +214,10 @@ public sealed class ConditionThenBuilder<T>
     public ConditionBuilder<T> ThenMessage(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName) =>
-        ThenErrorMessage(resourceType, resourceName);
-
-    /// <summary>
-    ///     配置满足条件时直接返回指定的错误消息
-    /// </summary>
-    /// <remarks>不执行任何验证逻辑，仅用于输出错误提示。</remarks>
-    /// <param name="resourceType">错误信息资源类型</param>
-    /// <param name="resourceName">错误信息资源名称</param>
-    /// <returns>
-    ///     <see cref="ConditionBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> ThenErrorMessage(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
-                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName)
     {
         // 将条件和验证器列表添加到父条件构建器
-        _parent._conditions.Add((_condition, [new FailureValidator().WithErrorMessage(resourceType, resourceName)]));
+        _parent._conditions.Add((_condition, [new FailureValidator().WithMessage(resourceType, resourceName)]));
 
         return _parent;
     }

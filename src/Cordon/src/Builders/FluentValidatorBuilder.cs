@@ -19,19 +19,21 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     where TSelf : FluentValidatorBuilder<T, TSelf>
 {
     /// <summary>
-    ///     高优先级验证器区域的结束索引（同时也是普通验证器区域的起始索引）
+    ///     高优先级验证器区域的结束索引
     /// </summary>
-    /// <remarks>
-    ///     该索引将验证器列表划分为两个区域：<c>[0, _highPriorityEndIndex)</c> 为高优先级验证器区域（按 <see cref="IHighPriorityValidator.Priority" />
-    ///     升序排列），<c>[_highPriorityEndIndex, Count)</c>
-    ///     为普通验证器区域。当添加新验证器时，高优先级验证器会插入到指定位置以维持顺序，普通验证器则直接追加到列表末尾，此索引值会相应更新以维护区域边界。
-    /// </remarks>
+    /// <remarks>同时也是普通验证器区域的起始索引。</remarks>
     internal int _highPriorityEndIndex;
 
     /// <summary>
     ///     跟踪最新添加的 <see cref="ValidatorBase" /> 实例
     /// </summary>
     internal ValidatorBase? _lastAddedValidator;
+
+    /// <summary>
+    ///     对象验证器区域的起始索引
+    /// </summary>
+    /// <remarks>同时也是普通验证器区域结束索引。</remarks>
+    internal int _objectValidatorStartIndex;
 
     /// <summary>
     ///     <see cref="IServiceProvider" /> 委托
@@ -102,108 +104,13 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public IReadOnlyList<ValidatorBase> GetValidators() => Validators;
 
     /// <summary>
-    ///     批量添加添加验证器
-    /// </summary>
-    /// <param name="validators">验证器集合</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf AddValidators(params IEnumerable<ValidatorBase> validators)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(validators);
-
-        // 遍历集合并逐项添加
-        foreach (var validator in validators)
-        {
-            AddValidator(validator);
-        }
-
-        return This;
-    }
-
-    /// <summary>
-    ///     添加验证器
-    /// </summary>
-    /// <param name="validator">
-    ///     <see cref="ValidatorBase" />
-    /// </param>
-    /// <param name="configure">自定义配置委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf AddValidator<TValidator>(TValidator validator, Action<TValidator>? configure = null)
-        where TValidator : ValidatorBase
-    {
-        // 空检查 
-        ArgumentNullException.ThrowIfNull(validator);
-
-        // 检查派生类型 this 是否实现 IRuleSetContextProvider 接口
-        if (this is IRuleSetContextProvider ruleSetProvider)
-        {
-            // 获取当前上下文中的规则集并设置
-            validator.RuleSets = ruleSetProvider.GetCurrentRuleSets();
-        }
-
-        // 检查验证器是否实现 IValidatorInitializer 接口
-        if (validator is IValidatorInitializer initializer)
-        {
-            // 同步 IServiceProvider 委托
-            initializer.InitializeServiceProvider(_serviceProvider);
-        }
-
-        // 检查是否是高优先级验证器
-        if (validator is IHighPriorityValidator highPriorityValidator)
-        {
-            // 只在 [0, _highPriorityEndIndex) 范围内查找插入位置（保持 Priority 升序）
-            var insertIndex = _highPriorityEndIndex;
-            for (var i = 0; i < _highPriorityEndIndex; i++)
-            {
-                // ReSharper disable once InvertIf
-                if (Validators[i] is IHighPriorityValidator existing &&
-                    existing.Priority > highPriorityValidator.Priority)
-                {
-                    insertIndex = i;
-                    break;
-                }
-            }
-
-            Validators.Insert(insertIndex, validator);
-
-            // 高优先级区域扩大
-            _highPriorityEndIndex++;
-        }
-        else
-        {
-            Validators.Add(validator);
-        }
-
-        // 调用自定义配置委托
-        configure?.Invoke(validator);
-
-        // 记录最新添加的验证器实例
-        _lastAddedValidator = validator;
-
-        return This;
-    }
-
-    /// <summary>
     ///     设置错误信息
     /// </summary>
     /// <param name="errorMessage">错误信息</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf WithMessage(string? errorMessage) => WithErrorMessage(errorMessage);
-
-    /// <summary>
-    ///     设置错误信息
-    /// </summary>
-    /// <param name="errorMessage">错误信息</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf WithErrorMessage(string? errorMessage)
+    public virtual TSelf WithMessage(string? errorMessage)
     {
         // 空检查
         if (_lastAddedValidator is null)
@@ -212,7 +119,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         }
 
         // 将错误消息设置给最新添加的验证器实例
-        _lastAddedValidator.WithErrorMessage(errorMessage);
+        _lastAddedValidator.WithMessage(errorMessage);
 
         // 重置最新添加的验证器实例
         _lastAddedValidator = null;
@@ -231,20 +138,6 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf WithMessage(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName) =>
-        WithErrorMessage(resourceType, resourceName);
-
-    /// <summary>
-    ///     设置错误信息
-    /// </summary>
-    /// <param name="resourceType">错误信息资源类型</param>
-    /// <param name="resourceName">错误信息资源名称</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf WithErrorMessage(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
-                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName)
     {
         // 空检查
@@ -254,7 +147,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         }
 
         // 将错误消息设置给最新添加的验证器实例
-        _lastAddedValidator.WithErrorMessage(resourceType, resourceName);
+        _lastAddedValidator.WithMessage(resourceType, resourceName);
 
         // 重置最新添加的验证器实例
         _lastAddedValidator = null;
@@ -441,7 +334,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf WhenMatch(Func<T, bool> condition, string? errorMessage) =>
-        Conditional(builder => builder.When(condition).ThenErrorMessage(errorMessage));
+        Conditional(builder => builder.When(condition).ThenMessage(errorMessage));
 
     /// <summary>
     ///     添加条件验证器
@@ -457,59 +350,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName) =>
-        Conditional(builder => builder.When(condition).ThenErrorMessage(resourceType, resourceName));
-
-    /// <summary>
-    ///     添加条件验证器
-    /// </summary>
-    /// <remarks>定义不满足指定条件时执行的验证规则。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <param name="thenConfigure">验证器配置委托</param>
-    /// <param name="otherwiseConfigure">验证器配置委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf UnlessMatch(Func<T, bool> condition, Action<FluentValidatorBuilder<T>> thenConfigure,
-        Action<FluentValidatorBuilder<T>>? otherwiseConfigure = null) =>
-        Conditional(builder =>
-        {
-            // 构建 ConditionBuilder<T> 实例
-            var conditionBuilder = builder.Unless(condition).Then(thenConfigure);
-
-            // 空检查
-            if (otherwiseConfigure is not null)
-            {
-                conditionBuilder.Otherwise(otherwiseConfigure);
-            }
-        });
-
-    /// <summary>
-    ///     添加条件验证器
-    /// </summary>
-    /// <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <param name="errorMessage">错误消息</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf UnlessMatch(Func<T, bool> condition, string? errorMessage) =>
-        Conditional(builder => builder.Unless(condition).ThenErrorMessage(errorMessage));
-
-    /// <summary>
-    ///     添加条件验证器
-    /// </summary>
-    /// <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <param name="resourceType">错误信息资源类型</param>
-    /// <param name="resourceName">错误信息资源名称</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf UnlessMatch(Func<T, bool> condition,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
-                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName) =>
-        Conditional(builder => builder.Unless(condition).ThenErrorMessage(resourceType, resourceName));
+        Conditional(builder => builder.When(condition).ThenMessage(resourceType, resourceName));
 
     /// <summary>
     ///     添加 <see cref="System.DateOnly" /> 验证器
@@ -1010,25 +851,6 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf PostalCode() => AddValidator(new PostalCodeValidator());
 
     /// <summary>
-    ///     添加自定义条件成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf Predicate(Func<T, bool> condition) => AddValidator(new PredicateValidator<T>(condition));
-
-    /// <summary>
-    ///     添加自定义条件成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf Predicate(Func<T, ValidationContext<T>, bool> condition) =>
-        AddValidator(new PredicateValidator<T>(condition));
-
-    /// <summary>
     ///     添加指定数值范围约束验证器
     /// </summary>
     /// <param name="minimum">允许的最小字段值</param>
@@ -1292,6 +1114,111 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// </returns>
     public virtual TSelf AddAnnotations(params ValidationAttribute[] attributes) =>
         AddValidator(new ValueAnnotationValidator(attributes, null, Items));
+
+    /// <summary>
+    ///     批量添加添加验证器
+    /// </summary>
+    /// <param name="validators">验证器集合</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf AddValidators(params IEnumerable<ValidatorBase> validators)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validators);
+
+        // 遍历集合并逐项添加
+        foreach (var validator in validators)
+        {
+            AddValidator(validator);
+        }
+
+        return This;
+    }
+
+    /// <summary>
+    ///     添加验证器
+    /// </summary>
+    /// <param name="validator">
+    ///     <see cref="ValidatorBase" />
+    /// </param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf AddValidator<TValidator>(TValidator validator, Action<TValidator>? configure = null)
+        where TValidator : ValidatorBase
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validator);
+
+        // 检查派生类型 this 是否实现 IRuleSetContextProvider 接口
+        if (this is IRuleSetContextProvider ruleSetProvider)
+        {
+            // 获取当前上下文中的规则集并设置
+            validator.RuleSets = ruleSetProvider.GetCurrentRuleSets();
+        }
+
+        // 检查验证器是否实现 IValidatorInitializer 接口
+        if (validator is IValidatorInitializer initializer)
+        {
+            // 同步 IServiceProvider 委托
+            initializer.InitializeServiceProvider(_serviceProvider);
+        }
+
+        // 检查是否是对象验证器
+        // ReSharper disable once ConvertIfStatementToSwitchStatement
+        if (validator is IObjectValidator)
+        {
+            Validators.Add(validator);
+
+            // 记录对象验证器区域起始位置
+            if (_objectValidatorStartIndex == _highPriorityEndIndex &&
+                _objectValidatorStartIndex == Validators.Count - 1)
+            {
+                _objectValidatorStartIndex = Validators.Count - 1;
+            }
+        }
+        // 检查是否是高优先级验证器
+        else if (validator is IHighPriorityValidator highPriorityValidator)
+        {
+            // 只在 [0, _highPriorityEndIndex) 范围内查找插入位置（保持 Priority 升序）
+            var insertIndex = _highPriorityEndIndex;
+            for (var i = 0; i < _highPriorityEndIndex; i++)
+            {
+                // ReSharper disable once InvertIf
+                if (Validators[i] is IHighPriorityValidator existing &&
+                    existing.Priority > highPriorityValidator.Priority)
+                {
+                    insertIndex = i;
+                    break;
+                }
+            }
+
+            Validators.Insert(insertIndex, validator);
+
+            // 高优先级区域扩大
+            _highPriorityEndIndex++;
+
+            // 对象验证器区域整体右移
+            _objectValidatorStartIndex++;
+        }
+        else
+        {
+            Validators.Insert(_objectValidatorStartIndex, validator);
+
+            // 对象验证器区域整体右移
+            _objectValidatorStartIndex++;
+        }
+
+        // 调用自定义配置委托
+        configure?.Invoke(validator);
+
+        // 记录最新添加的验证器实例
+        _lastAddedValidator = validator;
+
+        return This;
+    }
 
     /// <summary>
     ///     构建验证器集合

@@ -258,7 +258,7 @@ public static class Validators
     ///     <see cref="ConditionalValidator{T}" />
     /// </returns>
     public static ConditionalValidator<T> WhenMatch<T>(Func<T, bool> condition, string? errorMessage) =>
-        Conditional<T>(builder => builder.When(condition).ThenErrorMessage(errorMessage));
+        Conditional<T>(builder => builder.When(condition).ThenMessage(errorMessage));
 
     /// <summary>
     ///     创建条件验证器
@@ -275,63 +275,7 @@ public static class Validators
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName) =>
-        Conditional<T>(builder => builder.When(condition).ThenErrorMessage(resourceType, resourceName));
-
-    /// <summary>
-    ///     创建条件验证器
-    /// </summary>
-    /// <remarks>定义不满足指定条件时执行的验证规则。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <param name="thenConfigure">验证器配置委托</param>
-    /// <param name="otherwiseConfigure">验证器配置委托</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <returns>
-    ///     <see cref="ConditionalValidator{T}" />
-    /// </returns>
-    public static ConditionalValidator<T> UnlessMatch<T>(Func<T, bool> condition,
-        Action<FluentValidatorBuilder<T>> thenConfigure,
-        Action<FluentValidatorBuilder<T>>? otherwiseConfigure = null) =>
-        Conditional<T>(builder =>
-        {
-            // 构建 ConditionBuilder<T> 实例
-            var conditionBuilder = builder.Unless(condition).Then(thenConfigure);
-
-            // 空检查
-            if (otherwiseConfigure is not null)
-            {
-                conditionBuilder.Otherwise(otherwiseConfigure);
-            }
-        });
-
-    /// <summary>
-    ///     创建条件验证器
-    /// </summary>
-    /// <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <param name="errorMessage">错误消息</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <returns>
-    ///     <see cref="ConditionalValidator{T}" />
-    /// </returns>
-    public static ConditionalValidator<T> UnlessMatch<T>(Func<T, bool> condition, string? errorMessage) =>
-        Conditional<T>(builder => builder.Unless(condition).ThenErrorMessage(errorMessage));
-
-    /// <summary>
-    ///     创建条件验证器
-    /// </summary>
-    /// <remarks>定义不满足指定条件时返回指定的错误消息。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <param name="resourceType">错误信息资源类型</param>
-    /// <param name="resourceName">错误信息资源名称</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <returns>
-    ///     <see cref="ConditionalValidator{T}" />
-    /// </returns>
-    public static ConditionalValidator<T> UnlessMatch<T>(Func<T, bool> condition,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
-                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName) =>
-        Conditional<T>(builder => builder.Unless(condition).ThenErrorMessage(resourceType, resourceName));
+        Conditional<T>(builder => builder.When(condition).ThenMessage(resourceType, resourceName));
 
     /// <summary>
     ///     创建 <see cref="System.DateOnly" /> 验证器
@@ -867,26 +811,6 @@ public static class Validators
     ///     <see cref="PostalCodeValidator" />
     /// </returns>
     public static PostalCodeValidator PostalCode() => new();
-
-    /// <summary>
-    ///     创建自定义条件成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <returns>
-    ///     <see cref="PredicateValidator{T}" />
-    /// </returns>
-    public static PredicateValidator<T> Predicate<T>(Func<T, bool> condition) => new(condition);
-
-    /// <summary>
-    ///     创建自定义条件成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <returns>
-    ///     <see cref="PredicateValidator{T}" />
-    /// </returns>
-    public static PredicateValidator<T> Predicate<T>(Func<T, ValidationContext<T>, bool> condition) => new(condition);
 
     /// <summary>
     ///     创建属性验证特性验证器

@@ -7,34 +7,6 @@ namespace Cordon.Tests;
 public class ValidatorBaseExtensionsTests
 {
     [Fact]
-    public void WithErrorMessage_Invalid_Parameters()
-    {
-        var validator = new AgeValidator();
-        Assert.Throws<ArgumentNullException>(() => validator.WithErrorMessage(null!, null!));
-        Assert.Throws<ArgumentNullException>(() => validator.WithErrorMessage(typeof(TestValidationMessages), null!));
-        Assert.Throws<ArgumentException>(() =>
-            validator.WithErrorMessage(typeof(TestValidationMessages), string.Empty));
-        Assert.Throws<ArgumentException>(() =>
-            validator.WithErrorMessage(typeof(TestValidationMessages), "  "));
-    }
-
-    [Fact]
-    public void WithErrorMessage_ReturnOK()
-    {
-        var validator = new AgeValidator();
-        validator.WithErrorMessage("自定义错误消息");
-        Assert.Equal("自定义错误消息", validator.ErrorMessage);
-
-        validator.WithErrorMessage(null);
-        Assert.Null(validator.ErrorMessage);
-
-        var validator2 = new AgeValidator();
-        validator2.WithErrorMessage(typeof(TestValidationMessages), "TestValidator_ValidationError2");
-        Assert.Equal(typeof(TestValidationMessages), validator2.ErrorMessageResourceType);
-        Assert.Equal("TestValidator_ValidationError2", validator2.ErrorMessageResourceName);
-    }
-
-    [Fact]
     public void WithMessage_Invalid_Parameters()
     {
         var validator = new AgeValidator();

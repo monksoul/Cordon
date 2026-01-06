@@ -358,32 +358,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     }
 
     /// <summary>
-    ///     添加自定义条件成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf Predicate(Func<TProperty, ValidationContext<T>, bool> condition)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(condition);
-
-        return ValidatorProxy<PredicateValidator<TProperty>>(context =>
-            [new Func<TProperty, bool>(u => condition(u, context))]);
-    }
-
-    /// <summary>
-    ///     添加自定义条件成立时委托验证器
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf Predicate_(Func<TProperty, ValidationContext<T>, bool> condition) =>
-        Predicate(condition);
-
-    /// <summary>
     ///     添加验证器代理
     /// </summary>
     /// <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>

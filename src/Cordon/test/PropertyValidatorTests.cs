@@ -324,12 +324,12 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void GetValidationResults_WithMemberName_ReturnOK()
+    public void GetValidationResults_WithName_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator =
             new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
-                new RequiredValidator(), new MinLengthValidator(3)).WithMemberName("MyFirstName");
+                new RequiredValidator(), new MinLengthValidator(3)).WithName("MyFirstName");
 
         var validationResults = propertyValidator.GetValidationResults(new ObjectModel());
         Assert.NotNull(validationResults);
@@ -347,7 +347,7 @@ public class PropertyValidatorTests
 
         var propertyValidator2 =
             new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
-                    new RequiredValidator(), new MinLengthValidator(3)).WithMemberName("MyFirstName")
+                    new RequiredValidator(), new MinLengthValidator(3)).WithName("MyFirstName")
                 .WithDisplayName("DisplayFirstName");
 
         var validationResults3 = propertyValidator2.GetValidationResults(new ObjectModel());
@@ -567,12 +567,12 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void Validate_WithMemberName_ReturnOK()
+    public void Validate_WithName_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator =
             new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
-                new RequiredValidator(), new MinLengthValidator(3)).WithMemberName("MyFirstName");
+                new RequiredValidator(), new MinLengthValidator(3)).WithName("MyFirstName");
 
         var exception = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel()));
         Assert.Equal("The MyFirstName field is required.", exception.Message);
@@ -586,7 +586,7 @@ public class PropertyValidatorTests
 
         var propertyValidator2 =
             new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
-                    new RequiredValidator(), new MinLengthValidator(3)).WithMemberName("MyFirstName")
+                    new RequiredValidator(), new MinLengthValidator(3)).WithName("MyFirstName")
                 .WithDisplayName("DisplayFirstName");
 
         var exception3 = Assert.Throws<ValidationException>(() => propertyValidator2.Validate(new ObjectModel()));
@@ -1031,11 +1031,11 @@ public class PropertyValidatorTests
         Assert.Equal("Age", propertyValidator3.GetDisplayName());
 
         var propertyValidator4 =
-            new PropertyValidator<ObjectModel, int>(u => u.YourAge, objectValidator).WithMemberName("MyAge");
+            new PropertyValidator<ObjectModel, int>(u => u.YourAge, objectValidator).WithName("MyAge");
         Assert.Equal("MyAge", propertyValidator4.GetDisplayName());
 
         var propertyValidator5 = new PropertyValidator<ObjectModel, int>(u => u.YourAge, objectValidator)
-            .WithMemberName("MyAge").WithDisplayName("DisplayAge");
+            .WithName("MyAge").WithDisplayName("DisplayAge");
         Assert.Equal("DisplayAge", propertyValidator5.GetDisplayName());
     }
 

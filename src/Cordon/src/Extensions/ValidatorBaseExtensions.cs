@@ -23,23 +23,6 @@ public static class ValidatorBaseExtensions
     ///     <typeparamref name="TValidator" />
     /// </returns>
     public static TValidator WithMessage<TValidator>(this TValidator validator, string? errorMessage)
-        where TValidator : ValidatorBase =>
-        validator.WithErrorMessage(errorMessage);
-
-    /// <summary>
-    ///     设置错误信息
-    /// </summary>
-    /// <typeparam name="TValidator">
-    ///     <see cref="ValidatorBase" />
-    /// </typeparam>
-    /// <param name="validator">
-    ///     <typeparamref name="TValidator" />
-    /// </param>
-    /// <param name="errorMessage">错误信息</param>
-    /// <returns>
-    ///     <typeparamref name="TValidator" />
-    /// </returns>
-    public static TValidator WithErrorMessage<TValidator>(this TValidator validator, string? errorMessage)
         where TValidator : ValidatorBase
     {
         validator.ErrorMessage = errorMessage;
@@ -62,27 +45,6 @@ public static class ValidatorBaseExtensions
     ///     <typeparamref name="TValidator" />
     /// </returns>
     public static TValidator WithMessage<TValidator>(this TValidator validator,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
-                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName)
-        where TValidator : ValidatorBase =>
-        validator.WithErrorMessage(resourceType, resourceName);
-
-    /// <summary>
-    ///     设置错误信息资源
-    /// </summary>
-    /// <typeparam name="TValidator">
-    ///     <see cref="ValidatorBase" />
-    /// </typeparam>
-    /// <param name="validator">
-    ///     <typeparamref name="TValidator" />
-    /// </param>
-    /// <param name="resourceType">错误信息资源类型</param>
-    /// <param name="resourceName">错误信息资源名称</param>
-    /// <returns>
-    ///     <typeparamref name="TValidator" />
-    /// </returns>
-    public static TValidator WithErrorMessage<TValidator>(this TValidator validator,
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName)

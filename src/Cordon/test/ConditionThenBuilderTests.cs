@@ -41,7 +41,7 @@ public class ConditionThenBuilderTests
     }
 
     [Fact]
-    public void ThenMessage_ReturnOK()
+    public void ThenErrorMessage_ReturnOK()
     {
         var builder =
             new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).ThenMessage("错误消息1")
@@ -52,27 +52,8 @@ public class ConditionThenBuilderTests
 
         var builder2 =
             new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10)
-                .ThenErrorMessage(typeof(TestValidationMessages), "TestValidator_ValidationError")
+                .ThenMessage(typeof(TestValidationMessages), "TestValidator_ValidationError")
                 .When(u => u < 10).ThenMessage(typeof(TestValidationMessages), "TestValidator_ValidationError2");
-
-        Assert.Equal(2, builder._conditions.Count);
-        Assert.Equal(typeof(FailureValidator), builder2._conditions.First().Validators[0].GetType());
-    }
-
-    [Fact]
-    public void ThenErrorMessage_ReturnOK()
-    {
-        var builder =
-            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).ThenErrorMessage("错误消息1")
-                .When(u => u < 10).ThenErrorMessage("错误消息2");
-
-        Assert.Equal(2, builder._conditions.Count);
-        Assert.Equal(typeof(FailureValidator), builder._conditions.First().Validators[0].GetType());
-
-        var builder2 =
-            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10)
-                .ThenErrorMessage(typeof(TestValidationMessages), "TestValidator_ValidationError")
-                .When(u => u < 10).ThenErrorMessage(typeof(TestValidationMessages), "TestValidator_ValidationError2");
 
         Assert.Equal(2, builder._conditions.Count);
         Assert.Equal(typeof(FailureValidator), builder2._conditions.First().Validators[0].GetType());

@@ -35,7 +35,7 @@ public class CompositeValidatorTests
         Assert.Equal(3, validator2.Validators.Count);
         Assert.Equal([typeof(NotNullValidator), typeof(RequiredValidator), typeof(ChineseValidator)],
             validator2.Validators.Select(u => u.GetType()));
-        Assert.Equal(CompositeMode.All, validator2.Mode);
+        Assert.Equal(CompositeMode.FailFast, validator2.Mode);
 
         Assert.NotNull(validator2._errorMessageResourceAccessor);
         Assert.Null(validator2._errorMessageResourceAccessor());
@@ -144,7 +144,8 @@ public class CompositeValidatorTests
         validator.Mode = CompositeMode.Any;
         Assert.Null(validator.GetValidationResults(null, "Value"));
 
-        var validator2 = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
+        var validator2 =
+            new CompositeValidator(new ChineseValidator(), new ChineseNameValidator()).UseMode(CompositeMode.All);
         var validationResults = validator2.GetValidationResults("Furion", "Value");
         Assert.NotNull(validationResults);
         Assert.Equal(2, validationResults.Count);
@@ -283,9 +284,9 @@ public class CompositeValidatorTests
     public void UseMode_ReturnOK()
     {
         var validator = new CompositeValidator(new ChineseValidator());
-        Assert.Equal(CompositeMode.All, validator.Mode);
-        validator.UseMode(CompositeMode.FailFast);
         Assert.Equal(CompositeMode.FailFast, validator.Mode);
+        validator.UseMode(CompositeMode.All);
+        Assert.Equal(CompositeMode.All, validator.Mode);
     }
 
     [Fact]

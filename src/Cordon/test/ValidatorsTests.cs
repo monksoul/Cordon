@@ -115,7 +115,7 @@ public class ValidatorsTests
     {
         var validator = Validators.Composite(Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧"));
         Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(CompositeMode.All, validator.Mode);
+        Assert.Equal(CompositeMode.FailFast, validator.Mode);
 
         var validator2 = Validators.Composite([Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧")],
             CompositeMode.Any);
@@ -184,26 +184,6 @@ public class ValidatorsTests
 
         var validator3 =
             Validators.WhenMatch<int>(u => u > 10, typeof(TestValidationMessages), "TestValidator_ValidationError");
-        Assert.NotNull(validator3);
-        Assert.Single(validator3._conditions);
-        Assert.Null(validator3._defaultValidators);
-    }
-
-    [Fact]
-    public void UnlessMatch_ReturnOK()
-    {
-        var validator = Validators.UnlessMatch<int>(u => u > 10, b => b.Age(), b => b.Min(5));
-        Assert.NotNull(validator);
-        Assert.Single(validator._conditions);
-        Assert.NotNull(validator._defaultValidators);
-
-        var validator2 = Validators.UnlessMatch<int>(u => u > 10, "错误消息1");
-        Assert.NotNull(validator2);
-        Assert.Single(validator2._conditions);
-        Assert.Null(validator2._defaultValidators);
-
-        var validator3 =
-            Validators.UnlessMatch<int>(u => u > 10, typeof(TestValidationMessages), "TestValidator_ValidationError");
         Assert.NotNull(validator3);
         Assert.Single(validator3._conditions);
         Assert.Null(validator3._defaultValidators);
@@ -571,16 +551,6 @@ public class ValidatorsTests
     {
         var validator = Validators.PostalCode();
         Assert.NotNull(validator);
-    }
-
-    [Fact]
-    public void Predicate_ReturnOK()
-    {
-        var validator = Validators.Predicate<int>(u => u > 10);
-        Assert.NotNull(validator.Condition);
-
-        var validator2 = Validators.Predicate<int>((u, _) => u > 10);
-        Assert.NotNull(validator2.Condition);
     }
 
     [Fact]
