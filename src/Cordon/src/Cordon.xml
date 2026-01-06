@@ -1815,9 +1815,6 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
-        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1827,8 +1824,11 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -2232,6 +2232,16 @@
             <param name="mode">
                 <see cref="T:Cordon.CompositeMode" />
             </param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.Composite(System.Action{Cordon.FluentValidatorBuilder{`0}},Cordon.CompositeMode)">
+            <summary>
+                添加组合验证器
+            </summary>
+            <param name="configure">验证器配置委托</param>
+            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -3086,6 +3096,11 @@
                 组合验证器模式
             </summary>
         </member>
+        <member name="F:Cordon.CompositeMode.FailFast">
+            <summary>
+                遇到首个验证失败即停止后续验证
+            </summary>
+        </member>
         <member name="F:Cordon.CompositeMode.All">
             <summary>
                 所有验证器都会执行，且全部必须通过
@@ -3094,11 +3109,6 @@
         <member name="F:Cordon.CompositeMode.Any">
             <summary>
                 任一验证器验证成功，即视为整体验证通过
-            </summary>
-        </member>
-        <member name="F:Cordon.CompositeMode.FailFast">
-            <summary>
-                遇到首个验证失败即停止后续验证
             </summary>
         </member>
         <member name="T:Cordon.IValidationContext">
@@ -3855,6 +3865,56 @@
             <summary>
                 规则集
             </summary>
+        </member>
+        <member name="T:Cordon.ObjectValidatorProxy`1">
+            <summary>
+                对象验证器代理
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="F:Cordon.ObjectValidatorProxy`1._objectValidator">
+            <inheritdoc cref="T:Cordon.IObjectValidator`1" />
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.#ctor(Cordon.IObjectValidator{`0})">
+            <summary>
+                <inheritdoc cref="T:Cordon.ObjectValidatorProxy`1" />
+            </summary>
+            <param name="objectValidator">
+                <see cref="T:Cordon.IObjectValidator`1" />
+            </param>
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="P:Cordon.ObjectValidatorProxy`1.Cordon#IMemberPathRepairable#MemberPath">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.Cordon#IMemberPathRepairable#RepairMemberPaths(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.Dispose(System.Boolean)">
+            <summary>
+                释放资源
+            </summary>
+            <param name="disposing">是否释放托管资源</param>
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.IsValid(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.Validate(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.RepairMemberPaths(System.String)">
+            <inheritdoc cref="M:Cordon.IMemberPathRepairable.RepairMemberPaths(System.String)" />
         </member>
         <member name="T:Cordon.AbstractValidator`1">
             <summary>
@@ -5125,10 +5185,6 @@
             </summary>
             <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
         </member>
-        <member name="F:Cordon.ValueValidator`1._valueValidator">
-            <inheritdoc cref="T:Cordon.ValueValidator`1" />
-            <remarks>单个值级别验证器。</remarks>
-        </member>
         <member name="M:Cordon.ValueValidator`1.#ctor">
             <summary>
                 <inheritdoc cref="T:Cordon.ValueValidator`1" />
@@ -5379,9 +5435,6 @@
             </summary>
             <param name="ruleSets">规则集</param>
             <returns><see cref="T:System.String" />列表</returns>
-        </member>
-        <member name="M:Cordon.ValueValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
         <member name="M:Cordon.ValueValidator`1.GetCurrentRuleSets">
             <inheritdoc cref="M:Cordon.IRuleSetContextProvider.GetCurrentRuleSets" />
@@ -6129,6 +6182,16 @@
             <param name="mode">
                 <see cref="T:Cordon.CompositeMode" />
             </param>
+            <returns>
+                <see cref="T:Cordon.CompositeValidator" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.Composite(System.Action{Cordon.FluentValidatorBuilder{System.Object}},Cordon.CompositeMode)">
+            <summary>
+                创建组合验证器
+            </summary>
+            <param name="configure">验证器配置委托</param>
+            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
             <returns>
                 <see cref="T:Cordon.CompositeValidator" />
             </returns>
@@ -7233,8 +7296,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a hexadecimal digit exactly 3 times.<br/>
-                        ○ Match a hexadecimal digit exactly 8 times.<br/>
+                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7256,7 +7319,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character atomically any number of times.<br/>
+                            ○ Match a whitespace character greedily any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -7281,7 +7344,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character atomically any number of times.<br/>
+                                    ○ Match a whitespace character greedily any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -7342,13 +7405,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7362,13 +7425,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7390,7 +7453,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7415,10 +7478,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit atomically at least once.<br/>
+                                    ○ Match a Unicode digit greedily at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit atomically at least once.<br/>
+                                ○ Match a Unicode digit greedily at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -7576,7 +7639,7 @@
             <summary>
                 <inheritdoc cref="T:Cordon.CompositeMode" />
             </summary>
-            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.All" />。</remarks>
+            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.FailFast" />。</remarks>
         </member>
         <member name="M:Cordon.CompositeValidator.Dispose">
             <inheritdoc />
@@ -7906,12 +7969,12 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Loop greedily at least once.<br/>
                 ○ 1st capture group.<br/>
-                    ○ Match an ASCII letter or digit.<br/>
+                    ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Optional (greedy).<br/>
-                        ○ Match a character in the set [\-0-9A-Za-z] greedily at most 61 times.<br/>
-                        ○ Match an ASCII letter or digit.<br/>
+                        ○ Match a character in the set [-0-9A-Za-z] greedily at most 61 times.<br/>
+                        ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Match '.'.<br/>
-            ○ Match an ASCII letter atomically at least twice.<br/>
+            ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -7964,9 +8027,9 @@
                     ○ 7th capture group.<br/>
                         ○ Loop greedily at least once.<br/>
                             ○ 8th capture group.<br/>
-                                ○ Match a character in the set [\-0-9A-Za-z] atomically at least once.<br/>
+                                ○ Match a character in the set [-0-9A-Za-z] atomically at least once.<br/>
                                 ○ Match '.'.<br/>
-                        ○ Match an ASCII letter atomically at least twice.<br/>
+                        ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8548,7 +8611,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a hexadecimal digit exactly 32 times.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8562,8 +8625,8 @@
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
-                    ○ Match a hexadecimal digit exactly 16 times.<br/>
-                    ○ Match a hexadecimal digit exactly 32 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 16 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8871,7 +8934,7 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match an ASCII letter.<br/>
+                ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
                 ○ Match a Unicode digit.<br/>
@@ -9713,12 +9776,12 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match an ASCII letter.<br/>
+            ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [\-_] exactly 2 times.<br/>
-            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match an ASCII letter or digit.<br/>
+                ○ Match a character in the set [-_] exactly 2 times.<br/>
+            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match a character in the set [0-9A-Za-z].<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>

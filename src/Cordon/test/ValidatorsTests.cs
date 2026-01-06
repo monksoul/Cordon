@@ -115,12 +115,20 @@ public class ValidatorsTests
     {
         var validator = Validators.Composite(Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧"));
         Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(CompositeMode.All, validator.Mode);
+        Assert.Equal(CompositeMode.FailFast, validator.Mode);
 
         var validator2 = Validators.Composite([Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧")],
             CompositeMode.Any);
         Assert.Equal(2, validator2.Validators.Count);
         Assert.Equal(CompositeMode.Any, validator2.Mode);
+
+        var validator3 = Validators.Composite(u => u.Required().MinLength(2));
+        Assert.Equal(2, validator3.Validators.Count);
+        Assert.Equal(CompositeMode.FailFast, validator3.Mode);
+
+        var validator4 = Validators.Composite(u => u.Required().MinLength(2), CompositeMode.All);
+        Assert.Equal(2, validator4.Validators.Count);
+        Assert.Equal(CompositeMode.All, validator4.Mode);
     }
 
     [Fact]

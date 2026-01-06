@@ -199,6 +199,11 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void Composite_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<object>().Composite((Action<FluentValidatorBuilder<object>>)null!));
+
+    [Fact]
     public void Composite_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().Composite(new NotNullValidator(), new MinLengthValidator(3));
@@ -226,6 +231,19 @@ public class ValueValidatorValidationTests
         Assert.True(valueValidator2.IsValid(null));
         Assert.True(valueValidator2.IsValid("monksoul@outlook.com"));
         Assert.True(valueValidator2.IsValid("monksoul"));
+
+        var valueValidator3 =
+            new ValueValidator<object>().Composite(u => u.Required().MinLength(2));
+
+        Assert.Single(valueValidator3.Validators);
+
+        var addedValidator3 = valueValidator3._lastAddedValidator as CompositeValidator;
+        Assert.NotNull(addedValidator3);
+        Assert.Equal(2, addedValidator3.Validators.Count);
+
+        Assert.False(valueValidator3.IsValid(null));
+        Assert.True(valueValidator3.IsValid("Furion"));
+        Assert.False(valueValidator3.IsValid("F"));
     }
 
     [Fact]

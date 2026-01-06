@@ -451,6 +451,18 @@ public class CollectionPropertyValidatorTests
         Assert.True(cloned._allowEmptyStrings);
     }
 
+    [Fact]
+    public void EnsureNoElementValidatorAssigned_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ObjectModel>().RuleForCollection(u => u.Children)
+            .SetValidator(new ChildValidator());
+        var exception =
+            Assert.Throws<InvalidOperationException>(() => propertyValidator.EnsureNoElementValidatorAssigned());
+        Assert.Equal(
+            "An element validator has already been assigned. Only one is allowed per collection element. To configure nested rules, use `ChildRules` or `EachRules` within a single validator.",
+            exception.Message);
+    }
+
     public class ObjectModel
     {
         public List<Child>? Children { get; set; }

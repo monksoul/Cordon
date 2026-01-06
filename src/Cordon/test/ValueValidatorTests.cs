@@ -16,9 +16,9 @@ public class ValueValidatorTests
         Assert.Empty(valueValidator._ruleSetStack);
         Assert.NotNull(valueValidator.Validators);
         Assert.Null(valueValidator._lastAddedValidator);
-        Assert.Null(valueValidator._valueValidator);
         Assert.Empty(valueValidator.Validators);
         Assert.Equal(0, valueValidator._highPriorityEndIndex);
+        Assert.Equal(0, valueValidator._objectValidatorStartIndex);
         Assert.Null(valueValidator._preProcessor);
         Assert.Null(valueValidator.DisplayName);
         Assert.Null(valueValidator.WhenCondition);
@@ -384,6 +384,22 @@ public class ValueValidatorTests
         Assert.Equal(newNullValidator, valueValidator.Validators[1]);
         Assert.NotNull(valueValidator._lastAddedValidator);
         Assert.True(valueValidator._lastAddedValidator is NotNullValidator);
+
+        valueValidator.AddValidator(new ObjectValidatorProxy<string>(new ValueValidator<string>()));
+        Assert.Equal(6, valueValidator.Validators.Count);
+        Assert.Equal(3, valueValidator._highPriorityEndIndex);
+        Assert.Equal(5, valueValidator._objectValidatorStartIndex);
+        Assert.True(valueValidator.Validators.Last() is ObjectValidatorProxy<string>);
+        Assert.NotNull(valueValidator._lastAddedValidator);
+        Assert.True(valueValidator._lastAddedValidator is ObjectValidatorProxy<string>);
+
+        valueValidator.AddValidator(new ObjectValidatorProxy<string>(new ValueValidator<string>()));
+        Assert.Equal(7, valueValidator.Validators.Count);
+        Assert.Equal(3, valueValidator._highPriorityEndIndex);
+        Assert.Equal(5, valueValidator._objectValidatorStartIndex);
+        Assert.True(valueValidator.Validators.Last() is ObjectValidatorProxy<string>);
+        Assert.NotNull(valueValidator._lastAddedValidator);
+        Assert.True(valueValidator._lastAddedValidator is ObjectValidatorProxy<string>);
     }
 
     [Fact]
@@ -551,9 +567,11 @@ public class ValueValidatorTests
     {
         var valueValidator = new ValueValidator<string>();
 
-        Assert.Null(valueValidator._valueValidator);
+        Assert.Null(valueValidator.Validators.OfType<ObjectValidatorProxy<string>>()
+            .FirstOrDefault()?._objectValidator);
         valueValidator.SetValidator(new StringValueValidator());
-        Assert.NotNull(valueValidator._valueValidator);
+        Assert.NotNull(valueValidator.Validators.OfType<ObjectValidatorProxy<string>>()
+            .FirstOrDefault()?._objectValidator);
         Assert.Throws<InvalidOperationException>(() =>
             valueValidator.SetValidator((ValueValidator<string>?)null));
     }
@@ -761,6 +779,22 @@ public class ValueValidatorTests
         Assert.Equal<string>(["Login"], validationContext2.RuleSets!);
         Assert.Empty(validationContext2.Items);
         Assert.NotNull(validationContext2._serviceProvider);
+    }
+
+    [Fact]
+    public void RepairMemberPaths_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+        Assert.Null(valueValidator._memberPath);
+        valueValidator.SetValidator(new StringValueValidator());
+
+        valueValidator.RepairMemberPaths("Sub");
+        Assert.Equal("Sub", valueValidator._memberPath);
+
+        var childValueValidator = valueValidator.Validators.OfType<ObjectValidatorProxy<string>>()
+            .FirstOrDefault()?._objectValidator as ValueValidator<string>;
+        Assert.NotNull(childValueValidator);
+        Assert.Equal("Sub", childValueValidator._memberPath);
     }
 
     public class StringValueValidator : AbstractValueValidator<string>

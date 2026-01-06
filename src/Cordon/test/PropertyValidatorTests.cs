@@ -30,6 +30,7 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator._lastAddedValidator);
         Assert.Empty(propertyValidator.Validators);
         Assert.Equal(0, propertyValidator._highPriorityEndIndex);
+        Assert.Equal(0, propertyValidator._objectValidatorStartIndex);
         Assert.Null(propertyValidator._preProcessor);
         Assert.Null(propertyValidator.RuleSets);
         Assert.Null(propertyValidator.DisplayName);
@@ -722,6 +723,22 @@ public class PropertyValidatorTests
         Assert.Equal(newNullValidator, propertyValidator.Validators[1]);
         Assert.NotNull(propertyValidator._lastAddedValidator);
         Assert.True(propertyValidator._lastAddedValidator is NotNullValidator);
+
+        propertyValidator.AddValidator(new ObjectValidator<string>());
+        Assert.Equal(6, propertyValidator.Validators.Count);
+        Assert.Equal(3, propertyValidator._highPriorityEndIndex);
+        Assert.Equal(5, propertyValidator._objectValidatorStartIndex);
+        Assert.True(propertyValidator.Validators.Last() is ObjectValidator<string>);
+        Assert.NotNull(propertyValidator._lastAddedValidator);
+        Assert.True(propertyValidator._lastAddedValidator is ObjectValidator<string>);
+
+        propertyValidator.AddValidator(new ObjectValidator<string>());
+        Assert.Equal(7, propertyValidator.Validators.Count);
+        Assert.Equal(3, propertyValidator._highPriorityEndIndex);
+        Assert.Equal(5, propertyValidator._objectValidatorStartIndex);
+        Assert.True(propertyValidator.Validators.Last() is ObjectValidator<string>);
+        Assert.NotNull(propertyValidator._lastAddedValidator);
+        Assert.True(propertyValidator._lastAddedValidator is ObjectValidator<string>);
     }
 
     [Fact]

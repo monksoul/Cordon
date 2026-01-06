@@ -596,9 +596,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 遍历所有验证器
         foreach (var validator in Validators)
         {
-            if (validator is IMemberPathRepairable repairable)
+            if (validator is IMemberPathRepairable memberPathRepairable)
             {
-                repairable.RepairMemberPaths(memberPath);
+                memberPathRepairable.RepairMemberPaths(memberPath);
             }
         }
     }

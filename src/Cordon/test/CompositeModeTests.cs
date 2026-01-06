@@ -12,7 +12,7 @@ public class CompositeModeTests
         var names = Enum.GetNames(typeof(CompositeMode));
         Assert.Equal(3, names.Length);
 
-        var strings = new[] { nameof(CompositeMode.All), nameof(CompositeMode.Any), nameof(CompositeMode.FailFast) };
+        var strings = new[] { nameof(CompositeMode.FailFast), nameof(CompositeMode.All), nameof(CompositeMode.Any) };
         Assert.True(strings.SequenceEqual(names));
     }
 }

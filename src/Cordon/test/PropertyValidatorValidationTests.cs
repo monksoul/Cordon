@@ -268,6 +268,11 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void Composite_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1).Composite((Action<FluentValidatorBuilder<object>>)null!));
+
+    [Fact]
     public void Composite_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
@@ -297,6 +302,20 @@ public class PropertyValidatorValidationTests
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = null }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "monksoul@outlook.com" }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "monksoul" }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Composite(u => u.Required().MinLength(2));
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 = propertyValidator3._lastAddedValidator as CompositeValidator;
+        Assert.NotNull(addedValidator3);
+        Assert.Equal(2, addedValidator3.Validators.Count);
+
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Data1 = null }));
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { Data1 = "Furion" }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Data1 = "F" }));
     }
 
     [Fact]

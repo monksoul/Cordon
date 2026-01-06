@@ -245,18 +245,29 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加组合验证器
     /// </summary>
+    /// <param name="configure">验证器配置委托</param>
+    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Composite(Action<FluentValidatorBuilder<T>> configure,
+        CompositeMode mode = CompositeMode.FailFast)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], mode);
+    }
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
     /// <remarks>验证所有。</remarks>
     /// <param name="configure">验证器配置委托</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf All(Action<FluentValidatorBuilder<T>> configure)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
-
-        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], CompositeMode.All);
-    }
+    public virtual TSelf All(Action<FluentValidatorBuilder<T>> configure) => Composite(configure, CompositeMode.All);
 
     /// <summary>
     ///     添加组合验证器
@@ -266,13 +277,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf Any(Action<FluentValidatorBuilder<T>> configure)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
-
-        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], CompositeMode.Any);
-    }
+    public virtual TSelf Any(Action<FluentValidatorBuilder<T>> configure) => Composite(configure, CompositeMode.Any);
 
     /// <summary>
     ///     添加组合验证器
@@ -282,13 +287,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf FailFast(Action<FluentValidatorBuilder<T>> configure)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
-
-        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], CompositeMode.FailFast);
-    }
+    public virtual TSelf FailFast(Action<FluentValidatorBuilder<T>> configure) => Composite(configure);
 
     /// <summary>
     ///     添加条件验证器
@@ -1166,9 +1165,9 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
             initializer.InitializeServiceProvider(_serviceProvider);
         }
 
-        // 检查是否是对象验证器
+        // 检查是否是对象验证器或其代理类
         // ReSharper disable once ConvertIfStatementToSwitchStatement
-        if (validator is IObjectValidator)
+        if (validator is IObjectValidator or ObjectValidatorProxy<T>)
         {
             Validators.Add(validator);
 
