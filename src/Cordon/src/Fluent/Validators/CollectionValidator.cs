@@ -8,14 +8,13 @@ namespace Cordon;
 ///     集合验证器
 /// </summary>
 /// <typeparam name="TElement">元素类型</typeparam>
-public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>>,
-    IObjectValidator<IEnumerable<TElement>>, IMemberPathRepairable
+public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>>, ICollectionValidator<TElement>
 {
-    /// <inheritdoc cref="ObjectValidator{T}" />
+    /// <inheritdoc cref="IObjectValidator{T}" />
     internal readonly IObjectValidator<TElement> _elementValidator;
 
     /// <inheritdoc cref="IMemberPathRepairable" />
-    internal readonly IMemberPathRepairable? _repairable;
+    internal readonly IMemberPathRepairable? _memberPathRepairable;
 
     /// <summary>
     ///     元素过滤委托
@@ -39,7 +38,7 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
         ArgumentNullException.ThrowIfNull(elementValidator);
 
         _elementValidator = elementValidator;
-        _repairable = elementValidator as IMemberPathRepairable;
+        _memberPathRepairable = elementValidator as IMemberPathRepairable;
 
         ErrorMessageResourceAccessor = () => null!;
     }
@@ -55,17 +54,19 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
     void IMemberPathRepairable.RepairMemberPaths(string? memberPath) => RepairMemberPaths(memberPath);
 
     /// <inheritdoc />
-    public bool IsValid(IEnumerable<TElement>? instance, string?[]? ruleSets = null) => instance is null ||
-        GetValidatedElements(instance).All(u => _elementValidator.IsValid(u, ruleSets));
+    public bool IsValid(IEnumerable<TElement>? instance, string?[]? ruleSets = null)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(instance);
+
+        return GetValidatedElements(instance).All(u => _elementValidator.IsValid(u, ruleSets));
+    }
 
     /// <inheritdoc />
     public List<ValidationResult>? GetValidationResults(IEnumerable<TElement>? instance, string?[]? ruleSets = null)
     {
         // 空检查
-        if (instance is null)
-        {
-            return null;
-        }
+        ArgumentNullException.ThrowIfNull(instance);
 
         // 初始化验证结果集合
         var validationResults = new List<ValidationResult>();
@@ -75,10 +76,10 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
         foreach (var element in GetValidatedElements(instance))
         {
             // 获取原始属性路径
-            var originalPath = _repairable?.MemberPath;
+            var originalPath = _memberPathRepairable?.MemberPath;
 
             // 设置当前属性路径
-            _repairable?.MemberPath = $"{_memberPath}[{index}]";
+            _memberPathRepairable?.MemberPath = $"{_memberPath}[{index}]";
 
             try
             {
@@ -87,7 +88,7 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
             finally
             {
                 // 恢复原始属性路径
-                _repairable?.MemberPath = originalPath;
+                _memberPathRepairable?.MemberPath = originalPath;
             }
 
             index++;
@@ -100,20 +101,17 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
     public void Validate(IEnumerable<TElement>? instance, string?[]? ruleSets = null)
     {
         // 空检查
-        if (instance is null)
-        {
-            return;
-        }
+        ArgumentNullException.ThrowIfNull(instance);
 
         // 遍历用于验证的集合元素
         var index = 0;
         foreach (var element in GetValidatedElements(instance))
         {
             // 获取原始属性路径
-            var originalPath = _repairable?.MemberPath;
+            var originalPath = _memberPathRepairable?.MemberPath;
 
             // 设置当前属性路径
-            _repairable?.MemberPath = $"{_memberPath}[{index}]";
+            _memberPathRepairable?.MemberPath = $"{_memberPath}[{index}]";
 
             try
             {
@@ -122,7 +120,7 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
             finally
             {
                 // 恢复原始属性路径
-                _repairable?.MemberPath = originalPath;
+                _memberPathRepairable?.MemberPath = originalPath;
             }
 
             index++;
@@ -205,10 +203,6 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
         }
     }
 
-    /// <inheritdoc />
-    public override string? FormatErrorMessage(string name) =>
-        (string?)ErrorMessageString is null ? null : base.FormatErrorMessage(name);
-
     /// <summary>
     ///     筛选用于验证的集合元素
     /// </summary>
@@ -246,8 +240,13 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
     /// <returns>
     ///     <see cref="IEnumerable{T}" />
     /// </returns>
-    internal IEnumerable<TElement> GetValidatedElements(IEnumerable<TElement> elements) =>
-        _elementFilter is null ? elements : elements.Where(element => _elementFilter(element));
+    internal IEnumerable<TElement> GetValidatedElements(IEnumerable<TElement> elements)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(elements);
+
+        return _elementFilter is null ? elements : elements.Where(element => _elementFilter(element));
+    }
 
     /// <inheritdoc cref="IMemberPathRepairable.RepairMemberPaths" />
     internal virtual void RepairMemberPaths(string? memberPath) => _memberPath = memberPath;

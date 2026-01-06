@@ -39,7 +39,7 @@ public class MustValidatorTests
                 case < 10:
                     return false;
                 case 10:
-                    Must.False("不能等于 10");
+                    Must.WithMessage("不能等于 10");
                     break;
             }
 
@@ -79,7 +79,7 @@ public class MustValidatorTests
                 case < 10:
                     return false;
                 case 10:
-                    Must.False("不能等于 10");
+                    Must.WithMessage("不能等于 10");
                     break;
             }
 
@@ -128,7 +128,7 @@ public class MustValidatorTests
                 case < 10:
                     return false;
                 case 10:
-                    Must.False("不能等于 10");
+                    Must.WithMessage("不能等于 10");
                     break;
             }
 
@@ -150,12 +150,7 @@ public class MustValidatorTests
     [Fact]
     public void Must_StaticClass_ReturnOK()
     {
-        var exception = Assert.Throws<ValidatorException>(() => Must.False("错误消息"));
+        var exception = Assert.Throws<ValidatorException>(() => Must.WithMessage("错误消息"));
         Assert.Equal("错误消息", exception.Message);
-
-        Must.FalseIf(false, "错误消息");
-
-        var exception2 = Assert.Throws<ValidatorException>(() => Must.FalseIf(true, "错误消息"));
-        Assert.Equal("错误消息", exception2.Message);
     }
 }

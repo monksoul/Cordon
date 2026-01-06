@@ -11,15 +11,9 @@ namespace Cordon;
 public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, IDisposable
 {
     /// <summary>
-    ///     最终的条件与默认验证器集合
+    ///     <see cref="ConditionResult{T}" /> 构建结果
     /// </summary>
-    internal readonly List<(Func<T, bool> Condition, IReadOnlyList<ValidatorBase> Validators)> _conditions;
-
-    /// <summary>
-    ///     默认验证器集合
-    /// </summary>
-    /// <remarks>当无条件匹配时使用。</remarks>
-    internal IReadOnlyList<ValidatorBase>? _defaultValidators;
+    internal readonly ConditionResult<T> _conditionResult;
 
     /// <summary>
     ///     <inheritdoc cref="ConditionalValidator{T}" />
@@ -30,14 +24,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         // 空检查
         ArgumentNullException.ThrowIfNull(buildConditions);
 
-        // 初始化 ConditionBuilder<T> 实例
-        var conditionBuilder = new ConditionBuilder<T>();
-
-        // 调用条件验证构建器配置委托
-        buildConditions(conditionBuilder);
-
-        // 构建条件和默认验证器集合
-        (_conditions, _defaultValidators) = conditionBuilder.Build();
+        _conditionResult = new ConditionBuilder<T>().Build(buildConditions);
 
         ErrorMessageResourceAccessor = () => null!;
     }
@@ -112,10 +99,6 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         }
     }
 
-    /// <inheritdoc />
-    public override string? FormatErrorMessage(string name) =>
-        (string?)ErrorMessageString is null ? null : base.FormatErrorMessage(name);
-
     /// <summary>
     ///     抛出验证异常
     /// </summary>
@@ -158,7 +141,8 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         }
 
         // 释放所有验证器资源
-        foreach (var validator in (_defaultValidators ?? []).Concat(_conditions.SelectMany(u => u.Validators)))
+        foreach (var validator in (_conditionResult.DefaultRules ?? []).Concat(
+                     _conditionResult.ConditionalRules.SelectMany(u => u.Validators)))
         {
             if (validator is IDisposable disposable)
             {
@@ -180,7 +164,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         IReadOnlyList<ValidatorBase>? matchedValidators = null;
 
         // 遍历并查找第一个条件匹配的验证器集合
-        foreach (var (condition, validators) in _conditions)
+        foreach (var (condition, validators) in _conditionResult.ConditionalRules)
         {
             // ReSharper disable once InvertIf
             if (condition(instance!))
@@ -191,7 +175,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         }
 
         // 没有匹配条件时使用默认验证器集合
-        matchedValidators ??= _defaultValidators;
+        matchedValidators ??= _conditionResult.DefaultRules;
 
         return matchedValidators;
     }
@@ -200,7 +184,8 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
     {
         // 遍历所有验证器并尝试同步 IServiceProvider 委托
-        foreach (var validator in (_defaultValidators ?? []).Concat(_conditions.SelectMany(u => u.Validators)))
+        foreach (var validator in (_conditionResult.DefaultRules ?? []).Concat(
+                     _conditionResult.ConditionalRules.SelectMany(u => u.Validators)))
         {
             // 检查验证器是否实现 IValidatorInitializer 接口
             if (validator is IValidatorInitializer initializer)

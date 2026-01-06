@@ -335,10 +335,6 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         }
     }
 
-    /// <inheritdoc />
-    public override string? FormatErrorMessage(string name) =>
-        (string?)ErrorMessageString is null ? null : base.FormatErrorMessage(name);
-
     /// <summary>
     ///     为指定属性配置验证规则
     /// </summary>

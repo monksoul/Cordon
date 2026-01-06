@@ -86,12 +86,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     internal bool? SuppressAnnotationValidation { get; set; }
 
     /// <summary>
-    ///     <inheritdoc cref="CompositeMode" />
-    /// </summary>
-    /// <remarks>默认值为：<see cref="CompositeMode.FailFast" />。</remarks>
-    internal CompositeMode Mode { get; set; } = CompositeMode.FailFast;
-
-    /// <summary>
     ///     显示名称
     /// </summary>
     internal string? DisplayName { get; set; }
@@ -458,22 +452,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         ArgumentNullException.ThrowIfNull(memberNameProvider);
 
         MemberName = memberNameProvider(_annotationValidator.Property);
-
-        return This;
-    }
-
-    /// <summary>
-    ///     设置验证模式
-    /// </summary>
-    /// <param name="mode">
-    ///     <see cref="CompositeMode" />
-    /// </param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf UseMode(CompositeMode mode)
-    {
-        Mode = mode;
 
         return This;
     }

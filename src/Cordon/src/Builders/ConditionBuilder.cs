@@ -5,26 +5,39 @@
 namespace Cordon;
 
 /// <summary>
+///     条件规则
+/// </summary>
+/// <param name="Condition">条件委托</param>
+/// <param name="Validators">验证器集合</param>
+/// <typeparam name="T">对象类型</typeparam>
+internal record ConditionRule<T>(Func<T, bool> Condition, IReadOnlyList<ValidatorBase> Validators);
+
+/// <summary>
+///     <see cref="ConditionBuilder{T}" /> 构建结果
+/// </summary>
+/// <param name="ConditionalRules">条件规则集合</param>
+/// <param name="DefaultRules">默认验证规则</param>
+/// <typeparam name="T">对象类型</typeparam>
+internal record ConditionResult<T>(
+    IReadOnlyList<ConditionRule<T>> ConditionalRules,
+    IReadOnlyList<ValidatorBase>? DefaultRules);
+
+/// <summary>
 ///     条件验证构建器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
 public class ConditionBuilder<T>
 {
     /// <summary>
-    ///     条件与对应验证器列表
+    ///     条件规则集合
     /// </summary>
-    internal readonly List<(Func<T, bool> Condition, IReadOnlyList<ValidatorBase> Validators)> _conditions;
+    internal readonly List<ConditionRule<T>> _conditionalRules = [];
 
     /// <summary>
-    ///     默认验证器集合
+    ///     默认验证规则
     /// </summary>
-    /// <remarks>当无条件匹配时使用。</remarks>
-    internal IReadOnlyList<ValidatorBase>? _defaultValidators;
-
-    /// <summary>
-    ///     <inheritdoc cref="ConditionBuilder{T}" />
-    /// </summary>
-    internal ConditionBuilder() => _conditions = [];
+    /// <remarks>当所有条件均不满足时使用。</remarks>
+    internal IReadOnlyList<ValidatorBase>? defaultRules;
 
     /// <summary>
     ///     定义满足指定的条件委托
@@ -90,7 +103,7 @@ public class ConditionBuilder<T>
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
-        _defaultValidators = new FluentValidatorBuilder<T>().Build(configure);
+        defaultRules = new FluentValidatorBuilder<T>().Build(configure);
 
         return this;
     }
@@ -105,7 +118,7 @@ public class ConditionBuilder<T>
     /// </returns>
     public ConditionBuilder<T> OtherwiseMessage(string? errorMessage)
     {
-        _defaultValidators = [new FailureValidator().WithMessage(errorMessage)];
+        defaultRules = [new FailureValidator().WithMessage(errorMessage)];
 
         return this;
     }
@@ -124,19 +137,25 @@ public class ConditionBuilder<T>
             DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName)
     {
-        _defaultValidators = [new FailureValidator().WithMessage(resourceType, resourceName)];
+        defaultRules = [new FailureValidator().WithMessage(resourceType, resourceName)];
 
         return this;
     }
 
     /// <summary>
-    ///     构建最终的条件与默认验证器集合
+    ///     构建
     /// </summary>
+    /// <param name="buildConditions">条件验证构建器配置委托</param>
     /// <returns>
-    ///     <see cref="Tuple{T1,T2}" />
+    ///     <see cref="ConditionResult{T}" />
     /// </returns>
-    internal (List<(Func<T, bool> Condition, IReadOnlyList<ValidatorBase> Validators)> Conditions,
-        IReadOnlyList<ValidatorBase>? DefaultValidators) Build() => (_conditions, _defaultValidators);
+    internal ConditionResult<T> Build(Action<ConditionBuilder<T>>? buildConditions = null)
+    {
+        // 调用条件验证构建器配置委托
+        buildConditions?.Invoke(this);
+
+        return new ConditionResult<T>(_conditionalRules, defaultRules);
+    }
 }
 
 /// <summary>
@@ -151,20 +170,22 @@ public sealed class ConditionThenBuilder<T>
     internal readonly Func<T, bool> _condition;
 
     /// <inheritdoc cref="ConditionBuilder{T}" />
-    internal readonly ConditionBuilder<T> _parent;
+    internal readonly ConditionBuilder<T> _conditionBuilder;
 
     /// <summary>
     ///     构造函数
     /// </summary>
-    /// <param name="parent">父条件构建器</param>
+    /// <param name="conditionBuilder">
+    ///     <see cref="ConditionBuilder{T}" />
+    /// </param>
     /// <param name="condition">条件委托</param>
-    internal ConditionThenBuilder(ConditionBuilder<T> parent, Func<T, bool> condition)
+    internal ConditionThenBuilder(ConditionBuilder<T> conditionBuilder, Func<T, bool> condition)
     {
         // 空检查
-        ArgumentNullException.ThrowIfNull(parent);
+        ArgumentNullException.ThrowIfNull(conditionBuilder);
         ArgumentNullException.ThrowIfNull(condition);
 
-        _parent = parent;
+        _conditionBuilder = conditionBuilder;
         _condition = condition;
     }
 
@@ -180,10 +201,10 @@ public sealed class ConditionThenBuilder<T>
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
-        // 将条件和验证器列表添加到父条件构建器
-        _parent._conditions.Add((_condition, new FluentValidatorBuilder<T>().Build(configure)));
+        _conditionBuilder._conditionalRules.Add(
+            new ConditionRule<T>(_condition, new FluentValidatorBuilder<T>().Build(configure)));
 
-        return _parent;
+        return _conditionBuilder;
     }
 
     /// <summary>
@@ -196,10 +217,10 @@ public sealed class ConditionThenBuilder<T>
     /// </returns>
     public ConditionBuilder<T> ThenMessage(string? errorMessage)
     {
-        // 将条件和验证器列表添加到父条件构建器
-        _parent._conditions.Add((_condition, [new FailureValidator().WithMessage(errorMessage)]));
+        _conditionBuilder._conditionalRules.Add(new ConditionRule<T>(_condition,
+            [new FailureValidator().WithMessage(errorMessage)]));
 
-        return _parent;
+        return _conditionBuilder;
     }
 
     /// <summary>
@@ -216,9 +237,9 @@ public sealed class ConditionThenBuilder<T>
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName)
     {
-        // 将条件和验证器列表添加到父条件构建器
-        _parent._conditions.Add((_condition, [new FailureValidator().WithMessage(resourceType, resourceName)]));
+        _conditionBuilder._conditionalRules.Add(new ConditionRule<T>(_condition,
+            [new FailureValidator().WithMessage(resourceType, resourceName)]));
 
-        return _parent;
+        return _conditionBuilder;
     }
 }

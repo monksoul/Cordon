@@ -217,10 +217,6 @@ public class PropertyAnnotationValidator<T> : ValidatorBase<T>, IValidatorInitia
         }
     }
 
-    /// <inheritdoc />
-    public override string? FormatErrorMessage(string name) =>
-        (string?)ErrorMessageString is null ? null : base.FormatErrorMessage(name);
-
     /// <summary>
     ///     获取属性值
     /// </summary>

@@ -115,7 +115,7 @@ public class ValidatorsTests
     {
         var validator = Validators.Composite(Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧"));
         Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(CompositeMode.FailFast, validator.Mode);
+        Assert.Equal(CompositeMode.All, validator.Mode);
 
         var validator2 = Validators.Composite([Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧")],
             CompositeMode.Any);
@@ -165,8 +165,9 @@ public class ValidatorsTests
         var validator = Validators.Conditional<int>(builder =>
             builder.When(u => u > 10).Then(b => b.Age()).Otherwise(b => b.Min(5)));
         Assert.NotNull(validator);
-        Assert.Single(validator._conditions);
-        Assert.NotNull(validator._defaultValidators);
+        Assert.NotNull(validator._conditionResult);
+        Assert.Single(validator._conditionResult.ConditionalRules);
+        Assert.NotNull(validator._conditionResult.DefaultRules);
     }
 
     [Fact]
@@ -174,19 +175,20 @@ public class ValidatorsTests
     {
         var validator = Validators.WhenMatch<int>(u => u > 10, b => b.Age(), b => b.Min(5));
         Assert.NotNull(validator);
-        Assert.Single(validator._conditions);
-        Assert.NotNull(validator._defaultValidators);
+        Assert.NotNull(validator._conditionResult);
+        Assert.Single(validator._conditionResult.ConditionalRules);
+        Assert.NotNull(validator._conditionResult.DefaultRules);
 
         var validator2 = Validators.WhenMatch<int>(u => u > 10, "错误消息1");
         Assert.NotNull(validator2);
-        Assert.Single(validator2._conditions);
-        Assert.Null(validator2._defaultValidators);
+        Assert.Single(validator2._conditionResult.ConditionalRules);
+        Assert.Null(validator2._conditionResult.DefaultRules);
 
         var validator3 =
             Validators.WhenMatch<int>(u => u > 10, typeof(TestValidationMessages), "TestValidator_ValidationError");
         Assert.NotNull(validator3);
-        Assert.Single(validator3._conditions);
-        Assert.Null(validator3._defaultValidators);
+        Assert.Single(validator3._conditionResult.ConditionalRules);
+        Assert.Null(validator3._conditionResult.DefaultRules);
     }
 
     [Fact]

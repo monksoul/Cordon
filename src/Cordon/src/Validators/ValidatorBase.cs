@@ -417,7 +417,9 @@ public abstract class ValidatorBase
     ///     <see cref="string" />
     /// </returns>
     public virtual string? FormatErrorMessage(string name) =>
-        string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name);
+        (string?)ErrorMessageString is null
+            ? null
+            : string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name);
 
     /// <summary>
     ///     使用指定资源键设置验证错误消息

@@ -14,18 +14,18 @@ public class ConditionalValidatorTests
     public void New_ReturnOK()
     {
         var validator = new ConditionalValidator<int>(_ => { });
-        Assert.NotNull(validator._conditions);
-        Assert.Empty(validator._conditions);
-        Assert.Null(validator._defaultValidators);
+        Assert.NotNull(validator._conditionResult);
+        Assert.Empty(validator._conditionResult.ConditionalRules);
+        Assert.Null(validator._conditionResult.DefaultRules);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Null(validator._errorMessageResourceAccessor());
 
         var validator2 = new ConditionalValidator<string>(builder =>
             builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
-        Assert.NotNull(validator2._conditions);
-        Assert.Single(validator2._conditions);
-        Assert.NotNull(validator2._defaultValidators);
+        Assert.NotNull(validator2._conditionResult);
+        Assert.Single(validator2._conditionResult.ConditionalRules);
+        Assert.NotNull(validator2._conditionResult.DefaultRules);
     }
 
     [Fact]
@@ -216,12 +216,13 @@ public class ConditionalValidatorTests
             builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
 
         var exception = Assert.Throws<ValidationException>(() =>
-            validator.ThrowValidationException("monk__soul", validator._conditions.Last().Validators[0],
+            validator.ThrowValidationException("monk__soul",
+                validator._conditionResult.ConditionalRules.Last().Validators[0],
                 new LegacyValidationContext { DisplayName = "Value" }));
         Assert.Equal("The Value field is not a valid e-mail address.", exception.Message);
 
         var exception2 = Assert.Throws<ValidationException>(() =>
-            validator.ThrowValidationException("monksoul@qq", validator._defaultValidators![0],
+            validator.ThrowValidationException("monksoul@qq", validator._conditionResult.DefaultRules![0],
                 new LegacyValidationContext { DisplayName = "Value" }));
         Assert.Equal("The field Value is not a valid username.", exception2.Message);
     }
@@ -234,10 +235,11 @@ public class ConditionalValidatorTests
                 .Otherwise(b => b.AddAnnotations(new UserNameAttribute())));
 
         var conditionValueAnnotationValidator =
-            validator._conditions.SelectMany(u => u.Validators).First() as ValueAnnotationValidator;
+            validator._conditionResult.ConditionalRules.SelectMany(u => u.Validators).First() as
+                ValueAnnotationValidator;
         Assert.NotNull(conditionValueAnnotationValidator);
         var defaultValueAnnotationValidator =
-            validator._defaultValidators?[0] as ValueAnnotationValidator;
+            validator._conditionResult.DefaultRules?[0] as ValueAnnotationValidator;
         Assert.NotNull(defaultValueAnnotationValidator);
 
         Assert.Null(conditionValueAnnotationValidator._serviceProvider);

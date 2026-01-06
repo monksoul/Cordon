@@ -7,28 +7,15 @@ namespace Cordon;
 /// <summary>
 ///     <see cref="MustValidator{T}" /> 内部静态类
 /// </summary>
-/// <remarks>可通过 <see cref="Must.False" /> 设置不满足条件时的异常消息。</remarks>
+/// <remarks>可通过 <see cref="Must.WithMessage" /> 设置不满足条件时的异常消息。</remarks>
 public static class Must
 {
     /// <summary>
-    ///     抛出 <see cref="ValidatorException" /> 异常
+    ///     设置错误信息
     /// </summary>
     /// <param name="message">错误消息</param>
     [DoesNotReturn]
-    public static void False(string message) => ValidatorException.Throw(message);
-
-    /// <summary>
-    ///     抛出 <see cref="ValidatorException" /> 异常
-    /// </summary>
-    /// <param name="condition">条件</param>
-    /// <param name="message">错误消息</param>
-    public static void FalseIf(bool condition, string message)
-    {
-        if (condition)
-        {
-            ValidatorException.Throw(message);
-        }
-    }
+    public static void WithMessage(string message) => ValidatorException.Throw(message);
 }
 
 /// <summary>
@@ -73,7 +60,7 @@ public class MustValidator<T> : ValidatorBase<T>
         {
             return Condition(instance!, validationContext);
         }
-        // 检查验证器内部是否抛出 ValidatorException 异常
+        // 检查是否是 ValidatorException 异常
         catch (ValidatorException)
         {
             return false;
@@ -96,14 +83,14 @@ public class MustValidator<T> : ValidatorBase<T>
                 new ValidationResult(FormatErrorMessage(validationContext.DisplayName), validationContext.MemberNames)
             ];
         }
-        // 检查验证器内部是否抛出 ValidatorException 异常
+        // 检查是否是 ValidatorException 异常
         catch (ValidatorException e)
         {
             return
             [
                 new ValidationResult(
-                    string.Format(CultureInfo.CurrentCulture, e.Message, validationContext?.DisplayName),
-                    validationContext?.MemberNames)
+                    string.Format(CultureInfo.CurrentCulture, e.Message, validationContext.DisplayName),
+                    validationContext.MemberNames)
             ];
         }
     }
@@ -117,17 +104,17 @@ public class MustValidator<T> : ValidatorBase<T>
             if (!Condition(instance!, validationContext))
             {
                 throw new ValidationException(
-                    new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
-                        validationContext?.MemberNames), null, instance);
+                    new ValidationResult(FormatErrorMessage(validationContext.DisplayName),
+                        validationContext.MemberNames), null, instance);
             }
         }
-        // 检查验证器内部是否抛出 ValidatorException 异常
+        // 检查是否是 ValidatorException 异常
         catch (ValidatorException e)
         {
             throw new ValidationException(
                 new ValidationResult(
-                    string.Format(CultureInfo.CurrentCulture, e.Message, validationContext?.DisplayName),
-                    validationContext?.MemberNames), null, instance);
+                    string.Format(CultureInfo.CurrentCulture, e.Message, validationContext.DisplayName),
+                    validationContext.MemberNames), null, instance);
         }
     }
 }

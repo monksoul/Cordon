@@ -132,10 +132,6 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
         }
     }
 
-    /// <inheritdoc />
-    public override string? FormatErrorMessage(string name) =>
-        (string?)ErrorMessageString is null ? null : base.FormatErrorMessage(name);
-
     /// <summary>
     ///     创建 <see cref="ValidationContext" /> 实例
     /// </summary>

@@ -51,8 +51,8 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     /// <summary>
     ///     <inheritdoc cref="CompositeMode" />
     /// </summary>
-    /// <remarks>默认值为：<see cref="CompositeMode.FailFast" />。</remarks>
-    public CompositeMode Mode { get; set; } = CompositeMode.FailFast;
+    /// <remarks>默认值为：<see cref="CompositeMode.All" />。</remarks>
+    public CompositeMode Mode { get; set; } = CompositeMode.All;
 
     /// <inheritdoc />
     public void Dispose()
@@ -69,7 +69,7 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
     public override bool IsValid(object? value, IValidationContext? validationContext) =>
         Mode switch
         {
-            CompositeMode.FailFast or CompositeMode.All => Validators.All(u => u.IsValid(value, validationContext)),
+            CompositeMode.All or CompositeMode.FailFast => Validators.All(u => u.IsValid(value, validationContext)),
             CompositeMode.Any => Validators.Any(u => u.IsValid(value, validationContext)),
             _ => throw new NotSupportedException()
         };
@@ -132,7 +132,7 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
                 firstFailedValidator ??= validator;
 
                 // 检查验证器模式是否是遇到首个验证失败即停止后续验证
-                if (Mode is CompositeMode.FailFast or CompositeMode.All)
+                if (Mode is CompositeMode.All or CompositeMode.FailFast)
                 {
                     ThrowValidationException(value, validator, validationContext);
                 }
@@ -150,10 +150,6 @@ public class CompositeValidator : ValidatorBase, IValidatorInitializer, IDisposa
             ThrowValidationException(value, firstFailedValidator, validationContext);
         }
     }
-
-    /// <inheritdoc />
-    public override string? FormatErrorMessage(string name) =>
-        (string?)ErrorMessageString is null ? null : base.FormatErrorMessage(name);
 
     /// <summary>
     ///     添加验证器
