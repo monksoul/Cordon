@@ -201,114 +201,35 @@ public class ValueValidatorValidationTests
     [Fact]
     public void Composite_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() =>
-            new ValueValidator<object>().Composite((Action<FluentValidatorBuilder<object>>)null!));
+            new ValueValidator<object>().Composite(null!));
 
     [Fact]
     public void Composite_ReturnOK()
     {
-        var valueValidator = new ValueValidator<object>().Composite(new NotNullValidator(), new MinLengthValidator(3));
+        var valueValidator = new ValueValidator<object>().Composite(u => u.NotNull().MinLength(3));
 
         Assert.Single(valueValidator.Validators);
 
-        var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
+        var addedValidator = valueValidator._lastAddedValidator as CompositeValidator<object>;
         Assert.NotNull(addedValidator);
-        Assert.Equal(2, addedValidator.Validators.Count);
+        Assert.Equal(2, addedValidator._validators.Count);
 
         Assert.False(valueValidator.IsValid(null));
         Assert.False(valueValidator.IsValid("Fu"));
         Assert.True(valueValidator.IsValid("百小僧"));
 
         var valueValidator2 =
-            new ValueValidator<object>().Composite([new EmailAddressValidator(), new UserNameValidator()],
-                CompositeMode.Any);
+            new ValueValidator<object>().Composite(u => u.EmailAddress().UserName(), CompositeMode.Any);
 
         Assert.Single(valueValidator2.Validators);
 
-        var addedValidator2 = valueValidator2._lastAddedValidator as CompositeValidator;
+        var addedValidator2 = valueValidator2._lastAddedValidator as CompositeValidator<object>;
         Assert.NotNull(addedValidator2);
-        Assert.Equal(2, addedValidator2.Validators.Count);
+        Assert.Equal(2, addedValidator2._validators.Count);
 
         Assert.True(valueValidator2.IsValid(null));
         Assert.True(valueValidator2.IsValid("monksoul@outlook.com"));
         Assert.True(valueValidator2.IsValid("monksoul"));
-
-        var valueValidator3 =
-            new ValueValidator<object>().Composite(u => u.Required().MinLength(2));
-
-        Assert.Single(valueValidator3.Validators);
-
-        var addedValidator3 = valueValidator3._lastAddedValidator as CompositeValidator;
-        Assert.NotNull(addedValidator3);
-        Assert.Equal(2, addedValidator3.Validators.Count);
-
-        Assert.False(valueValidator3.IsValid(null));
-        Assert.True(valueValidator3.IsValid("Furion"));
-        Assert.False(valueValidator3.IsValid("F"));
-    }
-
-    [Fact]
-    public void All_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new ValueValidator<object>().All(null!));
-
-    [Fact]
-    public void All_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<object>().All(u => u.NotNull().MinLength(3));
-
-        Assert.Single(valueValidator.Validators);
-
-        var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
-        Assert.NotNull(addedValidator);
-        Assert.Equal(CompositeMode.All, addedValidator.Mode);
-        Assert.Equal(2, addedValidator.Validators.Count);
-
-        Assert.False(valueValidator.IsValid(null));
-        Assert.False(valueValidator.IsValid("Fu"));
-        Assert.True(valueValidator.IsValid("百小僧"));
-    }
-
-    [Fact]
-    public void Any_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() =>
-            new ValueValidator<object>().Any(null!));
-
-    [Fact]
-    public void Any_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<object>().Any(u => u.EmailAddress().UserName());
-
-        Assert.Single(valueValidator.Validators);
-
-        var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
-        Assert.NotNull(addedValidator);
-        Assert.Equal(CompositeMode.Any, addedValidator.Mode);
-        Assert.Equal(2, addedValidator.Validators.Count);
-
-        Assert.True(valueValidator.IsValid(null));
-        Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
-        Assert.True(valueValidator.IsValid("monksoul"));
-    }
-
-    [Fact]
-    public void FailFast_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() =>
-            new ValueValidator<object>().FailFast(null!));
-
-    [Fact]
-    public void FailFast_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<object>().FailFast(u => u.NotNull().MinLength(3));
-
-        Assert.Single(valueValidator.Validators);
-
-        var addedValidator = valueValidator._lastAddedValidator as CompositeValidator;
-        Assert.NotNull(addedValidator);
-        Assert.Equal(CompositeMode.FailFast, addedValidator.Mode);
-        Assert.Equal(2, addedValidator.Validators.Count);
-
-        Assert.False(valueValidator.IsValid(null));
-        Assert.False(valueValidator.IsValid("Fu"));
-        Assert.True(valueValidator.IsValid("百小僧"));
     }
 
     [Fact]

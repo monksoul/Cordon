@@ -270,20 +270,20 @@ public class PropertyValidatorValidationTests
     [Fact]
     public void Composite_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() => new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Data1).Composite((Action<FluentValidatorBuilder<object>>)null!));
+            .RuleFor(u => u.Data1).Composite(null!));
 
     [Fact]
     public void Composite_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .Composite(new NotNullValidator(), new MinLengthValidator(3));
+            .Composite(u => u.NotNull().MinLength(3));
 
         Assert.Single(propertyValidator.Validators);
 
-        var addedValidator = propertyValidator._lastAddedValidator as CompositeValidator;
+        var addedValidator = propertyValidator._lastAddedValidator as CompositeValidator<object>;
         Assert.NotNull(addedValidator);
-        Assert.Equal(2, addedValidator.Validators.Count);
+        Assert.Equal(2, addedValidator._validators.Count);
 
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "Fu" }));
@@ -291,103 +291,17 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator2 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .Composite([new EmailAddressValidator(), new UserNameValidator()], CompositeMode.Any);
+            .Composite(u => u.EmailAddress().UserName(), CompositeMode.Any);
 
         Assert.Single(propertyValidator2.Validators);
 
-        var addedValidator2 = propertyValidator2._lastAddedValidator as CompositeValidator;
+        var addedValidator2 = propertyValidator2._lastAddedValidator as CompositeValidator<object>;
         Assert.NotNull(addedValidator2);
-        Assert.Equal(2, addedValidator2.Validators.Count);
+        Assert.Equal(2, addedValidator2._validators.Count);
 
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = null }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "monksoul@outlook.com" }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "monksoul" }));
-
-        var propertyValidator3 = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Data1)
-            .Composite(u => u.Required().MinLength(2));
-
-        Assert.Single(propertyValidator3.Validators);
-
-        var addedValidator3 = propertyValidator3._lastAddedValidator as CompositeValidator;
-        Assert.NotNull(addedValidator3);
-        Assert.Equal(2, addedValidator3.Validators.Count);
-
-        Assert.False(propertyValidator3.IsValid(new ValidationModel { Data1 = null }));
-        Assert.True(propertyValidator3.IsValid(new ValidationModel { Data1 = "Furion" }));
-        Assert.False(propertyValidator3.IsValid(new ValidationModel { Data1 = "F" }));
-    }
-
-    [Fact]
-    public void All_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() =>
-            new ObjectValidator<ValidationModel>().RuleFor(u => u.Data1).All(null!));
-
-    [Fact]
-    public void All_ReturnOK()
-    {
-        var propertyValidator = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Data1)
-            .All(u => u.NotNull().MinLength(3));
-
-        Assert.Single(propertyValidator.Validators);
-
-        var addedValidator = propertyValidator._lastAddedValidator as CompositeValidator;
-        Assert.NotNull(addedValidator);
-        Assert.Equal(CompositeMode.All, addedValidator.Mode);
-        Assert.Equal(2, addedValidator.Validators.Count);
-
-        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
-        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "Fu" }));
-        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "百小僧" }));
-    }
-
-    [Fact]
-    public void Any_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() =>
-            new ObjectValidator<ValidationModel>().RuleFor(u => u.Data1).Any(null!));
-
-    [Fact]
-    public void Any_ReturnOK()
-    {
-        var propertyValidator = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Data1)
-            .Any(u => u.EmailAddress().UserName());
-
-        Assert.Single(propertyValidator.Validators);
-
-        var addedValidator = propertyValidator._lastAddedValidator as CompositeValidator;
-        Assert.NotNull(addedValidator);
-        Assert.Equal(CompositeMode.Any, addedValidator.Mode);
-        Assert.Equal(2, addedValidator.Validators.Count);
-
-        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
-        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "monksoul@outlook.com" }));
-        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "monksoul" }));
-    }
-
-    [Fact]
-    public void FailFast_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() =>
-            new ObjectValidator<ValidationModel>().RuleFor(u => u.Data1).FailFast(null!));
-
-    [Fact]
-    public void FailFast_ReturnOK()
-    {
-        var propertyValidator = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Data1)
-            .FailFast(u => u.NotNull().MinLength(3));
-
-        Assert.Single(propertyValidator.Validators);
-
-        var addedValidator = propertyValidator._lastAddedValidator as CompositeValidator;
-        Assert.NotNull(addedValidator);
-        Assert.Equal(CompositeMode.FailFast, addedValidator.Mode);
-        Assert.Equal(2, addedValidator.Validators.Count);
-
-        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
-        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "Fu" }));
-        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "百小僧" }));
     }
 
     [Fact]
@@ -1211,12 +1125,12 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator3 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Number1)
-            .Must_((_, ctx) => ctx.Instance.Number1 > 10);
+            .Must((_, ctx) => ctx.Instance > 10);
 
         Assert.Single(propertyValidator3.Validators);
 
         var addedValidator3 =
-            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<int>>;
+            propertyValidator3._lastAddedValidator as MustValidator<int>;
         Assert.NotNull(addedValidator3);
 
         Assert.True(propertyValidator3.IsValid(new ValidationModel { Number1 = 11 }));
@@ -1265,12 +1179,12 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator3 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
-            .MustIfNotNull_((_, ctx) => ctx.Instance.String1 != "furion");
+            .MustIfNotNull((_, ctx) => ctx.Instance != "furion");
 
         Assert.Single(propertyValidator3.Validators);
 
         var addedValidator3 =
-            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<string>>;
+            propertyValidator3._lastAddedValidator as MustValidator<string>;
         Assert.NotNull(addedValidator3);
 
         Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = null }));
@@ -1321,12 +1235,12 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator3 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
-            .MustIfNotNullOrEmpty_((_, ctx) => ctx.Instance.String1 != "furion");
+            .MustIfNotNullOrEmpty((_, ctx) => ctx.Instance != "furion");
 
         Assert.Single(propertyValidator3.Validators);
 
         var addedValidator3 =
-            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<string>>;
+            propertyValidator3._lastAddedValidator as MustValidator<string>;
         Assert.NotNull(addedValidator3);
 
         Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = null }));
@@ -1387,13 +1301,13 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator3 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
-            .MustAny_(allowedDomains,
-                (_, x, ctx) => ctx.Instance.String1!.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+            .MustAny(allowedDomains,
+                (_, x, ctx) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         Assert.Single(propertyValidator3.Validators);
 
         var addedValidator3 =
-            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<string>>;
+            propertyValidator3._lastAddedValidator as MustValidator<string>;
         Assert.NotNull(addedValidator3);
 
         Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
@@ -1453,13 +1367,13 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator3 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
-            .MustAll_(allowedDomains,
-                (_, x, ctx) => ctx.Instance.String1!.EndsWith(x, StringComparison.OrdinalIgnoreCase));
+            .MustAll(allowedDomains,
+                (_, x, ctx) => ctx.Instance.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         Assert.Single(propertyValidator3.Validators);
 
         var addedValidator3 =
-            propertyValidator3._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<string>>;
+            propertyValidator3._lastAddedValidator as MustValidator<string>;
         Assert.NotNull(addedValidator3);
 
         Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));

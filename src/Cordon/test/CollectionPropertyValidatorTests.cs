@@ -269,6 +269,7 @@ public class CollectionPropertyValidatorTests
 
         var collectionValidator =
             propertyValidator.Validators.OfType<CollectionValidator<Child>>().First();
+        Assert.True(collectionValidator.IsNested);
         var elementValidator = collectionValidator._elementValidator as ObjectValidator<Child>;
         Assert.NotNull(elementValidator);
         Assert.Null(elementValidator.InheritedRuleSets);
@@ -306,6 +307,7 @@ public class CollectionPropertyValidatorTests
                 new StringValidator());
         var collectionValidator4 =
             propertyValidator4.Validators.OfType<CollectionValidator<string?>>().First();
+        Assert.True(collectionValidator4.IsNested);
         var elementValidator4 = collectionValidator4._elementValidator as ValueValidator<string?>;
         Assert.NotNull(elementValidator4);
     }

@@ -113,58 +113,14 @@ public class ValidatorsTests
     [Fact]
     public void Composite_ReturnOK()
     {
-        var validator = Validators.Composite(Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧"));
-        Assert.Equal(2, validator.Validators.Count);
+        var validator = Validators.Composite<string>(u => u.ChineseName().AllowedValues("百签", "百小僧"));
+        Assert.Equal(2, validator._validators.Count);
         Assert.Equal(CompositeMode.FailFast, validator.Mode);
 
-        var validator2 = Validators.Composite([Validators.ChineseName(), Validators.AllowedValues("百签", "百小僧")],
-            CompositeMode.Any);
-        Assert.Equal(2, validator2.Validators.Count);
+        var validator2 =
+            Validators.Composite<string>(u => u.ChineseName().AllowedValues("百签", "百小僧"), CompositeMode.Any);
+        Assert.Equal(2, validator2._validators.Count);
         Assert.Equal(CompositeMode.Any, validator2.Mode);
-
-        var validator3 = Validators.Composite(u => u.Required().MinLength(2));
-        Assert.Equal(2, validator3.Validators.Count);
-        Assert.Equal(CompositeMode.FailFast, validator3.Mode);
-
-        var validator4 = Validators.Composite(u => u.Required().MinLength(2), CompositeMode.All);
-        Assert.Equal(2, validator4.Validators.Count);
-        Assert.Equal(CompositeMode.All, validator4.Mode);
-    }
-
-    [Fact]
-    public void All_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => Validators.All(null!));
-
-    [Fact]
-    public void All_ReturnOK()
-    {
-        var validator = Validators.All(u => u.ChineseName().AllowedValues("百签", "百小僧"));
-        Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(CompositeMode.All, validator.Mode);
-    }
-
-    [Fact]
-    public void Any_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => Validators.Any(null!));
-
-    [Fact]
-    public void Any_ReturnOK()
-    {
-        var validator = Validators.Any(u => u.ChineseName().AllowedValues("百签", "百小僧"));
-        Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(CompositeMode.Any, validator.Mode);
-    }
-
-    [Fact]
-    public void FailFast_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => Validators.FailFast(null!));
-
-    [Fact]
-    public void FailFast_ReturnOK()
-    {
-        var validator = Validators.FailFast(u => u.ChineseName().AllowedValues("百签", "百小僧"));
-        Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(CompositeMode.FailFast, validator.Mode);
     }
 
     [Fact]

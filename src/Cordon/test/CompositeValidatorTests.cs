@@ -7,34 +7,24 @@ namespace Cordon.Tests;
 public class CompositeValidatorTests
 {
     [Fact]
-    public void New_Invalid_Parameters()
-    {
-        Assert.Throws<ArgumentNullException>(() => new CompositeValidator(null!));
-
-        Assert.Throws<ArgumentNullException>(() =>
-            new CompositeValidator(new RequiredValidator(), null!, new ChineseValidator()));
-    }
+    public void New_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => new CompositeValidator<string>(null!));
 
     [Fact]
     public void New_ReturnOK()
     {
-        var validator = new CompositeValidator();
+        var validator = new CompositeValidator<string>(_ => { });
         Assert.NotNull(validator);
-        Assert.Equal(0, validator._highPriorityEndIndex);
         Assert.NotNull(validator._validators);
         Assert.Empty(validator._validators);
 
         var validator2 =
-            new CompositeValidator(new ChineseValidator(), new RequiredValidator(), new NotNullValidator());
+            new CompositeValidator<string>(u => u.Chinese().Required().NotNull());
 
         Assert.NotNull(validator2._validators);
         Assert.Equal(3, validator2._validators.Count);
         Assert.Equal([typeof(NotNullValidator), typeof(RequiredValidator), typeof(ChineseValidator)],
             validator2._validators.Select(u => u.GetType()));
-        Assert.NotNull(validator2.Validators);
-        Assert.Equal(3, validator2.Validators.Count);
-        Assert.Equal([typeof(NotNullValidator), typeof(RequiredValidator), typeof(ChineseValidator)],
-            validator2.Validators.Select(u => u.GetType()));
         Assert.Equal(CompositeMode.FailFast, validator2.Mode);
 
         Assert.NotNull(validator2._errorMessageResourceAccessor);
@@ -44,26 +34,26 @@ public class CompositeValidatorTests
     [Fact]
     public void IsValid_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese());
         Assert.True(validator.IsValid(null));
 
-        var validator2 = new CompositeValidator(new ChineseValidator(), new RequiredValidator());
+        var validator2 = new CompositeValidator<string>(u => u.Chinese().Required());
         Assert.False(validator2.IsValid(null));
 
-        var validator3 = new CompositeValidator(new ChineseValidator(), new NotNullValidator());
+        var validator3 = new CompositeValidator<string>(u => u.Chinese().NotNull());
         Assert.False(validator3.IsValid(null));
 
-        var validator4 = new CompositeValidator(new ChineseValidator(), new NotNullValidator());
+        var validator4 = new CompositeValidator<string>(u => u.Chinese().NotNull());
         Assert.True(validator4.IsValid("百小僧"));
 
-        var validator5 = new CompositeValidator(new ChineseValidator(), new NotNullValidator());
+        var validator5 = new CompositeValidator<string>(u => u.Chinese().NotNull());
         Assert.False(validator5.IsValid("Furion"));
     }
 
     [Fact]
     public void IsValid_WithMode_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese().ChineseName());
         Assert.False(validator.IsValid("凯文·杜兰特"));
 
         validator.Mode = CompositeMode.FailFast;
@@ -76,17 +66,17 @@ public class CompositeValidatorTests
     [Fact]
     public void GetValidationResults_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese());
         Assert.Null(validator.GetValidationResults(null, "Value"));
 
-        var validator2 = new CompositeValidator(new ChineseValidator(), new RequiredValidator());
+        var validator2 = new CompositeValidator<string>(u => u.Chinese().Required());
         Assert.Null(validator2.GetValidationResults("百小僧", "Value"));
     }
 
     [Fact]
     public void GetValidationResults_WithNullValue_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator(), new RequiredValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese().Required());
         var validationResults = validator.GetValidationResults(null, "Value");
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
@@ -110,7 +100,7 @@ public class CompositeValidatorTests
     [Fact]
     public void GetValidationResults_WithNoNullValue_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator(), new RequiredValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese().Required());
         var validationResults = validator.GetValidationResults("Furion", "Value");
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
@@ -135,7 +125,7 @@ public class CompositeValidatorTests
     [Fact]
     public void GetValidationResults_WithMode_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese().ChineseName());
         Assert.Null(validator.GetValidationResults(null, "Value"));
 
         validator.Mode = CompositeMode.FailFast;
@@ -145,7 +135,8 @@ public class CompositeValidatorTests
         Assert.Null(validator.GetValidationResults(null, "Value"));
 
         var validator2 =
-            new CompositeValidator(new ChineseValidator(), new ChineseNameValidator()).UseMode(CompositeMode.All);
+            new CompositeValidator<string>(u => u.Chinese().ChineseName()).UseMode(
+                CompositeMode.All);
         var validationResults = validator2.GetValidationResults("Furion", "Value");
         Assert.NotNull(validationResults);
         Assert.Equal(2, validationResults.Count);
@@ -160,7 +151,7 @@ public class CompositeValidatorTests
         Assert.NotNull(validationResults);
         Assert.Equal(2, validationResults.Count);
 
-        var validator3 = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
+        var validator3 = new CompositeValidator<string>(u => u.Chinese().ChineseName());
         var validationResults2 = validator3.GetValidationResults("凯文·杜兰特", "Value");
         Assert.NotNull(validationResults2);
         Assert.Single(validationResults2);
@@ -178,17 +169,17 @@ public class CompositeValidatorTests
     [Fact]
     public void Validate_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese());
         validator.Validate(null, "Value");
 
-        var validator2 = new CompositeValidator(new ChineseValidator(), new RequiredValidator());
+        var validator2 = new CompositeValidator<string>(u => u.Chinese().Required());
         validator2.Validate("百小僧", "Value");
     }
 
     [Fact]
     public void Validate_WithNullValue_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator(), new RequiredValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese().Required());
         var exception = Assert.Throws<ValidationException>(() => validator.Validate(null, "Value"));
         Assert.Equal("The Value field is required.", exception.Message);
 
@@ -206,7 +197,7 @@ public class CompositeValidatorTests
     [Fact]
     public void Validate_WithNoNullValue_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator(), new RequiredValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese().Required());
         var exception = Assert.Throws<ValidationException>(() => validator.Validate("Furion", "Value"));
         Assert.Equal("The field Value contains invalid Chinese characters.", exception.Message);
 
@@ -224,7 +215,7 @@ public class CompositeValidatorTests
     [Fact]
     public void Validate_WithMode_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese().ChineseName());
         validator.Validate(null, "Value");
 
         validator.Mode = CompositeMode.FailFast;
@@ -233,7 +224,7 @@ public class CompositeValidatorTests
         validator.Mode = CompositeMode.Any;
         validator.Validate(null, "Value");
 
-        var validator2 = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
+        var validator2 = new CompositeValidator<string>(u => u.Chinese().ChineseName());
         Assert.Throws<ValidationException>(() => validator2.Validate("Furion", "Value"));
 
         validator2.Mode = CompositeMode.FailFast;
@@ -242,7 +233,7 @@ public class CompositeValidatorTests
         validator2.Mode = CompositeMode.Any;
         Assert.Throws<ValidationException>(() => validator2.Validate("Furion", "Value"));
 
-        var validator3 = new CompositeValidator(new ChineseValidator(), new ChineseNameValidator());
+        var validator3 = new CompositeValidator<string>(u => u.Chinese().ChineseName());
         Assert.Throws<ValidationException>(() => validator3.Validate("凯文·杜兰特", "Value"));
 
         validator3.Mode = CompositeMode.FailFast;
@@ -255,7 +246,7 @@ public class CompositeValidatorTests
     [Fact]
     public void FormatErrorMessage_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator(), new RequiredValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese().Required());
         Assert.Null(validator.FormatErrorMessage(null!));
 
         validator.ErrorMessage = "自定义错误信息";
@@ -263,27 +254,9 @@ public class CompositeValidatorTests
     }
 
     [Fact]
-    public void Add_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new CompositeValidator().Add(null!));
-
-    [Fact]
-    public void Add_ReturnOK()
-    {
-        var validator = new CompositeValidator(new ChineseValidator());
-        validator.Add(new RequiredValidator());
-        validator.Add(new NotNullValidator(), new ChineseNameValidator());
-
-        Assert.Equal(4, validator.Validators.Count);
-        Assert.Equal(
-        [
-            typeof(NotNullValidator), typeof(RequiredValidator), typeof(ChineseValidator), typeof(ChineseNameValidator)
-        ], validator.Validators.Select(c => c.GetType()));
-    }
-
-    [Fact]
     public void UseMode_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese());
         Assert.Equal(CompositeMode.FailFast, validator.Mode);
         validator.UseMode(CompositeMode.All);
         Assert.Equal(CompositeMode.All, validator.Mode);
@@ -292,29 +265,29 @@ public class CompositeValidatorTests
     [Fact]
     public void Dispose_ReturnOK()
     {
-        var validator = new CompositeValidator(new ChineseValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese());
         validator.Dispose();
     }
 
     [Fact]
     public void ThrowValidationException_Invalid_Parameters()
     {
-        var validator = new CompositeValidator(new ChineseValidator(), new RequiredValidator());
+        var validator = new CompositeValidator<string>(u => u.Chinese().Required());
         Assert.Throws<ArgumentNullException>(() => validator.ThrowValidationException(null, null!, null!));
     }
 
     [Fact]
     public void ThrowValidationException_ReturnOK()
     {
-        var validator = new CompositeValidator(new RequiredValidator(), new ChineseValidator());
+        var validator = new CompositeValidator<string>(u => u.Required().Chinese());
 
         var exception = Assert.Throws<ValidationException>(() =>
-            validator.ThrowValidationException(null, validator.Validators.First(),
+            validator.ThrowValidationException(null, validator._validators.First(),
                 new LegacyValidationContext { DisplayName = "Value" }));
         Assert.Equal("The Value field is required.", exception.Message);
 
         var exception2 = Assert.Throws<ValidationException>(() =>
-            validator.ThrowValidationException("Furion", validator.Validators.Last(),
+            validator.ThrowValidationException("Furion", validator._validators.Last(),
                 new LegacyValidationContext { DisplayName = "Value" }));
         Assert.Equal("The field Value contains invalid Chinese characters.", exception2.Message);
     }
@@ -322,8 +295,8 @@ public class CompositeValidatorTests
     [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
-        var validator = new CompositeValidator(new ValueAnnotationValidator(new RequiredAttribute()));
-        var valueAnnotationValidator = validator.Validators[0] as ValueAnnotationValidator;
+        var validator = new CompositeValidator<string>(u => u.AddAnnotations(new RequiredAttribute()));
+        var valueAnnotationValidator = validator._validators[0] as ValueAnnotationValidator;
         Assert.NotNull(valueAnnotationValidator);
         Assert.Null(valueAnnotationValidator._serviceProvider);
 
@@ -331,40 +304,5 @@ public class CompositeValidatorTests
         validator.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(valueAnnotationValidator._serviceProvider);
-    }
-
-    [Fact]
-    public void AddValidatorCore_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new CompositeValidator().AddValidatorCore(null!));
-
-    [Fact]
-    public void AddValidatorCore_ReturnOK()
-    {
-        using var validator = new CompositeValidator();
-
-        validator.AddValidatorCore(new AgeValidator());
-        Assert.Single(validator.Validators);
-        Assert.Equal(0, validator._highPriorityEndIndex);
-
-        validator.AddValidatorCore(new RequiredValidator());
-        Assert.Equal(2, validator.Validators.Count);
-        Assert.Equal(1, validator._highPriorityEndIndex);
-        Assert.True(validator.Validators.First() is RequiredValidator);
-
-        validator.AddValidatorCore(new NotNullValidator());
-        Assert.Equal(3, validator.Validators.Count);
-        Assert.Equal(2, validator._highPriorityEndIndex);
-        Assert.True(validator.Validators.First() is NotNullValidator);
-
-        validator.AddValidatorCore(new EmailAddressValidator());
-        Assert.Equal(4, validator.Validators.Count);
-        Assert.Equal(2, validator._highPriorityEndIndex);
-        Assert.True(validator.Validators.Last() is EmailAddressValidator);
-
-        var newNullValidator = new NotNullValidator();
-        validator.AddValidatorCore(newNullValidator);
-        Assert.Equal(5, validator.Validators.Count);
-        Assert.Equal(3, validator._highPriorityEndIndex);
-        Assert.Equal(newNullValidator, validator.Validators[1]);
     }
 }

@@ -102,7 +102,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     /// <summary>
     ///     抛出验证异常
     /// </summary>
-    /// <param name="value">对象</param>
+    /// <param name="instance">对象</param>
     /// <param name="validator">
     ///     <see cref="ValidatorBase" />
     /// </param>
@@ -110,7 +110,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     ///     <see cref="IValidationContext" />
     /// </param>
     /// <exception cref="ValidationException"></exception>
-    internal void ThrowValidationException(object? value, ValidatorBase validator,
+    internal void ThrowValidationException(T? instance, ValidatorBase validator,
         IValidationContext? validationContext)
     {
         // 空检查
@@ -119,13 +119,13 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         // 检查是否配置了自定义错误信息
         if ((string?)ErrorMessageString is null)
         {
-            validator.Validate(value, validationContext);
+            validator.Validate(instance, validationContext);
         }
         else
         {
             throw new ValidationException(
                 new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
-                    validationContext?.MemberNames), null, value);
+                    validationContext?.MemberNames), null, instance);
         }
     }
 

@@ -27,6 +27,7 @@ public class ObjectValidatorTests
         Assert.Null(validator.WhenCondition);
         Assert.Null(validator._memberPath);
         Assert.NotNull(ObjectValidator<Tests.ObjectModel>.ValidationContextsKey);
+        Assert.False(validator.IsNested);
 
         using var validator2 = new ObjectValidator<ObjectModel>(new Dictionary<object, object?>());
         Assert.NotNull(validator2.Options);

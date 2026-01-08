@@ -118,6 +118,12 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     /// <remarks>用于 <see cref="PropertyValidator{T,TProperty,TSelf}.ChildRules" /> 场景。</remarks>
     internal string?[]? InheritedRuleSets { get; set => field = value?.Select(u => u?.Trim()).ToArray(); }
 
+    /// <summary>
+    ///     指示当前验证器是否作为子对象验证器
+    /// </summary>
+    /// <remarks>默认值为：<c>false</c>。</remarks>
+    internal bool IsNested { get; set; }
+
     /// <inheritdoc />
     string? IMemberPathRepairable.MemberPath
     {
@@ -160,13 +166,8 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
             return false;
         }
 
-        // 检查是否设置了对象级别验证器
-        if (_objectValidator is not null && !_objectValidator.IsValid(instance, resolvedRuleSets))
-        {
-            return false;
-        }
-
-        return Validators.All(u => u.IsValid(instance, resolvedRuleSets));
+        return Validators.All(u => u.IsValid(instance, resolvedRuleSets)) &&
+               (_objectValidator is null || _objectValidator.IsValid(instance, resolvedRuleSets));
     }
 
     /// <inheritdoc />
@@ -197,15 +198,15 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
             validationResults.AddRange(_annotationValidator.GetValidationResults(instance, validationContext) ?? []);
         }
 
+        // 获取所有属性验证器验证结果集合
+        validationResults.AddRange(
+            Validators.SelectMany(u => u.GetValidationResults(instance, resolvedRuleSets) ?? []));
+
         // 检查是否设置了对象级别验证器
         if (_objectValidator is not null)
         {
             validationResults.AddRange(_objectValidator.GetValidationResults(instance, resolvedRuleSets) ?? []);
         }
-
-        // 获取所有属性验证器验证结果集合
-        validationResults.AddRange(
-            Validators.SelectMany(u => u.GetValidationResults(instance, resolvedRuleSets) ?? []));
 
         return validationResults.ToResults();
     }
@@ -235,17 +236,17 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
             _annotationValidator.Validate(instance, validationContext);
         }
 
+        // 遍历属性验证器集合
+        foreach (var validator in Validators)
+        {
+            validator.Validate(instance, resolvedRuleSets);
+        }
+
         // 检查是否设置了对象级别验证器
         // ReSharper disable once UseNullPropagation
         if (_objectValidator is not null)
         {
             _objectValidator.Validate(instance, resolvedRuleSets);
-        }
-
-        // 遍历属性验证器集合
-        foreach (var validator in Validators)
-        {
-            validator.Validate(instance, resolvedRuleSets);
         }
     }
 
@@ -318,21 +319,39 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     void IValidationAnnotationsConfigurable.UseAnnotationValidation(bool enabled) => UseAnnotationValidation(enabled);
 
     /// <inheritdoc />
-    public override bool IsValid(T? instance, ValidationContext<T> validationContext) =>
-        instance is null || IsValid(instance, validationContext.RuleSets);
+    public override bool IsValid(T? instance, ValidationContext<T> validationContext)
+    {
+        // 检查是否是嵌套验证器
+        if (instance is null && IsNested)
+        {
+            return true;
+        }
+
+        return IsValid(instance, validationContext.RuleSets);
+    }
 
     /// <inheritdoc />
-    public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext) =>
-        instance is null ? null : GetValidationResults(instance, validationContext.RuleSets);
+    public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext)
+    {
+        // 检查是否是嵌套验证器
+        if (instance is null && IsNested)
+        {
+            return null;
+        }
+
+        return GetValidationResults(instance, validationContext.RuleSets);
+    }
 
     /// <inheritdoc />
     public override void Validate(T? instance, ValidationContext<T> validationContext)
     {
-        // 空检查
-        if (instance is not null)
+        // 检查是否是嵌套验证器
+        if (instance is null && IsNested)
         {
-            Validate(instance, validationContext.RuleSets);
+            return;
         }
+
+        Validate(instance, validationContext.RuleSets);
     }
 
     /// <summary>

@@ -643,7 +643,7 @@ public class ValueValidatorTests
         var subValidator = new StringValueValidator();
         var valueValidator = new ValueValidator<string>();
         valueValidator.AddAnnotations(new RequiredAttribute())
-            .Composite(new MinLengthValidator(3)).SetValidator(subValidator);
+            .Composite(u => u.MinLength(3)).SetValidator(subValidator);
 
         Assert.Null(valueValidator._serviceProvider);
         var valueAnnotationValidator = valueValidator.Validators[0] as ValueAnnotationValidator;

@@ -43,6 +43,12 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
         ErrorMessageResourceAccessor = () => null!;
     }
 
+    /// <summary>
+    ///     指示当前验证器是否作为子对象验证器
+    /// </summary>
+    /// <remarks>默认值为：<c>false</c>。</remarks>
+    internal bool IsNested { get; set; }
+
     /// <inheritdoc />
     string? IMemberPathRepairable.MemberPath
     {
@@ -184,23 +190,41 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
 
     /// <inheritdoc />
     public override bool IsValid(IEnumerable<TElement>? instance,
-        ValidationContext<IEnumerable<TElement>> validationContext) =>
-        instance is null || IsValid(instance, validationContext.RuleSets);
+        ValidationContext<IEnumerable<TElement>> validationContext)
+    {
+        // 检查是否是嵌套验证器
+        if (instance is null && IsNested)
+        {
+            return true;
+        }
+
+        return IsValid(instance, validationContext.RuleSets);
+    }
 
     /// <inheritdoc />
     public override List<ValidationResult>? GetValidationResults(IEnumerable<TElement>? instance,
-        ValidationContext<IEnumerable<TElement>> validationContext) =>
-        instance is null ? null : GetValidationResults(instance, validationContext.RuleSets);
+        ValidationContext<IEnumerable<TElement>> validationContext)
+    {
+        // 检查是否是嵌套验证器
+        if (instance is null && IsNested)
+        {
+            return null;
+        }
+
+        return GetValidationResults(instance, validationContext.RuleSets);
+    }
 
     /// <inheritdoc />
     public override void Validate(IEnumerable<TElement>? instance,
         ValidationContext<IEnumerable<TElement>> validationContext)
     {
-        // 空检查
-        if (instance is not null)
+        // 检查是否是嵌套验证器
+        if (instance is null && IsNested)
         {
-            Validate(instance, validationContext.RuleSets);
+            return;
         }
+
+        Validate(instance, validationContext.RuleSets);
     }
 
     /// <summary>

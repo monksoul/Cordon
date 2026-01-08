@@ -293,6 +293,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             return This;
         }
 
+        // 标记为嵌套验证器
+        objectValidator.IsNested = true;
+
         // 继承当前规则集
         objectValidator.SetInheritedRuleSetsIfNotSet(RuleSets);
 

@@ -143,73 +143,14 @@ public static class Validators
     /// <summary>
     ///     创建组合验证器
     /// </summary>
-    /// <param name="validators">验证器列表</param>
-    /// <returns>
-    ///     <see cref="CompositeValidator" />
-    /// </returns>
-    public static CompositeValidator Composite(params ValidatorBase[] validators) => new(validators);
-
-    /// <summary>
-    ///     创建组合验证器
-    /// </summary>
-    /// <param name="validators">验证器列表</param>
-    /// <param name="mode">
-    ///     <see cref="CompositeMode" />
-    /// </param>
-    /// <returns>
-    ///     <see cref="CompositeValidator" />
-    /// </returns>
-    public static CompositeValidator Composite(ValidatorBase[] validators, CompositeMode mode) =>
-        new(validators) { Mode = mode };
-
-    /// <summary>
-    ///     创建组合验证器
-    /// </summary>
     /// <param name="configure">验证器配置委托</param>
     /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <typeparam name="T">对象类型</typeparam>
     /// <returns>
-    ///     <see cref="CompositeValidator" />
+    ///     <see cref="CompositeValidator{T}" />
     /// </returns>
-    public static CompositeValidator Composite(Action<FluentValidatorBuilder<object>> configure,
-        CompositeMode mode = CompositeMode.FailFast)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
-
-        return Composite([..new FluentValidatorBuilder<object>().Build(configure)], mode);
-    }
-
-    /// <summary>
-    ///     创建组合验证器
-    /// </summary>
-    /// <remarks>验证所有。</remarks>
-    /// <param name="configure">验证器配置委托</param>
-    /// <returns>
-    ///     <see cref="CompositeValidator" />
-    /// </returns>
-    public static CompositeValidator All(Action<FluentValidatorBuilder<object>> configure) =>
-        Composite(configure, CompositeMode.All);
-
-    /// <summary>
-    ///     创建组合验证器
-    /// </summary>
-    /// <remarks>首个验证成功则视为通过。</remarks>
-    /// <param name="configure">验证器配置委托</param>
-    /// <returns>
-    ///     <see cref="CompositeValidator" />
-    /// </returns>
-    public static CompositeValidator Any(Action<FluentValidatorBuilder<object>> configure) =>
-        Composite(configure, CompositeMode.Any);
-
-    /// <summary>
-    ///     创建组合验证器
-    /// </summary>
-    /// <remarks>首个验证失败则停止验证。</remarks>
-    /// <param name="configure">验证器配置委托</param>
-    /// <returns>
-    ///     <see cref="CompositeValidator" />
-    /// </returns>
-    public static CompositeValidator FailFast(Action<FluentValidatorBuilder<object>> configure) => Composite(configure);
+    public static CompositeValidator<T> Composite<T>(Action<FluentValidatorBuilder<T>> configure,
+        CompositeMode mode = CompositeMode.FailFast) => new(configure) { Mode = mode };
 
     /// <summary>
     ///     创建条件验证器

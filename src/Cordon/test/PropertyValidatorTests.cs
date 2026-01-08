@@ -792,6 +792,7 @@ public class PropertyValidatorTests
 
         var propertyObjectValidator =
             propertyValidator.Validators.OfType<ObjectValidator<SubModel>>().First();
+        Assert.True(propertyObjectValidator.IsNested);
         Assert.Null(propertyObjectValidator.InheritedRuleSets);
         Assert.Throws<InvalidOperationException>(() =>
             propertyValidator.SetValidator((ObjectValidator<SubModel>?)null));

@@ -19,6 +19,7 @@ public class CollectionValidatorTests
         Assert.NotNull(collectionValidator._memberPathRepairable);
         Assert.Null(collectionValidator._memberPath);
         Assert.Null(collectionValidator._elementFilter);
+        Assert.False(collectionValidator.IsNested);
 
         Assert.NotNull(collectionValidator._errorMessageResourceAccessor);
         Assert.Null(collectionValidator._errorMessageResourceAccessor());
@@ -193,7 +194,7 @@ public class CollectionValidatorTests
     public void IsValid_ValidatorBase_ReturnOK()
     {
         var collectionValidator =
-            new CollectionValidator<string?>(new ValueValidator<string?>().Required().MinLength(2));
+            new CollectionValidator<string?>(new ValueValidator<string?>().Required().MinLength(2)) { IsNested = true };
         collectionValidator.IsValid(null, new ValidationContext<IEnumerable<string?>>(null!));
     }
 
@@ -201,7 +202,7 @@ public class CollectionValidatorTests
     public void GetValidationResults_ValidatorBase_ReturnOK()
     {
         var collectionValidator =
-            new CollectionValidator<string?>(new ValueValidator<string?>().Required().MinLength(2));
+            new CollectionValidator<string?>(new ValueValidator<string?>().Required().MinLength(2)) { IsNested = true };
         Assert.Null(
             collectionValidator.GetValidationResults(null, new ValidationContext<IEnumerable<string?>>(null!)));
     }
@@ -210,7 +211,7 @@ public class CollectionValidatorTests
     public void Validate_ValidatorBase_ReturnOK()
     {
         var collectionValidator =
-            new CollectionValidator<string?>(new ValueValidator<string?>().Required().MinLength(2));
+            new CollectionValidator<string?>(new ValueValidator<string?>().Required().MinLength(2)) { IsNested = true };
         collectionValidator.Validate(null, new ValidationContext<IEnumerable<string?>>(null!));
     }
 

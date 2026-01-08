@@ -222,72 +222,14 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加组合验证器
     /// </summary>
-    /// <param name="validators">验证器列表</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf Composite(params ValidatorBase[] validators) =>
-        AddValidator(new CompositeValidator(validators));
-
-    /// <summary>
-    ///     添加组合验证器
-    /// </summary>
-    /// <param name="validators">验证器列表</param>
-    /// <param name="mode">
-    ///     <see cref="CompositeMode" />
-    /// </param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf Composite(ValidatorBase[] validators, CompositeMode mode) =>
-        AddValidator(new CompositeValidator(validators) { Mode = mode });
-
-    /// <summary>
-    ///     添加组合验证器
-    /// </summary>
     /// <param name="configure">验证器配置委托</param>
     /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf Composite(Action<FluentValidatorBuilder<T>> configure,
-        CompositeMode mode = CompositeMode.FailFast)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
-
-        return Composite([..new FluentValidatorBuilder<T>().Build(configure)], mode);
-    }
-
-    /// <summary>
-    ///     添加组合验证器
-    /// </summary>
-    /// <remarks>验证所有。</remarks>
-    /// <param name="configure">验证器配置委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf All(Action<FluentValidatorBuilder<T>> configure) => Composite(configure, CompositeMode.All);
-
-    /// <summary>
-    ///     添加组合验证器
-    /// </summary>
-    /// <remarks>首个验证成功则视为通过。</remarks>
-    /// <param name="configure">验证器配置委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf Any(Action<FluentValidatorBuilder<T>> configure) => Composite(configure, CompositeMode.Any);
-
-    /// <summary>
-    ///     添加组合验证器
-    /// </summary>
-    /// <remarks>首个验证失败则停止验证。</remarks>
-    /// <param name="configure">验证器配置委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf FailFast(Action<FluentValidatorBuilder<T>> configure) => Composite(configure);
+        CompositeMode mode = CompositeMode.FailFast) =>
+        AddValidator(new CompositeValidator<T>(configure) { Mode = mode });
 
     /// <summary>
     ///     添加条件验证器
