@@ -77,8 +77,7 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
         // 空检查
         ArgumentNullException.ThrowIfNull(value);
 
-        return Validator.TryValidateObject(value, CreateValidationContext(value, validationContext?.DisplayName), null,
-            ValidateAllProperties);
+        return Validator.TryValidateObject(value, CreateValidationContext(value), null, ValidateAllProperties);
     }
 
     /// <inheritdoc />
@@ -97,8 +96,7 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
          * 参考源码：
          * https://github.com/dotnet/runtime/blob/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.ComponentModel.Annotations/src/System/ComponentModel/DataAnnotations/Validator.cs#L423-L430
          */
-        Validator.TryValidateObject(value, CreateValidationContext(value, validationContext?.DisplayName),
-            validationResults, ValidateAllProperties);
+        Validator.TryValidateObject(value, CreateValidationContext(value), validationResults, ValidateAllProperties);
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
@@ -119,44 +117,35 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
 
         try
         {
-            Validator.ValidateObject(value, CreateValidationContext(value, validationContext?.DisplayName),
-                ValidateAllProperties);
+            Validator.ValidateObject(value, CreateValidationContext(value), ValidateAllProperties);
         }
         // 如果验证未通过且配置了自定义错误信息，则重新抛出异常
         catch (ValidationException e) when (ErrorMessageString is not null)
         {
             throw new ValidationException(
                 new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
-                    validationContext?.MemberNames),
-                e.ValidationAttribute, e.Value) { Source = e.Source };
+                    validationContext?.MemberNames), e.ValidationAttribute, e.Value) { Source = e.Source };
         }
     }
+
+    /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
+    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) => _serviceProvider = serviceProvider;
 
     /// <summary>
     ///     创建 <see cref="ValidationContext" /> 实例
     /// </summary>
     /// <param name="value">对象</param>
-    /// <param name="name">显示名称</param>
     /// <returns>
     ///     <see cref="ValidationContext" />
     /// </returns>
-    internal ValidationContext CreateValidationContext(object value, string? name)
+    internal ValidationContext CreateValidationContext(object value)
     {
         // 初始化 ValidationContext 实例
         var validationContext = new ValidationContext(value, Items);
-
-        // 空检查
-        if (name is not null)
-        {
-            validationContext.DisplayName = name;
-        }
 
         // 同步 IServiceProvider 委托
         validationContext.InitializeServiceProvider(_serviceProvider!);
 
         return validationContext;
     }
-
-    /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
-    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) => _serviceProvider = serviceProvider;
 }

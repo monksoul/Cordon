@@ -1815,6 +1815,9 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1824,11 +1827,8 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
-        </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -4651,7 +4651,7 @@
                 设置属性验证前的预处理器
             </summary>
             <remarks>该预处理器仅用于验证，不会修改原始属性的值。</remarks>
-            <param name="preProcess">预处理器（函数）</param>
+            <param name="preProcess">预处理器</param>
             <returns>
                 <see cref="T:Cordon.PropertyValidator`2" />
             </returns>
@@ -5240,7 +5240,7 @@
                 设置值验证前的预处理器
             </summary>
             <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
-            <param name="preProcess">预处理器（函数）</param>
+            <param name="preProcess">预处理器</param>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
             </returns>
@@ -5920,6 +5920,7 @@
         <member name="M:Cordon.ValidationService`1.#ctor(System.IServiceProvider)">
             <summary>
                 <inheritdoc cref="T:Cordon.ValidationService`1" />
+  e`1" />
             </summary>
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
@@ -6011,6 +6012,18 @@
             <typeparam name="T">对象类型</typeparam>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.Collection``1(Cordon.IObjectValidator{``0})">
+            <summary>
+                创建集合验证器
+            </summary>
+            <param name="elementValidator">
+                <see cref="T:Cordon.IObjectValidator`1" />
+            </param>
+            <typeparam name="TElement">元素类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.CollectionValidator`1" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.Age(System.Boolean,System.Boolean)">
@@ -8709,18 +8722,17 @@
         <member name="M:Cordon.ObjectAnnotationValidator.Validate(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.CreateValidationContext(System.Object,System.String)">
+        <member name="M:Cordon.ObjectAnnotationValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
+        </member>
+        <member name="M:Cordon.ObjectAnnotationValidator.CreateValidationContext(System.Object)">
             <summary>
                 创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
             </summary>
             <param name="value">对象</param>
-            <param name="name">显示名称</param>
             <returns>
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
             </returns>
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
         <member name="T:Cordon.PasswordValidator">
             <summary>
@@ -10229,6 +10241,16 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

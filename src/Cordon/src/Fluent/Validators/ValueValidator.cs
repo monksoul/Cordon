@@ -351,7 +351,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     ///     设置值验证前的预处理器
     /// </summary>
     /// <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
-    /// <param name="preProcess">预处理器（函数）</param>
+    /// <param name="preProcess">预处理器</param>
     /// <returns>
     ///     <see cref="ValueValidator{T}" />
     /// </returns>
@@ -491,7 +491,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 空检查
         ArgumentNullException.ThrowIfNull(validationContext);
 
-        // 检查正向条件（When）
+        // 检查 When 条件
         if (WhenCondition is not null && !WhenCondition(value!, validationContext))
         {
             return false;

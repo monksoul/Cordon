@@ -781,7 +781,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         ArgumentNullException.ThrowIfNull(instance);
         ArgumentNullException.ThrowIfNull(validationContext);
 
-        // 检查正向条件（When）
+        // 检查 When 条件
         // ReSharper disable once ConvertIfStatementToReturnStatement
         if (WhenCondition is not null && !WhenCondition(instance, validationContext))
         {

@@ -200,32 +200,24 @@ public class ObjectAnnotationValidatorTests
     public void CreateValidationContext_ReturnOK()
     {
         var validator = new ObjectAnnotationValidator();
-        var validationContext = validator.CreateValidationContext(new ObjectClassTest(), null);
+        var validationContext = validator.CreateValidationContext(new ObjectClassTest());
         Assert.Equal("ObjectClassTest", validationContext.DisplayName);
         Assert.Null(validationContext.MemberName);
-
-        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest(), "DisplayName");
-        Assert.Equal("DisplayName", validationContext2.DisplayName);
-        Assert.Null(validationContext2.MemberName);
-
-        var validationContext3 = validator.CreateValidationContext(new ObjectClassTest(), null);
-        Assert.Equal("ObjectClassTest", validationContext3.DisplayName);
-        Assert.Null(validationContext3.MemberName);
 
         var serviceProviderField = typeof(ValidationContext).GetField("_serviceProvider",
             BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.NotNull(serviceProviderField);
 
         Assert.Null(validator._serviceProvider);
-        Assert.Null(serviceProviderField.GetValue(validationContext3));
+        Assert.Null(serviceProviderField.GetValue(validationContext));
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
         Assert.NotNull(validator._serviceProvider);
 
-        var validationContext4 = validator.CreateValidationContext(new ObjectClassTest(), null);
+        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest());
         Assert.NotNull(validator._serviceProvider);
-        Assert.NotNull(serviceProviderField.GetValue(validationContext4));
+        Assert.NotNull(serviceProviderField.GetValue(validationContext2));
     }
 }
 

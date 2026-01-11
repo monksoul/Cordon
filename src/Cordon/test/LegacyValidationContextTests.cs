@@ -23,6 +23,14 @@ public class LegacyValidationContextTests
         Assert.Equal(["Name"], validationContext2.MemberNames);
         Assert.Null(validationContext2.RuleSets);
         Assert.Empty(validationContext2.Items);
+
+        var validationContext3 = new LegacyValidationContext("Furion", null, null);
+        Assert.NotNull(validationContext3.Instance);
+        Assert.Equal("Furion", validationContext3.Instance);
+        Assert.Equal("String", validationContext3.DisplayName);
+        Assert.Null(validationContext3.MemberNames);
+        Assert.Null(validationContext3.RuleSets);
+        Assert.Empty(validationContext3.Items);
     }
 
     [Fact]
