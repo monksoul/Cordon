@@ -292,6 +292,20 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void FileExtensions_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().FileExtensions("png,jpg,jpeg,gif");
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as FileExtensionsValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.False(valueValidator.IsValid("furion.ico"));
+        Assert.True(valueValidator.IsValid("furion.png"));
+    }
+
+    [Fact]
     public void DateOnly_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().DateOnly();

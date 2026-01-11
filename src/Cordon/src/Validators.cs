@@ -370,6 +370,15 @@ public static class Validators
     public static FailureValidator Failure() => new();
 
     /// <summary>
+    ///     创建文件拓展名验证器
+    /// </summary>
+    /// <param name="extensions">文件拓展名</param>
+    /// <returns>
+    ///     <see cref="FileExtensionsValidator" />
+    /// </returns>
+    public static FileExtensionsValidator FileExtensions(string extensions) => new(extensions);
+
+    /// <summary>
     ///     创建大于等于验证器
     /// </summary>
     /// <param name="compareValue">比较的值</param>

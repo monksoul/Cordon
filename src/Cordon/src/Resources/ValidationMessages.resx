@@ -321,4 +321,7 @@
     <data name="HaveLengthValidator_ValidationError_AllowEmpty" xml:space="preserve">
         <value>The field {0} must be empty or have a length of exactly '{1}'.</value>
     </data>
+    <data name="FileExtensionsValidator_ValidationError" xml:space="preserve">
+        <value>The {0} field only accepts files with the following extensions: {1}.</value>
+    </data>
 </root>

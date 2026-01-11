@@ -386,6 +386,22 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void FileExtensions_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .FileExtensions("png,jpg,jpeg,gif");
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as FileExtensionsValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "furion.ico" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "furion.png" }));
+    }
+
+    [Fact]
     public void Compare_Invalid_Parameters()
     {
         Assert.Throws<ArgumentNullException>(() =>

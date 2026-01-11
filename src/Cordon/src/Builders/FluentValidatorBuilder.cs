@@ -433,6 +433,15 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf Failure() => AddValidator(new FailureValidator());
 
     /// <summary>
+    ///     添加文件拓展名验证器
+    /// </summary>
+    /// <param name="extensions">文件拓展名</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf FileExtensions(string extensions) => AddValidator(new FileExtensionsValidator(extensions));
+
+    /// <summary>
     ///     添加大于等于验证器
     /// </summary>
     /// <param name="compareValue">比较的值</param>

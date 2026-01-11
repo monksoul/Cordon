@@ -179,6 +179,14 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void FileExtensions_ReturnOK()
+    {
+        var validator = Validators.FileExtensions("png,jpg,jpeg,gif");
+        Assert.NotNull(validator);
+        Assert.Equal("png,jpg,jpeg,gif", validator.Extensions);
+    }
+
+    [Fact]
     public void DateOnly_ReturnOK()
     {
         var validator = Validators.DateOnly("yyyy/MM/dd");

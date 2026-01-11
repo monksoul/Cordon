@@ -258,6 +258,15 @@ namespace Cordon.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The {0} field only accepts files with the following extensions: {1}..
+        /// </summary>
+        internal static string FileExtensionsValidator_ValidationError {
+            get {
+                return ResourceManager.GetString("FileExtensionsValidator_ValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The field {0} must be greater than or equal to &apos;{1}&apos;..
         /// </summary>
         internal static string GreaterThanOrEqualToValidator_ValidationError {

@@ -2399,6 +2399,15 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.FileExtensions(System.String)">
+            <summary>
+                添加文件拓展名验证器
+            </summary>
+            <param name="extensions">文件拓展名</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.GreaterThanOrEqualTo(System.IComparable)">
             <summary>
                 添加大于等于验证器
@@ -3748,7 +3757,7 @@
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
-        <member name="T:Cordon.IPropertyValidatorCloneable`1">
+        <member name="T:Cordone="T:Cordon.IPropertyValidatorCloneable`1">
             <summary>
                 定义属性验证器可克隆行为
             </summary>
@@ -4815,7 +4824,7 @@
                 配置跳过该属性上的验证特性验证
             </summary>
             <returns>
-                <typeparamref name="TSelf" />
+                <typeparamrelf" />
             </returns>
         </member>
         <member name="M:Cordon.PropertyValidator`3.CustomOnly">
@@ -4908,7 +4917,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.MustIfNotNull(System.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
+        <member name="M:Cordon.PropertyValidator`3.MustIfNotNull(System.Func{`1,Cm.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 添加自定义条件成立时委托验证器
             </summary>
@@ -5074,7 +5083,7 @@
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
-        <member name="F:Cordon.ValueValidator`1._ruleSetStack">
+        <member name="F:Cordon.Var`1._ruleSetStack">
             <summary>
                 当前规则集上下文栈
             </summary>
@@ -5625,6 +5634,11 @@
               Looks up a localized string similar to The field {0} must be equal to &apos;{1}&apos;..
             </summary>
         </member>
+        <member name="P:Cordon.Resources.ValidationMessages.FileExtensionsValidator_ValidationError">
+            <summary>
+              Looks up a localized string similar to The {0} field only accepts files with the following extensions: {1}..
+            </summary>
+        </member>
         <member name="P:Cordon.Resources.ValidationMessages.GreaterThanOrEqualToValidator_ValidationError">
             <summary>
               Looks up a localized string similar to The field {0} must be greater than or equal to &apos;{1}&apos;..
@@ -5672,7 +5686,7 @@
         </member>
         <member name="P:Cordon.Resources.ValidationMessages.LessThanOrEqualToValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must be less than or equal to &apos;{1}&apos;..
+              Looks up a localized string zed string similar to The field {0} must be less than or equal to &apos;{1}&apos;..
             </summary>
         </member>
         <member name="P:Cordon.Resources.ValidationMessages.LessThanValidator_ValidationError">
@@ -5920,7 +5934,6 @@
         <member name="M:Cordon.ValidationService`1.#ctor(System.IServiceProvider)">
             <summary>
                 <inheritdoc cref="T:Cordon.ValidationService`1" />
-  e`1" />
             </summary>
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
@@ -6275,6 +6288,15 @@
             </summary>
             <returns>
                 <see cref="T:Cordon.FailureValidator" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.FileExtensions(System.String)">
+            <summary>
+                创建文件拓展名验证器
+            </summary>
+            <param name="extensions">文件拓展名</param>
+            <returns>
+                <see cref="T:Cordon.FileExtensionsValidator" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.GreaterThanOrEqualTo(System.IComparable)">
@@ -8008,6 +8030,48 @@
             <remarks>仅用于输出指定错误消息。</remarks>
         </member>
         <member name="M:Cordon.FailureValidator.IsValid(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="T:Cordon.FileExtensionsValidator">
+            <summary>
+                文件拓展名验证器
+            </summary>
+        </member>
+        <member name="F:Cordon.FileExtensionsValidator._validator">
+            <summary>
+                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+            </summary>
+        </member>
+        <member name="M:Cordon.FileExtensionsValidator.#ctor(System.String)">
+            <summary>
+                <inheritdoc cref="T:Cordon.FileExtensionsValidator" />
+            </summary>
+            <param name="extensions">文件拓展名</param>
+        </member>
+        <member name="P:Cordon.FileExtensionsValidator.Extensions">
+            <summary>
+                文件拓展名
+            </summary>
+        </member>
+        <member name="P:Cordon.FileExtensionsValidator.ExtensionsFormatted">
+            <summary>
+                格式化后的文件拓展名列表
+            </summary>
+        </member>
+        <member name="P:Cordon.FileExtensionsValidator.ExtensionsNormalized">
+            <summary>
+                标准化后的文件拓展名字符串
+            </summary>
+        </member>
+        <member name="P:Cordon.FileExtensionsValidator.ExtensionsParsed">
+            <summary>
+                解析后的文件拓展名集合
+            </summary>
+        </member>
+        <member name="M:Cordon.FileExtensionsValidator.IsValid(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.FileExtensionsValidator.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
         <member name="T:Cordon.GreaterThanOrEqualToValidator">
