@@ -104,14 +104,14 @@ public class ValidationBuilderTests
     }
 
     [Fact]
-    public void AddValidatorFromAssemblies_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new ValidationBuilder().AddValidatorFromAssemblies(null!));
+    public void AddValidatorsFromAssemblies_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => new ValidationBuilder().AddValidatorsFromAssemblies(null!));
 
     [Fact]
-    public void AddValidatorFromAssemblies_ReturnOK()
+    public void AddValidatorsFromAssemblies_ReturnOK()
     {
         var builder = new ValidationBuilder();
-        builder.AddValidatorFromAssemblies(typeof(ObjectModel).Assembly);
+        builder.AddValidatorsFromAssemblies(typeof(ObjectModel).Assembly);
 
         Assert.NotNull(builder._validatorTypes);
         Assert.Equal(11, builder._validatorTypes.Count);

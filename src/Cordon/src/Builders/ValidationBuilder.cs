@@ -101,7 +101,7 @@ public sealed class ValidationBuilder
     /// <returns>
     ///     <see cref="ValidationBuilder" />
     /// </returns>
-    public ValidationBuilder AddValidatorFromAssemblies(params IEnumerable<Assembly?> assemblies)
+    public ValidationBuilder AddValidatorsFromAssemblies(params IEnumerable<Assembly?> assemblies)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(assemblies);
