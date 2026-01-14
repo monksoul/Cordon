@@ -1196,4 +1196,18 @@ public static class Validators
     public static ValueAnnotationValidator ValueAnnotation(ValidationAttribute[] attributes,
         IServiceProvider? serviceProvider, IDictionary<object, object?>? items) =>
         new(attributes, serviceProvider, items);
+
+    /// <summary>
+    ///     创建指定对象类型的数据验证服务
+    /// </summary>
+    /// <param name="serviceProvider">
+    ///     <see cref="IServiceProvider" />
+    /// </param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="IValidationService{T}" />
+    /// </returns>
+    public static IValidationService<T> For<T>(IServiceProvider? serviceProvider = null)
+        where T : class =>
+        serviceProvider is null ? new ValidationService<T>() : new ValidationService<T>(serviceProvider);
 }

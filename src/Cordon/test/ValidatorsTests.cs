@@ -905,6 +905,17 @@ public class ValidatorsTests
         Assert.NotNull(validator3.Items);
     }
 
+    [Fact]
+    public void For_ReturnOK()
+    {
+        var validationService = Validators.For<ObjectModel>();
+        Assert.NotNull(validationService);
+
+        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
+        var validationService2 = Validators.For<ObjectModel>(serviceProvider);
+        Assert.NotNull(validationService2);
+    }
+
     public class ObjectModel
     {
         public string? Name { get; set; }
