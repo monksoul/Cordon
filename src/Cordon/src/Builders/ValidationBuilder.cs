@@ -17,6 +17,21 @@ public sealed class ValidationBuilder
     /// <summary>
     ///     添加 <see cref="IObjectValidator{T}" /> 验证器
     /// </summary>
+    /// <typeparam name="TValidator">
+    ///     <see cref="IObjectValidator{T}" />
+    /// </typeparam>
+    /// <returns>
+    ///     <see cref="ValidationBuilder" />
+    /// </returns>
+    public ValidationBuilder AddValidator<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+        TValidator>()
+        where TValidator : class, IObjectValidator =>
+        AddValidator(typeof(TValidator));
+
+    /// <summary>
+    ///     添加 <see cref="IObjectValidator{T}" /> 验证器
+    /// </summary>
     /// <param name="validatorType">
     ///     <see cref="IObjectValidator{T}" />
     /// </param>

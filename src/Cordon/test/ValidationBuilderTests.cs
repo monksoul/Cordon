@@ -55,6 +55,40 @@ public class ValidationBuilderTests
     }
 
     [Fact]
+    public void AddValidator_WithGeneric_Invalid_Parameters()
+    {
+        var builder = new ValidationBuilder();
+
+        var exception = Assert.Throws<ArgumentException>(() => builder.AddValidator<ObjectModelValidator5>());
+        Assert.Equal(
+            "Type `Cordon.Tests.ObjectModelValidator5` must be a non-abstract, non-static class to be registered as a validator. (Parameter 'validatorType')",
+            exception.Message);
+    }
+
+    [Fact]
+    public void AddValidator_WithGeneric_ReturnOK()
+    {
+        var builder = new ValidationBuilder();
+        builder.AddValidator<ObjectModelValidator1>();
+
+        Assert.NotNull(builder._validatorTypes);
+        Assert.Single(builder._validatorTypes);
+        Assert.Equal(typeof(ObjectModel), builder._validatorTypes[typeof(ObjectModelValidator1)]);
+
+        builder.AddValidator<ObjectModelValidator1>();
+
+        Assert.NotNull(builder._validatorTypes);
+        Assert.Single(builder._validatorTypes);
+        Assert.Equal(typeof(ObjectModel), builder._validatorTypes[typeof(ObjectModelValidator1)]);
+
+        builder.AddValidator<ObjectModelValidator2>();
+
+        Assert.NotNull(builder._validatorTypes);
+        Assert.Equal(2, builder._validatorTypes.Count);
+        Assert.Equal(typeof(ObjectModel), builder._validatorTypes[typeof(ObjectModelValidator2)]);
+    }
+
+    [Fact]
     public void AddValidators_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() => new ValidationBuilder().AddValidators(null!));
 
