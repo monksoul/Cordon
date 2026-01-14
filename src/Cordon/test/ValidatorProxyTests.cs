@@ -144,16 +144,16 @@ public class ValidatorProxyTests
     [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
-        var validator = new ValidatorProxy<ValueAnnotationValidator>();
-        var valueAnnotationValidator = GetProxyValidator(validator);
+        var validator = new ValidatorProxy<AttributeValueValidator>();
+        var attributeValueValidator = GetProxyValidator(validator);
 
-        Assert.NotNull(valueAnnotationValidator);
-        Assert.Null(valueAnnotationValidator._serviceProvider);
+        Assert.NotNull(attributeValueValidator);
+        Assert.Null(attributeValueValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
 
-        Assert.NotNull(valueAnnotationValidator._serviceProvider);
+        Assert.NotNull(attributeValueValidator._serviceProvider);
     }
 
     private static TValidator? GetProxyValidator<TValidator>(ValidatorProxy<TValidator> validator)

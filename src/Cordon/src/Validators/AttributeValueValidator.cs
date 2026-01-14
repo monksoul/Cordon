@@ -7,7 +7,7 @@ namespace Cordon;
 /// <summary>
 ///     单个值验证特性验证器
 /// </summary>
-public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
+public class AttributeValueValidator : ValidatorBase, IValidatorInitializer
 {
     /// <summary>
     ///     用于值验证的 <see cref="ValidationContext" /> 占位对象
@@ -20,34 +20,34 @@ public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
     internal Func<Type, object?>? _serviceProvider;
 
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
     /// <param name="attributes">验证特性列表</param>
     /// <exception cref="ArgumentException"></exception>
-    public ValueAnnotationValidator(params ValidationAttribute[] attributes)
+    public AttributeValueValidator(params ValidationAttribute[] attributes)
         : this(attributes, null, null)
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
     /// <param name="attributes">验证特性列表</param>
     /// <param name="items">共享数据</param>
-    public ValueAnnotationValidator(ValidationAttribute[] attributes, IDictionary<object, object?>? items)
+    public AttributeValueValidator(ValidationAttribute[] attributes, IDictionary<object, object?>? items)
         : this(attributes, null, items)
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
     /// <param name="attributes">验证特性列表</param>
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
     /// </param>
     /// <param name="items">共享数据</param>
-    public ValueAnnotationValidator(ValidationAttribute[] attributes, IServiceProvider? serviceProvider,
+    public AttributeValueValidator(ValidationAttribute[] attributes, IServiceProvider? serviceProvider,
         IDictionary<object, object?>? items)
     {
         // 空检查
@@ -89,8 +89,9 @@ public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
 
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext) =>
-        Validator.TryValidateValue(value, CreateValidationContext(value, validationContext?.DisplayName), null,
-            Attributes);
+        Validator.TryValidateValue(value,
+            CreateValidationContext(value, validationContext?.DisplayName,
+                validationContext?.MemberNames?.FirstOrDefault()), null, Attributes);
 
     /// <inheritdoc />
     public override List<ValidationResult>? GetValidationResults(object? value, IValidationContext? validationContext)
@@ -98,8 +99,9 @@ public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
         // 初始化验证结果集合和成员名称列表
         var validationResults = new List<ValidationResult>();
 
-        Validator.TryValidateValue(value, CreateValidationContext(value, validationContext?.DisplayName),
-            validationResults, Attributes);
+        Validator.TryValidateValue(value,
+            CreateValidationContext(value, validationContext?.DisplayName,
+                validationContext?.MemberNames?.FirstOrDefault()), validationResults, Attributes);
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
@@ -117,7 +119,9 @@ public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
     {
         try
         {
-            Validator.ValidateValue(value, CreateValidationContext(value, validationContext?.DisplayName), Attributes);
+            Validator.ValidateValue(value,
+                CreateValidationContext(value, validationContext?.DisplayName,
+                    validationContext?.MemberNames?.FirstOrDefault()), Attributes);
         }
         // 如果验证未通过且配置了自定义错误信息，则重新抛出异常
         catch (ValidationException e) when (ErrorMessageString is not null)
@@ -134,13 +138,14 @@ public class ValueAnnotationValidator : ValidatorBase, IValidatorInitializer
     /// </summary>
     /// <param name="value">对象</param>
     /// <param name="name">显示名称</param>
+    /// <param name="memberName">成员名称</param>
     /// <returns>
     ///     <see cref="ValidationContext" />
     /// </returns>
-    internal ValidationContext CreateValidationContext(object? value, string? name)
+    internal ValidationContext CreateValidationContext(object? value, string? name, string? memberName)
     {
         // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext(value ?? _sentinel, Items);
+        var validationContext = new ValidationContext(value ?? _sentinel, Items) { MemberName = memberName };
 
         // 空检查
         if (name is not null)

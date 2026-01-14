@@ -15,16 +15,16 @@ public class RequiredValidator : ValidatorBase, IHighPriorityValidator, IDisposa
     internal readonly string[] _observedPropertyNames = [nameof(AllowEmptyStrings)];
 
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
-    internal readonly ValueAnnotationValidator _validator;
+    internal readonly AttributeValueValidator _validator;
 
     /// <summary>
     ///     <inheritdoc cref="RequiredValidator" />
     /// </summary>
     public RequiredValidator()
     {
-        _validator = new ValueAnnotationValidator(new RequiredAttribute());
+        _validator = new AttributeValueValidator(new RequiredAttribute());
 
         // 订阅属性变更事件
         PropertyChanged += OnPropertyChanged;

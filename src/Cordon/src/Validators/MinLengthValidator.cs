@@ -10,9 +10,9 @@ namespace Cordon;
 public class MinLengthValidator : ValidatorBase
 {
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
-    internal readonly ValueAnnotationValidator _validator;
+    internal readonly AttributeValueValidator _validator;
 
     /// <summary>
     ///     <inheritdoc cref="MinLengthValidator" />
@@ -21,7 +21,7 @@ public class MinLengthValidator : ValidatorBase
     public MinLengthValidator(int length)
     {
         Length = length;
-        _validator = new ValueAnnotationValidator(new MinLengthAttribute(Length));
+        _validator = new AttributeValueValidator(new MinLengthAttribute(Length));
 
         UseResourceKey(() => nameof(ValidationMessages.MinLengthValidator_ValidationError));
     }

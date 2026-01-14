@@ -96,30 +96,30 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
-    public void UseAnnotationValidation_ReturnOK()
+    public void UseAttributeValidation_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ValidationModel>();
         var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
 
-        Assert.Null(propertyValidator.SuppressAnnotationValidation);
+        Assert.Null(propertyValidator.SuppressAttributeValidation);
 
-        propertyValidator.UseAnnotationValidation(false);
-        Assert.True(propertyValidator.SuppressAnnotationValidation);
+        propertyValidator.UseAttributeValidation(false);
+        Assert.True(propertyValidator.SuppressAttributeValidation);
 
-        propertyValidator.UseAnnotationValidation(true);
-        Assert.False(propertyValidator.SuppressAnnotationValidation);
+        propertyValidator.UseAttributeValidation(true);
+        Assert.False(propertyValidator.SuppressAttributeValidation);
 
-        propertyValidator.SkipAnnotationValidation();
-        Assert.True(propertyValidator.SuppressAnnotationValidation);
+        propertyValidator.SkipAttributeValidation();
+        Assert.True(propertyValidator.SuppressAttributeValidation);
 
-        propertyValidator.UseAnnotationValidation();
-        Assert.False(propertyValidator.SuppressAnnotationValidation);
+        propertyValidator.UseAttributeValidation();
+        Assert.False(propertyValidator.SuppressAttributeValidation);
 
         propertyValidator.CustomOnly();
-        Assert.True(propertyValidator.SuppressAnnotationValidation);
+        Assert.True(propertyValidator.SuppressAttributeValidation);
 
-        propertyValidator.UseAnnotationValidation(null);
-        Assert.Null(propertyValidator.SuppressAnnotationValidation);
+        propertyValidator.UseAttributeValidation(null);
+        Assert.Null(propertyValidator.SuppressAttributeValidation);
     }
 
     [Fact]
@@ -2017,19 +2017,42 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
-    public void AddAnnotations_ReturnOK()
+    public void WithAttributes_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .AddAnnotations(new UserNameAttribute());
+            .WithAttributes(new UserNameAttribute());
 
         Assert.Single(propertyValidator.Validators);
 
-        var addedValidator = propertyValidator._lastAddedValidator as ValueAnnotationValidator;
+        var addedValidator = propertyValidator._lastAddedValidator as AttributeValueValidator;
         Assert.NotNull(addedValidator);
 
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "monk__soul" }));
         Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "monksoul" }));
+
+        var validationResults = propertyValidator.GetValidationResults(new ValidationModel { Data1 = "monk__soul" });
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal("The field Data1 is not a valid username.", validationResults[0].ErrorMessage);
+        Assert.Equal("Data1", validationResults[0].MemberNames.First());
+
+        var exception = Assert.Throws<ValidationException>(() =>
+            propertyValidator.Validate(new ValidationModel { Data1 = "monk__soul" }));
+        Assert.Equal("The field Data1 is not a valid username.", exception.Message);
+        Assert.Equal("Data1", exception.ValidationResult.MemberNames.FirstOrDefault());
+
+        propertyValidator.WithName("Prop1");
+        var validationResults2 = propertyValidator.GetValidationResults(new ValidationModel { Data1 = "monk__soul" });
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal("The field Prop1 is not a valid username.", validationResults2[0].ErrorMessage);
+        Assert.Equal("Prop1", validationResults2[0].MemberNames.First());
+
+        var exception2 = Assert.Throws<ValidationException>(() =>
+            propertyValidator.Validate(new ValidationModel { Data1 = "monk__soul" }));
+        Assert.Equal("The field Prop1 is not a valid username.", exception2.Message);
+        Assert.Equal("Prop1", exception2.ValidationResult.MemberNames.FirstOrDefault());
     }
 
 

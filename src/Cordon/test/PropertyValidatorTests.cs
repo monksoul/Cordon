@@ -23,9 +23,9 @@ public class PropertyValidatorTests
         Assert.NotNull(propertyValidator._selector);
         Assert.NotNull(propertyValidator._objectValidator);
         Assert.Equal(objectValidator, propertyValidator._objectValidator);
-        Assert.NotNull(propertyValidator._annotationValidator);
-        Assert.Null(propertyValidator._annotationValidator._serviceProvider);
-        Assert.Empty(propertyValidator._annotationValidator.Items);
+        Assert.NotNull(propertyValidator._attributeValidator);
+        Assert.Null(propertyValidator._attributeValidator._serviceProvider);
+        Assert.Empty(propertyValidator._attributeValidator.Items);
         Assert.NotNull(propertyValidator.Validators);
         Assert.Null(propertyValidator._lastAddedValidator);
         Assert.Empty(propertyValidator.Validators);
@@ -35,7 +35,7 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator.RuleSets);
         Assert.Null(propertyValidator.DisplayName);
         Assert.Null(propertyValidator.MemberName);
-        Assert.Null(propertyValidator.SuppressAnnotationValidation);
+        Assert.Null(propertyValidator.SuppressAttributeValidation);
         Assert.Null(propertyValidator.WhenCondition);
         Assert.NotNull(propertyValidator.This);
         Assert.Equal(propertyValidator.This, propertyValidator);
@@ -50,9 +50,9 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator2._serviceProvider); // RuleFor 时同步
         Assert.NotNull(propertyValidator2._objectValidator);
         Assert.Equal(objectValidator2, propertyValidator2._objectValidator);
-        Assert.NotNull(propertyValidator2._annotationValidator);
-        Assert.Null(propertyValidator2._annotationValidator._serviceProvider); // RuleFor 时同步
-        Assert.NotNull(propertyValidator2._annotationValidator.Items);
+        Assert.NotNull(propertyValidator2._attributeValidator);
+        Assert.Null(propertyValidator2._attributeValidator._serviceProvider); // RuleFor 时同步
+        Assert.NotNull(propertyValidator2._attributeValidator.Items);
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void IsValid_WithSuppressAnnotationValidation_ReturnOK()
+    public void IsValid_WithSuppressAttributeValidation_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator =
@@ -119,7 +119,7 @@ public class PropertyValidatorTests
         Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Fu" }, ["rule"]));
         Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Furion" }, ["rule"]));
 
-        propertyValidator.SkipAnnotationValidation();
+        propertyValidator.SkipAttributeValidation();
 
         Assert.False(propertyValidator.IsValid(new ObjectModel()));
         Assert.True(propertyValidator.IsValid(new ObjectModel { Name = "Fu" }));
@@ -239,7 +239,7 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void GetValidationResults_WithSuppressAnnotationValidation_ReturnOK()
+    public void GetValidationResults_WithSuppressAttributeValidation_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator =
@@ -278,7 +278,7 @@ public class PropertyValidatorTests
         Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Fu" }, ["rule"]));
         Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { Name = "Furion" }, ["rule"]));
 
-        propertyValidator.SkipAnnotationValidation();
+        propertyValidator.SkipAttributeValidation();
 
         var validationResult7 = propertyValidator.GetValidationResults(new ObjectModel());
         Assert.NotNull(validationResult7);
@@ -491,7 +491,7 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void Validate_WithSuppressAnnotationValidation_ReturnOK()
+    public void Validate_WithSuppressAttributeValidation_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator =
@@ -528,7 +528,7 @@ public class PropertyValidatorTests
         propertyValidator.Validate(new ObjectModel { Name = "Fu" }, ["rule"]);
         propertyValidator.Validate(new ObjectModel { Name = "Furion" }, ["rule"]);
 
-        propertyValidator.SkipAnnotationValidation();
+        propertyValidator.SkipAttributeValidation();
 
         var exception5 = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel()));
         Assert.Equal("The Name field is required.", exception5.Message);
@@ -976,19 +976,19 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void ShouldRunAnnotationValidation_ReturnOK()
+    public void ShouldRunAttributeValidation_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
 
-        Assert.True(propertyValidator.ShouldRunAnnotationValidation());
+        Assert.True(propertyValidator.ShouldRunAttributeValidation());
 
-        objectValidator.Options.SuppressAnnotationValidation = true;
-        Assert.False(propertyValidator.ShouldRunAnnotationValidation());
+        objectValidator.Options.SuppressAttributeValidation = true;
+        Assert.False(propertyValidator.ShouldRunAttributeValidation());
 
-        objectValidator.Options.SuppressAnnotationValidation = false;
-        propertyValidator.SkipAnnotationValidation();
-        Assert.False(propertyValidator.ShouldRunAnnotationValidation());
+        objectValidator.Options.SuppressAttributeValidation = false;
+        propertyValidator.SkipAttributeValidation();
+        Assert.False(propertyValidator.ShouldRunAttributeValidation());
     }
 
     [Fact]
@@ -1104,12 +1104,12 @@ public class PropertyValidatorTests
         var subValidator = new SubModelValidator();
         var propertyValidator =
             new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator)
-                .AddAnnotations(new RequiredAttribute()).SetValidator(subValidator);
+                .WithAttributes(new RequiredAttribute()).SetValidator(subValidator);
 
         Assert.Null(propertyValidator._serviceProvider);
-        Assert.Null(propertyValidator._annotationValidator._serviceProvider);
+        Assert.Null(propertyValidator._attributeValidator._serviceProvider);
         Assert.Null(subValidator._serviceProvider);
-        var valueValidator = propertyValidator.Validators[0] as ValueAnnotationValidator;
+        var valueValidator = propertyValidator.Validators[0] as AttributeValueValidator;
         Assert.NotNull(valueValidator);
         Assert.Null(valueValidator._serviceProvider);
 
@@ -1117,7 +1117,7 @@ public class PropertyValidatorTests
         propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(propertyValidator._serviceProvider);
-        Assert.NotNull(propertyValidator._annotationValidator._serviceProvider);
+        Assert.NotNull(propertyValidator._attributeValidator._serviceProvider);
         Assert.NotNull(subValidator._serviceProvider);
         Assert.NotNull(valueValidator);
         Assert.NotNull(valueValidator._serviceProvider);

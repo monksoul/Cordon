@@ -10,9 +10,9 @@ namespace Cordon;
 public class AllowedValuesValidator : ValidatorBase
 {
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
-    internal readonly ValueAnnotationValidator _validator;
+    internal readonly AttributeValueValidator _validator;
 
     /// <summary>
     ///     <inheritdoc cref="AllowedValuesValidator" />
@@ -24,7 +24,7 @@ public class AllowedValuesValidator : ValidatorBase
         ArgumentNullException.ThrowIfNull(values);
 
         Values = values;
-        _validator = new ValueAnnotationValidator(new AllowedValuesAttribute(values));
+        _validator = new AttributeValueValidator(new AllowedValuesAttribute(values));
 
         UseResourceKey(() => nameof(ValidationMessages.AllowedValuesValidator_ValidationError));
     }

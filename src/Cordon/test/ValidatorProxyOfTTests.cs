@@ -272,17 +272,17 @@ public class ValidatorProxyOfTTests
     [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
-        var validator = new ValidatorProxy<ValidatorProxyClass, ObjectAnnotationValidator>(u => u);
+        var validator = new ValidatorProxy<ValidatorProxyClass, AttributeObjectValidator>(u => u);
         var instance = new ValidatorProxyClass { Value = "monksoul@qq.com" };
-        var objectAnnotationValidator = GetProxyValidator(validator)(instance, null!);
+        var attributeObjectValidator = GetProxyValidator(validator)(instance, null!);
 
-        Assert.NotNull(objectAnnotationValidator);
-        Assert.Null(objectAnnotationValidator._serviceProvider);
+        Assert.NotNull(attributeObjectValidator);
+        Assert.Null(attributeObjectValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
 
-        Assert.NotNull(objectAnnotationValidator._serviceProvider);
+        Assert.NotNull(attributeObjectValidator._serviceProvider);
     }
 
     private static Func<T, ValidationContext<T>, TValidator> GetProxyValidator<T, TValidator>(

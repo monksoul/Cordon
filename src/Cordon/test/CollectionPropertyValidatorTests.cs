@@ -13,7 +13,7 @@ public class CollectionPropertyValidatorTests
         var propertyValidator = new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator);
         Assert.NotNull(propertyValidator);
         Assert.NotNull(propertyValidator._objectValidator);
-        Assert.NotNull(propertyValidator._annotationValidator);
+        Assert.NotNull(propertyValidator._attributeValidator);
         Assert.Null(propertyValidator._elementFilter);
     }
 
@@ -412,17 +412,17 @@ public class CollectionPropertyValidatorTests
         var propertyValidator =
             new CollectionPropertyValidator<ObjectModel, Child>(u => u.Children, objectValidator)
                 .SetValidator(subValidator)
-                .AddAnnotations(new RequiredAttribute());
+                .WithAttributes(new RequiredAttribute());
 
         var propertyValidator2 =
             new CollectionPropertyValidator<ObjectModel, string?>(u => u.Names, objectValidator)
                 .EachRules(u => u.Required().MinLength(3))
-                .AddAnnotations(new RequiredAttribute());
+                .WithAttributes(new RequiredAttribute());
 
         Assert.Null(propertyValidator._serviceProvider);
-        Assert.Null(propertyValidator._annotationValidator._serviceProvider);
+        Assert.Null(propertyValidator._attributeValidator._serviceProvider);
         Assert.Null(subValidator._serviceProvider);
-        var valueValidator = propertyValidator.Validators.FirstOrDefault() as ValueAnnotationValidator;
+        var valueValidator = propertyValidator.Validators.FirstOrDefault() as AttributeValueValidator;
         Assert.NotNull(valueValidator);
         Assert.Null(valueValidator._serviceProvider);
 
@@ -432,7 +432,7 @@ public class CollectionPropertyValidatorTests
         propertyValidator2.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(propertyValidator._serviceProvider);
-        Assert.NotNull(propertyValidator._annotationValidator._serviceProvider);
+        Assert.NotNull(propertyValidator._attributeValidator._serviceProvider);
         Assert.NotNull(subValidator._serviceProvider);
         Assert.NotNull(valueValidator);
         Assert.NotNull(valueValidator._serviceProvider);

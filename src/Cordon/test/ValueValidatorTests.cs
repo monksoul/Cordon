@@ -642,28 +642,28 @@ public class ValueValidatorTests
     {
         var subValidator = new StringValueValidator();
         var valueValidator = new ValueValidator<string>();
-        valueValidator.AddAnnotations(new RequiredAttribute())
+        valueValidator.WithAttributes(new RequiredAttribute())
             .Composite(u => u.MinLength(3)).SetValidator(subValidator);
 
         Assert.Null(valueValidator._serviceProvider);
-        var valueAnnotationValidator = valueValidator.Validators[0] as ValueAnnotationValidator;
-        Assert.NotNull(valueAnnotationValidator);
-        Assert.Null(valueAnnotationValidator._serviceProvider);
+        var attributeValueValidator = valueValidator.Validators[0] as AttributeValueValidator;
+        Assert.NotNull(attributeValueValidator);
+        Assert.Null(attributeValueValidator._serviceProvider);
         Assert.Null(subValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         valueValidator.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(valueValidator._serviceProvider);
-        var valueAnnotationValidator2 = valueValidator.Validators[0] as ValueAnnotationValidator;
-        Assert.NotNull(valueAnnotationValidator2);
-        Assert.NotNull(valueAnnotationValidator2._serviceProvider);
+        var attributeValueValidator2 = valueValidator.Validators[0] as AttributeValueValidator;
+        Assert.NotNull(attributeValueValidator2);
+        Assert.NotNull(attributeValueValidator2._serviceProvider);
         Assert.NotNull(subValidator._serviceProvider);
 
-        valueValidator.AddAnnotations(new UserNameAttribute());
-        var valueAnnotationValidator3 = valueValidator.Validators[2] as ValueAnnotationValidator;
-        Assert.NotNull(valueAnnotationValidator3);
-        Assert.NotNull(valueAnnotationValidator3._serviceProvider);
+        valueValidator.WithAttributes(new UserNameAttribute());
+        var attributeValueValidator3 = valueValidator.Validators[2] as AttributeValueValidator;
+        Assert.NotNull(attributeValueValidator3);
+        Assert.NotNull(attributeValueValidator3._serviceProvider);
     }
 
     [Fact]

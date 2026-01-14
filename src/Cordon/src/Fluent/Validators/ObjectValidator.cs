@@ -9,7 +9,7 @@ namespace Cordon;
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
 public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMemberPathRepairable, IRuleSetContextProvider,
-    IValidationAnnotationsConfigurable
+    IValidationAttributeConfigurable
 {
     /// <summary>
     ///     验证上下文键
@@ -19,8 +19,8 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     /// </remarks>
     internal static readonly object ValidationContextsKey = new();
 
-    /// <inheritdoc cref="ObjectAnnotationValidator" />
-    internal readonly ObjectAnnotationValidator _annotationValidator;
+    /// <inheritdoc cref="AttributeObjectValidator" />
+    internal readonly AttributeObjectValidator _attributeValidator;
 
     /// <summary>
     ///     当前规则集上下文栈
@@ -78,8 +78,8 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
 
         Items = items is not null ? new Dictionary<object, object?>(items) : new Dictionary<object, object?>();
 
-        // 初始化 ObjectAnnotationValidator 实例
-        _annotationValidator = new ObjectAnnotationValidator(serviceProvider, items)
+        // 初始化 AttributeObjectValidator 实例
+        _attributeValidator = new AttributeObjectValidator(serviceProvider, items)
         {
             ValidateAllProperties = Options.ValidateAllProperties
         };
@@ -160,8 +160,8 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         }
 
         // 检查是否启用对象属性验证特性验证
-        // 此处可能存在验证特性重复执行的问题，可通过启用 SuppressAnnotationValidation 或调用 CustomOnly() 方法解决
-        if (ShouldRunAnnotationValidation() && !_annotationValidator.IsValid(instance, validationContext))
+        // 此处可能存在验证特性重复执行的问题，可通过启用 SuppressAttributeValidation 或调用 CustomOnly() 方法解决
+        if (ShouldRunAttributeValidation() && !_attributeValidator.IsValid(instance, validationContext))
         {
             return false;
         }
@@ -192,10 +192,10 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         var validationResults = new List<ValidationResult>();
 
         // 检查是否启用对象属性验证特性验证
-        // 此处可能存在验证特性重复执行的问题，可通过启用 SuppressAnnotationValidation 或调用 CustomOnly() 方法解决
-        if (ShouldRunAnnotationValidation())
+        // 此处可能存在验证特性重复执行的问题，可通过启用 SuppressAttributeValidation 或调用 CustomOnly() 方法解决
+        if (ShouldRunAttributeValidation())
         {
-            validationResults.AddRange(_annotationValidator.GetValidationResults(instance, validationContext) ?? []);
+            validationResults.AddRange(_attributeValidator.GetValidationResults(instance, validationContext) ?? []);
         }
 
         // 获取所有属性验证器验证结果集合
@@ -230,10 +230,10 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         }
 
         // 检查是否启用对象属性验证特性验证
-        // 此处可能存在验证特性重复执行的问题，可通过启用 SuppressAnnotationValidation 或调用 CustomOnly() 方法解决
-        if (ShouldRunAnnotationValidation())
+        // 此处可能存在验证特性重复执行的问题，可通过启用 SuppressAttributeValidation 或调用 CustomOnly() 方法解决
+        if (ShouldRunAttributeValidation())
         {
-            _annotationValidator.Validate(instance, validationContext);
+            _attributeValidator.Validate(instance, validationContext);
         }
 
         // 遍历属性验证器集合
@@ -255,8 +255,8 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     {
         _serviceProvider = serviceProvider;
 
-        // 同步 _annotationValidator 实例 IServiceProvider 委托
-        _annotationValidator.InitializeServiceProvider(serviceProvider);
+        // 同步 _attributeValidator 实例 IServiceProvider 委托
+        _attributeValidator.InitializeServiceProvider(serviceProvider);
 
         // 同步 _objectValidator 实例 IServiceProvider 委托
         _objectValidator?.InitializeServiceProvider(serviceProvider);
@@ -316,7 +316,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     string?[]? IRuleSetContextProvider.GetCurrentRuleSets() => GetCurrentRuleSets();
 
     /// <inheritdoc />
-    void IValidationAnnotationsConfigurable.UseAnnotationValidation(bool enabled) => UseAnnotationValidation(enabled);
+    void IValidationAttributeConfigurable.UseAttributeValidation(bool enabled) => UseAttributeValidation(enabled);
 
     /// <inheritdoc />
     public override bool IsValid(T? instance, ValidationContext<T> validationContext)
@@ -583,7 +583,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         // 空检查
         ArgumentNullException.ThrowIfNull(options);
 
-        Options.SuppressAnnotationValidation = options.SuppressAnnotationValidation;
+        Options.SuppressAttributeValidation = options.SuppressAttributeValidation;
         Options.ValidateAllProperties = options.ValidateAllProperties;
 
         return this;
@@ -686,9 +686,9 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public virtual ObjectValidator<T> UseAnnotationValidation(bool enabled)
+    public virtual ObjectValidator<T> UseAttributeValidation(bool enabled)
     {
-        Options.SuppressAnnotationValidation = !enabled;
+        Options.SuppressAttributeValidation = !enabled;
 
         return this;
     }
@@ -699,7 +699,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public virtual ObjectValidator<T> UseAnnotationValidation() => UseAnnotationValidation(true);
+    public virtual ObjectValidator<T> UseAttributeValidation() => UseAttributeValidation(true);
 
     /// <summary>
     ///     配置跳过对象属性验证特性验证
@@ -707,7 +707,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public virtual ObjectValidator<T> SkipAnnotationValidation() => UseAnnotationValidation(false);
+    public virtual ObjectValidator<T> SkipAttributeValidation() => UseAttributeValidation(false);
 
     /// <summary>
     ///     配置跳过对象属性验证特性验证
@@ -716,7 +716,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public virtual ObjectValidator<T> CustomOnly() => UseAnnotationValidation(false);
+    public virtual ObjectValidator<T> CustomOnly() => UseAttributeValidation(false);
 
     /// <summary>
     ///     获取对象验证结果集合
@@ -797,7 +797,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    internal bool ShouldRunAnnotationValidation() => !Options.SuppressAnnotationValidation;
+    internal bool ShouldRunAttributeValidation() => !Options.SuppressAttributeValidation;
 
     /// <summary>
     ///     解析验证时使用的规则集
@@ -818,10 +818,10 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     /// </param>
     internal void OptionsOnPropertyChanged(object? sender, PropertyChangedEventArgs arg)
     {
-        // 同步 ValidatorOptions.ValidateAllProperties 属性值到 _annotationValidator.ValidateAllProperties
+        // 同步 ValidatorOptions.ValidateAllProperties 属性值到 _attributeValidator.ValidateAllProperties
         if (arg.PropertyName == nameof(ValidatorOptions.ValidateAllProperties))
         {
-            _annotationValidator.ValidateAllProperties = Options.ValidateAllProperties;
+            _attributeValidator.ValidateAllProperties = Options.ValidateAllProperties;
         }
     }
 

@@ -4,12 +4,12 @@
 
 namespace Cordon.Tests;
 
-public class ObjectAnnotationValidatorTests
+public class AttributeObjectValidatorTests
 {
     [Fact]
     public void New_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         Assert.True(validator.ValidateAllProperties);
         Assert.Empty(validator.Items);
         Assert.Null(validator._serviceProvider);
@@ -17,7 +17,7 @@ public class ObjectAnnotationValidatorTests
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Null(validator._errorMessageResourceAccessor());
 
-        var validator2 = new ObjectAnnotationValidator(new Dictionary<object, object?> { { "id", 1 } });
+        var validator2 = new AttributeObjectValidator(new Dictionary<object, object?> { { "id", 1 } });
         Assert.Null(validator2._serviceProvider);
         Assert.NotNull(validator2.Items);
         Assert.Single(validator2.Items);
@@ -26,7 +26,7 @@ public class ObjectAnnotationValidatorTests
         using var serviceProvider = services.BuildServiceProvider();
 
         var validator3 =
-            new ObjectAnnotationValidator(serviceProvider, new Dictionary<object, object?> { { "id", 1 } });
+            new AttributeObjectValidator(serviceProvider, new Dictionary<object, object?> { { "id", 1 } });
         Assert.NotNull(validator3._serviceProvider);
         Assert.NotNull(validator3.Items);
         Assert.Single(validator3.Items);
@@ -35,14 +35,14 @@ public class ObjectAnnotationValidatorTests
     [Fact]
     public void IsValid_Invalid_Parameters()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         Assert.Throws<ArgumentNullException>(() => validator.IsValid(null));
     }
 
     [Fact]
     public void IsValid_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         Assert.False(validator.IsValid(new ObjectClassTest { Id = 1, Name = "Furion", Age = 10 }));
         Assert.False(validator.IsValid(new ObjectClassTest { Id = 3, Name = "Furion", Age = 10 }));
         Assert.False(validator.IsValid(new ObjectClassTest { Id = 3, Name = "OK", Age = 10 }));
@@ -54,7 +54,7 @@ public class ObjectAnnotationValidatorTests
     [Fact]
     public void IsValid_WithValidateAllProperties_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator { ValidateAllProperties = false };
+        var validator = new AttributeObjectValidator { ValidateAllProperties = false };
         Assert.False(validator.IsValid(new ObjectClassTest { Id = 1, Name = "Furion", Age = 10 }));
         Assert.False(validator.IsValid(new ObjectClassTest { Id = 3, Name = "Furion", Age = 10 }));
         Assert.False(validator.IsValid(new ObjectClassTest { Id = 3, Name = "OK", Age = 10 }));
@@ -66,14 +66,14 @@ public class ObjectAnnotationValidatorTests
     [Fact]
     public void GetValidationResults_Invalid_Parameters()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         Assert.Throws<ArgumentNullException>(() => validator.GetValidationResults(null, "data"));
     }
 
     [Fact]
     public void GetValidationResults_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         Assert.Null(validator.GetValidationResults(new ObjectClassTest { Id = 3, Name = "Furion", Age = 18 }, "data"));
 
         var validationResults =
@@ -102,7 +102,7 @@ public class ObjectAnnotationValidatorTests
     [Fact]
     public void GetValidationResults_WithValidateAllProperties_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator { ValidateAllProperties = false };
+        var validator = new AttributeObjectValidator { ValidateAllProperties = false };
         Assert.Null(validator.GetValidationResults(new ObjectClassTest { Id = 3, Name = "Furion", Age = 18 }, "data"));
         Assert.Null(validator.GetValidationResults(new ObjectClassTest { Id = 1, Name = "OK", Age = 18 }, "data"));
 
@@ -123,14 +123,14 @@ public class ObjectAnnotationValidatorTests
     [Fact]
     public void Validate_Invalid_Parameters()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         Assert.Throws<ArgumentNullException>(() => validator.Validate(null, "data"));
     }
 
     [Fact]
     public void Validate_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         validator.Validate(new ObjectClassTest { Id = 3, Name = "Furion", Age = 18 }, "data");
 
         var exception = Assert.Throws<ValidationException>(() =>
@@ -152,7 +152,7 @@ public class ObjectAnnotationValidatorTests
     [Fact]
     public void Validate_WithValidateAllProperties_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator { ValidateAllProperties = false };
+        var validator = new AttributeObjectValidator { ValidateAllProperties = false };
         validator.Validate(new ObjectClassTest { Id = 3, Name = "Furion", Age = 18 }, "data");
         validator.Validate(new ObjectClassTest { Id = 1, Name = "OK", Age = 18 }, "data");
 
@@ -174,7 +174,7 @@ public class ObjectAnnotationValidatorTests
     [Fact]
     public void FormatErrorMessage_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         Assert.Null(validator.FormatErrorMessage(null!));
 
         validator.ErrorMessage = "自定义错误信息";
@@ -184,7 +184,7 @@ public class ObjectAnnotationValidatorTests
     [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         Assert.Null(validator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
@@ -199,7 +199,7 @@ public class ObjectAnnotationValidatorTests
     [Fact]
     public void CreateValidationContext_ReturnOK()
     {
-        var validator = new ObjectAnnotationValidator();
+        var validator = new AttributeObjectValidator();
         var validationContext = validator.CreateValidationContext(new ObjectClassTest());
         Assert.Equal("ObjectClassTest", validationContext.DisplayName);
         Assert.Null(validationContext.MemberName);

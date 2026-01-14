@@ -10,16 +10,16 @@ namespace Cordon;
 public class Base64StringValidator : ValidatorBase
 {
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
-    internal readonly ValueAnnotationValidator _validator;
+    internal readonly AttributeValueValidator _validator;
 
     /// <summary>
     ///     <inheritdoc cref="Base64StringValidator" />
     /// </summary>
     public Base64StringValidator()
     {
-        _validator = new ValueAnnotationValidator(new Base64StringAttribute());
+        _validator = new AttributeValueValidator(new Base64StringAttribute());
 
         UseResourceKey(() => nameof(ValidationMessages.Base64StringValidator_ValidationError));
     }

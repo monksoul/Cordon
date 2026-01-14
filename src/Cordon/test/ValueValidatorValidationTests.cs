@@ -1520,17 +1520,40 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
-    public void AddAnnotations_ReturnOK()
+    public void WithAttributes_ReturnOK()
     {
-        var valueValidator = new ValueValidator<object>().AddAnnotations(new UserNameAttribute());
+        var valueValidator = new ValueValidator<object>().WithAttributes(new UserNameAttribute());
 
         Assert.Single(valueValidator.Validators);
 
-        var addedValidator = valueValidator._lastAddedValidator as ValueAnnotationValidator;
+        var addedValidator = valueValidator._lastAddedValidator as AttributeValueValidator;
         Assert.NotNull(addedValidator);
 
         Assert.False(valueValidator.IsValid("monk__soul"));
         Assert.True(valueValidator.IsValid("monksoul"));
+
+        var validationResults = valueValidator.GetValidationResults("monk__soul");
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal("The field Object is not a valid username.", validationResults[0].ErrorMessage);
+        Assert.Empty(validationResults[0].MemberNames);
+
+        var exception = Assert.Throws<ValidationException>(() =>
+            valueValidator.Validate("monk__soul"));
+        Assert.Equal("The field Object is not a valid username.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        valueValidator.WithName("Value");
+        var validationResults2 = valueValidator.GetValidationResults("monk__soul");
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal("The field Value is not a valid username.", validationResults2[0].ErrorMessage);
+        Assert.Equal("Value", validationResults2[0].MemberNames.FirstOrDefault());
+
+        var exception2 = Assert.Throws<ValidationException>(() =>
+            valueValidator.Validate("monk__soul"));
+        Assert.Equal("The field Value is not a valid username.", exception2.Message);
+        Assert.Equal("Value", exception2.ValidationResult.MemberNames.FirstOrDefault());
     }
 
     [Fact]

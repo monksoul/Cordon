@@ -9,36 +9,36 @@ namespace Cordon;
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
 /// <typeparam name="TProperty">属性类型</typeparam>
-public class PropertyAnnotationValidator<T, TProperty> : PropertyAnnotationValidator<T>
+public class AttributePropertyValidator<T, TProperty> : AttributePropertyValidator<T>
 {
     /// <summary>
-    ///     <inheritdoc cref="PropertyAnnotationValidator{T,TProperty}" />
+    ///     <inheritdoc cref="AttributePropertyValidator{T,TProperty}" />
     /// </summary>
     /// <param name="selector">属性选择器</param>
-    public PropertyAnnotationValidator(Expression<Func<T, TProperty>> selector)
+    public AttributePropertyValidator(Expression<Func<T, TProperty>> selector)
         : base(ConvertExpression(selector))
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="PropertyAnnotationValidator{T,TProperty}" />
+    ///     <inheritdoc cref="AttributePropertyValidator{T,TProperty}" />
     /// </summary>
     /// <param name="selector">属性选择器</param>
     /// <param name="items">共享数据</param>
-    public PropertyAnnotationValidator(Expression<Func<T, TProperty>> selector, IDictionary<object, object?>? items)
+    public AttributePropertyValidator(Expression<Func<T, TProperty>> selector, IDictionary<object, object?>? items)
         : base(ConvertExpression(selector), items)
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="PropertyAnnotationValidator{T,TProperty}" />
+    ///     <inheritdoc cref="AttributePropertyValidator{T,TProperty}" />
     /// </summary>
     /// <param name="selector">属性选择器</param>
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
     /// </param>
     /// <param name="items">共享数据</param>
-    public PropertyAnnotationValidator(Expression<Func<T, TProperty>> selector, IServiceProvider? serviceProvider,
+    public AttributePropertyValidator(Expression<Func<T, TProperty>> selector, IServiceProvider? serviceProvider,
         IDictionary<object, object?>? items)
         : base(ConvertExpression(selector), serviceProvider, items)
     {
@@ -80,7 +80,7 @@ public class PropertyAnnotationValidator<T, TProperty> : PropertyAnnotationValid
 ///     属性验证特性验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class PropertyAnnotationValidator<T> : ValidatorBase<T>, IValidatorInitializer
+public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitializer
 {
     /// <summary>
     ///     属性值访问器
@@ -93,34 +93,34 @@ public class PropertyAnnotationValidator<T> : ValidatorBase<T>, IValidatorInitia
     internal Func<Type, object?>? _serviceProvider;
 
     /// <summary>
-    ///     <inheritdoc cref="PropertyAnnotationValidator{T}" />
+    ///     <inheritdoc cref="AttributePropertyValidator{T}" />
     /// </summary>
     /// <param name="selector">属性选择器</param>
-    public PropertyAnnotationValidator(Expression<Func<T, object?>> selector)
+    public AttributePropertyValidator(Expression<Func<T, object?>> selector)
         // ReSharper disable once IntroduceOptionalParameters.Global
         : this(selector, null, null)
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="PropertyAnnotationValidator{T}" />
+    ///     <inheritdoc cref="AttributePropertyValidator{T}" />
     /// </summary>
     /// <param name="selector">属性选择器</param>
     /// <param name="items">共享数据</param>
-    public PropertyAnnotationValidator(Expression<Func<T, object?>> selector, IDictionary<object, object?>? items)
+    public AttributePropertyValidator(Expression<Func<T, object?>> selector, IDictionary<object, object?>? items)
         : this(selector, null, items)
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="PropertyAnnotationValidator{T}" />
+    ///     <inheritdoc cref="AttributePropertyValidator{T}" />
     /// </summary>
     /// <param name="selector">属性选择器</param>
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
     /// </param>
     /// <param name="items">共享数据</param>
-    public PropertyAnnotationValidator(Expression<Func<T, object?>> selector, IServiceProvider? serviceProvider,
+    public AttributePropertyValidator(Expression<Func<T, object?>> selector, IServiceProvider? serviceProvider,
         IDictionary<object, object?>? items)
     {
         // 空检查

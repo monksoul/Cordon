@@ -1815,6 +1815,9 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1824,11 +1827,8 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
-        </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -1849,7 +1849,7 @@
         <member name="M:Cordon.ValidationBaseAttribute.#ctor(System.String)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidationBaseAttribute.#ctor(System.Func{System.String})">
+        <member name="M:Cordon.ValidationBaseAttribute.#ctor(System.Func{System.Stringstem.String})">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValidationBaseAttribute.UseResourceKey(System.Func{System.String})">
@@ -2923,7 +2923,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.AddAnnotations(System.ComponentModel.DataAnnotations.ValidationAttribute[])">
+        <member name="M:Cordon.FluentValidatorBuilder`2.WithAttributes(System.ComponentModel.DataAnnotations.ValidationAttribute[])">
             <summary>
                 添加验证特性验证器
             </summary>
@@ -3504,7 +3504,7 @@
                 数据验证模块拓展类
             </summary>
         </member>
-        <member name="M:Cordon.ValidationExtensions.ToResults(System.Collections.Generic.List{System.ComponentModel.DataAnnotations.ValidationResult})">
+        <member name="M:Cordon.ValidationExtensions.ToResults(System.Collections.Generic.List{SyentModel.DataAnnotations.ValidationResult})">
             <summary>
                 若 <see cref="T:System.ComponentModel.DataAnnotations.ValidationResult" /> 列表为空则返回 <c>null</c>，否则返回列表本身
             </summary>
@@ -3796,12 +3796,12 @@
             </summary>
             <returns><see cref="T:System.String" />[]</returns>
         </member>
-        <member name="T:Cordon.IValidationAnnotationsConfigurable">
+        <member name="T:Cordon.IValidationAttributeConfigurable">
             <summary>
                 定义可配置是否启用基于特性的验证行为
             </summary>
         </member>
-        <member name="M:Cordon.IValidationAnnotationsConfigurable.UseAnnotationValidation(System.Boolean)">
+        <member name="M:Cordon.IValidationAttributeConfigurable.UseAttributeValidation(System.Boolean)">
             <summary>
                 配置是否启用对象属性验证特性验证
             </summary>
@@ -4116,8 +4116,8 @@
                 用于使用 <![CDATA[ValidationContext.With<T>()]]> 时设置。
             </remarks>
         </member>
-        <member name="F:Cordon.ObjectValidator`1._annotationValidator">
-            <inheritdoc cref="T:Cordon.ObjectAnnotationValidator" />
+        <member name="F:Cordon.ObjectValidator`1._attributeValidator">
+            <inheritdoc cref="T:Cordon.AttributeObjectValidator" />
         </member>
         <member name="F:Cordon.ObjectValidator`1._ruleSetStack">
             <summary>
@@ -4225,7 +4225,7 @@
         <member name="M:Cordon.ObjectValidator`1.Cordon#IRuleSetContextProvider#GetCurrentRuleSets">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ObjectValidator`1.Cordon#IValidationAnnotationsConfigurable#UseAnnotationValidation(System.Boolean)">
+        <member name="M:Cordon.ObjectValidator`1.Cordon#IValidationAttributeConfigurable#UseAttributeValidation(System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
@@ -4385,7 +4385,7 @@
             </returns>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
-        <member name="M:Cordon.ObjectValidator`1.UseAnnotationValidation(System.Boolean)">
+        <member name="M:Cordon.ObjectValidator`1.UseAttributeValidation(System.Boolean)">
             <summary>
                 配置是否启用对象属性验证特性验证
             </summary>
@@ -4394,7 +4394,7 @@
                 <see cref="T:Cordon.ObjectValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ObjectValidator`1.UseAnnotationValidation">
+        <member name="M:Cordon.ObjectValidator`1.UseAttributeValidation">
             <summary>
                 配置启用对象属性验证特性验证
             </summary>
@@ -4402,7 +4402,7 @@
                 <see cref="T:Cordon.ObjectValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ObjectValidator`1.SkipAnnotationValidation">
+        <member name="M:Cordon.ObjectValidator`1.SkipAttributeValidation">
             <summary>
                 配置跳过对象属性验证特性验证
             </summary>
@@ -4446,7 +4446,7 @@
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Cordon.ObjectValidator`1.ShouldRunAnnotationValidation">
+        <member name="M:Cordon.ObjectValidator`1.ShouldRunAttributeValidation">
             <summary>
                 检查是否启用对象属性验证特性验证
             </summary>
@@ -4512,8 +4512,8 @@
             <typeparam name="TSelf">派生类型自身类型</typeparam>
             <inheritdoc cref="T:Cordon.PropertyValidator`3" />
         </member>
-        <member name="F:Cordon.PropertyValidator`3._annotationValidator">
-            <inheritdoc cref="T:Cordon.PropertyAnnotationValidator`2" />
+        <member name="F:Cordon.PropertyValidator`3._attributeValidator">
+            <inheritdoc cref="T:Cordon.AttributePropertyValidator`2" />
         </member>
         <member name="F:Cordon.PropertyValidator`3._objectValidator">
             <inheritdoc cref="T:Cordon.ObjectValidator`1" />
@@ -4548,13 +4548,13 @@
                 规则集
             </summary>
         </member>
-        <member name="P:Cordon.PropertyValidator`3.SuppressAnnotationValidation">
+        <member name="P:Cordon.PropertyValidator`3.SuppressAttributeValidation">
             <summary>
                 是否禁用属性验证特性验证
             </summary>
             <remarks>
                 默认值为：<c>null</c>。当此值为 <c>null</c> 时，是否启用注解验证将由 <see cref="P:Cordon.ObjectValidator`1.Options" /> 中的
-                <see cref="P:Cordon.ValidatorOptions.SuppressAnnotationValidation" /> 配置项决定。
+                <see cref="P:Cordon.ValidatorOptions.SuppressAttributeValidation" /> 配置项决定。
             </remarks>
         </member>
         <member name="P:Cordon.PropertyValidator`3.DisplayName">
@@ -4606,7 +4606,7 @@
         <member name="M:Cordon.PropertyValidator`3.Cordon#IPropertyValidatorCloneable{T}#Clone(Cordon.ObjectValidator{`0})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.PropertyValidator`3.Cordon#IValidationAnnotationsConfigurable#UseAnnotationValidation(System.Boolean)">
+        <member name="M:Cordon.PropertyValidator`3.Cordon#IValidationAttributeConfigurable#UseAttributeValidation(System.Boolean)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.PropertyValidator`3.InitializeServiceProvider(System.Func{System.Type,System.Object})">
@@ -4728,7 +4728,7 @@
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.ShouldRunAnnotationValidation">
+        <member name="M:Cordon.PropertyValidator`3.ShouldRunAttributeValidation">
             <summary>
                 检查是否启用属性验证特性验证
             </summary>
@@ -4813,7 +4813,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.UseAnnotationValidation(System.Nullable{System.Boolean})">
+        <member name="M:Cordon.PropertyValidator`3.UseAttributeValidation(System.Nullable{System.Boolean})">
             <summary>
                 配置是否启用该属性上的验证特性验证
             </summary>
@@ -4822,7 +4822,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.UseAnnotationValidation">
+        <member name="M:Cordon.PropertyValidator`3.UseAttributeValidation">
             <summary>
                 配置启用该属性上的验证特性验证
             </summary>
@@ -4830,7 +4830,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.SkipAnnotationValidation">
+        <member name="M:Cordon.PropertyValidator`3.SkipAttributeValidation">
             <summary>
                 配置跳过该属性上的验证特性验证
             </summary>
@@ -5482,7 +5482,7 @@
                 验证器选项
             </summary>
         </member>
-        <member name="P:Cordon.ValidatorOptions.SuppressAnnotationValidation">
+        <member name="P:Cordon.ValidatorOptions.SuppressAttributeValidation">
             <summary>
                 是否禁用属性验证特性验证
             </summary>
@@ -6600,26 +6600,26 @@
                 <see cref="T:Cordon.NullValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.ObjectAnnotation">
+        <member name="M:Cordon.Validators.AttributeObject">
             <summary>
                 创建对象验证特性验证器
             </summary>
             <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
             <returns>
-                <see cref="T:Cordon.ObjectAnnotationValidator" />
+                <see cref="T:Cordon.AttributeObjectValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.ObjectAnnotation(System.Collections.Generic.IDictionary{System.Object,System.Object})">
+        <member name="M:Cordon.Validators.AttributeObject(System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
                 创建对象验证特性验证器
             </summary>
             <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
             <param name="items">共享数据</param>
             <returns>
-                <see cref="T:Cordon.ObjectAnnotationValidator" />
+                <see cref="T:Cordon.AttributeObjectValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.ObjectAnnotation(System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
+        <member name="M:Cordon.Validators.AttributeObject(System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
                 创建对象验证特性验证器
             </summary>
@@ -6629,7 +6629,7 @@
             </param>
             <param name="items">共享数据</param>
             <returns>
-                <see cref="T:Cordon.ObjectAnnotationValidator" />
+                <see cref="T:Cordon.AttributeObjectValidator" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.Password(System.Boolean)">
@@ -6657,17 +6657,17 @@
                 <see cref="T:Cordon.PostalCodeValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.PropertyAnnotation``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}})">
+        <member name="M:Cordon.Validators.AttributeProperty``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}})">
             <summary>
                 创建属性验证特性验证器
             </summary>
             <param name="selector">属性选择器</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
-                <see cref="T:Cordon.PropertyAnnotationValidator`1" />
+                <see cref="T:Cordon.AttributePropertyValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.PropertyAnnotation``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}},System.Collections.Generic.IDictionary{System.Object,System.Object})">
+        <member name="M:Cordon.Validators.AttributeProperty``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}},System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
                 创建属性验证特性验证器
             </summary>
@@ -6675,10 +6675,10 @@
             <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
-                <see cref="T:Cordon.PropertyAnnotationValidator`1" />
+                <see cref="T:Cordon.AttributePropertyValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.PropertyAnnotation``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
+        <member name="M:Cordon.Validators.AttributeProperty``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
                 创建属性验证特性验证器
             </summary>
@@ -6689,10 +6689,10 @@
             <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
-                <see cref="T:Cordon.PropertyAnnotationValidator`1" />
+                <see cref="T:Cordon.AttributePropertyValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.PropertyAnnotation``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+        <member name="M:Cordon.Validators.AttributeProperty``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
             <summary>
                 创建属性验证特性验证器
             </summary>
@@ -6700,10 +6700,10 @@
             <typeparam name="T">对象类型</typeparam>
             <typeparam name="TProperty">属性类型</typeparam>
             <returns>
-                <see cref="T:Cordon.PropertyAnnotationValidator`2" />
+                <see cref="T:Cordon.AttributePropertyValidator`2" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.PropertyAnnotation``2(System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Collections.Generic.IDictionary{System.Object,System.Object})">
+        <member name="M:Cordon.Validators.AttributeProperty``2(System.Linq.Expressions.Expression{System.Func{``0,``1}},System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
                 创建属性验证特性验证器
             </summary>
@@ -6712,10 +6712,10 @@
             <typeparam name="T">对象类型</typeparam>
             <typeparam name="TProperty">属性类型</typeparam>
             <returns>
-                <see cref="T:Cordon.PropertyAnnotationValidator`2" />
+                <see cref="T:Cordon.AttributePropertyValidator`2" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.PropertyAnnotation``2(System.Linq.Expressions.Expression{System.Func{``0,``1}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
+        <member name="M:Cordon.Validators.AttributeProperty``2(System.Linq.Expressions.Expression{System.Func{``0,``1}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
                 创建属性验证特性验证器
             </summary>
@@ -6727,7 +6727,7 @@
             <typeparam name="T">对象类型</typeparam>
             <typeparam name="TProperty">属性类型</typeparam>
             <returns>
-                <see cref="T:Cordon.PropertyAnnotationValidator`2" />
+                <see cref="T:Cordon.AttributePropertyValidator`2" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.Range(System.Int32,System.Int32,System.Action{Cordon.RangeValidator})">
@@ -6963,26 +6963,26 @@
                 <see cref="M:Cordon.Validators.ValidatorProxy``2(System.Func{``0,System.Object},System.Func{``0,Cordon.ValidationContext{``0},System.Object[]})" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.ValueAnnotation(System.ComponentModel.DataAnnotations.ValidationAttribute[])">
+        <member name="M:Cordon.Validators.AttributeValue(System.ComponentModel.DataAnnotations.ValidationAttribute[])">
             <summary>
                 创建单个值验证特性验证器
             </summary>
             <param name="attributes">验证特性列表</param>
             <returns>
-                <see cref="T:Cordon.ValueAnnotationValidator" />
+                <see cref="T:Cordon.AttributeValueValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.ValueAnnotation(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.Collections.Generic.IDictionary{System.Object,System.Object})">
+        <member name="M:Cordon.Validators.AttributeValue(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
                 创建单个值验证特性验证器
             </summary>
             <param name="attributes">验证特性列表</param>
             <param name="items">共享数据</param>
             <returns>
-                <see cref="T:Cordon.ValueAnnotationValidator" />
+                <see cref="T:Cordon.AttributeValttributeValueValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.ValueAnnotation(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
+        <member name="M:Cordon.Validators.AttributeValue(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
                 创建单个值验证特性验证器
             </summary>
@@ -6992,7 +6992,7 @@
             </param>
             <param name="items">共享数据</param>
             <returns>
-                <see cref="T:Cordon.ValueAnnotationValidator" />
+                <see cref="T:Cordon.AttributeValueValidator" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.For``1(System.IServiceProvider)">
@@ -7047,7 +7047,7 @@
         </member>
         <member name="F:Cordon.AllowedValuesValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.AllowedValuesValidator.#ctor(System.Object[])">
@@ -7063,6 +7063,299 @@
         </member>
         <member name="M:Cordon.AllowedValuesValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
+        </member>
+        <member name="T:Cordon.AttributeObjectValidator">
+            <summary>
+                对象验证特性验证器
+            </summary>
+            <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
+        </member>
+        <member name="F:Cordon.AttributeObjectValidator._serviceProvider">
+            <summary>
+                <see cref="T:System.IServiceProvider" /> 委托
+            </summary>
+        </member>
+        <member name="M:Cordon.AttributeObjectValidator.#ctor">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributeObjectValidator" />
+            </summary>
+        </member>
+        <member name="M:Cordon.AttributeObjectValidator.#ctor(System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributeObjectValidator" />
+            </summary>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="M:Cordon.AttributeObjectValidator.#ctor(System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributeObjectValidator" />
+            </summary>
+            <param name="serviceProvider">
+                <see cref="T:System.IServiceProvider" />
+            </param>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="P:Cordon.AttributeObjectValidator.ValidateAllProperties">
+            <summary>
+                是否验证所有属性的验证特性
+            </summary>
+            <remarks>
+                该属性用于控制是否执行属性级别的验证逻辑，默认值为 <c>true</c>。
+                若设置为 <c>true</c>，则会同时验证所有属性以及 <see cref="M:System.ComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)" /> 方法；
+                若设置为 <c>false</c>，则仅验证 <see cref="M:System.ComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)" /> 方法。
+            </remarks>
+        </member>
+        <member name="P:Cordon.AttributeObjectValidator.Items">
+            <summary>
+                共享数据
+            </summary>
+        </member>
+        <member name="M:Cordon.AttributeObjectValidator.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributeObjectValidator.IsValid(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributeObjectValidator.GetValidationResults(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributeObjectValidator.Validate(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributeObjectValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
+        </member>
+        <member name="M:Cordon.AttributeObjectValidator.CreateValidationContext(System.Object)">
+            <summary>
+                创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
+            </summary>
+            <param name="value">对象</param>
+            <returns>
+                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
+            </returns>
+        </member>
+        <member name="T:Cordon.AttributePropertyValidator`2">
+            <summary>
+                属性验证特性验证器
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+            <typeparam name="TProperty">属性类型</typeparam>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributePropertyValidator`2" />
+            </summary>
+            <param name="selector">属性选择器</param>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributePropertyValidator`2" />
+            </summary>
+            <param name="selector">属性选择器</param>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributePropertyValidator`2" />
+            </summary>
+            <param name="selector">属性选择器</param>
+            <param name="serviceProvider">
+                <see cref="T:System.IServiceProvider" />
+            </param>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`2.ConvertExpression(System.Linq.Expressions.Expression{System.Func{`0,`1}})">
+            <summary>
+                将属性表达式转换为 <![CDATA[Func<T, object?>]]> 类型
+            </summary>
+            <param name="selector">属性选择器</param>
+            <returns>
+                <see cref="T:System.Linq.Expressions.Expression`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`2.GetValue(`0)">
+            <summary>
+                获取属性值
+            </summary>
+            <param name="instance">对象</param>
+            <returns>
+                <typeparamref name="TProperty" />
+            </returns>
+        </member>
+        <member name="T:Cordon.AttributePropertyValidator`1">
+            <summary>
+                属性验证特性验证器
+            </summary>
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="F:Cordon.AttributePropertyValidator`1._getter">
+            <summary>
+                属性值访问器
+            </summary>
+        </member>
+        <member name="F:Cordon.AttributePropertyValidator`1._serviceProvider">
+            <summary>
+                <see cref="T:System.IServiceProvider" /> 委托
+            </summary>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributePropertyValidator`1" />
+            </summary>
+            <param name="selector">属性选择器</param>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Object}},System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributePropertyValidator`1" />
+            </summary>
+            <param name="selector">属性选择器</param>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Object}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributePropertyValidator`1" />
+            </summary>
+            <param name="selector">属性选择器</param>
+            <param name="serviceProvider">
+                <see cref="T:System.IServiceProvider" />
+            </param>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="P:Cordon.AttributePropertyValidator`1.Property">
+            <summary>
+                <inheritdoc cref="T:System.Reflection.PropertyInfo" />
+            </summary>
+        </member>
+        <member name="P:Cordon.AttributePropertyValidator`1.Items">
+            <summary>
+                共享数据
+            </summary>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.Validate(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.GetValue(`0)">
+            <summary>
+                获取属性值
+            </summary>
+            <param name="instance">对象</param>
+            <returns>
+                <see cref="T:System.Object" />
+            </returns>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.GetDisplayName(System.String)">
+            <summary>
+                获取显示名称
+            </summary>
+            <param name="name">显示名称</param>
+            <returns>
+                <see cref="T:System.String" />
+            </returns>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.GetMemberName">
+            <summary>
+                获取成员名称
+            </summary>
+            <returns>
+                <see cref="T:System.String" />
+            </returns>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.CreateValidationContext(System.Object,System.String)">
+            <summary>
+                创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
+            </summary>
+            <param name="value">对象</param>
+            <param name="name">显示名称</param>
+            <returns>
+                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
+            </returns>
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
+        </member>
+        <member name="T:Cordon.AttributeValueValidator">
+            <summary>
+                单个值验证特性验证器
+            </summary>
+        </member>
+        <member name="F:Cordon.AttributeValueValidator._sentinel">
+            <summary>
+                用于值验证的 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 占位对象
+            </summary>
+        </member>
+        <member name="F:Cordon.AttributeValueValidator._serviceProvider">
+            <summary>
+                <see cref="T:System.IServiceProvider" /> 委托
+            </summary>
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.#ctor(System.ComponentModel.DataAnnotations.ValidationAttribute[])">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
+            </summary>
+            <param name="attributes">验证特性列表</param>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.#ctor(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
+            </summary>
+            <param name="attributes">验证特性列表</param>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.#ctor(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
+            <summary>
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
+            </summary>
+            <param name="attributes">验证特性列表</param>
+            <param name="serviceProvider">
+                <see cref="T:System.IServiceProvider" />
+            </param>
+            <param name="items">共享数据</param>
+        </member>
+        <member name="P:Cordon.AttributeValueValidator.Attributes">
+            <summary>
+                验证特性列表
+            </summary>
+        </member>
+        <member name="P:Cordon.AttributeValueValidator.Items">
+            <summary>
+                共享数据
+            </summary>
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.IsValid(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.GetValidationResults(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.Validate(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.CreateValidationContext(System.Object,System.String,System.String)">
+            <summary>
+                创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
+            </summary>
+            <param name="value">对象</param>
+            <param name="name">显示名称</param>
+            <param name="memberName">成员名称</param>
+            <returns>
+                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
+            </returns>
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
         <member name="T:Cordon.BankCardValidator">
             <summary>
@@ -7110,7 +7403,7 @@
         </member>
         <member name="F:Cordon.Base64StringValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.Base64StringValidator.#ctor">
@@ -7814,7 +8107,7 @@
         </member>
         <member name="F:Cordon.DeniedValuesValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.DeniedValuesValidator.#ctor(System.Object[])">
@@ -8072,7 +8365,7 @@
         </member>
         <member name="F:Cordon.FileExtensionsValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.FileExtensionsValidator.#ctor(System.String)">
@@ -8428,7 +8721,7 @@
         </member>
         <member name="F:Cordon.LengthValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.LengthValidator.#ctor(System.Int32,System.Int32)">
@@ -8489,7 +8782,7 @@
         </member>
         <member name="F:Cordon.MaxLengthValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.MaxLengthValidator.#ctor(System.Int32)">
@@ -8577,7 +8870,7 @@
         </member>
         <member name="F:Cordon.MinLengthValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.MinLengthValidator.#ctor(System.Int32)">
@@ -8759,76 +9052,6 @@
             <param name="compareValue">比较的值</param>
             <returns>
                 <see cref="T:System.Boolean" />
-            </returns>
-        </member>
-        <member name="T:Cordon.ObjectAnnotationValidator">
-            <summary>
-                对象验证特性验证器
-            </summary>
-            <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
-        </member>
-        <member name="F:Cordon.ObjectAnnotationValidator._serviceProvider">
-            <summary>
-                <see cref="T:System.IServiceProvider" /> 委托
-            </summary>
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.#ctor">
-            <summary>
-                <inheritdoc cref="T:Cordon.ObjectAnnotationValidator" />
-            </summary>
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.#ctor(System.Collections.Generic.IDictionary{System.Object,System.Object})">
-            <summary>
-                <inheritdoc cref="T:Cordon.ObjectAnnotationValidator" />
-            </summary>
-            <param name="items">共享数据</param>
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.#ctor(System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
-            <summary>
-                <inheritdoc cref="T:Cordon.ObjectAnnotationValidator" />
-            </summary>
-            <param name="serviceProvider">
-                <see cref="T:System.IServiceProvider" />
-            </param>
-            <param name="items">共享数据</param>
-        </member>
-        <member name="P:Cordon.ObjectAnnotationValidator.ValidateAllProperties">
-            <summary>
-                是否验证所有属性的验证特性
-            </summary>
-            <remarks>
-                该属性用于控制是否执行属性级别的验证逻辑，默认值为 <c>true</c>。
-                若设置为 <c>true</c>，则会同时验证所有属性以及 <see cref="M:System.ComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)" /> 方法；
-                若设置为 <c>false</c>，则仅验证 <see cref="M:System.ComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)" /> 方法。
-            </remarks>
-        </member>
-        <member name="P:Cordon.ObjectAnnotationValidator.Items">
-            <summary>
-                共享数据
-            </summary>
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.IsValid(System.Object,Cordon.IValidationContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.GetValidationResults(System.Object,Cordon.IValidationContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.Validate(System.Object,Cordon.IValidationContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
-        </member>
-        <member name="M:Cordon.ObjectAnnotationValidator.CreateValidationContext(System.Object)">
-            <summary>
-                创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
-            </summary>
-            <param name="value">对象</param>
-            <returns>
-                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
             </returns>
         </member>
         <member name="T:Cordon.PasswordValidator">
@@ -9013,154 +9236,6 @@
             </code>
             </remarks>
         </member>
-        <member name="T:Cordon.PropertyAnnotationValidator`2">
-            <summary>
-                属性验证特性验证器
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-            <typeparam name="TProperty">属性类型</typeparam>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}})">
-            <summary>
-                <inheritdoc cref="T:Cordon.PropertyAnnotationValidator`2" />
-            </summary>
-            <param name="selector">属性选择器</param>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},System.Collections.Generic.IDictionary{System.Object,System.Object})">
-            <summary>
-                <inheritdoc cref="T:Cordon.PropertyAnnotationValidator`2" />
-            </summary>
-            <param name="selector">属性选择器</param>
-            <param name="items">共享数据</param>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
-            <summary>
-                <inheritdoc cref="T:Cordon.PropertyAnnotationValidator`2" />
-            </summary>
-            <param name="selector">属性选择器</param>
-            <param name="serviceProvider">
-                <see cref="T:System.IServiceProvider" />
-            </param>
-            <param name="items">共享数据</param>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`2.ConvertExpression(System.Linq.Expressions.Expression{System.Func{`0,`1}})">
-            <summary>
-                将属性表达式转换为 <![CDATA[Func<T, object?>]]> 类型
-            </summary>
-            <param name="selector">属性选择器</param>
-            <returns>
-                <see cref="T:System.Linq.Expressions.Expression`1" />
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`2.GetValue(`0)">
-            <summary>
-                获取属性值
-            </summary>
-            <param name="instance">对象</param>
-            <returns>
-                <typeparamref name="TProperty" />
-            </returns>
-        </member>
-        <member name="T:Cordon.PropertyAnnotationValidator`1">
-            <summary>
-                属性验证特性验证器
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-        </member>
-        <member name="F:Cordon.PropertyAnnotationValidator`1._getter">
-            <summary>
-                属性值访问器
-            </summary>
-        </member>
-        <member name="F:Cordon.PropertyAnnotationValidator`1._serviceProvider">
-            <summary>
-                <see cref="T:System.IServiceProvider" /> 委托
-            </summary>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
-            <summary>
-                <inheritdoc cref="T:Cordon.PropertyAnnotationValidator`1" />
-            </summary>
-            <param name="selector">属性选择器</param>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Object}},System.Collections.Generic.IDictionary{System.Object,System.Object})">
-            <summary>
-                <inheritdoc cref="T:Cordon.PropertyAnnotationValidator`1" />
-            </summary>
-            <param name="selector">属性选择器</param>
-            <param name="items">共享数据</param>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Object}},System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
-            <summary>
-                <inheritdoc cref="T:Cordon.PropertyAnnotationValidator`1" />
-            </summary>
-            <param name="selector">属性选择器</param>
-            <param name="serviceProvider">
-                <see cref="T:System.IServiceProvider" />
-            </param>
-            <param name="items">共享数据</param>
-        </member>
-        <member name="P:Cordon.PropertyAnnotationValidator`1.Property">
-            <summary>
-                <inheritdoc cref="T:System.Reflection.PropertyInfo" />
-            </summary>
-        </member>
-        <member name="P:Cordon.PropertyAnnotationValidator`1.Items">
-            <summary>
-                共享数据
-            </summary>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.GetValidationResults(`0,Cordon.ValidationContext{`0})">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.Validate(`0,Cordon.ValidationContext{`0})">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.GetValue(`0)">
-            <summary>
-                获取属性值
-            </summary>
-            <param name="instance">对象</param>
-            <returns>
-                <see cref="T:System.Object" />
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.GetDisplayName(System.String)">
-            <summary>
-                获取显示名称
-            </summary>
-            <param name="name">显示名称</param>
-            <returns>
-                <see cref="T:System.String" />
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.GetMemberName">
-            <summary>
-                获取成员名称
-            </summary>
-            <returns>
-                <see cref="T:System.String" />
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.CreateValidationContext(System.Object,System.String)">
-            <summary>
-                创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
-            </summary>
-            <param name="value">对象</param>
-            <param name="name">显示名称</param>
-            <returns>
-                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
-            </returns>
-        </member>
-        <member name="M:Cordon.PropertyAnnotationValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
-        </member>
         <member name="T:Cordon.RangeValidator">
             <summary>
                 指定数值范围约束验证器
@@ -9173,7 +9248,7 @@
         </member>
         <member name="F:Cordon.RangeValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.RangeValidator.#ctor(System.Int32,System.Int32)">
@@ -9282,7 +9357,7 @@
         </member>
         <member name="F:Cordon.RegularExpressionValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.RegularExpressionValidator.#ctor(System.String)">
@@ -9343,7 +9418,7 @@
         </member>
         <member name="F:Cordon.RequiredValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.RequiredValidator.#ctor">
@@ -9475,7 +9550,7 @@
         </member>
         <member name="F:Cordon.StringLengthValidator._validator">
             <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
+                <inheritdoc cref="T:Cordon.AttributeValueValidator" />
             </summary>
         </member>
         <member name="M:Cordon.StringLengthValidator.#ctor(System.Int32)">
@@ -10238,80 +10313,6 @@
             </param>
         </member>
         <member name="M:Cordon.ValidatorProxy`2.InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
-        </member>
-        <member name="T:Cordon.ValueAnnotationValidator">
-            <summary>
-                单个值验证特性验证器
-            </summary>
-        </member>
-        <member name="F:Cordon.ValueAnnotationValidator._sentinel">
-            <summary>
-                用于值验证的 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 占位对象
-            </summary>
-        </member>
-        <member name="F:Cordon.ValueAnnotationValidator._serviceProvider">
-            <summary>
-                <see cref="T:System.IServiceProvider" /> 委托
-            </summary>
-        </member>
-        <member name="M:Cordon.ValueAnnotationValidator.#ctor(System.ComponentModel.DataAnnotations.ValidationAttribute[])">
-            <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
-            </summary>
-            <param name="attributes">验证特性列表</param>
-            <exception cref="T:System.ArgumentException"></exception>
-        </member>
-        <member name="M:Cordon.ValueAnnotationValidator.#ctor(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.Collections.Generic.IDictionary{System.Object,System.Object})">
-            <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
-            </summary>
-            <param name="attributes">验证特性列表</param>
-            <param name="items">共享数据</param>
-        </member>
-        <member name="M:Cordon.ValueAnnotationValidator.#ctor(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
-            <summary>
-                <inheritdoc cref="T:Cordon.ValueAnnotationValidator" />
-            </summary>
-            <param name="attributes">验证特性列表</param>
-            <param name="serviceProvider">
-                <see cref="T:System.IServiceProvider" />
-            </param>
-            <param name="items">共享数据</param>
-        </member>
-        <member name="P:Cordon.ValueAnnotationValidator.Attributes">
-            <summary>
-                验证特性列表
-            </summary>
-        </member>
-        <member name="P:Cordon.ValueAnnotationValidator.Items">
-            <summary>
-                共享数据
-            </summary>
-        </member>
-        <member name="M:Cordon.ValueAnnotationValidator.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ValueAnnotationValidator.IsValid(System.Object,Cordon.IValidationContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ValueAnnotationValidator.GetValidationResults(System.Object,Cordon.IValidationContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ValueAnnotationValidator.Validate(System.Object,Cordon.IValidationContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ValueAnnotationValidator.CreateValidationContext(System.Object,System.String)">
-            <summary>
-                创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
-            </summary>
-            <param name="value">对象</param>
-            <param name="name">显示名称</param>
-            <returns>
-                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
-            </returns>
-        </member>
-        <member name="M:Cordon.ValueAnnotationValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
         <member name="T:Microsoft.Extensions.DependencyInjection.ValidationCoreServiceCollectionExtensions">

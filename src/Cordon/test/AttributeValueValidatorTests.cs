@@ -4,22 +4,22 @@
 
 namespace Cordon.Tests;
 
-public class ValueAnnotationValidatorTests
+public class AttributeValueValidatorTests
 {
     [Fact]
     public void New_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => new ValueAnnotationValidator(null!));
+        Assert.Throws<ArgumentNullException>(() => new AttributeValueValidator(null!));
 
         var exception = Assert.Throws<ArgumentException>(() =>
-            new ValueAnnotationValidator(new RequiredAttribute(), null!, new StringLengthAttribute(3)));
+            new AttributeValueValidator(new RequiredAttribute(), null!, new StringLengthAttribute(3)));
         Assert.Equal("Attributes cannot contain null elements. (Parameter 'attributes')", exception.Message);
     }
 
     [Fact]
     public void New_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new RequiredAttribute(), new StringLengthAttribute(3));
+        var validator = new AttributeValueValidator(new RequiredAttribute(), new StringLengthAttribute(3));
 
         Assert.NotNull(validator.Attributes);
         Assert.Equal(2, validator.Attributes.Length);
@@ -29,7 +29,7 @@ public class ValueAnnotationValidatorTests
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Null(validator._errorMessageResourceAccessor());
 
-        var validator2 = new ValueAnnotationValidator([new RequiredAttribute(), new StringLengthAttribute(3)],
+        var validator2 = new AttributeValueValidator([new RequiredAttribute(), new StringLengthAttribute(3)],
             new Dictionary<object, object?> { { "id", 1 } });
         Assert.Null(validator2._serviceProvider);
         Assert.NotNull(validator2.Items);
@@ -38,7 +38,7 @@ public class ValueAnnotationValidatorTests
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
 
-        var validator3 = new ValueAnnotationValidator([new RequiredAttribute(), new StringLengthAttribute(3)],
+        var validator3 = new AttributeValueValidator([new RequiredAttribute(), new StringLengthAttribute(3)],
             serviceProvider, new Dictionary<object, object?> { { "id", 1 } });
         Assert.NotNull(validator3._serviceProvider);
         Assert.NotNull(validator3.Items);
@@ -48,33 +48,33 @@ public class ValueAnnotationValidatorTests
     [Fact]
     public void IsValid_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3));
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3));
         Assert.True(validator.IsValid(null));
 
-        var validator2 = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator2 = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         Assert.False(validator2.IsValid(null));
 
-        var validator3 = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator3 = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         Assert.True(validator3.IsValid("Fur"));
 
-        var validator4 = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator4 = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         Assert.False(validator4.IsValid("Furion"));
     }
 
     [Fact]
     public void GetValidationResults_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3));
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3));
         Assert.Null(validator.GetValidationResults(null, "Value"));
 
-        var validator2 = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator2 = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         Assert.Null(validator2.GetValidationResults("Fur", "Value"));
     }
 
     [Fact]
     public void GetValidationResults_WithNullValue_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         var validationResults = validator.GetValidationResults(null, "Value");
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
@@ -98,7 +98,7 @@ public class ValueAnnotationValidatorTests
     [Fact]
     public void GetValidationResults_WithNoNullValue_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         var validationResults = validator.GetValidationResults("Furion", "Value");
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
@@ -123,7 +123,7 @@ public class ValueAnnotationValidatorTests
     [Fact]
     public void GetValidationResults_WithNoName_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         var validationResults = validator.GetValidationResults(null, null!);
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
@@ -139,17 +139,17 @@ public class ValueAnnotationValidatorTests
     [Fact]
     public void Validate_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3));
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3));
         validator.Validate(null, "Value");
 
-        var validator2 = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator2 = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         validator2.Validate("Fur", "Value");
     }
 
     [Fact]
     public void Validate_WithNullValue_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         var exception = Assert.Throws<ValidationException>(() => validator.Validate(null, "Value"));
         Assert.Equal("The Value field is required.", exception.Message);
         Assert.True(exception.ValidationAttribute is RequiredAttribute);
@@ -168,7 +168,7 @@ public class ValueAnnotationValidatorTests
     [Fact]
     public void Validate_WithNoNullValue_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         var exception = Assert.Throws<ValidationException>(() => validator.Validate("Furion", "Value"));
         Assert.Equal("The field Value must be a string with a maximum length of 3.", exception.Message);
         Assert.True(exception.ValidationAttribute is StringLengthAttribute);
@@ -187,7 +187,7 @@ public class ValueAnnotationValidatorTests
     [Fact]
     public void Validate_WithNoName_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         var exception = Assert.Throws<ValidationException>(() => validator.Validate(null, null!));
         Assert.Equal("The Object field is required.", exception.Message);
 
@@ -198,7 +198,7 @@ public class ValueAnnotationValidatorTests
     [Fact]
     public void FormatErrorMessage_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         Assert.Null(validator.FormatErrorMessage(null!));
 
         validator.ErrorMessage = "自定义错误信息";
@@ -208,7 +208,7 @@ public class ValueAnnotationValidatorTests
     [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
         Assert.Null(validator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
@@ -223,16 +223,16 @@ public class ValueAnnotationValidatorTests
     [Fact]
     public void CreateValidationContext_ReturnOK()
     {
-        var validator = new ValueAnnotationValidator(new StringLengthAttribute(3), new RequiredAttribute());
-        var validationContext = validator.CreateValidationContext(new ObjectClassTest(), null);
+        var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
+        var validationContext = validator.CreateValidationContext(new ObjectClassTest(), null, null);
         Assert.Equal("ObjectClassTest", validationContext.DisplayName);
         Assert.Null(validationContext.MemberName);
 
-        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest(), "DisplayName");
+        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest(), "DisplayName", "MemberName");
         Assert.Equal("DisplayName", validationContext2.DisplayName);
-        Assert.Null(validationContext2.MemberName);
+        Assert.Equal("MemberName", validationContext2.MemberName);
 
-        var validationContext3 = validator.CreateValidationContext(new ObjectClassTest(), null);
+        var validationContext3 = validator.CreateValidationContext(new ObjectClassTest(), null, null);
         Assert.Equal("ObjectClassTest", validationContext3.DisplayName);
         Assert.Null(validationContext3.MemberName);
 
@@ -247,7 +247,7 @@ public class ValueAnnotationValidatorTests
         validator.InitializeServiceProvider(serviceProvider.GetService);
         Assert.NotNull(validator._serviceProvider);
 
-        var validationContext4 = validator.CreateValidationContext(new ObjectClassTest(), null);
+        var validationContext4 = validator.CreateValidationContext(new ObjectClassTest(), null, null);
         Assert.NotNull(validator._serviceProvider);
         Assert.NotNull(serviceProviderField.GetValue(validationContext4));
     }

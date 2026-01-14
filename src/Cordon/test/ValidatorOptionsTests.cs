@@ -10,7 +10,7 @@ public class ValidatorOptionsTests
     public void ValidatorOptions_ReturnOK()
     {
         var validatorOptions = new ValidatorOptions();
-        Assert.False(validatorOptions.SuppressAnnotationValidation);
+        Assert.False(validatorOptions.SuppressAttributeValidation);
         Assert.True(validatorOptions.ValidateAllProperties);
     }
 
@@ -25,11 +25,11 @@ public class ValidatorOptionsTests
             list.Add(args.PropertyName);
         };
 
-        validatorOptions.SuppressAnnotationValidation = true;
+        validatorOptions.SuppressAttributeValidation = true;
         validatorOptions.ValidateAllProperties = false;
 
         Assert.Equal(
-            [nameof(validatorOptions.SuppressAnnotationValidation), nameof(validatorOptions.ValidateAllProperties)],
+            [nameof(validatorOptions.SuppressAttributeValidation), nameof(validatorOptions.ValidateAllProperties)],
             list);
     }
 }

@@ -15,9 +15,9 @@ public class RegularExpressionValidator : ValidatorBase, IDisposable
     internal readonly string[] _observedPropertyNames = [nameof(MatchTimeoutInMilliseconds)];
 
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
-    internal readonly ValueAnnotationValidator _validator;
+    internal readonly AttributeValueValidator _validator;
 
     /// <summary>
     ///     <inheritdoc cref="RegularExpressionValidator" />
@@ -28,7 +28,7 @@ public class RegularExpressionValidator : ValidatorBase, IDisposable
         Pattern = pattern;
         MatchTimeoutInMilliseconds = 2000;
 
-        _validator = new ValueAnnotationValidator(new RegularExpressionAttribute(pattern));
+        _validator = new AttributeValueValidator(new RegularExpressionAttribute(pattern));
 
         // 订阅属性变更事件
         PropertyChanged += OnPropertyChanged;

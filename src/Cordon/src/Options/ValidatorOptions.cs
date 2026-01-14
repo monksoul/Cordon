@@ -13,7 +13,7 @@ public sealed class ValidatorOptions : INotifyPropertyChanged
     ///     是否禁用属性验证特性验证
     /// </summary>
     /// <remarks>默认值为：<c>false</c>，即启用。</remarks>
-    public bool SuppressAnnotationValidation { get; set => SetField(ref field, value); }
+    public bool SuppressAttributeValidation { get; set => SetField(ref field, value); }
 
     /// <summary>
     ///     是否验证所有属性的验证特性

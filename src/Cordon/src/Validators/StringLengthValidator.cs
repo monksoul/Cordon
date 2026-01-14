@@ -15,9 +15,9 @@ public class StringLengthValidator : ValidatorBase, IDisposable
     internal readonly string[] _observedPropertyNames = [nameof(MinimumLength)];
 
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
-    internal readonly ValueAnnotationValidator _validator;
+    internal readonly AttributeValueValidator _validator;
 
     /// <summary>
     ///     <inheritdoc cref="StringLengthValidator" />
@@ -27,7 +27,7 @@ public class StringLengthValidator : ValidatorBase, IDisposable
     {
         MaximumLength = maximumLength;
 
-        _validator = new ValueAnnotationValidator(new StringLengthAttribute(maximumLength));
+        _validator = new AttributeValueValidator(new StringLengthAttribute(maximumLength));
 
         // 订阅属性变更事件
         PropertyChanged += OnPropertyChanged;

@@ -33,9 +33,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf UseAnnotationValidation(bool? enabled)
+    public virtual TSelf UseAttributeValidation(bool? enabled)
     {
-        SuppressAnnotationValidation = !enabled;
+        SuppressAttributeValidation = !enabled;
 
         return This;
     }
@@ -46,7 +46,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf UseAnnotationValidation() => UseAnnotationValidation(true);
+    public virtual TSelf UseAttributeValidation() => UseAttributeValidation(true);
 
     /// <summary>
     ///     配置跳过该属性上的验证特性验证
@@ -54,7 +54,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf SkipAnnotationValidation() => UseAnnotationValidation(false);
+    public virtual TSelf SkipAttributeValidation() => UseAttributeValidation(false);
 
     /// <summary>
     ///     配置跳过该属性上的验证特性验证
@@ -63,7 +63,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf CustomOnly() => UseAnnotationValidation(false);
+    public virtual TSelf CustomOnly() => UseAttributeValidation(false);
 
     /// <summary>
     ///     添加条件验证器

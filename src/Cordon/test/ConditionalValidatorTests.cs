@@ -231,25 +231,25 @@ public class ConditionalValidatorTests
     public void InitializeServiceProvider_ReturnOK()
     {
         var validator = new ConditionalValidator<string>(builder =>
-            builder.When(u => u.Contains('@')).Then(b => b.AddAnnotations(new RequiredAttribute()))
-                .Otherwise(b => b.AddAnnotations(new UserNameAttribute())));
+            builder.When(u => u.Contains('@')).Then(b => b.WithAttributes(new RequiredAttribute()))
+                .Otherwise(b => b.WithAttributes(new UserNameAttribute())));
 
-        var conditionValueAnnotationValidator =
+        var conditionAttributeValueValidator =
             validator._conditionResult.ConditionalRules.SelectMany(u => u.Validators).First() as
-                ValueAnnotationValidator;
-        Assert.NotNull(conditionValueAnnotationValidator);
-        var defaultValueAnnotationValidator =
-            validator._conditionResult.DefaultRules?[0] as ValueAnnotationValidator;
-        Assert.NotNull(defaultValueAnnotationValidator);
+                AttributeValueValidator;
+        Assert.NotNull(conditionAttributeValueValidator);
+        var defaultAttributeValueValidator =
+            validator._conditionResult.DefaultRules?[0] as AttributeValueValidator;
+        Assert.NotNull(defaultAttributeValueValidator);
 
-        Assert.Null(conditionValueAnnotationValidator._serviceProvider);
-        Assert.Null(defaultValueAnnotationValidator._serviceProvider);
+        Assert.Null(conditionAttributeValueValidator._serviceProvider);
+        Assert.Null(defaultAttributeValueValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
 
-        Assert.NotNull(conditionValueAnnotationValidator._serviceProvider);
-        Assert.NotNull(defaultValueAnnotationValidator._serviceProvider);
+        Assert.NotNull(conditionAttributeValueValidator._serviceProvider);
+        Assert.NotNull(defaultAttributeValueValidator._serviceProvider);
     }
 
     [Fact]

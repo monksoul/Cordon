@@ -73,7 +73,7 @@ public static class ValidationExtensions
         };
 
         // 初始化 ObjectValidator<T> 实例并跳过属性验证特性验证，避免死循环
-        var objectValidator = new ObjectValidator<T>(items).SkipAnnotationValidation();
+        var objectValidator = new ObjectValidator<T>(items).SkipAttributeValidation();
 
         // 同步 IServiceProvider 委托
         objectValidator.InitializeServiceProvider(validationContext.GetService);
@@ -133,7 +133,7 @@ public static class ValidationExtensions
         ArgumentNullException.ThrowIfNull(objectValidator);
 
         // 跳过属性验证特性验证并返回对象验证结果集合
-        return objectValidator.UseAnnotationValidation(false).ToResults(validationContext, disposeAfterValidation);
+        return objectValidator.UseAttributeValidation(false).ToResults(validationContext, disposeAfterValidation);
     }
 
     /// <summary>
@@ -159,10 +159,10 @@ public static class ValidationExtensions
             ? Activator.CreateInstance<TValidator>()
             : ActivatorUtilities.CreateInstance<TValidator>(validationContext);
 
-        // 检查验证器是否实现 IValidationAnnotationsConfigurable 接口
-        if (validator is IValidationAnnotationsConfigurable configurable)
+        // 检查验证器是否实现 IValidationAttributeConfigurable 接口
+        if (validator is IValidationAttributeConfigurable configurable)
         {
-            configurable.UseAnnotationValidation(false);
+            configurable.UseAttributeValidation(false);
         }
 
         return validator.ToResults(validationContext);

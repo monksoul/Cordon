@@ -8,7 +8,7 @@ namespace Cordon;
 ///     对象验证特性验证器
 /// </summary>
 /// <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
-public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
+public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
 {
     /// <summary>
     ///     <see cref="IServiceProvider" /> 委托
@@ -16,30 +16,30 @@ public class ObjectAnnotationValidator : ValidatorBase, IValidatorInitializer
     internal Func<Type, object?>? _serviceProvider;
 
     /// <summary>
-    ///     <inheritdoc cref="ObjectAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeObjectValidator" />
     /// </summary>
-    public ObjectAnnotationValidator()
+    public AttributeObjectValidator()
         : this(null, null)
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="ObjectAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeObjectValidator" />
     /// </summary>
     /// <param name="items">共享数据</param>
-    public ObjectAnnotationValidator(IDictionary<object, object?>? items)
+    public AttributeObjectValidator(IDictionary<object, object?>? items)
         : this(null, items)
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="ObjectAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeObjectValidator" />
     /// </summary>
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
     /// </param>
     /// <param name="items">共享数据</param>
-    public ObjectAnnotationValidator(IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
+    public AttributeObjectValidator(IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
     {
         // 空检查
         if (serviceProvider is not null)

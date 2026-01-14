@@ -295,14 +295,14 @@ public class CompositeValidatorTests
     [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
-        var validator = new CompositeValidator<string>(u => u.AddAnnotations(new RequiredAttribute()));
-        var valueAnnotationValidator = validator._validators[0] as ValueAnnotationValidator;
-        Assert.NotNull(valueAnnotationValidator);
-        Assert.Null(valueAnnotationValidator._serviceProvider);
+        var validator = new CompositeValidator<string>(u => u.WithAttributes(new RequiredAttribute()));
+        var attributeValueValidator = validator._validators[0] as AttributeValueValidator;
+        Assert.NotNull(attributeValueValidator);
+        Assert.Null(attributeValueValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
 
-        Assert.NotNull(valueAnnotationValidator._serviceProvider);
+        Assert.NotNull(attributeValueValidator._serviceProvider);
     }
 }

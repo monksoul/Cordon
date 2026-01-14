@@ -8,7 +8,7 @@ namespace Cordon;
 ///     属性验证器服务
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public interface IPropertyValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IValidationAnnotationsConfigurable,
+public interface IPropertyValidator<T> : IObjectValidator<T>, IMemberPathRepairable, IValidationAttributeConfigurable,
     IPropertyValidatorCloneable<T>;
 
 /// <summary>

@@ -506,19 +506,19 @@ public class ValidatorsTests
     }
 
     [Fact]
-    public void ObjectAnnotation_ReturnOK()
+    public void AttributeObject_ReturnOK()
     {
-        var validator = Validators.ObjectAnnotation();
+        var validator = Validators.AttributeObject();
         Assert.Null(validator._serviceProvider);
         Assert.Empty(validator.Items);
 
-        var validator2 = Validators.ObjectAnnotation(new Dictionary<object, object?>());
+        var validator2 = Validators.AttributeObject(new Dictionary<object, object?>());
         Assert.Null(validator2._serviceProvider);
         Assert.Empty(validator2.Items);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
-        var validator3 = Validators.ObjectAnnotation(serviceProvider, new Dictionary<object, object?>());
+        var validator3 = Validators.AttributeObject(serviceProvider, new Dictionary<object, object?>());
         Assert.NotNull(validator3._serviceProvider);
         Assert.NotNull(validator3.Items);
     }
@@ -548,9 +548,9 @@ public class ValidatorsTests
     }
 
     [Fact]
-    public void PropertyAnnotation_ReturnOK()
+    public void AttributeProperty_ReturnOK()
     {
-        var validator = Validators.PropertyAnnotation<ObjectModel>(u => u.Name);
+        var validator = Validators.AttributeProperty<ObjectModel>(u => u.Name);
         Assert.NotNull(validator.Property);
         Assert.Null(validator._serviceProvider);
         Assert.Empty(validator.Items);
@@ -559,30 +559,30 @@ public class ValidatorsTests
         using var serviceProvider = services.BuildServiceProvider();
 
         var validator2 =
-            Validators.PropertyAnnotation<ObjectModel>(u => u.Name, new Dictionary<object, object?>());
+            Validators.AttributeProperty<ObjectModel>(u => u.Name, new Dictionary<object, object?>());
         Assert.NotNull(validator2.Property);
         Assert.Null(validator2._serviceProvider);
         Assert.NotNull(validator2.Items);
 
         var validator3 =
-            Validators.PropertyAnnotation<ObjectModel>(u => u.Name, serviceProvider, new Dictionary<object, object?>());
+            Validators.AttributeProperty<ObjectModel>(u => u.Name, serviceProvider, new Dictionary<object, object?>());
         Assert.NotNull(validator3.Property);
         Assert.NotNull(validator3._serviceProvider);
         Assert.NotNull(validator3.Items);
 
-        var validator4 = Validators.PropertyAnnotation<ObjectModel, string?>(u => u.Name);
+        var validator4 = Validators.AttributeProperty<ObjectModel, string?>(u => u.Name);
         Assert.NotNull(validator4.Property);
         Assert.Null(validator4._serviceProvider);
         Assert.Empty(validator4.Items);
 
         var validator5 =
-            Validators.PropertyAnnotation<ObjectModel, string?>(u => u.Name, new Dictionary<object, object?>());
+            Validators.AttributeProperty<ObjectModel, string?>(u => u.Name, new Dictionary<object, object?>());
         Assert.NotNull(validator5.Property);
         Assert.Null(validator5._serviceProvider);
         Assert.NotNull(validator5.Items);
 
         var validator6 =
-            Validators.PropertyAnnotation<ObjectModel, string?>(u => u.Name, serviceProvider,
+            Validators.AttributeProperty<ObjectModel, string?>(u => u.Name, serviceProvider,
                 new Dictionary<object, object?>());
         Assert.NotNull(validator6.Property);
         Assert.NotNull(validator6._serviceProvider);
@@ -877,28 +877,28 @@ public class ValidatorsTests
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
         var validator2 =
-            Validators.ValidatorProxy<ObjectModel, PropertyAnnotationValidator<ObjectModel>>(
+            Validators.ValidatorProxy<ObjectModel, AttributePropertyValidator<ObjectModel>>(
                 instance => instance.Name,
                 (_, _) => [services, new Dictionary<object, object?>()]);
         Assert.NotNull(validator2);
     }
 
     [Fact]
-    public void ValueAnnotation_ReturnOK()
+    public void AttributeValue_ReturnOK()
     {
-        var validator = Validators.ValueAnnotation(new ChineseAttribute());
+        var validator = Validators.AttributeValue(new ChineseAttribute());
         Assert.Single(validator.Attributes);
         Assert.Null(validator._serviceProvider);
         Assert.Empty(validator.Items);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
-        var validator2 = Validators.ValueAnnotation([new ChineseAttribute()], new Dictionary<object, object?>());
+        var validator2 = Validators.AttributeValue([new ChineseAttribute()], new Dictionary<object, object?>());
         Assert.Single(validator2.Attributes);
         Assert.Null(validator2._serviceProvider);
         Assert.NotNull(validator2.Items);
 
-        var validator3 = Validators.ValueAnnotation([new ChineseAttribute()], serviceProvider,
+        var validator3 = Validators.AttributeValue([new ChineseAttribute()], serviceProvider,
             new Dictionary<object, object?>());
         Assert.Single(validator3.Attributes);
         Assert.NotNull(validator3._serviceProvider);

@@ -4,16 +4,16 @@
 
 namespace Cordon.Tests;
 
-public class PropertyAnnotationValidatorTests
+public class AttributePropertyValidatorTests
 {
     [Fact]
     public void New_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new PropertyAnnotationValidator<PropertyClassTest>(null!));
+        Assert.Throws<ArgumentNullException>(() => new AttributePropertyValidator<PropertyClassTest>(null!));
 
     [Fact]
     public void New_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.NotNull(validator.Property);
         Assert.Equal("Name", validator.Property.Name);
         Assert.Empty(validator.Items);
@@ -25,20 +25,20 @@ public class PropertyAnnotationValidatorTests
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Null(validator._errorMessageResourceAccessor());
 
-        var validator2 = new PropertyAnnotationValidator<PropertyClassTest, string?>(u => u.Name);
+        var validator2 = new AttributePropertyValidator<PropertyClassTest, string?>(u => u.Name);
         Assert.NotNull(validator2.Property);
         Assert.Null(validator2._serviceProvider);
         Assert.Equal("Name", validator2.Property.Name);
 
         var validator3 =
-            new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name,
+            new AttributePropertyValidator<PropertyClassTest>(u => u.Name,
                 new Dictionary<object, object?> { { "id", 1 } });
         Assert.Null(validator3._serviceProvider);
         Assert.NotNull(validator3.Items);
         Assert.Single(validator3.Items);
 
         var validator4 =
-            new PropertyAnnotationValidator<PropertyClassTest, string?>(u => u.Name,
+            new AttributePropertyValidator<PropertyClassTest, string?>(u => u.Name,
                 new Dictionary<object, object?> { { "id", 1 } });
         Assert.Null(validator4._serviceProvider);
         Assert.NotNull(validator4.Items);
@@ -48,14 +48,14 @@ public class PropertyAnnotationValidatorTests
         using var serviceProvider = services.BuildServiceProvider();
 
         var validator5 =
-            new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name, serviceProvider,
+            new AttributePropertyValidator<PropertyClassTest>(u => u.Name, serviceProvider,
                 new Dictionary<object, object?> { { "id", 1 } });
         Assert.NotNull(validator5._serviceProvider);
         Assert.NotNull(validator5.Items);
         Assert.Single(validator5.Items);
 
         var validator6 =
-            new PropertyAnnotationValidator<PropertyClassTest, string?>(u => u.Name, serviceProvider,
+            new AttributePropertyValidator<PropertyClassTest, string?>(u => u.Name, serviceProvider,
                 new Dictionary<object, object?> { { "id", 1 } });
         Assert.NotNull(validator6._serviceProvider);
         Assert.NotNull(validator6.Items);
@@ -65,7 +65,7 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void IsValid_Invalid_Parameters()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.Throws<ArgumentNullException>(() => validator.IsValid(null));
         Assert.Throws<InvalidCastException>(() => validator.IsValid(new { Name = "Furion" }));
     }
@@ -73,7 +73,7 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void IsValid_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.False(validator.IsValid(new PropertyClassTest { Name = null }));
         Assert.False(validator.IsValid(new PropertyClassTest { Name = "OK" }));
         Assert.True(validator.IsValid(new PropertyClassTest { Name = "Furion" }));
@@ -83,7 +83,7 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void GetValidationResults_Invalid_Parameters()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.Throws<ArgumentNullException>(() => validator.GetValidationResults(null, "data"));
         Assert.Throws<InvalidCastException>(() => validator.GetValidationResults(new { Name = "Furion" }, "data"));
     }
@@ -91,7 +91,7 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void GetValidationResults_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.Null(validator.GetValidationResults(new PropertyClassTest { Name = "Furion" }, "data"));
 
         var validationResults = validator.GetValidationResults(new PropertyClassTest { Name = null }, "Name");
@@ -116,7 +116,7 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void Validate_Invalid_Parameters()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.Throws<ArgumentNullException>(() => validator.Validate(null, "data"));
         Assert.Throws<InvalidCastException>(() => validator.Validate(new { Name = "Furion" }, "data"));
     }
@@ -124,7 +124,7 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void Validate_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         validator.Validate(new PropertyClassTest { Name = "Furion" }, "data");
 
         var exception =
@@ -152,7 +152,7 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void FormatErrorMessage_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.Null(validator.FormatErrorMessage(null!));
 
         validator.ErrorMessage = "自定义错误信息";
@@ -162,31 +162,31 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void GetValue_Invalid_Parameters()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.Throws<ArgumentNullException>(() => validator.GetValue(null!));
     }
 
     [Fact]
     public void GetValue_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.Null(validator.GetValue(new PropertyClassTest { Name = null }));
         Assert.Equal("Furion", validator.GetValue(new PropertyClassTest { Name = "Furion" }));
         Assert.Equal("OK", validator.GetValue(new PropertyClassTest { Name = "OK" }));
 
-        var validator2 = new PropertyAnnotationValidator<PropertyClassTest, string?>(u => u.Name);
+        var validator2 = new AttributePropertyValidator<PropertyClassTest, string?>(u => u.Name);
         Assert.Equal("Furion", validator2.GetValue(new PropertyClassTest { Name = "Furion" }));
     }
 
     [Fact]
     public void ConvertExpression_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() =>
-            PropertyAnnotationValidator<PropertyClassTest, string?>.ConvertExpression(null!));
+            AttributePropertyValidator<PropertyClassTest, string?>.ConvertExpression(null!));
 
     [Fact]
     public void ConvertExpression_ReturnOK()
     {
-        var expression = PropertyAnnotationValidator<PropertyClassTest, string?>.ConvertExpression(u => u.Name);
+        var expression = AttributePropertyValidator<PropertyClassTest, string?>.ConvertExpression(u => u.Name);
         Assert.NotNull(expression);
 
         var getter = expression.Compile();
@@ -196,30 +196,30 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void GetDisplayName_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest2>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name);
         Assert.Equal("Name", validator.GetDisplayName(null));
 
-        var validator2 = new PropertyAnnotationValidator<PropertyClassTest2>(u => u.Name1);
+        var validator2 = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name1);
         Assert.Equal("名称", validator2.GetDisplayName(null));
 
-        var validator3 = new PropertyAnnotationValidator<PropertyClassTest2>(u => u.Name2);
+        var validator3 = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name2);
         Assert.Equal("名称", validator3.GetDisplayName(null));
 
-        var validator4 = new PropertyAnnotationValidator<PropertyClassTest2>(u => u.Name2);
+        var validator4 = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name2);
         Assert.Equal("新名称", validator4.GetDisplayName("新名称"));
     }
 
     [Fact]
     public void GetMemberName_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest2>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name);
         Assert.Equal("Name", validator.GetMemberName());
     }
 
     [Fact]
     public void InitializeServiceProvider_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest2>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name);
         Assert.Null(validator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
@@ -234,7 +234,7 @@ public class PropertyAnnotationValidatorTests
     [Fact]
     public void CreateValidationContext_ReturnOK()
     {
-        var validator = new PropertyAnnotationValidator<PropertyClassTest2>(u => u.Name);
+        var validator = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name);
 
         var validationContext = validator.CreateValidationContext(new ObjectClassTest(), "DisplayName");
         Assert.Equal("DisplayName", validationContext.DisplayName);

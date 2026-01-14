@@ -28,8 +28,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     IPropertyValidator<T>
     where TSelf : PropertyValidator<T, TProperty, TSelf>
 {
-    /// <inheritdoc cref="PropertyAnnotationValidator{T,TProperty}" />
-    internal readonly PropertyAnnotationValidator<T, TProperty> _annotationValidator;
+    /// <inheritdoc cref="AttributePropertyValidator{T,TProperty}" />
+    internal readonly AttributePropertyValidator<T, TProperty> _attributeValidator;
 
     /// <inheritdoc cref="ObjectValidator{T}" />
     internal readonly ObjectValidator<T> _objectValidator;
@@ -67,8 +67,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         _selector = selector;
         _objectValidator = objectValidator;
 
-        // 初始化 PropertyAnnotationValidator 实例
-        _annotationValidator = new PropertyAnnotationValidator<T, TProperty>(selector!, null, objectValidator.Items);
+        // 初始化 AttributePropertyValidator 实例
+        _attributeValidator = new AttributePropertyValidator<T, TProperty>(selector!, null, objectValidator.Items);
     }
 
     /// <summary>
@@ -81,9 +81,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     /// </summary>
     /// <remarks>
     ///     默认值为：<c>null</c>。当此值为 <c>null</c> 时，是否启用注解验证将由 <see cref="ObjectValidator{T}.Options" /> 中的
-    ///     <see cref="ValidatorOptions.SuppressAnnotationValidation" /> 配置项决定。
+    ///     <see cref="ValidatorOptions.SuppressAttributeValidation" /> 配置项决定。
     /// </remarks>
-    internal bool? SuppressAnnotationValidation { get; set; }
+    internal bool? SuppressAttributeValidation { get; set; }
 
     /// <summary>
     ///     显示名称
@@ -136,7 +136,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         }
 
         // 检查是否启用属性验证特性验证
-        if (ShouldRunAnnotationValidation() && !_annotationValidator.IsValid(instance, validationContext))
+        if (ShouldRunAttributeValidation() && !_attributeValidator.IsValid(instance, validationContext))
         {
             return false;
         }
@@ -174,9 +174,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         var validationResults = new List<ValidationResult>();
 
         // 检查是否启用属性验证特性验证
-        if (ShouldRunAnnotationValidation())
+        if (ShouldRunAttributeValidation())
         {
-            validationResults.AddRange(_annotationValidator.GetValidationResults(instance, validationContext) ?? []);
+            validationResults.AddRange(_attributeValidator.GetValidationResults(instance, validationContext) ?? []);
         }
 
         // 创建 ValidationContext 实例（属性）
@@ -213,9 +213,9 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         }
 
         // 检查是否启用属性验证特性验证
-        if (ShouldRunAnnotationValidation())
+        if (ShouldRunAttributeValidation())
         {
-            _annotationValidator.Validate(instance, validationContext);
+            _attributeValidator.Validate(instance, validationContext);
         }
 
         // 创建 ValidationContext 实例（属性）
@@ -249,7 +249,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         Clone(objectValidator);
 
     /// <inheritdoc />
-    void IValidationAnnotationsConfigurable.UseAnnotationValidation(bool enabled) => UseAnnotationValidation(enabled);
+    void IValidationAttributeConfigurable.UseAttributeValidation(bool enabled) => UseAttributeValidation(enabled);
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
     internal override void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
@@ -257,8 +257,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 同步基类 IServiceProvider 委托
         base.InitializeServiceProvider(serviceProvider);
 
-        // 同步 _annotationValidator 实例 IServiceProvider 委托
-        _annotationValidator.InitializeServiceProvider(serviceProvider);
+        // 同步 _attributeValidator 实例 IServiceProvider 委托
+        _attributeValidator.InitializeServiceProvider(serviceProvider);
     }
 
     /// <summary>
@@ -437,7 +437,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 空检查
         ArgumentNullException.ThrowIfNull(jsonNamingPolicy);
 
-        MemberName = jsonNamingPolicy.ConvertName(_annotationValidator.GetMemberName());
+        MemberName = jsonNamingPolicy.ConvertName(_attributeValidator.GetMemberName());
 
         return This;
     }
@@ -454,7 +454,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 空检查
         ArgumentNullException.ThrowIfNull(memberNameProvider);
 
-        MemberName = memberNameProvider(_annotationValidator.Property);
+        MemberName = memberNameProvider(_attributeValidator.Property);
 
         return This;
     }
@@ -506,15 +506,15 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    internal bool ShouldRunAnnotationValidation()
+    internal bool ShouldRunAttributeValidation()
     {
         // 属性级配置优先
-        if (SuppressAnnotationValidation.HasValue)
+        if (SuppressAttributeValidation.HasValue)
         {
-            return !SuppressAnnotationValidation.Value;
+            return !SuppressAttributeValidation.Value;
         }
 
-        return !_objectValidator.Options.SuppressAnnotationValidation;
+        return !_objectValidator.Options.SuppressAttributeValidation;
     }
 
     /// <summary>
@@ -524,7 +524,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     /// <returns>
     ///     <typeparamref name="TProperty" />
     /// </returns>
-    internal TProperty GetValue(T instance) => _annotationValidator.GetValue(instance)!;
+    internal TProperty GetValue(T instance) => _attributeValidator.GetValue(instance)!;
 
     /// <summary>
     ///     获取用于验证的属性值
@@ -547,7 +547,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     /// <returns>
     ///     <see cref="string" />
     /// </returns>
-    internal string GetDisplayName() => DisplayName ?? MemberName ?? _annotationValidator.GetDisplayName(null);
+    internal string GetDisplayName() => DisplayName ?? MemberName ?? _attributeValidator.GetDisplayName(null);
 
     /// <summary>
     ///     获取属性路径
@@ -558,7 +558,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     internal string GetMemberPath()
     {
         // 获取属性（成员）名称和父级属性路径
-        var memberName = _annotationValidator.GetMemberName();
+        var memberName = _attributeValidator.GetMemberName();
         var parentPath = _objectValidator._memberPath;
 
         return string.IsNullOrWhiteSpace(parentPath) ? memberName : $"{parentPath}.{memberName}";
@@ -616,7 +616,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         var propertyValidator = new PropertyValidator<T, TProperty>(_selector, objectValidator)
         {
             RuleSets = RuleSets,
-            SuppressAnnotationValidation = SuppressAnnotationValidation,
+            SuppressAttributeValidation = SuppressAttributeValidation,
             DisplayName = DisplayName,
             MemberName = MemberName,
             WhenCondition = WhenCondition

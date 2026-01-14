@@ -7,11 +7,11 @@ namespace Cordon;
 /// <summary>
 ///     定义可配置是否启用基于特性的验证行为
 /// </summary>
-public interface IValidationAnnotationsConfigurable
+public interface IValidationAttributeConfigurable
 {
     /// <summary>
     ///     配置是否启用对象属性验证特性验证
     /// </summary>
     /// <param name="enabled">是否启用</param>
-    void UseAnnotationValidation(bool enabled);
+    void UseAttributeValidation(bool enabled);
 }

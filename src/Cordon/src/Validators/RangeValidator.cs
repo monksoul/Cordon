@@ -19,9 +19,9 @@ public class RangeValidator : ValidatorBase, IDisposable
     ];
 
     /// <summary>
-    ///     <inheritdoc cref="ValueAnnotationValidator" />
+    ///     <inheritdoc cref="AttributeValueValidator" />
     /// </summary>
-    internal readonly ValueAnnotationValidator _validator;
+    internal readonly AttributeValueValidator _validator;
 
     /// <summary>
     ///     <inheritdoc cref="RangeValidator" />
@@ -34,7 +34,7 @@ public class RangeValidator : ValidatorBase, IDisposable
         Maximum = maximum;
         OperandType = typeof(int);
 
-        _validator = new ValueAnnotationValidator(new RangeAttribute(minimum, maximum));
+        _validator = new AttributeValueValidator(new RangeAttribute(minimum, maximum));
 
         // 订阅属性变更事件
         PropertyChanged += OnPropertyChanged;
@@ -53,7 +53,7 @@ public class RangeValidator : ValidatorBase, IDisposable
         Maximum = maximum;
         OperandType = typeof(double);
 
-        _validator = new ValueAnnotationValidator(new RangeAttribute(minimum, maximum));
+        _validator = new AttributeValueValidator(new RangeAttribute(minimum, maximum));
 
         // 订阅属性变更事件
         PropertyChanged += OnPropertyChanged;
@@ -74,7 +74,7 @@ public class RangeValidator : ValidatorBase, IDisposable
         Minimum = minimum;
         Maximum = maximum;
 
-        _validator = new ValueAnnotationValidator(new RangeAttribute(type, minimum, maximum));
+        _validator = new AttributeValueValidator(new RangeAttribute(type, minimum, maximum));
 
         // 订阅属性变更事件
         PropertyChanged += OnPropertyChanged;
