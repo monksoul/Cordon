@@ -11,6 +11,8 @@ public class ValidationBuilderTests
     {
         var builder = new ValidationBuilder();
         Assert.Null(builder._validatorTypes);
+        Assert.Equal(typeof(AbstractValidator<>), ValidationBuilder.AbstractValidatorDefinition);
+        Assert.Equal(typeof(AbstractValueValidator<>), ValidationBuilder.AbstractValueValidatorDefinition);
     }
 
     [Fact]
@@ -27,7 +29,7 @@ public class ValidationBuilderTests
 
         var exception2 = Assert.Throws<ArgumentException>(() => builder.AddValidator(typeof(ObjectModel)));
         Assert.Equal(
-            "Type `Cordon.Tests.ObjectModel` is not a valid validator; it does not derive from `AbstractValidator<>`. (Parameter 'validatorType')",
+            "Type `Cordon.Tests.ObjectModel` is not a valid validator; it does not derive from `AbstractValidator<>` or `AbstractValueValidator<>`. (Parameter 'validatorType')",
             exception2.Message);
     }
 
@@ -52,6 +54,12 @@ public class ValidationBuilderTests
         Assert.NotNull(builder._validatorTypes);
         Assert.Equal(2, builder._validatorTypes.Count);
         Assert.Equal(typeof(ObjectModel), builder._validatorTypes[typeof(ObjectModelValidator2)]);
+
+        builder.AddValidator(typeof(StringTestValidator));
+
+        Assert.NotNull(builder._validatorTypes);
+        Assert.Equal(3, builder._validatorTypes.Count);
+        Assert.Equal(typeof(string), builder._validatorTypes[typeof(StringTestValidator)]);
     }
 
     [Fact]
@@ -114,7 +122,7 @@ public class ValidationBuilderTests
         builder.AddValidatorsFromAssemblies(typeof(ObjectModel).Assembly);
 
         Assert.NotNull(builder._validatorTypes);
-        Assert.Equal(11, builder._validatorTypes.Count);
+        Assert.Equal(15, builder._validatorTypes.Count);
     }
 
     [Fact]
@@ -199,7 +207,7 @@ public class ValidationBuilderTests
         var exception = Assert.Throws<ArgumentException>(() =>
             ValidationBuilder.TryGetValidatedType(typeof(ObjectModelValidator1), typeof(IObjectValidator), out _));
         Assert.Equal(
-            "The type 'Cordon.IObjectValidator' is not a generic type definition; expected an open generic such as AbstractValidator<>. (Parameter 'baseGenericTypeDefinition')",
+            "The type 'Cordon.IObjectValidator' is not a generic type definition; expected an open generic such as `AbstractValidator<>` or `AbstractValueValidator<>`. (Parameter 'genericTypeDefinition')",
             exception.Message);
     }
 
@@ -237,3 +245,5 @@ public class ObjectModelValidator4(object arg) : AbstractValidator<ObjectModel>
 public abstract class ObjectModelValidator5 : AbstractValidator<ObjectModel>;
 
 public class ObjectModelValidator6 : ObjectModelValidator5;
+
+public class StringTestValidator : AbstractValidator<string>;

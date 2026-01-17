@@ -10,6 +10,16 @@ namespace Cordon;
 public sealed class ValidationBuilder
 {
     /// <summary>
+    ///     <see cref="AbstractValidator{T}" /> 泛型定义
+    /// </summary>
+    internal static readonly Type AbstractValidatorDefinition = typeof(AbstractValidator<>);
+
+    /// <summary>
+    ///     <see cref="AbstractValueValidator{T}" /> 泛型定义
+    /// </summary>
+    internal static readonly Type AbstractValueValidatorDefinition = typeof(AbstractValueValidator<>);
+
+    /// <summary>
     ///     <see cref="IObjectValidator{T}" /> 类型集合
     /// </summary>
     internal Dictionary<Type, Type>? _validatorTypes;
@@ -46,6 +56,12 @@ public sealed class ValidationBuilder
         // 空检查
         ArgumentNullException.ThrowIfNull(validatorType);
 
+        // 检查验证器是否已添加
+        if (_validatorTypes is not null && _validatorTypes.ContainsKey(validatorType))
+        {
+            return this;
+        }
+
         // 检查类型是否可实例化
         if (!validatorType.IsInstantiable())
         {
@@ -55,17 +71,17 @@ public sealed class ValidationBuilder
                 nameof(validatorType));
         }
 
-        // 检查是否继承自 AbstractValidator<T> 抽象基类
-        if (!TryGetValidatedType(validatorType, typeof(AbstractValidator<>), out var modelType))
+        // 检查是否继承自 AbstractValidator<T> 或 AbstractValueValidator<T> 抽象基类
+        if (!TryGetValidatedType(validatorType, AbstractValidatorDefinition, out var modelType) &&
+            !TryGetValidatedType(validatorType, AbstractValueValidatorDefinition, out modelType))
         {
             throw new ArgumentException(
                 // ReSharper disable once LocalizableElement
-                $"Type `{validatorType}` is not a valid validator; it does not derive from `AbstractValidator<>`.",
+                $"Type `{validatorType}` is not a valid validator; it does not derive from `AbstractValidator<>` or `AbstractValueValidator<>`.",
                 nameof(validatorType));
         }
 
         _validatorTypes ??= new Dictionary<Type, Type>();
-
         _validatorTypes[validatorType] = modelType;
 
         return this;
@@ -106,12 +122,12 @@ public sealed class ValidationBuilder
         // 空检查
         ArgumentNullException.ThrowIfNull(assemblies);
 
-        // 初始化对象验证器泛型基类定义类型
-        var baseGenericTypeDefinition = typeof(AbstractValidator<>);
+        // 扫描程序集中所有继承自 AbstractValidator<T> 或 AbstractValueValidator<T> 抽象基类的类型
+        var candidateTypes = assemblies.SelectMany(ass => (ass?.GetTypes() ?? Enumerable.Empty<Type>()).Where(t =>
+            t.IsInstantiable() && (TryGetValidatedType(t, AbstractValidatorDefinition, out _) ||
+                                   TryGetValidatedType(t, AbstractValueValidatorDefinition, out _))));
 
-        return AddValidators(assemblies.SelectMany(ass =>
-            (ass?.GetTypes() ?? Enumerable.Empty<Type>()).Where(t =>
-                t.IsInstantiable() && TryGetValidatedType(t, baseGenericTypeDefinition, out _))));
+        return AddValidators(candidateTypes);
     }
 
     /// <summary>
@@ -171,21 +187,22 @@ public sealed class ValidationBuilder
             services.Add(ServiceDescriptor.Transient(typeof(IObjectValidator),
                 provider => CreateValidator(provider, validatorType)));
 
-            // 检查是否是单个值验证器
-            // if (typeof(IValueValidator).IsAssignableFrom(validatorType))
-            // {
-            //     // 注册 IValueValidator<T> 泛型接口
-            //     services.Add(ServiceDescriptor.Transient(typeof(IValueValidator<>).MakeGenericType(modelType),
-            //         provider => CreateValidator(provider, validatorType)));
-            //
-            //     // 注册 IValueValidator 非泛型接口
-            //     services.Add(ServiceDescriptor.Transient(typeof(IValueValidator),
-            //         provider => CreateValidator(provider, validatorType)));
-            // }
-
             // 注册验证器自身
             services.Add(ServiceDescriptor.Transient(validatorType,
                 provider => CreateValidator(provider, validatorType)));
+
+            // 检查是否是单个值验证器
+            // ReSharper disable once InvertIf
+            if (typeof(IValueValidator).IsAssignableFrom(validatorType))
+            {
+                // 注册 IValueValidator<T> 泛型接口
+                services.Add(ServiceDescriptor.Transient(typeof(IValueValidator<>).MakeGenericType(modelType),
+                    provider => CreateValidator(provider, validatorType)));
+
+                // 注册 IValueValidator 非泛型接口
+                services.Add(ServiceDescriptor.Transient(typeof(IValueValidator),
+                    provider => CreateValidator(provider, validatorType)));
+            }
         }
     }
 
@@ -219,32 +236,29 @@ public sealed class ValidationBuilder
     }
 
     /// <summary>
-    ///     检查是否继承自 <paramref name="baseGenericTypeDefinition" /> 抽象基类
+    ///     检查是否继承自 <paramref name="genericTypeDefinition" /> 抽象基类
     /// </summary>
     /// <param name="type">类型</param>
-    /// <param name="baseGenericTypeDefinition">泛型基类定义类型</param>
+    /// <param name="genericTypeDefinition">泛型基类定义类型</param>
     /// <param name="modelType">被验证的模型类型</param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
-    internal static bool TryGetValidatedType(Type type, Type baseGenericTypeDefinition,
+    internal static bool TryGetValidatedType(Type type, Type genericTypeDefinition,
         [NotNullWhen(true)] out Type? modelType)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(type);
-        ArgumentNullException.ThrowIfNull(baseGenericTypeDefinition);
+        ArgumentNullException.ThrowIfNull(genericTypeDefinition);
 
         // 泛型定义检查
-        if (!baseGenericTypeDefinition.IsGenericTypeDefinition)
+        if (!genericTypeDefinition.IsGenericTypeDefinition)
         {
-            if (!baseGenericTypeDefinition.IsGenericTypeDefinition)
-            {
-                throw new ArgumentException(
-                    // ReSharper disable once LocalizableElement
-                    $"The type '{baseGenericTypeDefinition}' is not a generic type definition; expected an open generic such as AbstractValidator<>.",
-                    nameof(baseGenericTypeDefinition));
-            }
+            throw new ArgumentException(
+                // ReSharper disable once LocalizableElement
+                $"The type '{genericTypeDefinition}' is not a generic type definition; expected an open generic such as `AbstractValidator<>` or `AbstractValueValidator<>`.",
+                nameof(genericTypeDefinition));
         }
 
         // 初始化被验证的模型类型
@@ -259,8 +273,8 @@ public sealed class ValidationBuilder
         // 沿着继承链向上遍历
         for (var current = type; current != null; current = current.BaseType)
         {
-            // 检查当前类型是否是泛型并且泛型定义为 baseGenericTypeDefinition
-            if (!current.IsGenericType || current.GetGenericTypeDefinition() != baseGenericTypeDefinition)
+            // 检查当前类型是否是泛型并且泛型定义为 genericTypeDefinition
+            if (!current.IsGenericType || current.GetGenericTypeDefinition() != genericTypeDefinition)
             {
                 continue;
             }

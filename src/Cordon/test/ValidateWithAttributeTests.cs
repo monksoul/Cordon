@@ -12,7 +12,8 @@ public class ValidateWithAttributeTests
         var attributeUsageAttribute = typeof(ValidateWithAttribute<StringValueValidator>)
             .GetCustomAttribute<AttributeUsageAttribute>();
         Assert.NotNull(attributeUsageAttribute);
-        Assert.Equal(AttributeTargets.Parameter, attributeUsageAttribute.ValidOn);
+        Assert.Equal(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
+            attributeUsageAttribute.ValidOn);
         Assert.False(attributeUsageAttribute.AllowMultiple);
         Assert.True(attributeUsageAttribute.Inherited);
     }

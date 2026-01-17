@@ -5,6 +5,7 @@
 global using System.ComponentModel.DataAnnotations;
 global using System.Data;
 global using System.Diagnostics;
+global using System.Reflection;
 global using System.Text.Encodings.Web;
 global using System.Text.Json;
 global using System.Text.Json.Serialization;

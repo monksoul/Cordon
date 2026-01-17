@@ -2970,6 +2970,16 @@
                 数据验证构建器
             </summary>
         </member>
+        <member name="F:Cordon.ValidationBuilder.AbstractValidatorDefinition">
+            <summary>
+                <see cref="T:Cordon.AbstractValidator`1" /> 泛型定义
+            </summary>
+        </member>
+        <member name="F:Cordon.ValidationBuilder.AbstractValueValidatorDefinition">
+            <summary>
+                <see cref="T:Cordon.AbstractValueValidator`1" /> 泛型定义
+            </summary>
+        </member>
         <member name="F:Cordon.ValidationBuilder._validatorTypes">
             <summary>
                 <see cref="T:Cordon.IObjectValidator`1" /> 类型集合
@@ -3050,10 +3060,10 @@
         </member>
         <member name="M:Cordon.ValidationBuilder.TryGetValidatedType(System.Type,System.Type,System.Type@)">
             <summary>
-                检查是否继承自 <paramref name="baseGenericTypeDefinition" /> 抽象基类
+                检查是否继承自 <paramref name="genericTypeDefinition" /> 抽象基类
             </summary>
             <param name="type">类型</param>
-            <param name="baseGenericTypeDefinition">泛型基类定义类型</param>
+            <param name="genericTypeDefinition">泛型基类定义类型</param>
             <param name="modelType">被验证的模型类型</param>
             <returns>
                 <see cref="T:System.Boolean" />
@@ -3646,7 +3656,7 @@
         </member>
         <member name="T:Cordon.ValidateWithAttribute`1">
             <summary>
-                指定参数使用指定的验证器进行验证
+                指定对象验证器验证特性
             </summary>
             <typeparam name="TValidator">
                 <see cref="T:Cordon.IObjectValidator" />
@@ -10374,16 +10384,6 @@
     </members>
 </doc>
        <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-     </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
-            <returns>
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </returns>
         </member>

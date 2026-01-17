@@ -7,7 +7,7 @@ builder.Services.AddValidation();
 builder.Services.AddControllers(options =>
 {
     // options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
-}).AddValidationCore();
+}).AddValidationCore(options => options.AddValidatorsFromAssemblies(Assembly.GetEntryAssembly()));
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
