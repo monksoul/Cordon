@@ -236,11 +236,11 @@ public class AttributePropertyValidatorTests
     {
         var validator = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name);
 
-        var validationContext = validator.CreateValidationContext(new ObjectClassTest(), "DisplayName");
+        var validationContext = validator.CreateValidationContext(new ObjectClassTest(), "DisplayName", null);
         Assert.Equal("DisplayName", validationContext.DisplayName);
         Assert.Equal("Name", validationContext.MemberName);
 
-        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest(), null);
+        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest(), null, null);
         Assert.Equal("Name", validationContext2.DisplayName);
         Assert.Equal("Name", validationContext2.MemberName);
 
@@ -255,9 +255,18 @@ public class AttributePropertyValidatorTests
         validator.InitializeServiceProvider(serviceProvider.GetService);
         Assert.NotNull(validator._serviceProvider);
 
-        var validationContext3 = validator.CreateValidationContext(new ObjectClassTest(), null);
+        var validationContext3 = validator.CreateValidationContext(new ObjectClassTest(), null, null);
         Assert.NotNull(validator._serviceProvider);
         Assert.NotNull(serviceProviderField.GetValue(validationContext3));
+
+        var validationContext4 = validator.CreateValidationContext(new ObjectClassTest(), null, ["login"]);
+        Assert.NotNull(validator._serviceProvider);
+        Assert.NotNull(serviceProviderField.GetValue(validationContext4));
+        Assert.Single(validationContext4.Items);
+        var metadata =
+            validationContext4.Items[ValidationDataContext.ValidationOptionsKey] as ValidationOptionsMetadata;
+        Assert.NotNull(metadata);
+        Assert.Equal(["login"], (string[]?)metadata.RuleSets!);
     }
 }
 

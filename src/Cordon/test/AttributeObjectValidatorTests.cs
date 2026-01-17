@@ -200,7 +200,7 @@ public class AttributeObjectValidatorTests
     public void CreateValidationContext_ReturnOK()
     {
         var validator = new AttributeObjectValidator();
-        var validationContext = validator.CreateValidationContext(new ObjectClassTest());
+        var validationContext = validator.CreateValidationContext(new ObjectClassTest(), null);
         Assert.Equal("ObjectClassTest", validationContext.DisplayName);
         Assert.Null(validationContext.MemberName);
 
@@ -215,9 +215,18 @@ public class AttributeObjectValidatorTests
         validator.InitializeServiceProvider(serviceProvider.GetService);
         Assert.NotNull(validator._serviceProvider);
 
-        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest());
+        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest(), null);
         Assert.NotNull(validator._serviceProvider);
         Assert.NotNull(serviceProviderField.GetValue(validationContext2));
+
+        var validationContext3 = validator.CreateValidationContext(new ObjectClassTest(), ["login"]);
+        Assert.NotNull(validator._serviceProvider);
+        Assert.NotNull(serviceProviderField.GetValue(validationContext3));
+        Assert.Single(validationContext3.Items);
+        var metadata =
+            validationContext3.Items[ValidationDataContext.ValidationOptionsKey] as ValidationOptionsMetadata;
+        Assert.NotNull(metadata);
+        Assert.Equal(["login"], (string[]?)metadata.RuleSets!);
     }
 }
 

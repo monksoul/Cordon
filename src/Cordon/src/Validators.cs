@@ -10,6 +10,12 @@ namespace Cordon;
 public static class Validators
 {
     /// <summary>
+    ///     默认的 <see cref="IValidationService" /> 实例
+    /// </summary>
+    /// <remarks>避免重复创建实例。</remarks>
+    internal static readonly IValidationService _defaultValidationService = new ValidationService();
+
+    /// <summary>
     ///     创建对象验证器
     /// </summary>
     /// <typeparam name="T">对象类型</typeparam>
@@ -1203,11 +1209,9 @@ public static class Validators
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
     /// </param>
-    /// <typeparam name="T">对象类型</typeparam>
     /// <returns>
-    ///     <see cref="IValidationService{T}" />
+    ///     <see cref="IValidationService" />
     /// </returns>
-    public static IValidationService<T> For<T>(IServiceProvider? serviceProvider = null)
-        where T : class =>
-        serviceProvider is null ? new ValidationService<T>() : new ValidationService<T>(serviceProvider);
+    public static IValidationService Service(IServiceProvider? serviceProvider = null) =>
+        serviceProvider is null ? _defaultValidationService : new ValidationService(serviceProvider);
 }

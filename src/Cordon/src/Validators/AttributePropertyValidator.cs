@@ -163,7 +163,8 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
         // 获取显示名称
         var displayName = GetDisplayName(validationContext.DisplayName);
 
-        return Validator.TryValidateProperty(GetValue(instance), CreateValidationContext(instance, displayName), null);
+        return Validator.TryValidateProperty(GetValue(instance),
+            CreateValidationContext(instance, displayName, validationContext.RuleSets), null);
     }
 
     /// <inheritdoc />
@@ -178,8 +179,8 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
         // 初始化验证结果集合
         var validationResults = new List<ValidationResult>();
 
-        Validator.TryValidateProperty(GetValue(instance), CreateValidationContext(instance, displayName),
-            validationResults);
+        Validator.TryValidateProperty(GetValue(instance),
+            CreateValidationContext(instance, displayName, validationContext.RuleSets), validationResults);
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
@@ -203,7 +204,8 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
 
         try
         {
-            Validator.ValidateProperty(GetValue(instance), CreateValidationContext(instance, displayName));
+            Validator.ValidateProperty(GetValue(instance),
+                CreateValidationContext(instance, displayName, validationContext.RuleSets));
         }
         // 如果验证未通过且配置了自定义错误信息，则重新抛出异常
         catch (ValidationException e) when (ErrorMessageString is not null)
@@ -251,15 +253,19 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
     /// </returns>
     public string GetMemberName() => Property.Name;
 
+    /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
+    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) => _serviceProvider = serviceProvider;
+
     /// <summary>
     ///     创建 <see cref="ValidationContext" /> 实例
     /// </summary>
     /// <param name="value">对象</param>
     /// <param name="name">显示名称</param>
+    /// <param name="ruleSets">规则集</param>
     /// <returns>
     ///     <see cref="ValidationContext" />
     /// </returns>
-    internal ValidationContext CreateValidationContext(object value, string? name)
+    internal ValidationContext CreateValidationContext(object value, string? name, string?[]? ruleSets)
     {
         // 初始化 ValidationContext 实例
         var validationContext = new ValidationContext(value, Items) { MemberName = Property.Name };
@@ -270,12 +276,16 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
             validationContext.DisplayName = name;
         }
 
+        // 空检查
+        if (ruleSets is not null)
+        {
+            // 设置规则集
+            validationContext.WithRuleSets(ruleSets);
+        }
+
         // 同步 IServiceProvider 委托
         validationContext.InitializeServiceProvider(_serviceProvider!);
 
         return validationContext;
     }
-
-    /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
-    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) => _serviceProvider = serviceProvider;
 }

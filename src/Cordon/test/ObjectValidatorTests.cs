@@ -26,7 +26,6 @@ public class ObjectValidatorTests
         Assert.Empty(validator._ruleSetStack);
         Assert.Null(validator.WhenCondition);
         Assert.Null(validator._memberPath);
-        Assert.NotNull(ObjectValidator<Tests.ObjectModel>.ValidationContextsKey);
         Assert.False(validator.IsNested);
 
         using var validator2 = new ObjectValidator<ObjectModel>(new Dictionary<object, object?>());
@@ -901,10 +900,7 @@ public class ObjectValidatorTests
     {
         var validationContext = new ValidationContext(new ObjectModel());
         var validator = new ObjectValidator<ObjectModel>(
-            new Dictionary<object, object?>
-            {
-                { ObjectValidator<ObjectModel>.ValidationContextsKey, validationContext }
-            });
+            new Dictionary<object, object?> { { Constants.ValidationContextKey, validationContext } });
 
         Assert.Equal(["The field Id must be between 1 and 2147483647.", "The Name field is required."],
             validator.ToResults().Select(u => u.ErrorMessage!).ToArray());

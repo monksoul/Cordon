@@ -47,8 +47,7 @@ public class ValidationExtensionsTests
         Assert.NotNull(objectValidator);
         Assert.NotNull(objectValidator.Items);
         Assert.Single(objectValidator.Items);
-        Assert.Equal(validationContext,
-            objectValidator.Items[ObjectValidator<Tests.ObjectModel>.ValidationContextsKey]);
+        Assert.Equal(validationContext, objectValidator.Items[Constants.ValidationContextKey]);
     }
 
     [Fact]

@@ -906,14 +906,17 @@ public class ValidatorsTests
     }
 
     [Fact]
-    public void For_ReturnOK()
+    public void Service_ReturnOK()
     {
-        var validationService = Validators.For<ObjectModel>();
+        Assert.NotNull(Validators._defaultValidationService);
+        var validationService = Validators.Service();
         Assert.NotNull(validationService);
+        var validationService2 = Validators.Service();
+        Assert.StrictEqual(validationService, validationService2);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        var validationService2 = Validators.For<ObjectModel>(serviceProvider);
-        Assert.NotNull(validationService2);
+        var validationService3 = Validators.Service(serviceProvider);
+        Assert.NotNull(validationService3);
     }
 
     public class ObjectModel

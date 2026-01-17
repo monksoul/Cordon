@@ -25,10 +25,9 @@ public class ValidationCoreServiceCollectionExtensionsTests
         var validationBuilder = new ValidationBuilder();
         services.AddValidationCore(validationBuilder);
 
-        Assert.Equal(3, services.Count);
+        Assert.Equal(2, services.Count);
         Assert.Contains(services, x => x.ServiceType == typeof(IValidationDataContext));
         Assert.Contains(services, x => x.ServiceType == typeof(IValidationService));
-        Assert.Contains(services, x => x.ServiceType == typeof(IValidationService<>));
         _ = services.BuildServiceProvider();
     }
 
@@ -38,10 +37,9 @@ public class ValidationCoreServiceCollectionExtensionsTests
         var services = new ServiceCollection();
         services.AddValidationCore();
 
-        Assert.Equal(3, services.Count);
+        Assert.Equal(2, services.Count);
         Assert.Contains(services, x => x.ServiceType == typeof(IValidationDataContext));
         Assert.Contains(services, x => x.ServiceType == typeof(IValidationService));
-        Assert.Contains(services, x => x.ServiceType == typeof(IValidationService<>));
         _ = services.BuildServiceProvider();
     }
 
@@ -51,7 +49,7 @@ public class ValidationCoreServiceCollectionExtensionsTests
         var services = new ServiceCollection();
         services.AddValidationCore(builder => builder.AddValidator(typeof(ObjectModelValidator1)));
 
-        Assert.Equal(6, services.Count);
+        Assert.Equal(5, services.Count);
         Assert.Contains(services, x => x.ServiceType == typeof(IObjectValidator<ObjectModel>));
         Assert.Contains(services, x => x.ServiceType == typeof(ObjectModelValidator1));
         _ = services.BuildServiceProvider();
@@ -65,7 +63,7 @@ public class ValidationCoreServiceCollectionExtensionsTests
         services.AddValidationCore(s => s.AddValidator(typeof(ObjectModelValidator1)));
         services.AddValidationCore(s => s.AddValidator(typeof(ObjectModelValidator1)));
 
-        Assert.Equal(6, services.Count);
+        Assert.Equal(5, services.Count);
         _ = services.BuildServiceProvider();
     }
 }

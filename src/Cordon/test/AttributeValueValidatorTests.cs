@@ -224,15 +224,16 @@ public class AttributeValueValidatorTests
     public void CreateValidationContext_ReturnOK()
     {
         var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
-        var validationContext = validator.CreateValidationContext(new ObjectClassTest(), null, null);
+        var validationContext = validator.CreateValidationContext(new ObjectClassTest(), null, null, null);
         Assert.Equal("ObjectClassTest", validationContext.DisplayName);
         Assert.Null(validationContext.MemberName);
 
-        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest(), "DisplayName", "MemberName");
+        var validationContext2 =
+            validator.CreateValidationContext(new ObjectClassTest(), "DisplayName", "MemberName", null);
         Assert.Equal("DisplayName", validationContext2.DisplayName);
         Assert.Equal("MemberName", validationContext2.MemberName);
 
-        var validationContext3 = validator.CreateValidationContext(new ObjectClassTest(), null, null);
+        var validationContext3 = validator.CreateValidationContext(new ObjectClassTest(), null, null, null);
         Assert.Equal("ObjectClassTest", validationContext3.DisplayName);
         Assert.Null(validationContext3.MemberName);
 
@@ -247,8 +248,17 @@ public class AttributeValueValidatorTests
         validator.InitializeServiceProvider(serviceProvider.GetService);
         Assert.NotNull(validator._serviceProvider);
 
-        var validationContext4 = validator.CreateValidationContext(new ObjectClassTest(), null, null);
+        var validationContext4 = validator.CreateValidationContext(new ObjectClassTest(), null, null, null);
         Assert.NotNull(validator._serviceProvider);
         Assert.NotNull(serviceProviderField.GetValue(validationContext4));
+
+        var validationContext5 = validator.CreateValidationContext(new ObjectClassTest(), null, null, ["login"]);
+        Assert.NotNull(validator._serviceProvider);
+        Assert.NotNull(serviceProviderField.GetValue(validationContext5));
+        Assert.Single(validationContext5.Items);
+        var metadata =
+            validationContext5.Items[ValidationDataContext.ValidationOptionsKey] as ValidationOptionsMetadata;
+        Assert.NotNull(metadata);
+        Assert.Equal(["login"], (string[]?)metadata.RuleSets!);
     }
 }

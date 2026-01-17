@@ -69,7 +69,7 @@ public static class ValidationExtensions
         // 拷贝一份共享数据并追加自身实例
         var items = new Dictionary<object, object?>(validationContext.Items)
         {
-            [ObjectValidator<T>.ValidationContextsKey] = validationContext
+            [Constants.ValidationContextKey] = validationContext
         };
 
         // 初始化 ObjectValidator<T> 实例并跳过属性验证特性验证，避免死循环

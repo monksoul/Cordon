@@ -2154,10 +2154,8 @@ public class PropertyValidatorValidationTests
     {
         var validationContext = new ValidationContext(new ObjectModel());
         var validator = new ObjectValidator<ObjectModel>(
-            new Dictionary<object, object?>
-            {
-                { ObjectValidator<ObjectModel>.ValidationContextsKey, validationContext }
-            }).RuleFor(u => u.Name).Required();
+                new Dictionary<object, object?> { { Constants.ValidationContextKey, validationContext } })
+            .RuleFor(u => u.Name).Required();
 
         Assert.Equal(["The Name field is required.", "The Name field is required.", "The Name field is required."],
             validator.ToResults().Select(u => u.ErrorMessage!).ToArray());

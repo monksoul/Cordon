@@ -77,7 +77,8 @@ public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
         // 空检查
         ArgumentNullException.ThrowIfNull(value);
 
-        return Validator.TryValidateObject(value, CreateValidationContext(value), null, ValidateAllProperties);
+        return Validator.TryValidateObject(value, CreateValidationContext(value, validationContext?.RuleSets), null,
+            ValidateAllProperties);
     }
 
     /// <inheritdoc />
@@ -96,7 +97,8 @@ public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
          * 参考源码：
          * https://github.com/dotnet/runtime/blob/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.ComponentModel.Annotations/src/System/ComponentModel/DataAnnotations/Validator.cs#L423-L430
          */
-        Validator.TryValidateObject(value, CreateValidationContext(value), validationResults, ValidateAllProperties);
+        Validator.TryValidateObject(value, CreateValidationContext(value, validationContext?.RuleSets),
+            validationResults, ValidateAllProperties);
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
@@ -117,7 +119,8 @@ public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
 
         try
         {
-            Validator.ValidateObject(value, CreateValidationContext(value), ValidateAllProperties);
+            Validator.ValidateObject(value, CreateValidationContext(value, validationContext?.RuleSets),
+                ValidateAllProperties);
         }
         // 如果验证未通过且配置了自定义错误信息，则重新抛出异常
         catch (ValidationException e) when (ErrorMessageString is not null)
@@ -135,13 +138,21 @@ public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
     ///     创建 <see cref="ValidationContext" /> 实例
     /// </summary>
     /// <param name="value">对象</param>
+    /// <param name="ruleSets">规则集</param>
     /// <returns>
     ///     <see cref="ValidationContext" />
     /// </returns>
-    internal ValidationContext CreateValidationContext(object value)
+    internal ValidationContext CreateValidationContext(object value, string?[]? ruleSets)
     {
         // 初始化 ValidationContext 实例
         var validationContext = new ValidationContext(value, Items);
+
+        // 空检查
+        if (ruleSets is not null)
+        {
+            // 设置规则集
+            validationContext.WithRuleSets(ruleSets);
+        }
 
         // 同步 IServiceProvider 委托
         validationContext.InitializeServiceProvider(_serviceProvider!);

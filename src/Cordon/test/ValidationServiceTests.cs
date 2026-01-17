@@ -7,11 +7,7 @@ namespace Cordon.Tests;
 public class ValidationServiceTests
 {
     [Fact]
-    public void New_Invalid_Parameters()
-    {
-        Assert.Throws<ArgumentNullException>(() => new ValidationService(null!));
-        Assert.Throws<ArgumentNullException>(() => new ValidationService<ObjectModel>(null!));
-    }
+    public void New_Invalid_Parameters() => Assert.Throws<ArgumentNullException>(() => new ValidationService(null!));
 
     [Fact]
     public void New_ReturnOK()
@@ -22,18 +18,12 @@ public class ValidationServiceTests
         var validationService = new ValidationService(serviceProvider);
         Assert.NotNull(validationService);
         Assert.NotNull(validationService._serviceProvider);
+        Assert.NotNull(validationService._attributeValidator);
 
-        var validationService2 = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService2 = new ValidationService();
         Assert.NotNull(validationService2);
-        Assert.NotNull(validationService2._serviceProvider);
-
-        var validationService3 = new ValidationService();
-        Assert.NotNull(validationService3);
-        Assert.Null(validationService3._serviceProvider);
-
-        var validationService4 = new ValidationService<ObjectModel>();
-        Assert.NotNull(validationService4);
-        Assert.Null(validationService4._serviceProvider);
+        Assert.Null(validationService2._serviceProvider);
+        Assert.NotNull(validationService2._attributeValidator);
     }
 
     [Fact]
@@ -41,38 +31,11 @@ public class ValidationServiceTests
     {
         var services = new ServiceCollection();
         services.AddTransient<IValidationService, ValidationService>();
-        services.AddTransient(typeof(IValidationService<>), typeof(ValidationService<>));
         using var serviceProvider = services.BuildServiceProvider();
 
         var validationService = serviceProvider.GetRequiredService<IValidationService>();
         Assert.NotNull(validationService);
         Assert.NotNull((validationService as ValidationService)?._serviceProvider);
-
-        var validationService2 = serviceProvider.GetRequiredService<IValidationService<ObjectModel>>();
-        Assert.NotNull(validationService2);
-        Assert.NotNull((validationService2 as ValidationService<ObjectModel>)?._serviceProvider);
-    }
-
-    [Fact]
-    public void For_ReturnOK()
-    {
-        var services = new ServiceCollection();
-        services.AddTransient(typeof(IValidationService<>), typeof(ValidationService<>));
-        using var serviceProvider = services.BuildServiceProvider();
-
-        var validationService = new ValidationService(serviceProvider);
-        var validationService2 = validationService.For<ObjectModel>();
-        Assert.NotNull(validationService2);
-        Assert.NotNull((validationService2 as ValidationService<ObjectModel>)?._serviceProvider);
-    }
-
-    [Fact]
-    public void For_WithNoDI_ReturnOK()
-    {
-        var validationService = new ValidationService();
-        var validationService2 = validationService.For<ObjectModel>();
-        Assert.NotNull(validationService2);
-        Assert.Null((validationService2 as ValidationService<ObjectModel>)?._serviceProvider);
     }
 
     [Fact]
@@ -80,10 +43,11 @@ public class ValidationServiceTests
     {
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
-
-        var validationService = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService = new ValidationService(serviceProvider);
 
         Assert.Throws<ArgumentNullException>(() => validationService.IsValid(null!));
+        Assert.Throws<ArgumentNullException>(() => validationService.IsValid((object?)null));
+        Assert.Throws<ArgumentNullException>(() => validationService.IsValid([null]));
     }
 
     [Fact]
@@ -92,7 +56,7 @@ public class ValidationServiceTests
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
 
-        var validationService = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService = new ValidationService(serviceProvider);
 
         Assert.False(validationService.IsValid(new ObjectModel()));
         Assert.False(validationService.IsValid(new ObjectModel { Name = "Furion" }));
@@ -104,7 +68,7 @@ public class ValidationServiceTests
     [Fact]
     public void IsValid_WithNoDI_ReturnOK()
     {
-        var validationService = new ValidationService<ObjectModel>();
+        var validationService = new ValidationService();
 
         Assert.False(validationService.IsValid(new ObjectModel()));
         Assert.False(validationService.IsValid(new ObjectModel { Name = "Furion" }));
@@ -114,14 +78,31 @@ public class ValidationServiceTests
     }
 
     [Fact]
+    public void IsValid_WithMany_ReturnOK()
+    {
+        var services = new ServiceCollection();
+        using var serviceProvider = services.BuildServiceProvider();
+
+        var validationService = new ValidationService(serviceProvider);
+
+        Assert.False(validationService.IsValid([new ObjectModel(), new OtherModel()]));
+        Assert.True(validationService.IsValid([
+            new ObjectModel { Name = "Furion", SomeProperty = "monksoul@outlook.com" },
+            new OtherModel { Name = "Furion" }
+        ]));
+    }
+
+    [Fact]
     public void GetValidationResults_Invalid_Parameters()
     {
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
 
-        var validationService = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService = new ValidationService(serviceProvider);
 
         Assert.Throws<ArgumentNullException>(() => validationService.GetValidationResults(null!));
+        Assert.Throws<ArgumentNullException>(() => validationService.GetValidationResults((object?)null));
+        Assert.Throws<ArgumentNullException>(() => validationService.GetValidationResults([null]));
     }
 
     [Fact]
@@ -130,7 +111,7 @@ public class ValidationServiceTests
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
 
-        var validationService = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService = new ValidationService(serviceProvider);
 
         var validationResults = validationService.GetValidationResults(new ObjectModel());
         Assert.NotNull(validationResults);
@@ -159,7 +140,7 @@ public class ValidationServiceTests
     [Fact]
     public void GetValidationResults_WithNoDI_ReturnOK()
     {
-        var validationService = new ValidationService<ObjectModel>();
+        var validationService = new ValidationService();
 
         var validationResults = validationService.GetValidationResults(new ObjectModel());
         Assert.NotNull(validationResults);
@@ -186,14 +167,36 @@ public class ValidationServiceTests
     }
 
     [Fact]
+    public void GetValidationResults_WithMany_ReturnOK()
+    {
+        var services = new ServiceCollection();
+        using var serviceProvider = services.BuildServiceProvider();
+
+        var validationService = new ValidationService(serviceProvider);
+
+        var validationResults = validationService.GetValidationResults([new ObjectModel(), new OtherModel()]);
+        Assert.NotNull(validationResults);
+        Assert.Equal(2, validationResults.Count);
+        Assert.Equal(["The Name field is required.", "The Name field is required."],
+            validationResults.Select(u => u.ErrorMessage!).ToArray());
+
+        Assert.Null(validationService.GetValidationResults([
+            new ObjectModel { Name = "Furion", SomeProperty = "monksoul@outlook.com" },
+            new OtherModel { Name = "Furion" }
+        ]));
+    }
+
+    [Fact]
     public void Validate_Invalid_Parameters()
     {
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
 
-        var validationService = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService = new ValidationService(serviceProvider);
 
         Assert.Throws<ArgumentNullException>(() => validationService.Validate(null!));
+        Assert.Throws<ArgumentNullException>(() => validationService.Validate((object?)null));
+        Assert.Throws<ArgumentNullException>(() => validationService.Validate([null]));
     }
 
     [Fact]
@@ -202,7 +205,7 @@ public class ValidationServiceTests
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
 
-        var validationService = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService = new ValidationService(serviceProvider);
 
         var exception = Assert.Throws<ValidationException>(() => validationService.Validate(new ObjectModel()));
         Assert.Equal("The Name field is required.", exception.Message);
@@ -222,7 +225,7 @@ public class ValidationServiceTests
     [Fact]
     public void Validate_WithNoDI_ReturnOK()
     {
-        var validationService = new ValidationService<ObjectModel>();
+        var validationService = new ValidationService();
 
         var exception = Assert.Throws<ValidationException>(() => validationService.Validate(new ObjectModel()));
         Assert.Equal("The Name field is required.", exception.Message);
@@ -240,11 +243,29 @@ public class ValidationServiceTests
     }
 
     [Fact]
+    public void Validate_WithMany_ReturnOK()
+    {
+        var services = new ServiceCollection();
+        using var serviceProvider = services.BuildServiceProvider();
+
+        var validationService = new ValidationService(serviceProvider);
+
+        var exception =
+            Assert.Throws<ValidationException>(() => validationService.Validate([new ObjectModel(), new OtherModel()]));
+        Assert.Equal("The Name field is required.", exception.Message);
+
+        validationService.Validate([
+            new ObjectModel { Name = "Furion", SomeProperty = "monksoul@outlook.com" },
+            new OtherModel { Name = "Furion" }
+        ]);
+    }
+
+    [Fact]
     public void CreateValidationContext_Invalid_Parameters()
     {
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
-        var validationService = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService = new ValidationService(serviceProvider);
 
         Assert.Throws<ArgumentNullException>(() => validationService.CreateValidationContext(null!, null));
     }
@@ -254,39 +275,31 @@ public class ValidationServiceTests
     {
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
-        var validationService = new ValidationService<ObjectModel>(serviceProvider);
+        var validationService = new ValidationService(serviceProvider);
 
         var validationContext = validationService.CreateValidationContext(new ObjectModel(), null);
         Assert.NotNull(validationContext);
-        Assert.Equal(typeof(ObjectModel), validationContext.ObjectType);
         Assert.Empty(validationContext.Items);
         Assert.NotNull(validationContext.GetService(typeof(IServiceProvider)));
 
         var validationContext2 = validationService.CreateValidationContext(new ObjectModel(), ["login"]);
-        Assert.Single(validationContext2.Items);
-        var metadata2 =
-            validationContext2.Items[ValidationDataContext.ValidationOptionsKey] as ValidationOptionsMetadata;
-        Assert.NotNull(metadata2);
-        Assert.Equal(["login"], (string[]?)metadata2.RuleSets!);
+        Assert.Empty(validationContext2.Items);
+        Assert.Equal(["login"], (string[]?)validationContext2.RuleSets!);
     }
 
     [Fact]
     public void CreateValidationContext_WithNoDI_ReturnOK()
     {
-        var validationService = new ValidationService<ObjectModel>();
+        var validationService = new ValidationService();
 
         var validationContext = validationService.CreateValidationContext(new ObjectModel(), null);
         Assert.NotNull(validationContext);
-        Assert.Equal(typeof(ObjectModel), validationContext.ObjectType);
         Assert.Empty(validationContext.Items);
         Assert.Null(validationContext.GetService(typeof(IServiceProvider)));
 
         var validationContext2 = validationService.CreateValidationContext(new ObjectModel(), ["login"]);
-        Assert.Single(validationContext2.Items);
-        var metadata2 =
-            validationContext2.Items[ValidationDataContext.ValidationOptionsKey] as ValidationOptionsMetadata;
-        Assert.NotNull(metadata2);
-        Assert.Equal(["login"], (string[]?)metadata2.RuleSets!);
+        Assert.Empty(validationContext2.Items);
+        Assert.Equal(["login"], (string[]?)validationContext2.RuleSets!);
     }
 
     public class ObjectModel : IValidatableObject
@@ -300,5 +313,10 @@ public class ValidationServiceTests
             validationContext.With<ObjectModel>()
                 .RuleFor(u => u.SomeProperty).Required().EmailAddress()
                 .ToResults();
+    }
+
+    public class OtherModel
+    {
+        [Required] [MinLength(2)] public string? Name { get; set; }
     }
 }

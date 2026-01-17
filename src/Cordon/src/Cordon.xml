@@ -2141,7 +2141,8 @@
             <param name="errorMessage">错误信息</param>
             <returns>
                 <typeparamref name="TSelf" />
-            </returns>member>
+            </returns>
+        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.WithMessage(System.Type,System.String)">
             <summary>
                 设置错误信息
@@ -2408,7 +2409,6 @@
             </returns>
         </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.GreaterThanOrEqualTo(System.IComparable)">
-    le)">
             <summary>
                 添加大于等于验证器
             </summary>
@@ -2775,7 +2775,7 @@
             <summary>
                 添加正则表达式验证器
             </summary>
-            <paattern">正则表达式模式</param>
+            <param name="pattern">正则表达式模式</param>
             <param name="matchTimeoutInMilliseconds">用于在操作超时前执行单个匹配操作的时间量。以毫秒为单位，默认值为：2000。</param>
             <returns>
                 <typeparamref name="TSelf" />
@@ -3079,6 +3079,19 @@
             <summary>
                 任一验证器验证成功，即视为整体验证通过
             </summary>
+        </member>
+        <member name="T:Cordon.Constants">
+            <summary>
+                数据验证模块常量配置
+            </summary>
+        </member>
+        <member name="F:Cordon.Constants.ValidationContextKey">
+            <summary>
+                验证上下文键
+            </summary>
+            <remarks>
+                用于使用 <![CDATA[ValidationContext.With<T>()]]> 时设置。
+            </remarks>
         </member>
         <member name="T:Cordon.IValidationContext">
             <summary>
@@ -4107,14 +4120,6 @@
                 对象验证器
             </summary>
             <typeparam name="T">对象类型</typeparam>
-        </member>
-        <member name="F:Cordon.ObjectValidator`1.ValidationContextsKey">
-            <summary>
-                验证上下文键
-            </summary>
-            <remarks>
-                用于使用 <![CDATA[ValidationContext.With<T>()]]> 时设置。
-            </remarks>
         </member>
         <member name="F:Cordon.ObjectValidator`1._attributeValidator">
             <inheritdoc cref="T:Cordon.AttributeObjectValidator" />
@@ -5875,22 +5880,7 @@
                 数据验证服务
             </summary>
         </member>
-        <member name="M:Cordon.IValidationService.For``1">
-            <summary>
-                创建指定对象类型的数据验证服务
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-            <returns>
-                <see cref="T:Cordon.IValidationService`1" />
-            </returns>
-        </member>
-        <member name="T:Cordon.IValidationService`1">
-            <summary>
-                数据验证服务
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-        </member>
-        <member name="M:Cordon.IValidationService`1.IsValid(`0,System.String[])">
+        <member name="M:Cordon.IValidationService.IsValid(System.Object,System.String[])">
             <summary>
                 检查对象合法性
             </summary>
@@ -5900,7 +5890,7 @@
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Cordon.IValidationService`1.GetValidationResults(`0,System.String[])">
+        <member name="M:Cordon.IValidationService.GetValidationResults(System.Object,System.String[])">
             <summary>
                 获取对象验证结果集合
             </summary>
@@ -5910,7 +5900,7 @@
                 <see cref="T:System.Collections.Generic.List`1" />
             </returns>
         </member>
-        <member name="M:Cordon.IValidationService`1.Validate(`0,System.String[])">
+        <member name="M:Cordon.IValidationService.Validate(System.Object,System.String[])">
             <summary>
                 验证对象
             </summary>
@@ -5919,8 +5909,40 @@
             <param name="ruleSets">规则集</param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
         </member>
+        <member name="M:Cordon.IValidationService.IsValid(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
+            <summary>
+                检查多个对象合法性
+            </summary>
+            <param name="instances">对象集合</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:System.Boolean" />
+            </returns>
+        </member>
+        <member name="M:Cordon.IValidationService.GetValidationResults(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
+            <summary>
+                获取多个对象验证结果集合
+            </summary>
+            <param name="instances">对象集合</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:System.Collections.Generic.List`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.IValidationService.Validate(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
+            <summary>
+                验证多个对象
+            </summary>
+            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <param name="instances">对象集合</param>
+            <param name="ruleSets">规则集</param>
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
+        </member>
         <member name="T:Cordon.ValidationService">
             <inheritdoc />
+        </member>
+        <member name="F:Cordon.ValidationService._attributeValidator">
+            <inheritdoc cref="T:Cordon.AttributeObjectValidator" />
         </member>
         <member name="F:Cordon.ValidationService._serviceProvider">
             <inheritdoc cref="T:System.IServiceProvider" />
@@ -5938,51 +5960,44 @@
                 <see cref="T:System.IServiceProvider" />
             </param>
         </member>
-        <member name="M:Cordon.ValidationService.For``1">
+        <member name="M:Cordon.ValidationService.IsValid(System.Object,System.String[])">
             <inheritdoc />
         </member>
-        <member name="T:Cordon.ValidationService`1">
+        <member name="M:Cordon.ValidationService.GetValidationResults(System.Object,System.String[])">
             <inheritdoc />
         </member>
-        <member name="F:Cordon.ValidationService`1._serviceProvider">
-            <inheritdoc cref="T:System.IServiceProvider" />
+        <member name="M:Cordon.ValidationService.Validate(System.Object,System.String[])">
+            <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidationService`1.#ctor">
+        <member name="M:Cordon.ValidationService.IsValid(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ValidationService.GetValidationResults(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ValidationService.Validate(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ValidationService.CreateValidationContext(System.Object,System.String[])">
             <summary>
-                <inheritdoc cref="T:Cordon.ValidationService`1" />
-            </summary>
-        </member>
-        <member name="M:Cordon.ValidationService`1.#ctor(System.IServiceProvider)">
-            <summary>
-                <inheritdoc cref="T:Cordon.ValidationService`1" />
-            </summary>
-            <param name="serviceProvider">
-                <see cref="T:System.IServiceProvider" />
-            </param>
-        </member>
-        <member name="M:Cordon.ValidationService`1.IsValid(`0,System.String[])">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ValidationService`1.GetValidationResults(`0,System.String[])">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ValidationService`1.Validate(`0,System.String[])">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ValidationService`1.CreateValidationContext(`0,System.String[])">
-            <summary>
-                创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
+                创建 <see cref="T:Cordon.ValidationContext`1" /> 实例
             </summary>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
             <returns>
-                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
+                <see cref="T:Cordon.ValidationContext`1" />
             </returns>
         </member>
         <member name="T:Cordon.Validators">
             <summary>
                 数据验证模块静态类
             </summary>
+        </member>
+        <member name="F:Cordon.Validators._defaultValidationService">
+            <summary>
+                默认的 <see cref="T:Cordon.IValidationService" /> 实例
+            </summary>
+            <remarks>避免重复创建实例。</remarks>
         </member>
         <member name="M:Cordon.Validators.Object``1">
             <summary>
@@ -6995,16 +7010,15 @@
                 <see cref="T:Cordon.AttributeValueValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.For``1(System.IServiceProvider)">
+        <member name="M:Cordon.Validators.Service(System.IServiceProvider)">
             <summary>
                 创建指定对象类型的数据验证服务
             </summary>
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
             </param>
-            <typeparam name="T">对象类型</typeparam>
             <returns>
-                <see cref="T:Cordon.IValidationService`1" />
+                <see cref="T:Cordon.IValidationService" />
             </returns>
         </member>
         <member name="T:Cordon.AgeValidator">
@@ -7125,11 +7139,12 @@
         <member name="M:Cordon.AttributeObjectValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
-        <member name="M:Cordon.AttributeObjectValidator.CreateValidationContext(System.Object)">
+        <member name="M:Cordon.AttributeObjectValidator.CreateValidationContext(System.Object,System.String[])">
             <summary>
                 创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
             </summary>
             <param name="value">对象</param>
+            <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
             </returns>
@@ -7269,18 +7284,19 @@
                 <see cref="T:System.String" />
             </returns>
         </member>
-        <member name="M:Cordon.AttributePropertyValidator`1.CreateValidationContext(System.Object,System.String)">
+        <member name="M:Cordon.AttributePropertyValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
+        </member>
+        <member name="M:Cordon.AttributePropertyValidator`1.CreateValidationContext(System.Object,System.String,System.String[])">
             <summary>
                 创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
             </summary>
             <param name="value">对象</param>
             <param name="name">显示名称</param>
+            <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
             </returns>
-        </member>
-        <member name="M:Cordon.AttributePropertyValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
         <member name="T:Cordon.AttributeValueValidator">
             <summary>
@@ -7343,19 +7359,20 @@
         <member name="M:Cordon.AttributeValueValidator.Validate(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.AttributeValueValidator.CreateValidationContext(System.Object,System.String,System.String)">
+        <member name="M:Cordon.AttributeValueValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
+            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
+        </member>
+        <member name="M:Cordon.AttributeValueValidator.CreateValidationContext(System.Object,System.String,System.String,System.String[])">
             <summary>
                 创建 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 实例
             </summary>
             <param name="value">对象</param>
             <param name="name">显示名称</param>
             <param name="memberName">成员名称</param>
+            <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
             </returns>
-        </member>
-        <member name="M:Cordon.AttributeValueValidator.InitializeServiceProvider(System.Func{System.Type,System.Object})">
-            <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
         <member name="T:Cordon.BankCardValidator">
             <summary>
@@ -7517,8 +7534,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a hexadecimal digit exactly 3 times.<br/>
-                        ○ Match a hexadecimal digit exactly 8 times.<br/>
+                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7540,7 +7557,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character atomically any number of times.<br/>
+                            ○ Match a whitespace character greedily any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -7565,7 +7582,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character atomically any number of times.<br/>
+                                    ○ Match a whitespace character greedily any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -7626,13 +7643,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7646,13 +7663,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7674,7 +7691,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7699,10 +7716,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit atomically at least once.<br/>
+                                    ○ Match a Unicode digit greedily at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit atomically at least once.<br/>
+                                ○ Match a Unicode digit greedily at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -7990,7 +8007,6 @@
             <remarks>需与 <see cref="P:Cordon.DateOnlyValidator.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
         </member>
         <member name="M:Cordon.DateOnlyValidator.IsValid(System.Object,Cordon.IValidationContext)">
-            <inheritdoc lidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.DateOnlyValidator.FormatErrorMessage(System.String)">
@@ -8501,18 +8517,18 @@
                                     ○ 7th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 8th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [12].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 9th capture group.<br/>
@@ -8525,10 +8541,10 @@
                                     ○ 12th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ Match a sequence of expressions.<br/>
@@ -8542,13 +8558,13 @@
                                     ○ 15th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '2'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 16th capture group.<br/>
                                     ○ 17th capture group.<br/>
@@ -8561,13 +8577,13 @@
                                                 ○ 20th capture group.<br/>
                                                     ○ Match with 3 alternative expressions.<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match a character in the set [13579].<br/>
+                                                            ○ Match an empty string.<br/>
                                                             ○ Match a character in the set [26].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match a character in the set [2468].<br/>
+                                                            ○ Match an empty string.<br/>
                                                             ○ Match a character in the set [048].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match '0'.<br/>
+                                                            ○ Match an empty string.<br/>
                                                             ○ Match a character in the set [48].<br/>
                                             ○ 21st capture group.<br/>
                                                 ○ Match the string "2000".<br/>
@@ -8582,18 +8598,18 @@
                                     ○ 26th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 27th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [12].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 28th capture group.<br/>
@@ -8602,10 +8618,10 @@
                                     ○ 30th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ 31st capture group.<br/>
@@ -8615,25 +8631,25 @@
                                     ○ 33rd capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '2'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 34th capture group.<br/>
                                     ○ 35th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [13579].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [26].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [2468].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                     ○ Match the string "0229".<br/>
                         ○ Match a Unicode digit exactly 2 times.<br/>
@@ -9158,25 +9174,25 @@
             ○ Match '1'.<br/>
             ○ Match with 7 alternative expressions.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '3'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '4'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [579].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '5'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '6'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [6-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '7'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '8'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '9'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
             ○ Match a Unicode digit exactly 8 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -9206,31 +9222,31 @@
             ○ 1st capture group.<br/>
                 ○ Match with 9 alternative expressions.<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '0'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '1'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-356].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '2'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '3'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-6].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '4'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '5'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '6'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '7'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-5].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '8'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [013-6].<br/>
             ○ Match a Unicode digit exactly 4 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -10165,14 +10181,7 @@
         <member name="M:Cordon.ValidatorProxy`1.Validate(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidatorProxy`1.FormatErrorMessage(System.String)">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.ValidatorProxy`1.Dispose(System.Boolean)">
-            <summary>
-                释放资源
-            </summary>
-            <param name="disposing">是否释放托管资源</param>
+释放托管资源</param>
         </member>
         <member name="M:Cordon.ValidatorProxy`1.OnPropertyChanged(System.Object,Cordon.ValidationPropertyChangedEventArgs)">
             <summary>
