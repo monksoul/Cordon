@@ -19,25 +19,25 @@ public class ValidationOptionsModelValidatorTests
     }
 
     [Fact]
-    public void ExtractFromAction_ReturnOK()
+    public void ExtractFromMethod_ReturnOK()
     {
         Assert.Null(
-            ValidationOptionsModelValidator.ExtractFromAction(
+            ValidationOptionsModelValidator.ExtractFromMethod(
                 typeof(TestController).GetMethod(nameof(TestController.Get))!));
 
         var metadata =
-            ValidationOptionsModelValidator.ExtractFromAction(
+            ValidationOptionsModelValidator.ExtractFromMethod(
                 typeof(TestController2).GetMethod(nameof(TestController.Get))!);
         Assert.NotNull(metadata);
         Assert.Equal(["action"], (string[]?)metadata.RuleSets!);
     }
 
     [Fact]
-    public void ExtractFromController_ReturnOK()
+    public void ExtractFromDeclaredType_ReturnOK()
     {
-        Assert.Null(ValidationOptionsModelValidator.ExtractFromController(typeof(TestController).GetTypeInfo()));
+        Assert.Null(ValidationOptionsModelValidator.ExtractFromDeclaredType(typeof(TestController).GetTypeInfo()));
 
-        var metadata = ValidationOptionsModelValidator.ExtractFromController(typeof(TestController2).GetTypeInfo());
+        var metadata = ValidationOptionsModelValidator.ExtractFromDeclaredType(typeof(TestController2).GetTypeInfo());
         Assert.NotNull(metadata);
         Assert.Equal(["controller"], (string[]?)metadata.RuleSets!);
     }

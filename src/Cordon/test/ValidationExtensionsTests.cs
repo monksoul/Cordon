@@ -58,7 +58,7 @@ public class ValidationExtensionsTests
 
         validationContext.WithRuleSets();
         Assert.Single(validationContext.Items);
-        var metadata = validationContext.Items[ValidationDataContext.ValidationOptionsKey] as ValidationOptionsMetadata;
+        var metadata = validationContext.Items[Constants.ValidationOptionsKey] as ValidationOptionsMetadata;
         Assert.NotNull(metadata);
         Assert.Null(metadata.RuleSets);
 
@@ -66,7 +66,7 @@ public class ValidationExtensionsTests
         Assert.Single(validationContext.Items);
 
         var metadata2 =
-            validationContext.Items[ValidationDataContext.ValidationOptionsKey] as ValidationOptionsMetadata;
+            validationContext.Items[Constants.ValidationOptionsKey] as ValidationOptionsMetadata;
         Assert.NotNull(metadata2);
         Assert.Equal(["login", "register"], (string[]?)metadata2.RuleSets!);
     }
@@ -110,7 +110,7 @@ public class ValidationExtensionsTests
                 new ValidationContext(model5, null,
                     new Dictionary<object, object?>
                     {
-                        { ValidationDataContext.ValidationOptionsKey, new ValidationOptionsMetadata(["email"]) }
+                        { Constants.ValidationOptionsKey, new ValidationOptionsMetadata(["email"]) }
                     }),
                 true));
         Assert.Equal("The Name field is not a valid e-mail address.", exception5.Message);
@@ -119,7 +119,7 @@ public class ValidationExtensionsTests
         services.AddValidationCore();
         using var serviceProvider = services.BuildServiceProvider();
         var validationDataContext = serviceProvider.GetRequiredService<IValidationDataContext>();
-        validationDataContext.SetValue(ValidationDataContext.ValidationOptionsKey,
+        validationDataContext.SetValue(Constants.ValidationOptionsKey,
             new ValidationOptionsMetadata(["email"]));
 
         var model6 = new ObjectModel { Id = 1, Name = "百小僧" };

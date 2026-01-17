@@ -5,8 +5,12 @@
 namespace Cordon;
 
 /// <summary>
-///     验证选项元数据提取验证器
+///     提取验证选项元数据（<see cref="ValidationOptionsAttribute" />）的 MVC 验证器
 /// </summary>
+/// <remarks>
+///     为实现了 <see cref="IValidatableObject" /> 接口的模型和 <see cref="ValidateWithAttribute{TValidator}" />
+///     特性提供验证选项（如规则集）支持。
+/// </remarks>
 internal sealed class ValidationOptionsModelValidator : IModelValidator
 {
     /// <inheritdoc />
@@ -32,19 +36,15 @@ internal sealed class ValidationOptionsModelValidator : IModelValidator
         }
 
         // 提取验证选项
-        var validationOptionsMetadata = ExtractFromAction(actionDescriptor.MethodInfo) ??
-                                        ExtractFromController(actionDescriptor.ControllerTypeInfo);
+        var validationOptionsMetadata = ExtractFromMethod(actionDescriptor.MethodInfo) ??
+                                        ExtractFromDeclaredType(actionDescriptor.ControllerTypeInfo);
 
-        // 空检查
-        if (validationOptionsMetadata is not null)
-        {
-            // 设置当前验证选项
-            validationDataContext.SetValidationOptions(validationOptionsMetadata);
-        }
+        // 设置当前验证选项（单次请求仅解析并设置一次，支持 null 值）
+        validationDataContext.SetValidationOptions(validationOptionsMetadata);
     }
 
     /// <summary>
-    ///     从 Action 方法提取验证选项
+    ///     从操作方法（Action/Handler）提取验证选项
     /// </summary>
     /// <param name="methodInfo">
     ///     <see cref="MethodInfo" />
@@ -52,20 +52,20 @@ internal sealed class ValidationOptionsModelValidator : IModelValidator
     /// <returns>
     ///     <see cref="ValidationOptionsMetadata" />
     /// </returns>
-    internal static ValidationOptionsMetadata? ExtractFromAction(MethodInfo methodInfo) =>
+    internal static ValidationOptionsMetadata? ExtractFromMethod(MethodInfo methodInfo) =>
         CreateMetadata(methodInfo.GetCustomAttribute<ValidationOptionsAttribute>(true));
 
     /// <summary>
-    ///     从 Controller 类提取验证选项
+    ///     从声明类（Controller/PageModel）提取验证选项
     /// </summary>
-    /// <param name="declaredTypeInfo">
+    /// <param name="typeInfo">
     ///     <see cref="TypeInfo" />
     /// </param>
     /// <returns>
     ///     <see cref="ValidationOptionsMetadata" />
     /// </returns>
-    internal static ValidationOptionsMetadata? ExtractFromController(TypeInfo declaredTypeInfo) =>
-        CreateMetadata(declaredTypeInfo.GetCustomAttribute<ValidationOptionsAttribute>(true));
+    internal static ValidationOptionsMetadata? ExtractFromDeclaredType(TypeInfo typeInfo) =>
+        CreateMetadata(typeInfo.GetCustomAttribute<ValidationOptionsAttribute>(true));
 
     /// <summary>
     ///     从 <see cref="ValidationOptionsAttribute" /> 中创建 <see cref="ValidationOptionsMetadata" /> 实例

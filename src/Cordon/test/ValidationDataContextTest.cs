@@ -15,7 +15,6 @@ public class ValidationDataContextTest
         Assert.Empty(context.Items);
         Assert.NotNull(context.Items);
         Assert.Empty(context.Items);
-        Assert.NotNull(ValidationDataContext.ValidationOptionsKey);
     }
 
     [Fact]
@@ -61,10 +60,6 @@ public class ValidationDataContextTest
         context.SetValue("key", "value");
         Assert.True(context.ContainsKey("key"));
     }
-
-    [Fact]
-    public void SetValidationOptions_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new ValidationDataContext().SetValidationOptions(null!));
 
     [Fact]
     public void SetValidationOptions_ReturnOK()

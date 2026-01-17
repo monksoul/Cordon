@@ -5,20 +5,18 @@
 namespace Cordon;
 
 /// <summary>
-///     验证选项模型验证器提供程序
+///     提取验证选项元数据（<see cref="ValidationOptionsAttribute" />）的模型验证器提供器
 /// </summary>
+/// <remarks>
+///     为实现了 <see cref="IValidatableObject" /> 接口的模型和 <see cref="ValidateWithAttribute{TValidator}" />
+///     特性提供验证选项（如规则集）支持。
+/// </remarks>
 internal sealed class ValidationOptionsModelValidatorProvider : IModelValidatorProvider
 {
     /// <inheritdoc />
-    public void CreateValidators(ModelValidatorProviderContext context)
-    {
-        // 检查是否实现了 IValidatableObject 接口
-        if (typeof(IValidatableObject).IsAssignableFrom(context.ModelMetadata.ModelType))
+    public void CreateValidators(ModelValidatorProviderContext context) =>
+        context.Results.Add(new ValidatorItem
         {
-            context.Results.Add(new ValidatorItem
-            {
-                Validator = new ValidationOptionsModelValidator(), IsReusable = true
-            });
-        }
-    }
+            Validator = new ValidationOptionsModelValidator(), IsReusable = true /*确保验证器实例可以被重用*/
+        });
 }

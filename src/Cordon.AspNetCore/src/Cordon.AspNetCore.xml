@@ -9,9 +9,9 @@
                 数据验证模块 <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" /> 拓展类
             </summary>
         </member>
-        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationMvcBuilderExtensions.AddValidationOptions(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Action{Cordon.ValidationBuilder})">
+        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationMvcBuilderExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Action{Cordon.ValidationBuilder})">
             <summary>
-                添加验证选项配置
+                添加数据验证服务
             </summary>
             <param name="mvcBuilder">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" />
@@ -23,8 +23,12 @@
         </member>
         <member name="T:Cordon.ValidationOptionsAsyncPageFilter">
             <summary>
-                验证选项元数据提取验证器
+                提取验证选项元数据（<see cref="T:Cordon.ValidationOptionsAttribute" />）的 Razor Pages 筛选器
             </summary>
+            <remarks>
+                为实现了 <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject" /> 接口的模型和 <see cref="T:Cordon.ValidateWithAttribute`1" />
+                特性提供验证选项（如规则集）支持。
+            </remarks>
         </member>
         <member name="M:Cordon.ValidationOptionsAsyncPageFilter.OnPageHandlerSelectionAsync(Microsoft.AspNetCore.Mvc.Filters.PageHandlerSelectedContext)">
             <inheritdoc />
@@ -34,15 +38,19 @@
         </member>
         <member name="T:Cordon.ValidationOptionsModelValidator">
             <summary>
-                验证选项元数据提取验证器
+                提取验证选项元数据（<see cref="T:Cordon.ValidationOptionsAttribute" />）的 MVC 验证器
             </summary>
+            <remarks>
+                为实现了 <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject" /> 接口的模型和 <see cref="T:Cordon.ValidateWithAttribute`1" />
+                特性提供验证选项（如规则集）支持。
+            </remarks>
         </member>
         <member name="M:Cordon.ValidationOptionsModelValidator.Validate(Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ModelValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ValidationOptionsModelValidator.ExtractFromAction(System.Reflection.MethodInfo)">
+        <member name="M:Cordon.ValidationOptionsModelValidator.ExtractFromMethod(System.Reflection.MethodInfo)">
             <summary>
-                从 Action 方法提取验证选项
+                从操作方法（Action/Handler）提取验证选项
             </summary>
             <param name="methodInfo">
                 <see cref="T:System.Reflection.MethodInfo" />
@@ -51,11 +59,11 @@
                 <see cref="T:Cordon.ValidationOptionsMetadata" />
             </returns>
         </member>
-        <member name="M:Cordon.ValidationOptionsModelValidator.ExtractFromController(System.Reflection.TypeInfo)">
+        <member name="M:Cordon.ValidationOptionsModelValidator.ExtractFromDeclaredType(System.Reflection.TypeInfo)">
             <summary>
-                从 Controller 类提取验证选项
+                从声明类（Controller/PageModel）提取验证选项
             </summary>
-            <param name="declaredTypeInfo">
+            <param name="typeInfo">
                 <see cref="T:System.Reflection.TypeInfo" />
             </param>
             <returns>
@@ -75,8 +83,12 @@
         </member>
         <member name="T:Cordon.ValidationOptionsModelValidatorProvider">
             <summary>
-                验证选项模型验证器提供程序
+                提取验证选项元数据（<see cref="T:Cordon.ValidationOptionsAttribute" />）的模型验证器提供器
             </summary>
+            <remarks>
+                为实现了 <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject" /> 接口的模型和 <see cref="T:Cordon.ValidateWithAttribute`1" />
+                特性提供验证选项（如规则集）支持。
+            </remarks>
         </member>
         <member name="M:Cordon.ValidationOptionsModelValidatorProvider.CreateValidators(Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ModelValidatorProviderContext)">
             <inheritdoc />

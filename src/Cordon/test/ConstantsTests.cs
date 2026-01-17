@@ -7,5 +7,8 @@ namespace Cordon.Tests;
 public class ConstantsTests
 {
     [Fact]
+    public void ValidationOptionsKey_ReturnOK() => Assert.NotNull(Constants.ValidationOptionsKey);
+
+    [Fact]
     public void ValidationContextKey_ReturnOK() => Assert.NotNull(Constants.ValidationContextKey);
 }

@@ -5,8 +5,12 @@
 namespace Cordon;
 
 /// <summary>
-///     验证选项元数据提取验证器
+///     提取验证选项元数据（<see cref="ValidationOptionsAttribute" />）的 Razor Pages 筛选器
 /// </summary>
+/// <remarks>
+///     为实现了 <see cref="IValidatableObject" /> 接口的模型和 <see cref="ValidateWithAttribute{TValidator}" />
+///     特性提供验证选项（如规则集）支持。
+/// </remarks>
 internal sealed class ValidationOptionsAsyncPageFilter : IAsyncPageFilter
 {
     /// <inheritdoc />
@@ -33,15 +37,11 @@ internal sealed class ValidationOptionsAsyncPageFilter : IAsyncPageFilter
         }
 
         // 提取验证选项
-        var validationOptionsMetadata = ValidationOptionsModelValidator.ExtractFromAction(handlerMethod.MethodInfo) ??
-                                        ValidationOptionsModelValidator.ExtractFromController(modelType);
+        var validationOptionsMetadata = ValidationOptionsModelValidator.ExtractFromMethod(handlerMethod.MethodInfo) ??
+                                        ValidationOptionsModelValidator.ExtractFromDeclaredType(modelType);
 
-        // 空检查
-        if (validationOptionsMetadata is not null)
-        {
-            // 设置当前验证选项
-            validationDataContext.SetValidationOptions(validationOptionsMetadata);
-        }
+        // 设置当前验证选项（单次请求仅解析并设置一次，支持 null 值）
+        validationDataContext.SetValidationOptions(validationOptionsMetadata);
 
         return Task.CompletedTask;
     }

@@ -16,20 +16,21 @@ public class GetStartController
         return Task.FromResult(custom);
     }
 
-    // [HttpPost /*ValidationOptions(["create"])*/]
-    // public Task<Custom> Post3([ValidateWith<CustomValidator>] Custom custom)
-    // {
-    //     return Task.FromResult(custom);
-    // }
+    [HttpPost]
+    [ValidationOptions(["create"])]
+    public Task<Custom> Post3([ValidateWith<CustomValidator>] Custom custom)
+    {
+        return Task.FromResult(custom);
+    }
 
     [HttpPost]
-    public Task<User> Post3(User user)
+    public Task<User> Post4(User user)
     {
         return Task.FromResult(user);
     }
 
     [HttpPost]
-    public Task<Test> Post4(Test test)
+    public Task<Test> Post5(Test test)
     {
         return Task.FromResult(test);
     }

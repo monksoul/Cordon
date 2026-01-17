@@ -257,7 +257,7 @@ public class AttributeValueValidatorTests
         Assert.NotNull(serviceProviderField.GetValue(validationContext5));
         Assert.Single(validationContext5.Items);
         var metadata =
-            validationContext5.Items[ValidationDataContext.ValidationOptionsKey] as ValidationOptionsMetadata;
+            validationContext5.Items[Constants.ValidationOptionsKey] as ValidationOptionsMetadata;
         Assert.NotNull(metadata);
         Assert.Equal(["login"], (string[]?)metadata.RuleSets!);
     }

@@ -14,9 +14,20 @@ namespace Cordon;
 public class ValidateWithAttribute<TValidator> : ValidationAttribute
     where TValidator : IObjectValidator
 {
+    /// <summary>
+    ///     规则集
+    /// </summary>
+    public string?[]? RuleSets { get; set; }
+
     /// <inheritdoc />
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
+        // 空检查
+        if (RuleSets is not null)
+        {
+            validationContext.WithRuleSets(RuleSets);
+        }
+
         // 创建 TValidator 实例
         var validator = validationContext.GetService<IServiceProvider>() is null
             ? Activator.CreateInstance<TValidator>()

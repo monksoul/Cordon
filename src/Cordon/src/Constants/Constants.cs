@@ -10,6 +10,15 @@ namespace Cordon;
 internal static class Constants
 {
     /// <summary>
+    ///     验证选项键
+    /// </summary>
+    /// <remarks>
+    ///     用于 <see cref="ValidationContext" />、<c>ValidationOptionsModelValidator</c> 和
+    ///     <c>ValidationOptionsAsyncPageFilter</c> 中写入规则集配置。
+    /// </remarks>
+    internal static readonly object ValidationOptionsKey = new();
+
+    /// <summary>
     ///     验证上下文键
     /// </summary>
     /// <remarks>

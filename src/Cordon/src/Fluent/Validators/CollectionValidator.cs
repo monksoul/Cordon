@@ -167,7 +167,7 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
 
         // 尝试从 ValidationContext.Items 中解析验证选项中的规则集
         string?[]? ruleSets = null;
-        if (validationContext.Items.TryGetValue(ValidationDataContext.ValidationOptionsKey, out var metadataObj) &&
+        if (validationContext.Items.TryGetValue(Constants.ValidationOptionsKey, out var metadataObj) &&
             metadataObj is ValidationOptionsMetadata metadata)
         {
             ruleSets = metadata.RuleSets;

@@ -10,7 +10,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ValidationMvcBuilderExtensions
 {
     /// <summary>
-    ///     添加验证选项配置
+    ///     添加数据验证服务
     /// </summary>
     /// <param name="mvcBuilder">
     ///     <see cref="IMvcBuilder" />
@@ -19,7 +19,7 @@ public static class ValidationMvcBuilderExtensions
     /// <returns>
     ///     <see cref="IMvcBuilder" />
     /// </returns>
-    public static IMvcBuilder AddValidationOptions(this IMvcBuilder mvcBuilder,
+    public static IMvcBuilder AddValidationCore(this IMvcBuilder mvcBuilder,
         Action<ValidationBuilder>? configure = null)
     {
         // 添加数据验证服务

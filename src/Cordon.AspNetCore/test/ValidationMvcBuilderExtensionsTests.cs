@@ -7,10 +7,10 @@ namespace Cordon.AspNetCore.Tests;
 public class ValidationMvcBuilderExtensionsTests
 {
     [Fact]
-    public void AddValidationOptions_ReturnOK()
+    public void AddValidationCore_ReturnOK()
     {
         var builder = WebApplication.CreateBuilder();
-        builder.Services.AddControllers().AddValidationOptions();
+        builder.Services.AddControllers().AddValidationCore();
 
         Assert.Contains(builder.Services, u => u.ServiceType == typeof(IValidationDataContext));
         using var app = builder.Build();
@@ -28,10 +28,10 @@ public class ValidationMvcBuilderExtensionsTests
     }
 
     [Fact]
-    public void AddValidationOptions_Duplicate_ReturnOK()
+    public void AddValidationCore_Duplicate_ReturnOK()
     {
         var builder = WebApplication.CreateBuilder();
-        builder.Services.AddControllers().AddValidationOptions().AddValidationOptions();
+        builder.Services.AddControllers().AddValidationCore().AddValidationCore();
 
         Assert.Contains(builder.Services, u => u.ServiceType == typeof(IValidationDataContext));
         using var app = builder.Build();

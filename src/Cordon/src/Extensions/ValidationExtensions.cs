@@ -44,7 +44,7 @@ public static class ValidationExtensions
         // 空检查
         ArgumentNullException.ThrowIfNull(validationContext);
 
-        validationContext.Items[ValidationDataContext.ValidationOptionsKey] = new ValidationOptionsMetadata(ruleSets);
+        validationContext.Items[Constants.ValidationOptionsKey] = new ValidationOptionsMetadata(ruleSets);
 
         return validationContext;
     }
