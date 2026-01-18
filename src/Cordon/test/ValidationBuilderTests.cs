@@ -163,6 +163,44 @@ public class ValidationBuilderTests
     }
 
     [Fact]
+    public void ConfigureDataAnnotationValidationMessages_Invalid_Parameters()
+    {
+        var builder = new ValidationBuilder();
+        Assert.Throws<ArgumentNullException>(() => builder.ConfigureDataAnnotationValidationMessages(null!));
+    }
+
+    [Fact]
+    public void ConfigureDataAnnotationValidationMessages_ReturnOK()
+    {
+        var builder = new ValidationBuilder();
+        Assert.Empty(DataAnnotationMessageProvider._overrides);
+        builder.ConfigureDataAnnotationValidationMessages(message =>
+        {
+            message["RequiredAttribute_ValidationError"] = "字段 {0} 是必填项。";
+            message["StringLengthAttribute_ValidationError"] = "字段 {0} 必须是字符串，且最大长度为 {1}。";
+        });
+
+        Assert.Equal(2, DataAnnotationMessageProvider._overrides.Count);
+        Assert.Equal("字段 {0} 是必填项。", DataAnnotationMessageProvider._overrides["RequiredAttribute_ValidationError"]);
+        Assert.Equal("字段 {0} 必须是字符串，且最大长度为 {1}。",
+            DataAnnotationMessageProvider._overrides["StringLengthAttribute_ValidationError"]);
+
+        // 清除单元测试影响
+        DataAnnotationMessageProvider.ClearOverrides();
+    }
+
+    [Fact]
+    public void UseChineseDataAnnotationMessages_ReturnOK()
+    {
+        var builder = new ValidationBuilder();
+        builder.UseChineseDataAnnotationMessages();
+        Assert.Equal(24, DataAnnotationMessageProvider._overrides.Count);
+
+        // 清除单元测试影响
+        DataAnnotationMessageProvider.ClearOverrides();
+    }
+
+    [Fact]
     public void Build_ReturnOK()
     {
         var builder = new ValidationBuilder();
