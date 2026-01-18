@@ -8,6 +8,7 @@ global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 global using Microsoft.AspNetCore.Mvc.RazorPages;
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Localization;
 global using System.ComponentModel.DataAnnotations;
 global using System.Reflection;
 global using System.Runtime.CompilerServices;

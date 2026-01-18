@@ -67,7 +67,7 @@ public static class DataAnnotationMessageProvider
     /// </summary>
     public static void UseChineseMessages()
     {
-        // 参考地址：https://github.com/dotnet/dotnet/blob/main/src/runtime/src/libraries/System.ComponentModel.Annotations/src/Resources/Strings.resx
+        // 更多可替换项参考：https://github.com/dotnet/dotnet/blob/main/src/runtime/src/libraries/System.ComponentModel.Annotations/src/Resources/Strings.resx
         var chineseMessages = new Dictionary<string, string>
         {
             { "RequiredAttribute_ValidationError", "字段 {0} 是必填项。" },

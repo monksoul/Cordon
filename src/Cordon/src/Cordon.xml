@@ -1815,6 +1815,9 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1824,11 +1827,8 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
-        </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -3584,7 +3584,7 @@
             <param name="validationResults"><see cref="T:System.ComponentModel.DataAnnotations.ValidationResult" /> 列表</param>
             <returns>
                 <see cref="T:System.Collections.Generic.List`1" />
-   returns>
+            </returns>
         </member>
         <member name="M:Cordon.ValidationExtensions.WithRuleSets(System.ComponentModel.DataAnnotations.ValidationContext,System.String[])">
             <summary>
@@ -4114,7 +4114,6 @@
         </member>
         <member name="P:Cordon.CollectionValidator`1.IsNested">
             <summary>
-     ary>
                 指示当前验证器是否作为子对象验证器
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
@@ -4548,7 +4547,8 @@
             <param name="sender">事件源</param>
             <param name="arg">
                 <see cref="T:System.ComponentModel.PropertyChangedEventArgs" />
-                   </member>
+            </param>
+        </member>
         <member name="M:Cordon.ObjectValidator`1.GetCurrentRuleSets">
             <inheritdoc cref="M:Cordon.IRuleSetContextProvider.GetCurrentRuleSets" />
         </member>
@@ -6430,7 +6430,7 @@
             <param name="provider">格式提供器</param>
             <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
             <returns>
-                           <see cref="T:Cordon.DateTimeValidator" />
+                <see cref="T:Cordon.DateTimeValidator" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.DecimalPlaces(System.Int32,System.Boolean)">
@@ -7313,7 +7313,7 @@
             <remarks>
                 该属性用于控制是否执行属性级别的验证逻辑，默认值为 <c>true</c>。
                 若设置为 <c>true</c>，则会同时验证所有属性以及 <see cref="M:System.ComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)" /> 方法；
-                若设置为 <c>false</c>，则仅验证 <see crefComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)" /> 方法。
+                若设置为 <c>false</c>，则仅验证 <see cref="M:System.ComponentModel.DataAnnotations.IValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)" /> 方法。
             </remarks>
         </member>
         <member name="P:Cordon.AttributeObjectValidator.Items">
@@ -7388,7 +7388,7 @@
         <member name="M:Cordon.AttributePropertyValidator`2.GetValue(`0)">
             <summary>
                 获取属性值
-            </         </summary>
+            </summary>
             <param name="instance">对象</param>
             <returns>
                 <typeparamref name="TProperty" />
@@ -7731,8 +7731,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
+                            ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7754,7 +7754,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character greedily any number of times.<br/>
+                            ○ Match a whitespace character atomically any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -7779,7 +7779,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character greedily any number of times.<br/>
+                                    ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -7840,13 +7840,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7860,13 +7860,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7888,7 +7888,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7913,10 +7913,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit greedily at least once.<br/>
+                                    ○ Match a Unicode digit atomically at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit greedily at least once.<br/>
+                                ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -7967,7 +7967,8 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.CompareValidator`2.FormatErrorMessage(System.String)">
-  
+            <inheritdoc />
+        </member>
         <member name="M:Cordon.CompareValidator`2.GetDisplayNameForProperty(System.Reflection.PropertyInfo)">
             <summary>
                 获取属性显示名称
