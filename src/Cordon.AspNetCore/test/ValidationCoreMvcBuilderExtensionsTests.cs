@@ -4,7 +4,7 @@
 
 namespace Cordon.AspNetCore.Tests;
 
-public class ValidationMvcBuilderExtensionsTests
+public class ValidationCoreMvcBuilderExtensionsTests
 {
     [Fact]
     public void AddValidationCore_ReturnOK()
@@ -13,6 +13,10 @@ public class ValidationMvcBuilderExtensionsTests
         builder.Services.AddControllers().AddValidationCore();
 
         Assert.Contains(builder.Services, u => u.ServiceType == typeof(IValidationDataContext));
+        Assert.Contains(builder.Services, u => u.ServiceType == typeof(IStringLocalizer<>));
+        Assert.Contains(builder.Services, u => u.ServiceType == typeof(IStringLocalizerFactory));
+        Assert.Contains(builder.Services,
+            u => u.ServiceType == typeof(IConfigureOptions<MvcDataAnnotationsLocalizationOptions>));
         using var app = builder.Build();
 
         var mvcOptions = app.Services.GetRequiredService<IOptions<MvcOptions>>().Value;
@@ -34,6 +38,10 @@ public class ValidationMvcBuilderExtensionsTests
         builder.Services.AddControllers().AddValidationCore().AddValidationCore();
 
         Assert.Contains(builder.Services, u => u.ServiceType == typeof(IValidationDataContext));
+        Assert.Contains(builder.Services, u => u.ServiceType == typeof(IStringLocalizer<>));
+        Assert.Contains(builder.Services, u => u.ServiceType == typeof(IStringLocalizerFactory));
+        Assert.Contains(builder.Services,
+            u => u.ServiceType == typeof(IConfigureOptions<MvcDataAnnotationsLocalizationOptions>));
         using var app = builder.Build();
 
         var mvcOptions = app.Services.GetRequiredService<IOptions<MvcOptions>>().Value;

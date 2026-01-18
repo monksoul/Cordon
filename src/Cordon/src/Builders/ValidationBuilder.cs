@@ -131,6 +131,45 @@ public sealed class ValidationBuilder
     }
 
     /// <summary>
+    ///     配置验证消息的全局覆盖项
+    /// </summary>
+    /// <remarks>用于在运行时替换框架内置的默认验证错误消息。</remarks>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <see cref="ValidationBuilder" />
+    /// </returns>
+    public ValidationBuilder ConfigureValidationMessages(Action<Dictionary<string, string>> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        // 初始化包含资源键到消息模板映射的字典
+        var overrides = new Dictionary<string, string>();
+
+        // 调用自定义配置委托
+        configure(overrides);
+
+        // 批量注册多个验证消息覆盖项
+        ValidationMessageProvider.AddOverrides(overrides);
+
+        return this;
+    }
+
+    /// <summary>
+    ///     启用标准中文验证错误消息
+    /// </summary>
+    /// <returns>
+    ///     <see cref="ValidationBuilder" />
+    /// </returns>
+    public ValidationBuilder UseChineseValidationMessages()
+    {
+        // 使用标准中文验证消息替换框架内置的默认验证错误消息
+        ValidationMessageProvider.UseChineseMessages();
+
+        return this;
+    }
+
+    /// <summary>
     ///     构建模块服务
     /// </summary>
     /// <remarks>多个实例会导致重复注册。</remarks>

@@ -453,6 +453,15 @@ public abstract class ValidatorBase
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(resourceKey);
 
+        // 优先使用：尝试根据资源键获取已注册的覆盖消息
+        var overrideMessage = ValidationMessageProvider.TryGetOverride(resourceKey);
+
+        // 空检查
+        if (overrideMessage is not null)
+        {
+            return overrideMessage;
+        }
+
         // 获取 ValidationMessages 静态属性
         var property = GetValidationMessagesProperty(resourceKey);
 

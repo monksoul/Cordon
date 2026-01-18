@@ -126,6 +126,43 @@ public class ValidationBuilderTests
     }
 
     [Fact]
+    public void ConfigureValidationMessages_Invalid_Parameters()
+    {
+        var builder = new ValidationBuilder();
+        Assert.Throws<ArgumentNullException>(() => builder.ConfigureValidationMessages(null!));
+    }
+
+    [Fact]
+    public void ConfigureValidationMessages_ReturnOK()
+    {
+        var builder = new ValidationBuilder();
+        Assert.Empty(ValidationMessageProvider._overrides);
+        builder.ConfigureValidationMessages(message =>
+        {
+            message["AgeValidator_ValidationError"] = "字段 {0} 不是有效的年龄。";
+            message["BankCardValidator_ValidationError"] = "字段 {0} 不是有效的银行卡号。";
+        });
+
+        Assert.Equal(2, ValidationMessageProvider._overrides.Count);
+        Assert.Equal("字段 {0} 不是有效的年龄。", ValidationMessageProvider._overrides["AgeValidator_ValidationError"]);
+        Assert.Equal("字段 {0} 不是有效的银行卡号。", ValidationMessageProvider._overrides["BankCardValidator_ValidationError"]);
+
+        // 清除单元测试影响
+        ValidationMessageProvider.ClearOverrides();
+    }
+
+    [Fact]
+    public void UseChineseValidationMessages_ReturnOK()
+    {
+        var builder = new ValidationBuilder();
+        builder.UseChineseValidationMessages();
+        Assert.Equal(67, ValidationMessageProvider._overrides.Count);
+
+        // 清除单元测试影响
+        ValidationMessageProvider.ClearOverrides();
+    }
+
+    [Fact]
     public void Build_ReturnOK()
     {
         var builder = new ValidationBuilder();

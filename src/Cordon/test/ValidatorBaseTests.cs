@@ -205,6 +205,15 @@ public class ValidatorBaseTests
         var errorMessage = ValidatorBase.GetResourceString("AgeValidator_ValidationError");
         Assert.NotNull(errorMessage);
         Assert.Equal("The field {0} is not a valid age.", errorMessage);
+
+        ValidationMessageProvider.UseChineseMessages();
+
+        var errorMessage2 = ValidatorBase.GetResourceString("AgeValidator_ValidationError");
+        Assert.NotNull(errorMessage2);
+        Assert.Equal("字段 {0} 不是有效的年龄。", errorMessage2);
+
+        // 清除单元测试影响
+        ValidationMessageProvider.ClearOverrides();
     }
 
     [Fact]

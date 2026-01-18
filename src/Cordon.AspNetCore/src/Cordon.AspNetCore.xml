@@ -4,14 +4,14 @@
         <name>Cordon.AspNetCore</name>
     </assembly>
     <members>
-        <member name="T:Microsoft.Extensions.DependencyInjection.ValidationMvcBuilderExtensions">
+        <member name="T:Microsoft.Extensions.DependencyInjection.ValidationCoreMvcBuilderExtensions">
             <summary>
                 数据验证模块
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/>
                 拓展类
             </summary>
         </member>
-        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationMvcBuilderExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Action{Cordon.ValidationBuilder})">
+        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationCoreMvcBuilderExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Action{Cordon.ValidationBuilder})">
             <summary>
                 添加数据验证服务
             </summary>
