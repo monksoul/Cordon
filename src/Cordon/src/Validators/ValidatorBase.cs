@@ -436,7 +436,7 @@ public abstract class ValidatorBase
             // 获取 ValidationMessages 中的属性名
             var resourceKey = resourceKeyResolver();
 
-            return GetResourceString(resourceKey) ?? $"[{resourceKey}]";
+            return GetResourceString(resourceKey) ?? resourceKey;
         };
     }
 

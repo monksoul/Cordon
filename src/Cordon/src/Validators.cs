@@ -51,7 +51,7 @@ public static class Validators
         where T : class => new(serviceProvider, items);
 
     /// <summary>
-    ///     创建单个值验证器
+    ///     创建单值验证器
     /// </summary>
     /// <typeparam name="T">对象类型</typeparam>
     /// <returns>
@@ -60,7 +60,7 @@ public static class Validators
     public static ValueValidator<T> Value<T>() => new();
 
     /// <summary>
-    ///     创建单个值验证器
+    ///     创建单值验证器
     /// </summary>
     /// <param name="items">共享数据</param>
     /// <typeparam name="T">对象类型</typeparam>
@@ -70,7 +70,7 @@ public static class Validators
     public static ValueValidator<T> Value<T>(IDictionary<object, object?>? items) => new(items);
 
     /// <summary>
-    ///     创建单个值验证器
+    ///     创建单值验证器
     /// </summary>
     /// <param name="serviceProvider">
     ///     <see cref="IServiceProvider" />
@@ -1169,7 +1169,7 @@ public static class Validators
         new(validatedObjectProvider, constructorArgsFactory);
 
     /// <summary>
-    ///     创建单个值验证特性验证器
+    ///     创建单值验证特性验证器
     /// </summary>
     /// <param name="attributes">验证特性列表</param>
     /// <returns>
@@ -1178,7 +1178,7 @@ public static class Validators
     public static AttributeValueValidator AttributeValue(params ValidationAttribute[] attributes) => new(attributes);
 
     /// <summary>
-    ///     创建单个值验证特性验证器
+    ///     创建单值验证特性验证器
     /// </summary>
     /// <param name="attributes">验证特性列表</param>
     /// <param name="items">共享数据</param>
@@ -1189,7 +1189,7 @@ public static class Validators
         IDictionary<object, object?>? items) => new(attributes, items);
 
     /// <summary>
-    ///     创建单个值验证特性验证器
+    ///     创建单值验证特性验证器
     /// </summary>
     /// <param name="attributes">验证特性列表</param>
     /// <param name="serviceProvider">

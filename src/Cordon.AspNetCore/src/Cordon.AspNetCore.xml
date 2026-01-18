@@ -6,7 +6,9 @@
     <members>
         <member name="T:Microsoft.Extensions.DependencyInjection.ValidationMvcBuilderExtensions">
             <summary>
-                数据验证模块 <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" /> 拓展类
+                数据验证模块
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/>
+                拓展类
             </summary>
         </member>
         <member name="M:Microsoft.Extensions.DependencyInjection.ValidationMvcBuilderExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Action{Cordon.ValidationBuilder})">
@@ -14,49 +16,55 @@
                 添加数据验证服务
             </summary>
             <param name="mvcBuilder">
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" />
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/>
             </param>
             <param name="configure">自定义配置委托</param>
             <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" />
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder"/>
             </returns>
         </member>
         <member name="T:Cordon.ValidationOptionsAsyncPageFilter">
             <summary>
-                提取验证选项元数据（<see cref="T:Cordon.ValidationOptionsAttribute" />）的 Razor Pages 筛选器
+                提取验证选项元数据（<see cref="T:Cordon.ValidationOptionsAttribute"/>）的 Razor Pages 筛选器
             </summary>
             <remarks>
-                为实现了 <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject" /> 接口的模型和 <see cref="T:Cordon.ValidateWithAttribute`1" />
+                为实现了
+                <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/>
+                接口的模型和
+                <see cref="T:Cordon.ValidateWithAttribute`1"/>
                 特性提供验证选项（如规则集）支持。
             </remarks>
         </member>
         <member name="M:Cordon.ValidationOptionsAsyncPageFilter.OnPageHandlerSelectionAsync(Microsoft.AspNetCore.Mvc.Filters.PageHandlerSelectedContext)">
-            <inheritdoc />
+            <inheritdoc/>
         </member>
         <member name="M:Cordon.ValidationOptionsAsyncPageFilter.OnPageHandlerExecutionAsync(Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutingContext,Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutionDelegate)">
-            <inheritdoc />
+            <inheritdoc/>
         </member>
         <member name="T:Cordon.ValidationOptionsModelValidator">
             <summary>
-                提取验证选项元数据（<see cref="T:Cordon.ValidationOptionsAttribute" />）的 MVC 验证器
+                提取验证选项元数据（<see cref="T:Cordon.ValidationOptionsAttribute"/>）的 MVC 验证器
             </summary>
             <remarks>
-                为实现了 <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject" /> 接口的模型和 <see cref="T:Cordon.ValidateWithAttribute`1" />
+                为实现了
+                <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/>
+                接口的模型和
+                <see cref="T:Cordon.ValidateWithAttribute`1"/>
                 特性提供验证选项（如规则集）支持。
             </remarks>
         </member>
         <member name="M:Cordon.ValidationOptionsModelValidator.Validate(Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ModelValidationContext)">
-            <inheritdoc />
+            <inheritdoc/>
         </member>
         <member name="M:Cordon.ValidationOptionsModelValidator.ExtractFromMethod(System.Reflection.MethodInfo)">
             <summary>
                 从操作方法（Action/Handler）提取验证选项
             </summary>
             <param name="methodInfo">
-                <see cref="T:System.Reflection.MethodInfo" />
+                <see cref="T:System.Reflection.MethodInfo"/>
             </param>
             <returns>
-                <see cref="T:Cordon.ValidationOptionsMetadata" />
+                <see cref="T:Cordon.ValidationOptionsMetadata"/>
             </returns>
         </member>
         <member name="M:Cordon.ValidationOptionsModelValidator.ExtractFromDeclaredType(System.Reflection.TypeInfo)">
@@ -64,34 +72,41 @@
                 从声明类（Controller/PageModel）提取验证选项
             </summary>
             <param name="typeInfo">
-                <see cref="T:System.Reflection.TypeInfo" />
+                <see cref="T:System.Reflection.TypeInfo"/>
             </param>
             <returns>
-                <see cref="T:Cordon.ValidationOptionsMetadata" />
+                <see cref="T:Cordon.ValidationOptionsMetadata"/>
             </returns>
         </member>
         <member name="M:Cordon.ValidationOptionsModelValidator.CreateMetadata(Cordon.ValidationOptionsAttribute)">
             <summary>
-                从 <see cref="T:Cordon.ValidationOptionsAttribute" /> 中创建 <see cref="T:Cordon.ValidationOptionsMetadata" /> 实例
+                从
+                <see cref="T:Cordon.ValidationOptionsAttribute"/>
+                中创建
+                <see cref="T:Cordon.ValidationOptionsMetadata"/>
+                实例
             </summary>
             <param name="attribute">
-                <see cref="T:Cordon.ValidationOptionsAttribute" />
+                <see cref="T:Cordon.ValidationOptionsAttribute"/>
             </param>
             <returns>
-                <see cref="T:Cordon.ValidationOptionsMetadata" />
+                <see cref="T:Cordon.ValidationOptionsMetadata"/>
             </returns>
         </member>
         <member name="T:Cordon.ValidationOptionsModelValidatorProvider">
             <summary>
-                提取验证选项元数据（<see cref="T:Cordon.ValidationOptionsAttribute" />）的模型验证器提供器
+                提取验证选项元数据（<see cref="T:Cordon.ValidationOptionsAttribute"/>）的模型验证器提供器
             </summary>
             <remarks>
-                为实现了 <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject" /> 接口的模型和 <see cref="T:Cordon.ValidateWithAttribute`1" />
+                为实现了
+                <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/>
+                接口的模型和
+                <see cref="T:Cordon.ValidateWithAttribute`1"/>
                 特性提供验证选项（如规则集）支持。
             </remarks>
         </member>
         <member name="M:Cordon.ValidationOptionsModelValidatorProvider.CreateValidators(Microsoft.AspNetCore.Mvc.ModelBinding.Validation.ModelValidatorProviderContext)">
-            <inheritdoc />
+            <inheritdoc/>
         </member>
     </members>
 </doc>

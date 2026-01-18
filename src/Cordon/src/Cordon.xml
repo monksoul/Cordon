@@ -3604,6 +3604,24 @@
                 <see cref="T:System.Collections.Generic.IEnumerable`1" />
             </returns>
         </member>
+        <member name="M:Cordon.ValidationExtensions.ValidateWith``1(System.ComponentModel.DataAnnotations.ValidationContext,Cordon.ValueValidator{``0},System.Boolean)">
+            <summary>
+                使用指定单值验证器验证当前实例并返回验证结果集合
+            </summary>
+            <param name="validationContext">
+                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
+            </param>
+            <param name="valueValidator">
+                <see cref="T:Cordon.AbstractValueValidator`1" />
+            </param>
+            <param name="disposeAfterValidation">
+                是否在验证完成后自动释放 <paramref name="valueValidator" />。默认值为：<c>true</c>
+            </param>
+            <typeparam name="T">对象类型</typeparam>
+            <returns>
+                <see cref="T:System.Collections.Generic.IEnumerable`1" />
+            </returns>
+        </member>
         <member name="M:Cordon.ValidationExtensions.ValidateWith``1(System.ComponentModel.DataAnnotations.ValidationContext)">
             <summary>
                 使用指定对象验证器验证当前实例并返回验证结果集合
@@ -3840,7 +3858,7 @@
         </member>
         <member name="T:Cordon.IValueValidator">
             <summary>
-                单个值验证器服务
+                单值验证器服务
             </summary>
         </member>
         <member name="T:Cordon.IValueValidator`1">
@@ -3924,7 +3942,7 @@
         </member>
         <member name="T:Cordon.AbstractValueValidator`1">
             <summary>
-                单个值验证器抽象基类
+                单值验证器抽象基类
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
@@ -5113,7 +5131,7 @@
         </member>
         <member name="T:Cordon.ValueValidator`1">
             <summary>
-                单个值验证器
+                单值验证器
             </summary>
             <typeparam name="T">对象类型</typeparam>
         </member>
@@ -5290,7 +5308,7 @@
         </member>
         <member name="M:Cordon.ValueValidator`1.SetValidator(System.Func{System.Collections.Generic.IDictionary{System.Object,System.Object},Cordon.ValueValidator{`0}})">
             <summary>
-                设置单个值验证器
+                设置单值验证器
             </summary>
             <param name="validatorFactory">
                 <see cref="T:Cordon.ValueValidator`1" /> 工厂委托
@@ -5302,7 +5320,7 @@
         </member>
         <member name="M:Cordon.ValueValidator`1.SetValidator(Cordon.ValueValidator{`0})">
             <summary>
-                设置单个值验证器
+                设置单值验证器
             </summary>
             <param name="validator">
                 <see cref="T:Cordon.ValueValidator`1" />
@@ -6051,7 +6069,7 @@
         </member>
         <member name="M:Cordon.Validators.Value``1">
             <summary>
-                创建单个值验证器
+                创建单值验证器
             </summary>
             <typeparam name="T">对象类型</typeparam>
             <returns>
@@ -6060,7 +6078,7 @@
         </member>
         <member name="M:Cordon.Validators.Value``1(System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
-                创建单个值验证器
+                创建单值验证器
             </summary>
             <param name="items">共享数据</param>
             <typeparam name="T">对象类型</typeparam>
@@ -6070,7 +6088,7 @@
         </member>
         <member name="M:Cordon.Validators.Value``1(System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
-                创建单个值验证器
+                创建单值验证器
             </summary>
             <param name="serviceProvider">
                 <see cref="T:System.IServiceProvider" />
@@ -6998,7 +7016,7 @@
         </member>
         <member name="M:Cordon.Validators.AttributeValue(System.ComponentModel.DataAnnotations.ValidationAttribute[])">
             <summary>
-                创建单个值验证特性验证器
+                创建单值验证特性验证器
             </summary>
             <param name="attributes">验证特性列表</param>
             <returns>
@@ -7007,7 +7025,7 @@
         </member>
         <member name="M:Cordon.Validators.AttributeValue(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
-                创建单个值验证特性验证器
+                创建单值验证特性验证器
             </summary>
             <param name="attributes">验证特性列表</param>
             <param name="items">共享数据</param>
@@ -7017,7 +7035,7 @@
         </member>
         <member name="M:Cordon.Validators.AttributeValue(System.ComponentModel.DataAnnotations.ValidationAttribute[],System.IServiceProvider,System.Collections.Generic.IDictionary{System.Object,System.Object})">
             <summary>
-                创建单个值验证特性验证器
+                创建单值验证特性验证器
             </summary>
             <param name="attributes">验证特性列表</param>
             <param name="serviceProvider">
@@ -7318,7 +7336,7 @@
         </member>
         <member name="T:Cordon.AttributeValueValidator">
             <summary>
-                单个值验证特性验证器
+                单值验证特性验证器
             </summary>
         </member>
         <member name="F:Cordon.AttributeValueValidator._sentinel">
@@ -10378,12 +10396,6 @@
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>
             <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-       <returns>
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </returns>
         </member>

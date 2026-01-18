@@ -186,7 +186,7 @@ public class ValidatorBaseTests
         Assert.NotNull(userResourceMethod);
 
         userResourceMethod(() => "TestValidator_Error");
-        Assert.Equal("[TestValidator_Error]", validator._errorMessageResourceAccessor!());
+        Assert.Equal("TestValidator_Error", validator._errorMessageResourceAccessor!());
     }
 
     [Fact]

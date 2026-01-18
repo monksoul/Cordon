@@ -73,7 +73,7 @@ public static class ValidationExtensions
         };
 
         // 初始化 ObjectValidator<T> 实例并跳过属性验证特性验证，避免死循环
-        var objectValidator = new ObjectValidator<T>(items).SkipAttributeValidation();
+        var objectValidator = new ObjectValidator<T>(items).UseAttributeValidation(false);
 
         // 同步 IServiceProvider 委托
         objectValidator.InitializeServiceProvider(validationContext.GetService);
@@ -134,6 +134,33 @@ public static class ValidationExtensions
 
         // 跳过属性验证特性验证并返回对象验证结果集合
         return objectValidator.UseAttributeValidation(false).ToResults(validationContext, disposeAfterValidation);
+    }
+
+    /// <summary>
+    ///     使用指定单值验证器验证当前实例并返回验证结果集合
+    /// </summary>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext" />
+    /// </param>
+    /// <param name="valueValidator">
+    ///     <see cref="AbstractValueValidator{T}" />
+    /// </param>
+    /// <param name="disposeAfterValidation">
+    ///     是否在验证完成后自动释放 <paramref name="valueValidator" />。默认值为：<c>true</c>
+    /// </param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="IEnumerable{T}" />
+    /// </returns>
+    public static IEnumerable<ValidationResult> ValidateWith<T>(this ValidationContext validationContext,
+        ValueValidator<T> valueValidator, bool disposeAfterValidation = true)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(validationContext);
+        ArgumentNullException.ThrowIfNull(valueValidator);
+
+        // 返回对象验证结果集合
+        return valueValidator.ToResults(validationContext, disposeAfterValidation);
     }
 
     /// <summary>

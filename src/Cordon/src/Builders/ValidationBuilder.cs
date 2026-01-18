@@ -191,7 +191,7 @@ public sealed class ValidationBuilder
             services.Add(ServiceDescriptor.Transient(validatorType,
                 provider => CreateValidator(provider, validatorType)));
 
-            // 检查是否是单个值验证器
+            // 检查是否是单值验证器
             // ReSharper disable once InvertIf
             if (typeof(IValueValidator).IsAssignableFrom(validatorType))
             {

@@ -5,7 +5,7 @@
 namespace Cordon;
 
 /// <summary>
-///     单个值验证器
+///     单值验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
 public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, IValueValidator<T>
@@ -363,7 +363,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <summary>
-    ///     设置单个值验证器
+    ///     设置单值验证器
     /// </summary>
     /// <param name="validatorFactory">
     ///     <see cref="ValueValidator{T}" /> 工厂委托
@@ -401,7 +401,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <summary>
-    ///     设置单个值验证器
+    ///     设置单值验证器
     /// </summary>
     /// <param name="validator">
     ///     <see cref="ValueValidator{T}" />

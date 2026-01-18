@@ -122,7 +122,7 @@ public class ValidationBuilderTests
         builder.AddValidatorsFromAssemblies(typeof(ObjectModel).Assembly);
 
         Assert.NotNull(builder._validatorTypes);
-        Assert.Equal(15, builder._validatorTypes.Count);
+        Assert.Equal(16, builder._validatorTypes.Count);
     }
 
     [Fact]

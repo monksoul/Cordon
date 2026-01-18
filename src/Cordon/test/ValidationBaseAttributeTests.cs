@@ -59,7 +59,7 @@ public class ValidationBaseAttributeTests
         var errorMessageResourceAccessorGetter =
             (Func<string>)errorMessageResourceAccessorProperty.GetValue(attribute)!;
 
-        Assert.Equal("[TestValidator_Error]", errorMessageResourceAccessorGetter());
+        Assert.Equal("TestValidator_Error", errorMessageResourceAccessorGetter());
     }
 
     public class CustomAttribute : ValidationBaseAttribute;
