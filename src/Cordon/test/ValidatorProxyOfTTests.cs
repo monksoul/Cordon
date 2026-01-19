@@ -25,7 +25,7 @@ public class ValidatorProxyOfTTests
         Assert.NotNull(validator._validatorConfigurations);
         Assert.Empty(validator._validatorConfigurations);
 
-        Assert.NotNull(validator._validatedObjectProvider);
+        Assert.NotNull(validator._validatingObjectFactory);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Null(validator._errorMessageResourceAccessor());
@@ -192,12 +192,12 @@ public class ValidatorProxyOfTTests
     }
 
     [Fact]
-    public void GetValidatedObject_Invalid_Parameters()
+    public void GetValidatingObject_Invalid_Parameters()
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
         var getValidationValueMethod =
             validator.GetType()
-                .GetMethod("GetValidatedObject", BindingFlags.NonPublic | BindingFlags.Instance);
+                .GetMethod("GetValidatingObject", BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.NotNull(getValidationValueMethod);
 
         var exception =
@@ -206,12 +206,12 @@ public class ValidatorProxyOfTTests
     }
 
     [Fact]
-    public void GetValidatedObject_ReturnOK()
+    public void GetValidatingObject_ReturnOK()
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
         var getValidationValueMethod =
             validator.GetType()
-                .GetMethod("GetValidatedObject", BindingFlags.NonPublic | BindingFlags.Instance);
+                .GetMethod("GetValidatingObject", BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.NotNull(getValidationValueMethod);
 
         var instance = new ValidatorProxyClass { Value = "monksoul@outlook.com" };

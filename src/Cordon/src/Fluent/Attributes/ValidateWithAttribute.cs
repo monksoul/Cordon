@@ -33,7 +33,7 @@ public class ValidateWithAttribute<TValidator> : ValidationAttribute
             ? Activator.CreateInstance<TValidator>()
             : ActivatorUtilities.CreateInstance<TValidator>(validationContext);
 
-        // 获取对象验证结果集合
+        // 获取对象验证结果列表
         var validationResults = validator.ToResults(validationContext);
 
         return validationResults is { Count: > 0 } ? validationResults[0] : ValidationResult.Success;

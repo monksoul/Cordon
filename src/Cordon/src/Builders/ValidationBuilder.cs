@@ -71,9 +71,9 @@ public sealed class ValidationBuilder
                 nameof(validatorType));
         }
 
-        // 检查是否继承自 AbstractValidator<T> 或 AbstractValueValidator<T> 抽象基类
-        if (!TryGetValidatedType(validatorType, AbstractValidatorDefinition, out var modelType) &&
-            !TryGetValidatedType(validatorType, AbstractValueValidatorDefinition, out modelType))
+        // 尝试从指定类型中提取其作为 AbstractValidator<T> 或 AbstractValueValidator<T> 泛型子类时所验证的目标模型类型
+        if (!TryGetModelTypeFromValidator(validatorType, AbstractValidatorDefinition, out var modelType) &&
+            !TryGetModelTypeFromValidator(validatorType, AbstractValueValidatorDefinition, out modelType))
         {
             throw new ArgumentException(
                 // ReSharper disable once LocalizableElement
@@ -122,10 +122,10 @@ public sealed class ValidationBuilder
         // 空检查
         ArgumentNullException.ThrowIfNull(assemblies);
 
-        // 扫描程序集中所有继承自 AbstractValidator<T> 或 AbstractValueValidator<T> 抽象基类的类型
+        // 扫描程序集中所有继承自 AbstractValidator<T> 或 AbstractValueValidator<T> 泛型的验证器类型
         var candidateTypes = assemblies.SelectMany(ass => (ass?.GetTypes() ?? Enumerable.Empty<Type>()).Where(t =>
-            t.IsInstantiable() && (TryGetValidatedType(t, AbstractValidatorDefinition, out _) ||
-                                   TryGetValidatedType(t, AbstractValueValidatorDefinition, out _))));
+            t.IsInstantiable() && (TryGetModelTypeFromValidator(t, AbstractValidatorDefinition, out _) ||
+                                   TryGetModelTypeFromValidator(t, AbstractValueValidatorDefinition, out _))));
 
         return AddValidators(candidateTypes);
     }
@@ -316,20 +316,20 @@ public sealed class ValidationBuilder
     }
 
     /// <summary>
-    ///     检查是否继承自 <paramref name="genericTypeDefinition" /> 抽象基类
+    ///     尝试从指定类型中提取其作为 <paramref name="genericTypeDefinition" /> 泛型子类时所验证的目标模型类型
     /// </summary>
-    /// <param name="type">类型</param>
-    /// <param name="genericTypeDefinition">泛型基类定义类型</param>
+    /// <param name="validatorType">验证器类型</param>
+    /// <param name="genericTypeDefinition">验证器基类的泛型定义</param>
     /// <param name="modelType">被验证的模型类型</param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
-    internal static bool TryGetValidatedType(Type type, Type genericTypeDefinition,
+    internal static bool TryGetModelTypeFromValidator(Type validatorType, Type genericTypeDefinition,
         [NotNullWhen(true)] out Type? modelType)
     {
         // 空检查
-        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(validatorType);
         ArgumentNullException.ThrowIfNull(genericTypeDefinition);
 
         // 泛型定义检查
@@ -345,13 +345,13 @@ public sealed class ValidationBuilder
         modelType = null;
 
         // 必须是类且不能是抽象类
-        if (!type.IsClass || type.IsAbstract)
+        if (!validatorType.IsClass || validatorType.IsAbstract)
         {
             return false;
         }
 
         // 沿着继承链向上遍历
-        for (var current = type; current != null; current = current.BaseType)
+        for (var current = validatorType; current != null; current = current.BaseType)
         {
             // 检查当前类型是否是泛型并且泛型定义为 genericTypeDefinition
             if (!current.IsGenericType || current.GetGenericTypeDefinition() != genericTypeDefinition)

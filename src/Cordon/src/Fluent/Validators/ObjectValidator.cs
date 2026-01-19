@@ -291,7 +291,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
 
         try
         {
-            // 获取对象验证结果集合
+            // 获取对象验证结果列表
             return GetValidationResults((T)validationContext.ObjectInstance, ruleSets) ?? [];
         }
         finally
@@ -711,7 +711,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     public virtual ObjectValidator<T> CustomOnly() => UseAttributeValidation(false);
 
     /// <summary>
-    ///     获取对象验证结果集合
+    ///     获取对象验证结果列表
     /// </summary>
     /// <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>
     /// <returns>

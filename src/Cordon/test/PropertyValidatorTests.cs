@@ -1011,25 +1011,25 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void GetValueForValidation_Invalid_Parameters()
+    public void GetValidatingValue_Invalid_Parameters()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
 
-        Assert.Throws<ArgumentNullException>(() => propertyValidator.GetValueForValidation(null!));
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.GetValidatingValue(null!));
     }
 
     [Fact]
-    public void GetValueForValidation_ReturnOK()
+    public void GetValidatingValue_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
 
         var model = new ObjectModel { Name = " Furion " };
-        Assert.Equal(" Furion ", propertyValidator.GetValueForValidation(model));
+        Assert.Equal(" Furion ", propertyValidator.GetValidatingValue(model));
 
         propertyValidator.PreProcess(u => u?.Trim());
-        Assert.Equal("Furion", propertyValidator.GetValueForValidation(model));
+        Assert.Equal("Furion", propertyValidator.GetValidatingValue(model));
     }
 
     [Fact]

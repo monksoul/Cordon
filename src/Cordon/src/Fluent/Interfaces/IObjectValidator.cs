@@ -10,7 +10,7 @@ namespace Cordon;
 public interface IObjectValidator : IValidatorInitializer, IDisposable
 {
     /// <summary>
-    ///     检查对象合法性
+    ///     检查对象是否合法
     /// </summary>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
@@ -20,7 +20,7 @@ public interface IObjectValidator : IValidatorInitializer, IDisposable
     bool IsValid(object? instance, string?[]? ruleSets = null);
 
     /// <summary>
-    ///     获取对象验证结果集合
+    ///     获取对象验证结果列表
     /// </summary>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
@@ -30,7 +30,7 @@ public interface IObjectValidator : IValidatorInitializer, IDisposable
     List<ValidationResult>? GetValidationResults(object? instance, string?[]? ruleSets = null);
 
     /// <summary>
-    ///     验证对象
+    ///     执行验证
     /// </summary>
     /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="instance">对象</param>
@@ -39,7 +39,7 @@ public interface IObjectValidator : IValidatorInitializer, IDisposable
     void Validate(object? instance, string?[]? ruleSets = null);
 
     /// <summary>
-    ///     获取对象验证结果集合
+    ///     获取对象验证结果列表
     /// </summary>
     /// <param name="validationContext">
     ///     <see cref="ValidationContext" />
@@ -58,7 +58,7 @@ public interface IObjectValidator : IValidatorInitializer, IDisposable
 public interface IObjectValidator<in T> : IObjectValidator
 {
     /// <summary>
-    ///     检查对象合法性
+    ///     检查对象是否合法
     /// </summary>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
@@ -68,7 +68,7 @@ public interface IObjectValidator<in T> : IObjectValidator
     bool IsValid(T? instance, string?[]? ruleSets = null);
 
     /// <summary>
-    ///     获取对象验证结果集合
+    ///     获取对象验证结果列表
     /// </summary>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
@@ -78,7 +78,7 @@ public interface IObjectValidator<in T> : IObjectValidator
     List<ValidationResult>? GetValidationResults(T? instance, string?[]? ruleSets = null);
 
     /// <summary>
-    ///     验证对象
+    ///     执行验证
     /// </summary>
     /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="instance">对象</param>

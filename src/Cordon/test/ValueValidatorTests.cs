@@ -667,14 +667,14 @@ public class ValueValidatorTests
     }
 
     [Fact]
-    public void GetValueForValidation_ReturnOK()
+    public void GetValidatingValue_ReturnOK()
     {
         var valueValidator = new ValueValidator<string>();
 
-        Assert.Equal(" Furion ", valueValidator.GetValueForValidation(" Furion "));
+        Assert.Equal(" Furion ", valueValidator.GetValidatingValue(" Furion "));
 
         valueValidator.PreProcess(u => u.Trim());
-        Assert.Equal("Furion", valueValidator.GetValueForValidation(" Furion "));
+        Assert.Equal("Furion", valueValidator.GetValidatingValue(" Furion "));
     }
 
     [Fact]

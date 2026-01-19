@@ -46,7 +46,7 @@ public abstract class ComparisonAttribute : ValidationBaseAttribute
     public IComparable CompareValue { get; }
 
     /// <summary>
-    ///     检查对象合法性
+    ///     检查对象是否合法
     /// </summary>
     /// <param name="value">对象</param>
     /// <returns>

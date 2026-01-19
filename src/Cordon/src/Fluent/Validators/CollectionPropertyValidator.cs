@@ -25,7 +25,7 @@ public sealed class
     }
 
     /// <summary>
-    ///     筛选用于验证的集合元素
+    ///     筛选用于执行验证的集合元素
     /// </summary>
     /// <param name="elementFilter">元素过滤委托</param>
     /// <returns>

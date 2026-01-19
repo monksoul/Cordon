@@ -1167,7 +1167,7 @@ public static class Validators
     /// <summary>
     ///     创建验证器代理
     /// </summary>
-    /// <param name="validatedObjectProvider">被验证对象的提供器</param>
+    /// <param name="validatingObjectFactory">用于执行验证的对象工厂</param>
     /// <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
     /// <typeparam name="T">对象类型</typeparam>
     /// <typeparam name="TValidator">
@@ -1176,10 +1176,10 @@ public static class Validators
     /// <returns>
     ///     <see cref="ValidatorProxy{T1,T2}" />
     /// </returns>
-    public static ValidatorProxy<T, TValidator> ValidatorProxy<T, TValidator>(Func<T, object?> validatedObjectProvider,
+    public static ValidatorProxy<T, TValidator> ValidatorProxy<T, TValidator>(Func<T, object?> validatingObjectFactory,
         Func<T, ValidationContext<T>, object?[]?>? constructorArgsFactory = null)
         where TValidator : ValidatorBase =>
-        new(validatedObjectProvider, constructorArgsFactory);
+        new(validatingObjectFactory, constructorArgsFactory);
 
     /// <summary>
     ///     创建单值验证特性验证器

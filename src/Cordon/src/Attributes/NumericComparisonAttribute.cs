@@ -27,7 +27,7 @@ public abstract class NumericComparisonAttribute : ComparisonAttribute
         IsValid(Convert.ToDecimal(value), Convert.ToDecimal(CompareValue));
 
     /// <summary>
-    ///     检查对象合法性
+    ///     检查对象是否合法
     /// </summary>
     /// <param name="value">对象</param>
     /// <param name="compareValue">比较的值</param>

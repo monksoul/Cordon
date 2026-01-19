@@ -10,7 +10,7 @@ namespace Cordon;
 public interface IAsyncValidator
 {
     /// <summary>
-    ///     检查对象合法性
+    ///     检查对象是否合法
     /// </summary>
     /// <param name="value">对象</param>
     /// <param name="validationContext">
@@ -22,7 +22,7 @@ public interface IAsyncValidator
     Task<bool> IsValidAsync(object? value, IValidationContext? validationContext);
 
     /// <summary>
-    ///     获取对象验证结果集合
+    ///     获取对象验证结果列表
     /// </summary>
     /// <param name="value">对象</param>
     /// <param name="validationContext">
@@ -34,7 +34,7 @@ public interface IAsyncValidator
     Task<List<ValidationResult>?> GetValidationResultsAsync(object? value, IValidationContext? validationContext);
 
     /// <summary>
-    ///     验证对象
+    ///     执行验证
     /// </summary>
     /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="value">对象</param>

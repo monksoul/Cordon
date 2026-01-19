@@ -303,7 +303,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     ///     添加验证器代理
     /// </summary>
     /// <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
-    /// <param name="validatedObjectProvider">被验证对象的提供器</param>
+    /// <param name="validatingObjectFactory">用于执行验证的对象工厂</param>
     /// <param name="configure">配置验证器实例</param>
     /// <typeparam name="TValidator">
     ///     <see cref="ValidatorBase" />
@@ -313,12 +313,12 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// </returns>
     public virtual TSelf ValidatorProxy<TValidator>(
         Func<ValidationContext<T>, object?[]?>? constructorArgsFactory = null,
-        Func<T, object?>? validatedObjectProvider = null, Action<TValidator>? configure = null)
+        Func<T, object?>? validatingObjectFactory = null, Action<TValidator>? configure = null)
         where TValidator : ValidatorBase
     {
         // 初始化 ValidatorProxy<T, TValidator> 实例
         var validatorProxy = new ValidatorProxy<T, TValidator>(
-            validatedObjectProvider ?? (instance => GetValueForValidation(instance)),
+            validatingObjectFactory ?? (instance => GetValidatingValue(instance)),
             constructorArgsFactory is null
                 ? null
                 : (_, context) => constructorArgsFactory(context));
@@ -428,7 +428,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
         _objectValidator.RuleSet(ruleSets, setAction);
 
     /// <summary>
-    ///     获取对象验证结果集合
+    ///     获取对象验证结果列表
     /// </summary>
     /// <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>
     /// <returns>

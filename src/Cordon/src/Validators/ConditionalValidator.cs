@@ -91,7 +91,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         // 遍历验证器集合
         foreach (var validator in matchedValidators)
         {
-            // 检查对象合法性
+            // 检查对象是否合法
             if (!validator.IsValid(instance, validationContext))
             {
                 ThrowValidationException(instance, validator, validationContext);

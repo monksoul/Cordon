@@ -123,8 +123,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 修复验证器及其子验证器的成员路径
         RepairMemberPaths(GetEffectiveMemberName());
 
-        // 获取用于验证的属性值
-        var propertyValue = GetValueForValidation(instance);
+        // 获取用于执行验证的属性值
+        var propertyValue = GetValidatingValue(instance);
 
         // 创建 ValidationContext 实例
         var validationContext = CreateValidationContext(instance, ruleSets);
@@ -158,8 +158,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 修复验证器及其子验证器的成员路径
         RepairMemberPaths(GetEffectiveMemberName());
 
-        // 获取用于验证的属性值
-        var propertyValue = GetValueForValidation(instance);
+        // 获取用于执行验证的属性值
+        var propertyValue = GetValidatingValue(instance);
 
         // 创建 ValidationContext 实例
         var validationContext = CreateValidationContext(instance, ruleSets);
@@ -200,8 +200,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 修复验证器及其子验证器的成员路径
         RepairMemberPaths(GetEffectiveMemberName());
 
-        // 获取用于验证的属性值
-        var propertyValue = GetValueForValidation(instance);
+        // 获取用于执行验证的属性值
+        var propertyValue = GetValidatingValue(instance);
 
         // 创建 ValidationContext 实例
         var validationContext = CreateValidationContext(instance, ruleSets);
@@ -527,13 +527,13 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     internal TProperty GetValue(T instance) => _attributeValidator.GetValue(instance)!;
 
     /// <summary>
-    ///     获取用于验证的属性值
+    ///     获取用于执行验证的属性值
     /// </summary>
     /// <param name="instance">对象</param>
     /// <returns>
     ///     <typeparamref name="TProperty" />
     /// </returns>
-    internal TProperty GetValueForValidation(T instance)
+    internal TProperty GetValidatingValue(T instance)
     {
         // 获取属性值
         var propertyValue = GetValue(instance);

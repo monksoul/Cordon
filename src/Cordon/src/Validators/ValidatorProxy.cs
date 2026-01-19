@@ -153,9 +153,9 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
     internal readonly ConcurrentDictionary<string, object?> _propertyChanges = new();
 
     /// <summary>
-    ///     被验证对象的提供器
+    ///     用于执行验证的对象工厂
     /// </summary>
-    internal readonly Func<T, object?> _validatedObjectProvider;
+    internal readonly Func<T, object?> _validatingObjectFactory;
 
     /// <summary>
     ///     验证器实例缓存字典
@@ -170,15 +170,15 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
     /// <summary>
     ///     <inheritdoc cref="ValidatorProxy{TValidator}" />
     /// </summary>
-    /// <param name="validatedObjectProvider">被验证对象的提供器</param>
+    /// <param name="validatingObjectFactory">用于执行验证的对象工厂</param>
     /// <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
-    public ValidatorProxy(Func<T, object?> validatedObjectProvider,
+    public ValidatorProxy(Func<T, object?> validatingObjectFactory,
         Func<T, ValidationContext<T>, object?[]?>? constructorArgsFactory = null)
     {
         // 空检查
-        ArgumentNullException.ThrowIfNull(validatedObjectProvider);
+        ArgumentNullException.ThrowIfNull(validatingObjectFactory);
 
-        _validatedObjectProvider = validatedObjectProvider;
+        _validatingObjectFactory = validatingObjectFactory;
         _constructorArgsFactory = constructorArgsFactory;
 
         // 订阅属性变更事件
@@ -220,15 +220,16 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
 
     /// <inheritdoc />
     public override bool IsValid(T? instance, ValidationContext<T> validationContext) =>
-        GetValidator(instance, validationContext).IsValid(GetValidatedObject(instance), validationContext);
+        GetValidator(instance, validationContext).IsValid(GetValidatingObject(instance), validationContext);
 
     /// <inheritdoc />
     public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext) =>
-        GetValidator(instance, validationContext).GetValidationResults(GetValidatedObject(instance), validationContext);
+        GetValidator(instance, validationContext)
+            .GetValidationResults(GetValidatingObject(instance), validationContext);
 
     /// <inheritdoc />
     public override void Validate(T? instance, ValidationContext<T> validationContext) =>
-        GetValidator(instance, validationContext).Validate(GetValidatedObject(instance), validationContext);
+        GetValidator(instance, validationContext).Validate(GetValidatingObject(instance), validationContext);
 
     /// <inheritdoc />
     /// <exception cref="NotSupportedException"></exception>
@@ -236,7 +237,7 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
         throw new NotSupportedException("Use FormatErrorMessage(string name, T? instance) instead.");
 
     /// <summary>
-    ///     错误信息格式化设置
+    ///     格式化错误消息
     /// </summary>
     /// <param name="name">显示名称</param>
     /// <param name="instance">对象</param>
@@ -286,19 +287,19 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
     }
 
     /// <summary>
-    ///     获取用于验证的对象
+    ///     获取用于执行验证的对象
     /// </summary>
     /// <remarks>用于确定在 <see cref="ValidatorBase" /> 中实际被验证的对象（即验证的主体）。</remarks>
     /// <param name="instance">对象</param>
     /// <returns>
     ///     <see cref="object" />
     /// </returns>
-    protected object? GetValidatedObject(T? instance)
+    protected object? GetValidatingObject(T? instance)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
 
-        return _validatedObjectProvider.Invoke(instance);
+        return _validatingObjectFactory.Invoke(instance);
     }
 
     /// <summary>

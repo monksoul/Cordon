@@ -132,7 +132,7 @@ public static class ValidationExtensions
         ArgumentNullException.ThrowIfNull(validationContext);
         ArgumentNullException.ThrowIfNull(objectValidator);
 
-        // 跳过属性验证特性验证并返回对象验证结果集合
+        // 跳过属性验证特性验证并返回对象验证结果列表
         return objectValidator.UseAttributeValidation(false).ToResults(validationContext, disposeAfterValidation);
     }
 
@@ -159,7 +159,7 @@ public static class ValidationExtensions
         ArgumentNullException.ThrowIfNull(validationContext);
         ArgumentNullException.ThrowIfNull(valueValidator);
 
-        // 返回对象验证结果集合
+        // 返回对象验证结果列表
         return valueValidator.ToResults(validationContext, disposeAfterValidation);
     }
 

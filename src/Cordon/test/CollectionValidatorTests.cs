@@ -149,21 +149,21 @@ public class CollectionValidatorTests
     }
 
     [Fact]
-    public void GetValidatedElements_Invalid_Parameters()
+    public void GetValidatingElements_Invalid_Parameters()
     {
         var collectionValidator = new CollectionValidator<string?>(new ValueValidator<string?>());
-        Assert.Throws<ArgumentNullException>(() => collectionValidator.GetValidatedElements(null!));
+        Assert.Throws<ArgumentNullException>(() => collectionValidator.GetValidatingElements(null!));
     }
 
     [Fact]
-    public void GetValidatedElements_ReturnOK()
+    public void GetValidatingElements_ReturnOK()
     {
         var collectionValidator = new CollectionValidator<string?>(new ValueValidator<string?>());
         string[] list = ["furion", "fur", "百小僧"];
-        Assert.Equal(["furion", "fur", "百小僧"], collectionValidator.GetValidatedElements(list));
+        Assert.Equal(["furion", "fur", "百小僧"], collectionValidator.GetValidatingElements(list));
 
         collectionValidator.Where(u => u != "fur");
-        Assert.Equal(["furion", "百小僧"], collectionValidator.GetValidatedElements(list));
+        Assert.Equal(["furion", "百小僧"], collectionValidator.GetValidatingElements(list));
     }
 
     [Fact]

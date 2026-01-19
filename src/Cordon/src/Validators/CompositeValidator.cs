@@ -64,7 +64,7 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
         // 遍历验证器集合
         foreach (var validator in _validators)
         {
-            // 获取对象验证结果集合
+            // 获取对象验证结果列表
             if (validator.GetValidationResults(instance, validationContext) is { Count: > 0 } results)
             {
                 // 追加验证结果集合
@@ -105,7 +105,7 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
         // 遍历验证器集合
         foreach (var validator in _validators)
         {
-            // 检查对象合法性
+            // 检查对象是否合法
             if (!validator.IsValid(instance, validationContext))
             {
                 // 缓存首个验证无效的验证器

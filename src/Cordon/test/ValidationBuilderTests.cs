@@ -273,14 +273,15 @@ public class ValidationBuilderTests
     }
 
     [Fact]
-    public void TryGetValidatedType_Invalid_Parameters()
+    public void TryGetModelTypeFromValidator_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => ValidationBuilder.TryGetValidatedType(null!, null!, out _));
+        Assert.Throws<ArgumentNullException>(() => ValidationBuilder.TryGetModelTypeFromValidator(null!, null!, out _));
         Assert.Throws<ArgumentNullException>(() =>
-            ValidationBuilder.TryGetValidatedType(typeof(ObjectModelValidator1), null!, out _));
+            ValidationBuilder.TryGetModelTypeFromValidator(typeof(ObjectModelValidator1), null!, out _));
 
         var exception = Assert.Throws<ArgumentException>(() =>
-            ValidationBuilder.TryGetValidatedType(typeof(ObjectModelValidator1), typeof(IObjectValidator), out _));
+            ValidationBuilder.TryGetModelTypeFromValidator(typeof(ObjectModelValidator1), typeof(IObjectValidator),
+                out _));
         Assert.Equal(
             "The type 'Cordon.IObjectValidator' is not a generic type definition; expected an open generic such as `AbstractValidator<>` or `AbstractValueValidator<>`. (Parameter 'genericTypeDefinition')",
             exception.Message);
@@ -296,10 +297,10 @@ public class ValidationBuilderTests
     [InlineData(typeof(ObjectModelValidator5), false, null)]
     [InlineData(typeof(ObjectModelValidator6), true, typeof(ObjectModel))]
     [InlineData(typeof(object), false, null)]
-    public void TryGetValidatedType_ReturnOK(Type type, bool valid, Type? modelType)
+    public void TryGetModelTypeFromValidator_ReturnOK(Type type, bool valid, Type? modelType)
     {
         Assert.Equal(valid,
-            ValidationBuilder.TryGetValidatedType(type, typeof(AbstractValidator<>), out var modelType1));
+            ValidationBuilder.TryGetModelTypeFromValidator(type, typeof(AbstractValidator<>), out var modelType1));
         Assert.Equal(modelType, modelType1);
     }
 }
