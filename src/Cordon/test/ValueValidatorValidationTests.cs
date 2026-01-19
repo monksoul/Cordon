@@ -306,6 +306,24 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void CustomValidation_ReturnOK()
+    {
+        var valueValidator =
+            new ValueValidator<object>().CustomValidation(typeof(CustomValidators),
+                nameof(CustomValidators.ValidateValue));
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as CustomValidationValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(typeof(CustomValidators), addedValidator.ValidatorType);
+        Assert.Equal("ValidateValue", addedValidator.Method);
+
+        Assert.False(valueValidator.IsValid("fu"));
+        Assert.True(valueValidator.IsValid("Furion"));
+    }
+
+    [Fact]
     public void DateOnly_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().DateOnly();
@@ -1561,5 +1579,16 @@ public class ValueValidatorValidationTests
     {
         var valueValidator = new ValueValidator<object>().Required().NotBlank();
         Assert.Equal(2, valueValidator.Build().Count);
+    }
+
+    public static class CustomValidators
+    {
+        public static ValidationResult? ValidateValue(object? value, ValidationContext context) =>
+            value switch
+            {
+                null => ValidationResult.Success,
+                string { Length: < 3 } => new ValidationResult("不能小于或等于 3"),
+                _ => ValidationResult.Success
+            };
     }
 }

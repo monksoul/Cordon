@@ -294,6 +294,19 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         Conditional(builder => builder.When(condition).ThenMessage(resourceType, resourceName));
 
     /// <summary>
+    ///     添加自定义验证特性验证器
+    /// </summary>
+    /// <param name="validatorType">执行自定义验证的类型</param>
+    /// <param name="method">验证方法</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf CustomValidation(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type validatorType, string method) =>
+        AddValidator(new CustomValidationValidator(validatorType, method));
+
+    /// <summary>
     ///     添加 <see cref="System.DateOnly" /> 验证器
     /// </summary>
     /// <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>

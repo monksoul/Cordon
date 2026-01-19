@@ -195,6 +195,13 @@ public class ValidatorBaseTests
         Assert.Throws<ArgumentNullException>(() => ValidatorBase.GetResourceString(null!));
         Assert.Throws<ArgumentException>(() => ValidatorBase.GetResourceString(string.Empty));
         Assert.Throws<ArgumentException>(() => ValidatorBase.GetResourceString(" "));
+
+        Assert.Throws<ArgumentNullException>(() => ValidatorBase.GetResourceString(null!, null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            ValidatorBase.GetResourceString(typeof(TestValidationMessages), null!));
+        Assert.Throws<ArgumentException>(() =>
+            ValidatorBase.GetResourceString(typeof(TestValidationMessages), string.Empty));
+        Assert.Throws<ArgumentException>(() => ValidatorBase.GetResourceString(typeof(TestValidationMessages), " "));
     }
 
     [Fact]
@@ -214,6 +221,11 @@ public class ValidatorBaseTests
 
         // 清除单元测试影响
         ValidationMessageProvider.ClearOverrides();
+
+        var errorMessage3 =
+            ValidatorBase.GetResourceString(typeof(TestValidationMessages), "TestValidator_ValidationError");
+        Assert.NotNull(errorMessage3);
+        Assert.Equal("单元测试{0}错误信息", errorMessage3);
     }
 
     [Fact]

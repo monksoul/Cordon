@@ -187,6 +187,14 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void CustomValidation_ReturnOK()
+    {
+        var validator = Validators.CustomValidation(typeof(CustomValidators), nameof(CustomValidators.ValidateValue));
+        Assert.Equal(typeof(CustomValidators), validator.ValidatorType);
+        Assert.Equal("ValidateValue", validator.Method);
+    }
+
+    [Fact]
     public void DateOnly_ReturnOK()
     {
         var validator = Validators.DateOnly("yyyy/MM/dd");
@@ -922,5 +930,16 @@ public class ValidatorsTests
     public class ObjectModel
     {
         public string? Name { get; set; }
+    }
+
+    public static class CustomValidators
+    {
+        public static ValidationResult? ValidateValue(object? value, ValidationContext context) =>
+            value switch
+            {
+                null => ValidationResult.Success,
+                string { Length: < 3 } => new ValidationResult("不能小于或等于 3"),
+                _ => ValidationResult.Success
+            };
     }
 }

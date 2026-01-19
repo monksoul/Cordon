@@ -34,16 +34,12 @@ public class MustValidatorTests
     {
         var validator = new MustValidator<int?>(u =>
         {
-            switch (u)
+            return u switch
             {
-                case < 10:
-                    return false;
-                case 10:
-                    Must.WithMessage("不能等于 10");
-                    break;
-            }
-
-            return true;
+                < 10 => false,
+                10 => Must.WithMessage("不能等于 10"),
+                _ => true
+            };
         });
         Assert.True(validator.IsValid(null));
         Assert.True(validator.IsValid(11));
@@ -74,16 +70,12 @@ public class MustValidatorTests
     {
         var validator = new MustValidator<int?>(u =>
         {
-            switch (u)
+            return u switch
             {
-                case < 10:
-                    return false;
-                case 10:
-                    Must.WithMessage("不能等于 10");
-                    break;
-            }
-
-            return true;
+                < 10 => false,
+                10 => Must.WithMessage("不能等于 10"),
+                _ => true
+            };
         });
         Assert.Null(validator.GetValidationResults(15, "data"));
 
@@ -123,16 +115,12 @@ public class MustValidatorTests
     {
         var validator = new MustValidator<int?>(u =>
         {
-            switch (u)
+            return u switch
             {
-                case < 10:
-                    return false;
-                case 10:
-                    Must.WithMessage("不能等于 10");
-                    break;
-            }
-
-            return true;
+                < 10 => false,
+                10 => Must.WithMessage("不能等于 10"),
+                _ => true
+            };
         });
         validator.Validate(15, "data");
 
@@ -152,5 +140,13 @@ public class MustValidatorTests
     {
         var exception = Assert.Throws<ValidatorException>(() => Must.WithMessage("错误消息"));
         Assert.Equal("错误消息", exception.Message);
+
+        var exception2 = Assert.Throws<ValidatorException>(() =>
+            Must.WithMessage(typeof(TestValidationMessages), "TestValidator_ValidationError"));
+        Assert.Equal("单元测试{0}错误信息", exception2.Message);
+
+        var exception3 = Assert.Throws<ValidatorException>(() =>
+            Must.WithMessage(typeof(TestValidationMessages), "Unknown"));
+        Assert.Equal("Unknown", exception3.Message);
     }
 }

@@ -449,6 +449,24 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void CustomValidation_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .CustomValidation(typeof(CustomValidators), nameof(CustomValidators.ValidateValue));
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as CustomValidationValidator;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(typeof(CustomValidators), addedValidator.ValidatorType);
+        Assert.Equal("ValidateValue", addedValidator.Method);
+
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "fu" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "Furion" }));
+    }
+
+    [Fact]
     public void DateOnly_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
@@ -2202,5 +2220,16 @@ public class PropertyValidatorValidationTests
     public class Child
     {
         public string? Name { get; set; }
+    }
+
+    public static class CustomValidators
+    {
+        public static ValidationResult? ValidateValue(object? value, ValidationContext context) =>
+            value switch
+            {
+                null => ValidationResult.Success,
+                string { Length: < 3 } => new ValidationResult("不能小于或等于 3"),
+                _ => ValidationResult.Success
+            };
     }
 }

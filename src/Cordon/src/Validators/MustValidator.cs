@@ -7,15 +7,33 @@ namespace Cordon;
 /// <summary>
 ///     <see cref="MustValidator{T}" /> 内部静态类
 /// </summary>
-/// <remarks>可通过 <see cref="Must.WithMessage" /> 设置不满足条件时的异常消息。</remarks>
+/// <remarks>可通过 <see cref="Must.WithMessage(string)" /> 或 <see cref="Must.WithMessage(Type,string)" /> 设置不满足条件时的异常消息。</remarks>
 public static class Must
 {
     /// <summary>
     ///     设置错误信息
     /// </summary>
     /// <param name="message">错误消息</param>
+    /// <returns>Never Return</returns>
     [DoesNotReturn]
-    public static void WithMessage(string message) => ValidatorException.Throw(message);
+    public static bool WithMessage(string message)
+    {
+        ValidatorException.Throw(message);
+        return false;
+    }
+
+    /// <summary>
+    ///     设置错误信息资源
+    /// </summary>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <returns>Never Return</returns>
+    [DoesNotReturn]
+    public static bool WithMessage(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName) =>
+        WithMessage(ValidatorBase.GetResourceString(resourceType, resourceName) ?? resourceName);
 }
 
 /// <summary>

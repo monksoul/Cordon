@@ -121,7 +121,8 @@ public static class ValidationMessageProvider
             { "EnumValidator_ValidationError_SupportFlags", "字段 {0} 必须是枚举 {1} 中定义的有效值组合。" },
             { "HaveLengthValidator_ValidationError", "字段 {0} 必须是字符串或集合类型，且长度恰好为“{1}”。" },
             { "HaveLengthValidator_ValidationError_AllowEmpty", "字段 {0} 必须为空，或长度恰好为“{1}”。" },
-            { "FileExtensionsValidator_ValidationError", "字段 {0} 仅接受以下扩展名的文件：{1}。" }
+            { "FileExtensionsValidator_ValidationError", "字段 {0} 仅接受以下扩展名的文件：{1}。" },
+            { "CustomValidationValidator_ValidationError", "{0} 无效。" }
         };
 
         AddOverrides(chineseMessages);

@@ -469,6 +469,29 @@ public abstract class ValidatorBase
     }
 
     /// <summary>
+    ///     获取资源字符串
+    /// </summary>
+    /// <param name="resourceType">资源类型</param>
+    /// <param name="resourceKey">资源属性名</param>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    internal static string? GetResourceString(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceKey)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(resourceType);
+        ArgumentException.ThrowIfNullOrWhiteSpace(resourceKey);
+
+        // 查找用户自定义资源类型
+        var property = TryGetPropertyFromAssembly(resourceType.Assembly, resourceType.FullName!, resourceKey);
+
+        return property?.GetValue(null, null) as string;
+    }
+
+    /// <summary>
     ///     触发属性变更事件
     /// </summary>
     /// <param name="propertyValue">已更改属性的值</param>

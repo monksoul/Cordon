@@ -141,6 +141,15 @@ namespace Cordon.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is not valid..
+        /// </summary>
+        internal static string CustomValidationValidator_ValidationError {
+            get {
+                return ResourceManager.GetString("CustomValidationValidator_ValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The field {0} must be a valid date..
         /// </summary>
         internal static string DateOnlyValidator_ValidationError {
