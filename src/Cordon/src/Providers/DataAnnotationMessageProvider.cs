@@ -177,9 +177,10 @@ public static class DataAnnotationMessageProvider
     }
 
     /// <summary>
-    ///     自定义 ResourceManager
+    ///     自定义 <see cref="ResourceManager" />
     /// </summary>
     /// <remarks>用于返回覆盖 .NET 内置验证特性验证错误消息。</remarks>
+    /// <param name="overrides">存储资源键到自定义消息的映射</param>
     internal sealed class OverrideResourceManager(ConcurrentDictionary<string, string> overrides) : ResourceManager
     {
         /// <inheritdoc />

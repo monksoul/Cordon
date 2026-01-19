@@ -18,7 +18,7 @@ public partial class ColorValueValidator : ValidatorBase
     /// <summary>
     ///     是否启用完整模式
     /// </summary>
-    /// <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA。若未启用，则仅支持：十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
+    /// <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA；若未启用，则仅支持十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
     public bool FullMode { get; set; }
 
     /// <inheritdoc />

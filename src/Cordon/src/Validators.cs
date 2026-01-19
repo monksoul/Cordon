@@ -152,7 +152,7 @@ public static class Validators
     ///     创建颜色值验证器
     /// </summary>
     /// <param name="fullMode">
-    ///     是否启用完整模式。在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA。若未启用，则仅支持：十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>
+    ///     是否启用完整模式。在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA；若未启用，则仅支持十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>
     /// </param>
     /// <returns>
     ///     <see cref="ColorValueValidator" />

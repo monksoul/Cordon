@@ -109,7 +109,7 @@
             <summary>
                 是否启用完整模式
             </summary>
-            <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA。若未启用，则仅支持：十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
+            <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA；若未启用，则仅支持十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.ColorValueAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -2127,7 +2127,7 @@
                 添加颜色值验证器
             </summary>
             <param name="fullMode">
-                是否启用完整模式。在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA。若未启用，则仅支持：十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>
+                是否启用完整模式。在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA；若未启用，则仅支持十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>
             </param>
             <returns>
                 <typeparamref name="TSelf" />
@@ -5583,15 +5583,17 @@
         </member>
         <member name="T:Cordon.DataAnnotationMessageProvider.OverrideResourceManager">
             <summary>
-                自定义 ResourceManager
+                自定义 <see cref="T:System.Resources.ResourceManager" />
             </summary>
             <remarks>用于返回覆盖 .NET 内置验证特性验证错误消息。</remarks>
+            <param name="overrides">存储资源键到自定义消息的映射</param>
         </member>
         <member name="M:Cordon.DataAnnotationMessageProvider.OverrideResourceManager.#ctor(System.Collections.Concurrent.ConcurrentDictionary{System.String,System.String})">
             <summary>
-                自定义 ResourceManager
+                自定义 <see cref="T:System.Resources.ResourceManager" />
             </summary>
             <remarks>用于返回覆盖 .NET 内置验证特性验证错误消息。</remarks>
+            <param name="overrides">存储资源键到自定义消息的映射</param>
         </member>
         <member name="M:Cordon.DataAnnotationMessageProvider.OverrideResourceManager.GetString(System.String,System.Globalization.CultureInfo)">
             <inheritdoc />
@@ -6246,7 +6248,7 @@
                 创建颜色值验证器
             </summary>
             <param name="fullMode">
-                是否启用完整模式。在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA。若未启用，则仅支持：十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>
+                是否启用完整模式。在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA；若未启用，则仅支持十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>
             </param>
             <returns>
                 <see cref="T:Cordon.ColorValueValidator" />
@@ -7630,7 +7632,7 @@
             <summary>
                 是否启用完整模式
             </summary>
-            <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA。若未启用，则仅支持：十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
+            <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA；若未启用，则仅支持十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
         </member>
         <member name="M:Cordon.ColorValueValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
