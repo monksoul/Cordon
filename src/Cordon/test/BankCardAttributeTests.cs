@@ -25,8 +25,7 @@ public class BankCardAttributeTests
     {
         var attribute = new BankCardAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as BankCardValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class DateOnlyAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="DateOnlyValidator" />
+    internal readonly DateOnlyValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="DateOnlyAttribute" />
     /// </summary>
@@ -20,7 +23,7 @@ public class DateOnlyAttribute : ValidationBaseAttribute
         ArgumentNullException.ThrowIfNull(formats);
 
         Formats = formats;
-        Validator = new DateOnlyValidator(formats);
+        _validator = new DateOnlyValidator(formats);
 
         UseResourceKey(GetResourceKey);
     }
@@ -40,7 +43,7 @@ public class DateOnlyAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.Provider = value;
+            _validator.Provider = value;
         }
     } = CultureInfo.InvariantCulture;
 
@@ -54,17 +57,12 @@ public class DateOnlyAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.Style = value;
+            _validator.Style = value;
         }
     } = DateTimeStyles.None;
 
-    /// <summary>
-    ///     <inheritdoc cref="DateOnlyValidator" />
-    /// </summary>
-    protected DateOnlyValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) => string.Format(CultureInfo.CurrentCulture,

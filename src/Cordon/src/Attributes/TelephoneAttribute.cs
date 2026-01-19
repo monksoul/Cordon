@@ -10,21 +10,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class TelephoneAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="TelephoneValidator" />
+    internal readonly TelephoneValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="TelephoneAttribute" />
     /// </summary>
     public TelephoneAttribute()
     {
-        Validator = new TelephoneValidator();
+        _validator = new TelephoneValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.TelephoneValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="TelephoneValidator" />
-    /// </summary>
-    protected TelephoneValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

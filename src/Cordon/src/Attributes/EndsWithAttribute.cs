@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class EndsWithAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="EndsWithValidator" />
+    internal readonly EndsWithValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="EndsWithAttribute" />
     /// </summary>
@@ -26,7 +29,7 @@ public class EndsWithAttribute : ValidationBaseAttribute
     public EndsWithAttribute(string searchValue)
     {
         SearchValue = searchValue;
-        Validator = new EndsWithValidator(SearchValue);
+        _validator = new EndsWithValidator(SearchValue);
 
         UseResourceKey(() => nameof(ValidationMessages.EndsWithValidator_ValidationError));
     }
@@ -46,17 +49,12 @@ public class EndsWithAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.Comparison = value;
+            _validator.Comparison = value;
         }
     } = StringComparison.Ordinal;
 
-    /// <summary>
-    ///     <inheritdoc cref="EndsWithValidator" />
-    /// </summary>
-    protected EndsWithValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>

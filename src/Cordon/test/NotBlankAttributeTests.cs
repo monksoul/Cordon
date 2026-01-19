@@ -25,8 +25,7 @@ public class NotBlankAttributeTests
     {
         var attribute = new NotBlankAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as NotBlankValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

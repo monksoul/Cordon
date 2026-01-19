@@ -9,6 +9,9 @@
                 年龄（0-120 岁）验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.AgeAttribute._validator">
+            <inheritdoc cref="T:Cordon.AgeValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.AgeAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.AgeAttribute" />
@@ -16,20 +19,15 @@
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.AgeAttribute.IsAdultOnly">
             <summary>
-                是否仅验证成年人（18 岁及以上）
+                是否仅允许成年人（18 岁及以上）
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.AgeAttribute.AllowStringValues">
             <summary>
-                允许字符串数值
+                是否允许字符串数值
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.AgeAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.AgeValidator" />
-            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.AgeAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -51,14 +49,12 @@
                 <see href="https://www.ee.unb.ca/cgi-bin/tervo/luhn.pl">Luhn 算法在线测试</see>
             </remarks>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.BankCardAttribute._validator">
+            <inheritdoc cref="T:Cordon.BankCardValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.BankCardAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.BankCardAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.BankCardAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.BankCardValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.BankCardAttribute.IsValid(System.Object)">
@@ -69,14 +65,12 @@
                 中文/汉字验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.ChineseAttribute._validator">
+            <inheritdoc cref="T:Cordon.ChineseValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.ChineseAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ChineseAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.ChineseAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.ChineseValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.ChineseAttribute.IsValid(System.Object)">
@@ -87,14 +81,12 @@
                 中文姓名验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.ChineseNameAttribute._validator">
+            <inheritdoc cref="T:Cordon.ChineseNameValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.ChineseNameAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ChineseNameAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.ChineseNameAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.ChineseNameValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.ChineseNameAttribute.IsValid(System.Object)">
@@ -104,6 +96,9 @@
             <summary>
                 颜色值验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.ColorValueAttribute._validator">
+            <inheritdoc cref="T:Cordon.ColorValueValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.ColorValueAttribute.#ctor">
             <summary>
@@ -115,11 +110,6 @@
                 是否启用完整模式
             </summary>
             <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA。若未启用，则仅支持：十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.ColorValueAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.ColorValueValidator" />
-            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.ColorValueAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -168,6 +158,9 @@
                 <see cref="T:System.DateOnly" /> 验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.DateOnlyAttribute._validator">
+            <inheritdoc cref="T:Cordon.DateOnlyValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.DateOnlyAttribute.#ctor(System.String[])">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.DateOnlyAttribute" />
@@ -191,11 +184,6 @@
             </summary>
             <remarks>需与 <see cref="P:System.ComponentModel.DataAnnotations.DateOnlyAttribute.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.DateOnlyAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.DateOnlyValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.DateOnlyAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
@@ -214,6 +202,9 @@
             <summary>
                 <see cref="T:System.DateTime" /> 验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.DateTimeAttribute._validator">
+            <inheritdoc cref="T:Cordon.DateTimeValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.DateTimeAttribute.#ctor(System.String[])">
             <summary>
@@ -238,11 +229,6 @@
             </summary>
             <remarks>需与 <see cref="P:System.ComponentModel.DataAnnotations.DateTimeAttribute.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.DateTimeAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.DateTimeValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.DateTimeAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
@@ -262,6 +248,9 @@
                 验证数值的小数位数验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute._validator">
+            <inheritdoc cref="T:Cordon.DecimalPlacesValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute.#ctor(System.Int32)">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute" />
@@ -275,14 +264,9 @@
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute.AllowStringValues">
             <summary>
-                允许字符串数值
+                是否允许字符串数值
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.DecimalPlacesValidator" />
-            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -296,14 +280,12 @@
             </summary>
             <remarks>不含协议（如 https/http）。</remarks>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.DomainAttribute._validator">
+            <inheritdoc cref="T:Cordon.DomainValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.DomainAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.DomainAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.DomainAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.DomainValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.DomainAttribute.IsValid(System.Object)">
@@ -314,14 +296,12 @@
                 邮箱地址增强版验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.EmailAddressStrictAttribute._validator">
+            <inheritdoc cref="T:Cordon.EmailAddressValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.EmailAddressStrictAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EmailAddressStrictAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.EmailAddressStrictAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.EmailAddressValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EmailAddressStrictAttribute.IsValid(System.Object)">
@@ -332,14 +312,12 @@
                 空集合、数组和字符串验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.EmptyAttribute._validator">
+            <inheritdoc cref="T:Cordon.EmptyValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.EmptyAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EmptyAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.EmptyAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.EmptyValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EmptyAttribute.IsValid(System.Object)">
@@ -349,6 +327,9 @@
             <summary>
                 以特定字符/字符串结尾的验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.EndsWithAttribute._validator">
+            <inheritdoc cref="T:Cordon.EndsWithValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EndsWithAttribute.#ctor(System.Char)">
             <summary>
@@ -373,11 +354,6 @@
             </summary>
             <remarks>默认值为：<see cref="F:System.StringComparison.Ordinal" />。</remarks>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.EndsWithAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.EndsWithValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.EndsWithAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
@@ -397,6 +373,9 @@
                 枚举验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.EnumAttribute._validator">
+            <inheritdoc cref="T:Cordon.EnumValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.#ctor(System.Type)">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EnumAttribute" />
@@ -412,11 +391,6 @@
                 是否支持 Flags 模式
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.EnumAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.EnumValidator" />
-            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -437,6 +411,9 @@
                 相等验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.EqualToAttribute._validator">
+            <inheritdoc cref="T:Cordon.EqualToValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.EqualToAttribute.#ctor(System.Object)">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EqualToAttribute" />
@@ -446,11 +423,6 @@
         <member name="P:System.ComponentModel.DataAnnotations.EqualToAttribute.CompareValue">
             <summary>
                 比较的值
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.EqualToAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.EqualToValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EqualToAttribute.IsValid(System.Object)">
@@ -463,6 +435,9 @@
             <summary>
                 大于验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.GreaterThanAttribute._validator">
+            <inheritdoc cref="T:Cordon.GreaterThanValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.GreaterThanAttribute.#ctor(System.Int32)">
             <summary>
@@ -482,11 +457,6 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.GreaterThanAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.GreaterThanValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.GreaterThanAttribute.IsValid(System.IComparable)">
             <inheritdoc />
         </member>
@@ -494,6 +464,9 @@
             <summary>
                 大于等于验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.GreaterThanOrEqualToAttribute._validator">
+            <inheritdoc cref="T:Cordon.GreaterThanOrEqualToValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.GreaterThanOrEqualToAttribute.#ctor(System.Int32)">
             <summary>
@@ -513,11 +486,6 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.GreaterThanOrEqualToAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.GreaterThanOrEqualToValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.GreaterThanOrEqualToAttribute.IsValid(System.IComparable)">
             <inheritdoc />
         </member>
@@ -525,6 +493,9 @@
             <summary>
                 固定长度验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.HaveLengthAttribute._validator">
+            <inheritdoc cref="T:Cordon.HaveLengthValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.HaveLengthAttribute.#ctor(System.Int32)">
             <summary>
@@ -542,11 +513,6 @@
                 是否允许空集合、数组和字符串
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.HaveLengthAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.HaveLengthValidator" />
-            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.HaveLengthAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -567,14 +533,12 @@
                 身份证号验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.IDCardAttribute._validator">
+            <inheritdoc cref="T:Cordon.IDCardValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.IDCardAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.IDCardAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.IDCardAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.IDCardValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.IDCardAttribute.IsValid(System.Object)">
@@ -584,6 +548,9 @@
             <summary>
                 IP 地址验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.IpAddressAttribute._validator">
+            <inheritdoc cref="T:Cordon.IpAddressValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.IpAddressAttribute.#ctor">
             <summary>
@@ -595,11 +562,6 @@
                 是否允许 IPv6 地址
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.IpAddressAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.IpAddressValidator" />
-            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.IpAddressAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -618,6 +580,9 @@
             </summary>
             <remarks>验证输入是否为有效的 JSON 对象（{...}）或数组（[...]）。</remarks>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.JsonAttribute._validator">
+            <inheritdoc cref="T:Cordon.JsonValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.JsonAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.JsonAttribute" />
@@ -629,11 +594,6 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.JsonAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.JsonValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.JsonAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
@@ -641,6 +601,9 @@
             <summary>
                 小于验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.LessThanAttribute._validator">
+            <inheritdoc cref="T:Cordon.LessThanValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.LessThanAttribute.#ctor(System.Int32)">
             <summary>
@@ -660,11 +623,6 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.LessThanAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.LessThanValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.LessThanAttribute.IsValid(System.IComparable)">
             <inheritdoc />
         </member>
@@ -672,6 +630,9 @@
             <summary>
                 小于等于验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.LessThanOrEqualToAttribute._validator">
+            <inheritdoc cref="T:Cordon.LessThanOrEqualToValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.LessThanOrEqualToAttribute.#ctor(System.Int32)">
             <summary>
@@ -691,11 +652,6 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.LessThanOrEqualToAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.LessThanOrEqualToValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.LessThanOrEqualToAttribute.IsValid(System.IComparable)">
             <inheritdoc />
         </member>
@@ -703,6 +659,9 @@
             <summary>
                 最大值验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.MaxAttribute._validator">
+            <inheritdoc cref="T:Cordon.MaxValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.MaxAttribute.#ctor(System.Int32)">
             <summary>
@@ -722,11 +681,6 @@
             </summary>
             <param name="maximum">允许的最大字段值</param>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.MaxAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.MaxValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.MaxAttribute.IsValid(System.IComparable)">
             <inheritdoc />
         </member>
@@ -735,6 +689,9 @@
                 MD5 字符串验证特性
             </summary>
             <remarks>支持 32 位标准格式，可选 16 字符截断格式。</remarks>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.MD5StringAttribute._validator">
+            <inheritdoc cref="T:Cordon.MD5StringValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.MD5StringAttribute.#ctor">
             <summary>
@@ -747,11 +704,6 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.MD5StringAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.MD5StringValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.MD5StringAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
@@ -759,6 +711,9 @@
             <summary>
                 最小值验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.MinAttribute._validator">
+            <inheritdoc cref="T:Cordon.MinValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.MinAttribute.#ctor(System.Int32)">
             <summary>
@@ -778,11 +733,6 @@
             </summary>
             <param name="minimum">允许的最小字段值</param>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.MinAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.MinValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.MinAttribute.IsValid(System.IComparable)">
             <inheritdoc />
         </member>
@@ -791,14 +741,12 @@
                 非空白字符串验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.NotBlankAttribute._validator">
+            <inheritdoc cref="T:Cordon.NotBlankValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.NotBlankAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.NotBlankAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.NotBlankAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.NotBlankValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.NotBlankAttribute.IsValid(System.Object)">
@@ -809,14 +757,12 @@
                 非空集合、数组和字符串验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.NotEmptyAttribute._validator">
+            <inheritdoc cref="T:Cordon.NotEmptyValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.NotEmptyAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.NotEmptyAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.NotEmptyAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.NotEmptyValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.NotEmptyAttribute.IsValid(System.Object)">
@@ -827,6 +773,9 @@
                 不相等验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.NotEqualToAttribute._validator">
+            <inheritdoc cref="T:Cordon.NotEqualToValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.NotEqualToAttribute.#ctor(System.Object)">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.NotEqualToAttribute" />
@@ -836,11 +785,6 @@
         <member name="P:System.ComponentModel.DataAnnotations.NotEqualToAttribute.CompareValue">
             <summary>
                 比较的值
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.NotEqualToAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.NotEqualToValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.NotEqualToAttribute.IsValid(System.Object)">
@@ -854,14 +798,12 @@
                 非 <c>null</c> 验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.NotNullAttribute._validator">
+            <inheritdoc cref="T:Cordon.NotNullValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.NotNullAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.NotNullAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.NotNullAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.NotNullValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.NotNullAttribute.IsValid(System.Object)">
@@ -872,14 +814,12 @@
                 <c>null</c> 验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.NullAttribute._validator">
+            <inheritdoc cref="T:Cordon.NullValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.NullAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.NullAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.NullAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.NullValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.NullAttribute.IsValid(System.Object)">
@@ -919,6 +859,9 @@
                 强密码模式：密码长度为 12-64 位，必须包含大小写字母、数字、特殊字符（如 <![CDATA[!@#$%^&*]]>）。
             </remarks>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.PasswordAttribute._validator">
+            <inheritdoc cref="T:Cordon.PasswordValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.PasswordAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.PasswordAttribute" />
@@ -929,11 +872,6 @@
                 是否启用强密码验证模式
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.PasswordAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.PasswordValidator" />
-            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.PasswordAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -952,14 +890,12 @@
             </summary>
             <remarks>支持国际区号（如：13800138000 或 +8613800138000 或 008613800138000）。</remarks>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.PhoneNumberAttribute._validator">
+            <inheritdoc cref="T:Cordon.PhoneNumberValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.PhoneNumberAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.PhoneNumberAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.PhoneNumberAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.PhoneNumberValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.PhoneNumberAttribute.IsValid(System.Object)">
@@ -970,14 +906,12 @@
                 邮政编码（中国）验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.PostalCodeAttribute._validator">
+            <inheritdoc cref="T:Cordon.PostalCodeValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.PostalCodeAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.PostalCodeAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.PostalCodeAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.PostalCodeValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.PostalCodeAttribute.IsValid(System.Object)">
@@ -988,14 +922,12 @@
                 单项验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.SingleAttribute._validator">
+            <inheritdoc cref="T:Cordon.SingleValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.SingleAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.SingleAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.SingleAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.SingleValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.SingleAttribute.IsValid(System.Object)">
@@ -1005,6 +937,9 @@
             <summary>
                 以特定字符/字符串开头的验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.StartsWithAttribute._validator">
+            <inheritdoc cref="T:Cordon.StartsWithValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.StartsWithAttribute.#ctor(System.Char)">
             <summary>
@@ -1029,11 +964,6 @@
             </summary>
             <remarks>默认值为：<see cref="F:System.StringComparison.Ordinal" />。</remarks>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.StartsWithAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.StartsWithValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.StartsWithAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
@@ -1044,6 +974,9 @@
             <summary>
                 包含特定字符/字符串的验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.StringContainsAttribute._validator">
+            <inheritdoc cref="T:Cordon.StringContainsValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.StringContainsAttribute.#ctor(System.Char)">
             <summary>
@@ -1068,11 +1001,6 @@
             </summary>
             <remarks>默认值为：<see cref="F:System.StringComparison.Ordinal" />。</remarks>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.StringContainsAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.StringContainsValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.StringContainsAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
@@ -1083,6 +1011,9 @@
             <summary>
                 不包含特定字符/字符串的验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.StringNotContainsAttribute._validator">
+            <inheritdoc cref="T:Cordon.StringNotContainsValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.StringNotContainsAttribute.#ctor(System.Char)">
             <summary>
@@ -1106,11 +1037,6 @@
                 <inheritdoc cref="T:System.StringComparison" />
             </summary>
             <remarks>默认值为：<see cref="F:System.StringComparison.Ordinal" />。</remarks>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.StringNotContainsAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.StringNotContainsValidator" />
-            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.StringNotContainsAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -1136,14 +1062,12 @@
                 座机（电话）验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.TelephoneAttribute._validator">
+            <inheritdoc cref="T:Cordon.TelephoneValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.TelephoneAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.TelephoneAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.TelephoneAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.TelephoneValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.TelephoneAttribute.IsValid(System.Object)">
@@ -1153,6 +1077,9 @@
             <summary>
                 时间格式 <see cref="T:System.TimeOnly" /> 验证特性
             </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.TimeOnlyAttribute._validator">
+            <inheritdoc cref="T:Cordon.TimeOnlyValidator" />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.TimeOnlyAttribute.#ctor(System.String[])">
             <summary>
@@ -1177,11 +1104,6 @@
             </summary>
             <remarks>需与 <see cref="P:System.ComponentModel.DataAnnotations.TimeOnlyAttribute.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.TimeOnlyAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.TimeOnlyValidator" />
-            </summary>
-        </member>
         <member name="M:System.ComponentModel.DataAnnotations.TimeOnlyAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
@@ -1201,6 +1123,9 @@
                 URL 地址增强版验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.UrlStrictAttribute._validator">
+            <inheritdoc cref="T:Cordon.UrlValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.UrlStrictAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.UrlStrictAttribute" />
@@ -1211,11 +1136,6 @@
                 是否支持 FTP 协议
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.UrlStrictAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.UrlValidator" />
-            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.UrlStrictAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -1237,14 +1157,12 @@
                 不允许包含空格或其他特殊字符，禁止连续特殊字符（如 __）。
             </remarks>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.UserNameAttribute._validator">
+            <inheritdoc cref="T:Cordon.UserNameValidator" />
+        </member>
         <member name="M:System.ComponentModel.DataAnnotations.UserNameAttribute.#ctor">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.UserNameAttribute" />
-            </summary>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.UserNameAttribute.Validator">
-            <summary>
-                <inheritdoc cref="T:Cordon.UserNameValidator" />
             </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.UserNameAttribute.IsValid(System.Object)">
@@ -2157,8 +2075,8 @@
             <summary>
                 添加年龄（0-120 岁）验证器
             </summary>
-            <param name="isAdultOnly">是否仅验证成年人（18 岁及以上），默认值为：<c>false</c></param>
-            <param name="allowStringValues">允许字符串数值，默认值为：<c>false</c></param>
+            <param name="isAdultOnly">是否仅允许成年人（18 岁及以上），默认值为：<c>false</c></param>
+            <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -2314,7 +2232,7 @@
                 添加验证数值的小数位数验证器
             </summary>
             <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
-            <param name="allowStringValues">允许字符串数值，默认值为：<c>false</c></param>
+            <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -6276,8 +6194,8 @@
             <summary>
                 创建年龄（0-120 岁）验证器
             </summary>
-            <param name="isAdultOnly">是否仅验证成年人（18 岁及以上），默认值为：<c>false</c></param>
-            <param name="allowStringValues">允许字符串数值，默认值为：<c>false</c></param>
+            <param name="isAdultOnly">是否仅允许成年人（18 岁及以上），默认值为：<c>false</c></param>
+            <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
             <returns>
                 <see cref="T:Cordon.AgeValidator" />
             </returns>
@@ -6438,7 +6356,7 @@
                 创建验证数值的小数位数验证器
             </summary>
             <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
-            <param name="allowStringValues">允许字符串数值，默认值为：<c>false</c></param>
+            <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
             <returns>
                 <see cref="T:Cordon.DecimalPlacesValidator" />
             </returns>
@@ -7230,13 +7148,13 @@
         </member>
         <member name="P:Cordon.AgeValidator.IsAdultOnly">
             <summary>
-                是否仅验证成年人（18 岁及以上）
+                是否仅允许成年人（18 岁及以上）
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
         <member name="P:Cordon.AgeValidator.AllowStringValues">
             <summary>
-                允许字符串数值
+                是否允许字符串数值
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
@@ -8295,7 +8213,7 @@
         </member>
         <member name="P:Cordon.DecimalPlacesValidator.AllowStringValues">
             <summary>
-                允许字符串数值
+                是否允许字符串数值
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
@@ -10553,22 +10471,6 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-       <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

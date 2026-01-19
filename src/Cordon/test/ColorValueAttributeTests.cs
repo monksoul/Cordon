@@ -26,16 +26,14 @@ public class ColorValueAttributeTests
         var attribute = new ColorValueAttribute();
         Assert.False(attribute.FullMode);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as ColorValueValidator;
-        Assert.NotNull(validator);
-        Assert.False(validator.FullMode);
+        Assert.NotNull(attribute._validator);
+        Assert.False(attribute._validator.FullMode);
 
         var attribute2 = new ColorValueAttribute { FullMode = true };
         Assert.True(attribute2.FullMode);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as ColorValueValidator;
-        Assert.NotNull(validator2);
-        Assert.True(validator2.FullMode);
+        Assert.NotNull(attribute2._validator);
+        Assert.True(attribute2._validator.FullMode);
     }
 
     [Fact]

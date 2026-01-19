@@ -11,12 +11,15 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class MD5StringAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="MD5StringValidator" />
+    internal readonly MD5StringValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="MD5StringAttribute" />
     /// </summary>
     public MD5StringAttribute()
     {
-        Validator = new MD5StringValidator();
+        _validator = new MD5StringValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.MD5StringValidator_ValidationError));
     }
@@ -31,15 +34,10 @@ public class MD5StringAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.AllowShortFormat = value;
+            _validator.AllowShortFormat = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="MD5StringValidator" />
-    /// </summary>
-    protected MD5StringValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

@@ -14,21 +14,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class BankCardAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="BankCardValidator" />
+    internal readonly BankCardValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="BankCardAttribute" />
     /// </summary>
     public BankCardAttribute()
     {
-        Validator = new BankCardValidator();
+        _validator = new BankCardValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.BankCardValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="BankCardValidator" />
-    /// </summary>
-    protected BankCardValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

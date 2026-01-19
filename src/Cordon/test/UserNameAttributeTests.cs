@@ -25,8 +25,7 @@ public class UserNameAttributeTests
     {
         var attribute = new UserNameAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as UserNameValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

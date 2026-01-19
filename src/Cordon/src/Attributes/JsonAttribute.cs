@@ -11,12 +11,15 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class JsonAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="JsonValidator" />
+    internal readonly JsonValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="JsonAttribute" />
     /// </summary>
     public JsonAttribute()
     {
-        Validator = new JsonValidator();
+        _validator = new JsonValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.JsonValidator_ValidationError));
     }
@@ -31,15 +34,10 @@ public class JsonAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.AllowTrailingCommas = value;
+            _validator.AllowTrailingCommas = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="JsonValidator" />
-    /// </summary>
-    protected JsonValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

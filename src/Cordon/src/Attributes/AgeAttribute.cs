@@ -10,18 +10,21 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class AgeAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="AgeValidator" />
+    internal readonly AgeValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="AgeAttribute" />
     /// </summary>
     public AgeAttribute()
     {
-        Validator = new AgeValidator();
+        _validator = new AgeValidator();
 
         UseResourceKey(GetResourceKey);
     }
 
     /// <summary>
-    ///     是否仅验证成年人（18 岁及以上）
+    ///     是否仅允许成年人（18 岁及以上）
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
     public bool IsAdultOnly
@@ -30,12 +33,12 @@ public class AgeAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.IsAdultOnly = value;
+            _validator.IsAdultOnly = value;
         }
     }
 
     /// <summary>
-    ///     允许字符串数值
+    ///     是否允许字符串数值
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
     public bool AllowStringValues
@@ -44,17 +47,12 @@ public class AgeAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.AllowStringValues = value;
+            _validator.AllowStringValues = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="AgeValidator" />
-    /// </summary>
-    protected AgeValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <summary>
     ///     获取错误信息对应的资源键

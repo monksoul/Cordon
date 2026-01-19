@@ -26,16 +26,14 @@ public class JsonAttributeTests
         var attribute = new JsonAttribute();
         Assert.False(attribute.AllowTrailingCommas);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as JsonValidator;
-        Assert.NotNull(validator);
-        Assert.False(validator.AllowTrailingCommas);
+        Assert.NotNull(attribute._validator);
+        Assert.False(attribute._validator.AllowTrailingCommas);
 
         var attribute2 = new JsonAttribute { AllowTrailingCommas = true };
         Assert.True(attribute2.AllowTrailingCommas);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as JsonValidator;
-        Assert.NotNull(validator2);
-        Assert.True(validator2.AllowTrailingCommas);
+        Assert.NotNull(attribute2._validator);
+        Assert.True(attribute2._validator.AllowTrailingCommas);
     }
 
     [Fact]

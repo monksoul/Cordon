@@ -10,21 +10,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class NullAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="NullValidator" />
+    internal readonly NullValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="NullAttribute" />
     /// </summary>
     public NullAttribute()
     {
-        Validator = new NullValidator();
+        _validator = new NullValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.NullValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="NullValidator" />
-    /// </summary>
-    protected NullValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

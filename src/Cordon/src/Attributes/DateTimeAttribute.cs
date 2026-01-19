@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class DateTimeAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="DateTimeValidator" />
+    internal readonly DateTimeValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="DateTimeAttribute" />
     /// </summary>
@@ -20,7 +23,7 @@ public class DateTimeAttribute : ValidationBaseAttribute
         ArgumentNullException.ThrowIfNull(formats);
 
         Formats = formats;
-        Validator = new DateTimeValidator(formats);
+        _validator = new DateTimeValidator(formats);
 
         UseResourceKey(GetResourceKey);
     }
@@ -40,7 +43,7 @@ public class DateTimeAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.Provider = value;
+            _validator.Provider = value;
         }
     } = CultureInfo.InvariantCulture;
 
@@ -54,17 +57,12 @@ public class DateTimeAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.Style = value;
+            _validator.Style = value;
         }
     } = DateTimeStyles.None;
 
-    /// <summary>
-    ///     <inheritdoc cref="DateTimeValidator" />
-    /// </summary>
-    protected DateTimeValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) => string.Format(CultureInfo.CurrentCulture,

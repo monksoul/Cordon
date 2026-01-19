@@ -10,12 +10,15 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class UrlStrictAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="UrlValidator" />
+    internal readonly UrlValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="UrlStrictAttribute" />
     /// </summary>
     public UrlStrictAttribute()
     {
-        Validator = new UrlValidator();
+        _validator = new UrlValidator();
 
         UseResourceKey(GetResourceKey);
     }
@@ -30,17 +33,12 @@ public class UrlStrictAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.SupportsFtp = value;
+            _validator.SupportsFtp = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="UrlValidator" />
-    /// </summary>
-    protected UrlValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <summary>
     ///     获取错误信息对应的资源键

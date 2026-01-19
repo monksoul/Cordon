@@ -25,8 +25,7 @@ public class EmptyAttributeTests
     {
         var attribute = new EmptyAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as EmptyValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

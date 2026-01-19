@@ -26,16 +26,14 @@ public class IpAddressAttributeTests
         var attribute = new IpAddressAttribute();
         Assert.False(attribute.AllowIPv6);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as IpAddressValidator;
-        Assert.NotNull(validator);
-        Assert.False(validator.AllowIPv6);
+        Assert.NotNull(attribute._validator);
+        Assert.False(attribute._validator.AllowIPv6);
 
         var attribute2 = new IpAddressAttribute { AllowIPv6 = true };
         Assert.True(attribute2.AllowIPv6);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as IpAddressValidator;
-        Assert.NotNull(validator2);
-        Assert.True(validator2.AllowIPv6);
+        Assert.NotNull(attribute2._validator);
+        Assert.True(attribute2._validator.AllowIPv6);
     }
 
     [Fact]

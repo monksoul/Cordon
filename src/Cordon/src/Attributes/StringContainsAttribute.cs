@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class StringContainsAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="StringContainsValidator" />
+    internal readonly StringContainsValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="StringContainsAttribute" />
     /// </summary>
@@ -26,7 +29,7 @@ public class StringContainsAttribute : ValidationBaseAttribute
     public StringContainsAttribute(string searchValue)
     {
         SearchValue = searchValue;
-        Validator = new StringContainsValidator(searchValue);
+        _validator = new StringContainsValidator(searchValue);
 
         UseResourceKey(() => nameof(ValidationMessages.StringContainsValidator_ValidationError));
     }
@@ -46,17 +49,12 @@ public class StringContainsAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.Comparison = value;
+            _validator.Comparison = value;
         }
     } = StringComparison.Ordinal;
 
-    /// <summary>
-    ///     <inheritdoc cref="StringContainsValidator" />
-    /// </summary>
-    protected StringContainsValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>

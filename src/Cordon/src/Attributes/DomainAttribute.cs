@@ -11,21 +11,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class DomainAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="DomainValidator" />
+    internal readonly DomainValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="DomainAttribute" />
     /// </summary>
     public DomainAttribute()
     {
-        Validator = new DomainValidator();
+        _validator = new DomainValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.DomainValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="DomainValidator" />
-    /// </summary>
-    protected DomainValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

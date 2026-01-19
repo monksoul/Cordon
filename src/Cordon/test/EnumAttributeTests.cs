@@ -40,33 +40,29 @@ public class EnumAttributeTests
         Assert.Equal(typeof(MyEnum), attribute.EnumType);
         Assert.False(attribute.SupportFlags);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as EnumValidator;
-        Assert.NotNull(validator);
-        Assert.False(validator.SupportFlags);
+        Assert.NotNull(attribute._validator);
+        Assert.False(attribute._validator.SupportFlags);
 
         var attribute2 = new EnumAttribute<MyFlagsEnum> { SupportFlags = true };
         Assert.Equal(typeof(MyFlagsEnum), attribute2.EnumType);
         Assert.True(attribute2.SupportFlags);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as EnumValidator;
-        Assert.NotNull(validator2);
-        Assert.True(validator2.SupportFlags);
+        Assert.NotNull(attribute2._validator);
+        Assert.True(attribute2._validator.SupportFlags);
 
         var attribute3 = new EnumAttribute(typeof(MyEnum));
         Assert.Equal(typeof(MyEnum), attribute3.EnumType);
         Assert.False(attribute3.SupportFlags);
         Assert.Null(attribute3.ErrorMessage);
-        var validator3 = Helpers.GetValidator(attribute3) as EnumValidator;
-        Assert.NotNull(validator3);
-        Assert.False(validator3.SupportFlags);
+        Assert.NotNull(attribute3._validator);
+        Assert.False(attribute3._validator.SupportFlags);
 
         var attribute4 = new EnumAttribute(typeof(MyFlagsEnum)) { SupportFlags = true };
         Assert.Equal(typeof(MyFlagsEnum), attribute4.EnumType);
         Assert.True(attribute4.SupportFlags);
         Assert.Null(attribute4.ErrorMessage);
-        var validator4 = Helpers.GetValidator(attribute4) as EnumValidator;
-        Assert.NotNull(validator4);
-        Assert.True(validator4.SupportFlags);
+        Assert.NotNull(attribute4._validator);
+        Assert.True(attribute4._validator.SupportFlags);
     }
 
     [Fact]

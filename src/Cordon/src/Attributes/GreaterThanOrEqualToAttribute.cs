@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class GreaterThanOrEqualToAttribute : ComparisonAttribute
 {
+    /// <inheritdoc cref="GreaterThanOrEqualToValidator" />
+    internal readonly GreaterThanOrEqualToValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="GreaterThanOrEqualToAttribute" />
     /// </summary>
@@ -34,13 +37,8 @@ public class GreaterThanOrEqualToAttribute : ComparisonAttribute
     /// <param name="compareValue">比较的值</param>
     public GreaterThanOrEqualToAttribute(IComparable compareValue)
         : base(compareValue, nameof(ValidationMessages.GreaterThanOrEqualToValidator_ValidationError)) =>
-        Validator = new GreaterThanOrEqualToValidator(compareValue);
-
-    /// <summary>
-    ///     <inheritdoc cref="GreaterThanOrEqualToValidator" />
-    /// </summary>
-    protected GreaterThanOrEqualToValidator Validator { get; }
+        _validator = new GreaterThanOrEqualToValidator(compareValue);
 
     /// <inheritdoc />
-    protected override bool IsValid(IComparable value) => Validator.IsValid(value);
+    protected override bool IsValid(IComparable value) => _validator.IsValid(value);
 }

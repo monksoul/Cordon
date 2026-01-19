@@ -25,8 +25,7 @@ public class NotNullAttributeTests
     {
         var attribute = new NotNullAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as NotNullValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

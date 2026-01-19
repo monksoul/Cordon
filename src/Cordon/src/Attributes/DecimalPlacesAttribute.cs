@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class DecimalPlacesAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="DecimalPlacesValidator" />
+    internal readonly DecimalPlacesValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="DecimalPlacesAttribute" />
     /// </summary>
@@ -17,7 +20,7 @@ public class DecimalPlacesAttribute : ValidationBaseAttribute
     public DecimalPlacesAttribute(int maxDecimalPlaces)
     {
         MaxDecimalPlaces = maxDecimalPlaces;
-        Validator = new DecimalPlacesValidator(maxDecimalPlaces);
+        _validator = new DecimalPlacesValidator(maxDecimalPlaces);
 
         UseResourceKey(() => nameof(ValidationMessages.DecimalPlacesValidator_ValidationError));
     }
@@ -28,7 +31,7 @@ public class DecimalPlacesAttribute : ValidationBaseAttribute
     public int MaxDecimalPlaces { get; }
 
     /// <summary>
-    ///     允许字符串数值
+    ///     是否允许字符串数值
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
     public bool AllowStringValues
@@ -37,17 +40,12 @@ public class DecimalPlacesAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.AllowStringValues = value;
+            _validator.AllowStringValues = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="DecimalPlacesValidator" />
-    /// </summary>
-    protected DecimalPlacesValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>

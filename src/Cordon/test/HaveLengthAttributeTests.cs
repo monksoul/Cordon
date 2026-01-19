@@ -27,19 +27,17 @@ public class HaveLengthAttributeTests
         Assert.Equal(2, attribute.Length);
         Assert.False(attribute.AllowEmpty);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as HaveLengthValidator;
-        Assert.NotNull(validator);
-        Assert.Equal(2, validator.Length);
-        Assert.False(validator.AllowEmpty);
+        Assert.NotNull(attribute._validator);
+        Assert.Equal(2, attribute._validator.Length);
+        Assert.False(attribute._validator.AllowEmpty);
 
         var attribute2 = new HaveLengthAttribute(2) { AllowEmpty = true };
         Assert.Equal(2, attribute2.Length);
         Assert.True(attribute2.AllowEmpty);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as HaveLengthValidator;
-        Assert.NotNull(validator2);
-        Assert.Equal(2, validator2.Length);
-        Assert.True(validator2.AllowEmpty);
+        Assert.NotNull(attribute2._validator);
+        Assert.Equal(2, attribute2._validator.Length);
+        Assert.True(attribute2._validator.AllowEmpty);
     }
 
     [Fact]

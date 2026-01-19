@@ -25,8 +25,7 @@ public class EqualToAttributeTests
     {
         var attribute = new EqualToAttribute("furion");
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as EqualToValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

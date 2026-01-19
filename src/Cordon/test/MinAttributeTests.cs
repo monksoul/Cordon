@@ -26,8 +26,7 @@ public class MinAttributeTests
         var attribute = new MinAttribute(10);
         Assert.Equal(10, attribute.CompareValue);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as MinValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

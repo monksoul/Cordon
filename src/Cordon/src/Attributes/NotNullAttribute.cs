@@ -10,21 +10,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class NotNullAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="NotNullValidator" />
+    internal readonly NotNullValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="NotNullAttribute" />
     /// </summary>
     public NotNullAttribute()
     {
-        Validator = new NotNullValidator();
+        _validator = new NotNullValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.NotNullValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="NotNullValidator" />
-    /// </summary>
-    protected NotNullValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

@@ -10,12 +10,15 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class IpAddressAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="IpAddressValidator" />
+    internal readonly IpAddressValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="IpAddressAttribute" />
     /// </summary>
     public IpAddressAttribute()
     {
-        Validator = new IpAddressValidator();
+        _validator = new IpAddressValidator();
 
         UseResourceKey(GetResourceKey);
     }
@@ -30,17 +33,12 @@ public class IpAddressAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.AllowIPv6 = value;
+            _validator.AllowIPv6 = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="IpAddressValidator" />
-    /// </summary>
-    protected IpAddressValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <summary>
     ///     获取错误信息对应的资源键

@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class EqualToAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="EqualToValidator" />
+    internal readonly EqualToValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="EqualToAttribute" />
     /// </summary>
@@ -17,7 +20,7 @@ public class EqualToAttribute : ValidationBaseAttribute
     public EqualToAttribute(object? compareValue)
     {
         CompareValue = compareValue;
-        Validator = new EqualToValidator(compareValue);
+        _validator = new EqualToValidator(compareValue);
 
         UseResourceKey(() => nameof(ValidationMessages.EqualToValidator_ValidationError));
     }
@@ -27,13 +30,8 @@ public class EqualToAttribute : ValidationBaseAttribute
     /// </summary>
     public object? CompareValue { get; }
 
-    /// <summary>
-    ///     <inheritdoc cref="EqualToValidator" />
-    /// </summary>
-    protected EqualToValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>

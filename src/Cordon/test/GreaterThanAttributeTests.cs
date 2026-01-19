@@ -26,8 +26,7 @@ public class GreaterThanAttributeTests
         var attribute = new GreaterThanAttribute(10);
         Assert.Equal(10, attribute.CompareValue);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as GreaterThanValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

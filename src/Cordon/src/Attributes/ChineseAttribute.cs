@@ -10,21 +10,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class ChineseAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="ChineseValidator" />
+    internal readonly ChineseValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="ChineseAttribute" />
     /// </summary>
     public ChineseAttribute()
     {
-        Validator = new ChineseValidator();
+        _validator = new ChineseValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.ChineseValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="ChineseValidator" />
-    /// </summary>
-    protected ChineseValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

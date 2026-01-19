@@ -27,18 +27,16 @@ public class AgeAttributeTests
         Assert.False(attribute.IsAdultOnly);
         Assert.False(attribute.AllowStringValues);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as AgeValidator;
-        Assert.NotNull(validator);
-        Assert.False(validator.IsAdultOnly);
-        Assert.False(validator.AllowStringValues);
+        Assert.NotNull(attribute._validator);
+        Assert.False(attribute._validator.IsAdultOnly);
+        Assert.False(attribute._validator.AllowStringValues);
 
         var attribute2 = new AgeAttribute { IsAdultOnly = true, AllowStringValues = true };
         Assert.True(attribute2.IsAdultOnly);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as AgeValidator;
-        Assert.NotNull(validator2);
-        Assert.True(validator2.IsAdultOnly);
-        Assert.True(validator2.AllowStringValues);
+        Assert.NotNull(attribute2._validator);
+        Assert.True(attribute2._validator.IsAdultOnly);
+        Assert.True(attribute2._validator.AllowStringValues);
     }
 
     [Fact]

@@ -28,11 +28,10 @@ public class TimeOnlyAttributeTests
         Assert.Equal(CultureInfo.InvariantCulture, attribute.Provider);
         Assert.Equal(DateTimeStyles.None, attribute.Style);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as TimeOnlyValidator;
-        Assert.NotNull(validator);
-        Assert.Empty(validator.Formats);
-        Assert.Equal(CultureInfo.InvariantCulture, validator.Provider);
-        Assert.Equal(DateTimeStyles.None, validator.Style);
+        Assert.NotNull(attribute._validator);
+        Assert.Empty(attribute._validator.Formats);
+        Assert.Equal(CultureInfo.InvariantCulture, attribute._validator.Provider);
+        Assert.Equal(DateTimeStyles.None, attribute._validator.Style);
 
         var attribute2 = new TimeOnlyAttribute("HH:mm:ss")
         {
@@ -42,11 +41,10 @@ public class TimeOnlyAttributeTests
         Assert.Equal(CultureInfo.CurrentCulture, attribute2.Provider);
         Assert.Equal(DateTimeStyles.AllowTrailingWhite, attribute2.Style);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as TimeOnlyValidator;
-        Assert.NotNull(validator2);
-        Assert.Equal(["HH:mm:ss"], validator2.Formats);
-        Assert.Equal(CultureInfo.CurrentCulture, validator2.Provider);
-        Assert.Equal(DateTimeStyles.AllowTrailingWhite, validator2.Style);
+        Assert.NotNull(attribute2._validator);
+        Assert.Equal(["HH:mm:ss"], attribute2._validator.Formats);
+        Assert.Equal(CultureInfo.CurrentCulture, attribute2._validator.Provider);
+        Assert.Equal(DateTimeStyles.AllowTrailingWhite, attribute2._validator.Style);
     }
 
     [Fact]

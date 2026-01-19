@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class LessThanOrEqualToAttribute : ComparisonAttribute
 {
+    /// <inheritdoc cref="LessThanOrEqualToValidator" />
+    internal readonly LessThanOrEqualToValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="LessThanOrEqualToAttribute" />
     /// </summary>
@@ -34,13 +37,8 @@ public class LessThanOrEqualToAttribute : ComparisonAttribute
     /// <param name="compareValue">比较的值</param>
     public LessThanOrEqualToAttribute(IComparable compareValue)
         : base(compareValue, nameof(ValidationMessages.LessThanOrEqualToValidator_ValidationError)) =>
-        Validator = new LessThanOrEqualToValidator(compareValue);
-
-    /// <summary>
-    ///     <inheritdoc cref="LessThanOrEqualToValidator" />
-    /// </summary>
-    protected LessThanOrEqualToValidator Validator { get; }
+        _validator = new LessThanOrEqualToValidator(compareValue);
 
     /// <inheritdoc />
-    protected override bool IsValid(IComparable value) => Validator.IsValid(value);
+    protected override bool IsValid(IComparable value) => _validator.IsValid(value);
 }

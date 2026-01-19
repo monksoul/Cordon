@@ -99,8 +99,8 @@ public static class Validators
     /// <summary>
     ///     创建年龄（0-120 岁）验证器
     /// </summary>
-    /// <param name="isAdultOnly">是否仅验证成年人（18 岁及以上），默认值为：<c>false</c></param>
-    /// <param name="allowStringValues">允许字符串数值，默认值为：<c>false</c></param>
+    /// <param name="isAdultOnly">是否仅允许成年人（18 岁及以上），默认值为：<c>false</c></param>
+    /// <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
     /// <returns>
     ///     <see cref="AgeValidator" />
     /// </returns>
@@ -284,7 +284,7 @@ public static class Validators
     ///     创建验证数值的小数位数验证器
     /// </summary>
     /// <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
-    /// <param name="allowStringValues">允许字符串数值，默认值为：<c>false</c></param>
+    /// <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
     /// <returns>
     ///     <see cref="DecimalPlacesValidator" />
     /// </returns>

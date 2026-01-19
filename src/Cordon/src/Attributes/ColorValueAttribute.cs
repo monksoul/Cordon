@@ -10,12 +10,15 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class ColorValueAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="ColorValueValidator" />
+    internal readonly ColorValueValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="ColorValueAttribute" />
     /// </summary>
     public ColorValueAttribute()
     {
-        Validator = new ColorValueValidator();
+        _validator = new ColorValueValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.ColorValueValidator_ValidationError));
     }
@@ -30,15 +33,10 @@ public class ColorValueAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.FullMode = value;
+            _validator.FullMode = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="ColorValueValidator" />
-    /// </summary>
-    protected ColorValueValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

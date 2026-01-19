@@ -14,21 +14,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class UserNameAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="UserNameValidator" />
+    internal readonly UserNameValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="UserNameAttribute" />
     /// </summary>
     public UserNameAttribute()
     {
-        Validator = new UserNameValidator();
+        _validator = new UserNameValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.UserNameValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="UserNameValidator" />
-    /// </summary>
-    protected UserNameValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

@@ -15,12 +15,15 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class PasswordAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="PasswordValidator" />
+    internal readonly PasswordValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="PasswordAttribute" />
     /// </summary>
     public PasswordAttribute()
     {
-        Validator = new PasswordValidator();
+        _validator = new PasswordValidator();
 
         UseResourceKey(GetResourceKey);
     }
@@ -35,17 +38,12 @@ public class PasswordAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.Strong = value;
+            _validator.Strong = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="PasswordValidator" />
-    /// </summary>
-    protected PasswordValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <summary>
     ///     获取错误信息对应的资源键

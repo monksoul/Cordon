@@ -15,13 +15,13 @@ public class AgeValidator : ValidatorBase
     public AgeValidator() => UseResourceKey(GetResourceKey);
 
     /// <summary>
-    ///     是否仅验证成年人（18 岁及以上）
+    ///     是否仅允许成年人（18 岁及以上）
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
     public bool IsAdultOnly { get; set; }
 
     /// <summary>
-    ///     允许字符串数值
+    ///     是否允许字符串数值
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
     public bool AllowStringValues { get; set; }

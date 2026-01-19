@@ -10,21 +10,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class IDCardAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="IDCardValidator" />
+    internal readonly IDCardValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="IDCardAttribute" />
     /// </summary>
     public IDCardAttribute()
     {
-        Validator = new IDCardValidator();
+        _validator = new IDCardValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.IDCardValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="IDCardValidator" />
-    /// </summary>
-    protected IDCardValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

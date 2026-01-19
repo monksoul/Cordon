@@ -25,8 +25,7 @@ public class DomainAttributeTests
     {
         var attribute = new DomainAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as DomainValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

@@ -26,8 +26,7 @@ public class LessThanOrEqualToAttributeTests
         var attribute = new LessThanOrEqualToAttribute(10);
         Assert.Equal(10, attribute.CompareValue);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as LessThanOrEqualToValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

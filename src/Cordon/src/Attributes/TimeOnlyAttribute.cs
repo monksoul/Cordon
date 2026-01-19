@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class TimeOnlyAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="TimeOnlyValidator" />
+    internal readonly TimeOnlyValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="TimeOnlyAttribute" />
     /// </summary>
@@ -20,7 +23,7 @@ public class TimeOnlyAttribute : ValidationBaseAttribute
         ArgumentNullException.ThrowIfNull(formats);
 
         Formats = formats;
-        Validator = new TimeOnlyValidator(formats);
+        _validator = new TimeOnlyValidator(formats);
 
         UseResourceKey(GetResourceKey);
     }
@@ -40,7 +43,7 @@ public class TimeOnlyAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.Provider = value;
+            _validator.Provider = value;
         }
     } = CultureInfo.InvariantCulture;
 
@@ -54,17 +57,12 @@ public class TimeOnlyAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.Style = value;
+            _validator.Style = value;
         }
     } = DateTimeStyles.None;
 
-    /// <summary>
-    ///     <inheritdoc cref="TimeOnlyValidator" />
-    /// </summary>
-    protected TimeOnlyValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) => string.Format(CultureInfo.CurrentCulture,

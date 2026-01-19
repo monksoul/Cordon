@@ -10,21 +10,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class NotBlankAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="NotBlankValidator" />
+    internal readonly NotBlankValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="NotBlankAttribute" />
     /// </summary>
     public NotBlankAttribute()
     {
-        Validator = new NotBlankValidator();
+        _validator = new NotBlankValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.NotBlankValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="NotBlankValidator" />
-    /// </summary>
-    protected NotBlankValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

@@ -11,21 +11,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class PhoneNumberAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="PhoneNumberValidator" />
+    internal readonly PhoneNumberValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="PhoneNumberAttribute" />
     /// </summary>
     public PhoneNumberAttribute()
     {
-        Validator = new PhoneNumberValidator();
+        _validator = new PhoneNumberValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.PhoneNumberValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="PhoneNumberValidator" />
-    /// </summary>
-    protected PhoneNumberValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

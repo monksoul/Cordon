@@ -27,19 +27,17 @@ public class DecimalPlacesAttributeTests
         Assert.Equal(1, attribute.MaxDecimalPlaces);
         Assert.False(attribute.AllowStringValues);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as DecimalPlacesValidator;
-        Assert.NotNull(validator);
-        Assert.Equal(1, validator.MaxDecimalPlaces);
-        Assert.False(validator.AllowStringValues);
+        Assert.NotNull(attribute._validator);
+        Assert.Equal(1, attribute._validator.MaxDecimalPlaces);
+        Assert.False(attribute._validator.AllowStringValues);
 
         var attribute2 = new DecimalPlacesAttribute(1) { AllowStringValues = true };
         Assert.Equal(1, attribute2.MaxDecimalPlaces);
         Assert.True(attribute2.AllowStringValues);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as DecimalPlacesValidator;
-        Assert.NotNull(validator2);
-        Assert.Equal(1, validator2.MaxDecimalPlaces);
-        Assert.True(validator2.AllowStringValues);
+        Assert.NotNull(attribute2._validator);
+        Assert.Equal(1, attribute2._validator.MaxDecimalPlaces);
+        Assert.True(attribute2._validator.AllowStringValues);
     }
 
     [Fact]

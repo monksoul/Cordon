@@ -25,8 +25,7 @@ public class EmailAddressStrictAttributeTests
     {
         var attribute = new EmailAddressStrictAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as EmailAddressValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

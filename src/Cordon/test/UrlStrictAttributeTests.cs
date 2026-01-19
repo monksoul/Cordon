@@ -26,16 +26,14 @@ public class UrlStrictAttributeTests
         var attribute = new UrlStrictAttribute();
         Assert.False(attribute.SupportsFtp);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as UrlValidator;
-        Assert.NotNull(validator);
-        Assert.False(validator.SupportsFtp);
+        Assert.NotNull(attribute._validator);
+        Assert.False(attribute._validator.SupportsFtp);
 
         var attribute2 = new UrlStrictAttribute { SupportsFtp = true };
         Assert.True(attribute2.SupportsFtp);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as UrlValidator;
-        Assert.NotNull(validator2);
-        Assert.True(validator2.SupportsFtp);
+        Assert.NotNull(attribute2._validator);
+        Assert.True(attribute2._validator.SupportsFtp);
     }
 
     [Fact]

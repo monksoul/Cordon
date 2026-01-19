@@ -23,13 +23,16 @@ public class EnumAttribute<TEnum> : EnumAttribute
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class EnumAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="EnumValidator" />
+    internal readonly EnumValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="EnumAttribute" />
     /// </summary>
     public EnumAttribute(Type enumType)
     {
         EnumType = enumType;
-        Validator = new EnumValidator(enumType);
+        _validator = new EnumValidator(enumType);
 
         UseResourceKey(GetResourceKey);
     }
@@ -49,17 +52,12 @@ public class EnumAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.SupportFlags = value;
+            _validator.SupportFlags = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="EnumValidator" />
-    /// </summary>
-    protected EnumValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>

@@ -10,21 +10,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class SingleAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="SingleValidator" />
+    internal readonly SingleValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="SingleAttribute" />
     /// </summary>
     public SingleAttribute()
     {
-        Validator = new SingleValidator();
+        _validator = new SingleValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.SingleValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="SingleValidator" />
-    /// </summary>
-    protected SingleValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

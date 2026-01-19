@@ -25,8 +25,7 @@ public class PostalCodeAttributeTests
     {
         var attribute = new PostalCodeAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as PostalCodeValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

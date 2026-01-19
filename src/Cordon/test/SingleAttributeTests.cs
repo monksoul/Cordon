@@ -25,8 +25,7 @@ public class SingleAttributeTests
     {
         var attribute = new SingleAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as SingleValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

@@ -26,9 +26,8 @@ public class StrongPasswordAttributeTests
         var attribute = new StrongPasswordAttribute();
         Assert.True(attribute.Strong);
         Assert.Null(attribute.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute) as PasswordValidator;
-        Assert.NotNull(validator2);
-        Assert.True(validator2.Strong);
+        Assert.NotNull(attribute._validator);
+        Assert.True(attribute._validator.Strong);
     }
 
     [Fact]

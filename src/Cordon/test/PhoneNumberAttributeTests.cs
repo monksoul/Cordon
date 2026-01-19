@@ -25,8 +25,7 @@ public class PhoneNumberAttributeTests
     {
         var attribute = new PhoneNumberAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as PhoneNumberValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

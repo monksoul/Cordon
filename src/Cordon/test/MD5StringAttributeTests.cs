@@ -26,16 +26,14 @@ public class MD5StringAttributeTests
         var attribute = new MD5StringAttribute();
         Assert.False(attribute.AllowShortFormat);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as MD5StringValidator;
-        Assert.NotNull(validator);
-        Assert.False(validator.AllowShortFormat);
+        Assert.NotNull(attribute._validator);
+        Assert.False(attribute._validator.AllowShortFormat);
 
         var attribute2 = new MD5StringAttribute { AllowShortFormat = true };
         Assert.True(attribute2.AllowShortFormat);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute) as MD5StringValidator;
-        Assert.NotNull(validator2);
-        Assert.False(validator2.AllowShortFormat);
+        Assert.NotNull(attribute2._validator);
+        Assert.True(attribute2._validator.AllowShortFormat);
     }
 
     [Fact]

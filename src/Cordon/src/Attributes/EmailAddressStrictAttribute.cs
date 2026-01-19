@@ -10,21 +10,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class EmailAddressStrictAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="EmailAddressValidator" />
+    internal readonly EmailAddressValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="EmailAddressStrictAttribute" />
     /// </summary>
     public EmailAddressStrictAttribute()
     {
-        Validator = new EmailAddressValidator();
+        _validator = new EmailAddressValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.EmailAddressValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="EmailAddressValidator" />
-    /// </summary>
-    protected EmailAddressValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

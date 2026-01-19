@@ -27,19 +27,17 @@ public class StartsWithAttributeTests
         Assert.Equal("fu", attribute.SearchValue);
         Assert.Equal(StringComparison.Ordinal, attribute.Comparison);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as StartsWithValidator;
-        Assert.NotNull(validator);
-        Assert.Equal("fu", validator.SearchValue);
-        Assert.Equal(StringComparison.Ordinal, validator.Comparison);
+        Assert.NotNull(attribute._validator);
+        Assert.Equal("fu", attribute._validator.SearchValue);
+        Assert.Equal(StringComparison.Ordinal, attribute._validator.Comparison);
 
         var attribute2 = new StartsWithAttribute('i') { Comparison = StringComparison.InvariantCulture };
         Assert.Equal("i", attribute2.SearchValue);
         Assert.Equal(StringComparison.InvariantCulture, attribute2.Comparison);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as StartsWithValidator;
-        Assert.NotNull(validator2);
-        Assert.Equal("i", validator2.SearchValue);
-        Assert.Equal(StringComparison.InvariantCulture, validator2.Comparison);
+        Assert.NotNull(attribute2._validator);
+        Assert.Equal("i", attribute2._validator.SearchValue);
+        Assert.Equal(StringComparison.InvariantCulture, attribute2._validator.Comparison);
     }
 
     [Fact]

@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class HaveLengthAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="HaveLengthValidator" />
+    internal readonly HaveLengthValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="HaveLengthAttribute" />
     /// </summary>
@@ -17,7 +20,7 @@ public class HaveLengthAttribute : ValidationBaseAttribute
     public HaveLengthAttribute(int length)
     {
         Length = length;
-        Validator = new HaveLengthValidator(length);
+        _validator = new HaveLengthValidator(length);
 
         UseResourceKey(GetResourceKey);
     }
@@ -37,17 +40,12 @@ public class HaveLengthAttribute : ValidationBaseAttribute
         set
         {
             field = value;
-            Validator.AllowEmpty = value;
+            _validator.AllowEmpty = value;
         }
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="HaveLengthValidator" />
-    /// </summary>
-    protected HaveLengthValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>

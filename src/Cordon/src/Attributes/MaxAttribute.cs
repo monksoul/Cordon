@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class MaxAttribute : ComparisonAttribute
 {
+    /// <inheritdoc cref="MaxValidator" />
+    internal readonly MaxValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="MaxAttribute" />
     /// </summary>
@@ -34,13 +37,8 @@ public class MaxAttribute : ComparisonAttribute
     /// <param name="maximum">允许的最大字段值</param>
     public MaxAttribute(IComparable maximum)
         : base(maximum, nameof(ValidationMessages.MaxValidator_ValidationError)) =>
-        Validator = new MaxValidator(maximum);
-
-    /// <summary>
-    ///     <inheritdoc cref="MaxValidator" />
-    /// </summary>
-    protected MaxValidator Validator { get; }
+        _validator = new MaxValidator(maximum);
 
     /// <inheritdoc />
-    protected override bool IsValid(IComparable value) => Validator.IsValid(value);
+    protected override bool IsValid(IComparable value) => _validator.IsValid(value);
 }

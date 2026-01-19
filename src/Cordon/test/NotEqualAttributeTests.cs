@@ -25,8 +25,7 @@ public class NotNotEqualAttributeTests
     {
         var attribute = new NotEqualToAttribute("furion");
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as NotEqualToValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

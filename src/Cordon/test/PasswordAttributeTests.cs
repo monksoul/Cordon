@@ -26,16 +26,14 @@ public class PasswordAttributeTests
         var attribute = new PasswordAttribute();
         Assert.False(attribute.Strong);
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as PasswordValidator;
-        Assert.NotNull(validator);
-        Assert.False(validator.Strong);
+        Assert.NotNull(attribute._validator);
+        Assert.False(attribute._validator.Strong);
 
         var attribute2 = new PasswordAttribute { Strong = true };
         Assert.True(attribute2.Strong);
         Assert.Null(attribute2.ErrorMessage);
-        var validator2 = Helpers.GetValidator(attribute2) as PasswordValidator;
-        Assert.NotNull(validator2);
-        Assert.True(validator2.Strong);
+        Assert.NotNull(attribute2._validator);
+        Assert.True(attribute2._validator.Strong);
     }
 
     [Fact]

@@ -25,8 +25,7 @@ public class IDCardAttributeTests
     {
         var attribute = new IDCardAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as IDCardValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]

@@ -10,21 +10,19 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class PostalCodeAttribute : ValidationBaseAttribute
 {
+    /// <inheritdoc cref="PostalCodeValidator" />
+    internal readonly PostalCodeValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="PostalCodeAttribute" />
     /// </summary>
     public PostalCodeAttribute()
     {
-        Validator = new PostalCodeValidator();
+        _validator = new PostalCodeValidator();
 
         UseResourceKey(() => nameof(ValidationMessages.PostalCodeValidator_ValidationError));
     }
 
-    /// <summary>
-    ///     <inheritdoc cref="PostalCodeValidator" />
-    /// </summary>
-    protected PostalCodeValidator Validator { get; }
-
     /// <inheritdoc />
-    public override bool IsValid(object? value) => Validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
 }

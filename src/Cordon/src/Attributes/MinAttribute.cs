@@ -10,6 +10,9 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class MinAttribute : ComparisonAttribute
 {
+    /// <inheritdoc cref="MinValidator" />
+    internal readonly MinValidator _validator;
+
     /// <summary>
     ///     <inheritdoc cref="MinAttribute" />
     /// </summary>
@@ -34,13 +37,8 @@ public class MinAttribute : ComparisonAttribute
     /// <param name="minimum">允许的最小字段值</param>
     public MinAttribute(IComparable minimum)
         : base(minimum, nameof(ValidationMessages.MinValidator_ValidationError)) =>
-        Validator = new MinValidator(minimum);
-
-    /// <summary>
-    ///     <inheritdoc cref="MinValidator" />
-    /// </summary>
-    protected MinValidator Validator { get; }
+        _validator = new MinValidator(minimum);
 
     /// <inheritdoc />
-    protected override bool IsValid(IComparable value) => Validator.IsValid(value);
+    protected override bool IsValid(IComparable value) => _validator.IsValid(value);
 }

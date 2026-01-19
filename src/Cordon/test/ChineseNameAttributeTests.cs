@@ -25,8 +25,7 @@ public class ChineseNameAttributeTests
     {
         var attribute = new ChineseNameAttribute();
         Assert.Null(attribute.ErrorMessage);
-        var validator = Helpers.GetValidator(attribute) as ChineseNameValidator;
-        Assert.NotNull(validator);
+        Assert.NotNull(attribute._validator);
     }
 
     [Fact]
