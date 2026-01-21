@@ -27,6 +27,7 @@ public class ObjectValidatorTests
         Assert.Null(validator.WhenCondition);
         Assert.Null(validator._memberPath);
         Assert.False(validator.IsNested);
+        Assert.Equal(CompositeMode.All, validator.Mode);
 
         using var validator2 = new ObjectValidator<ObjectModel>(new Dictionary<object, object?>());
         Assert.NotNull(validator2.Options);
@@ -803,6 +804,15 @@ public class ObjectValidatorTests
 
         validator.CustomOnly();
         Assert.True(validator.Options.SuppressAttributeValidation);
+    }
+
+    [Fact]
+    public void UseMode_ReturnOK()
+    {
+        using var validator = new ObjectValidator<ObjectModel>();
+        Assert.Equal(CompositeMode.All, validator.Mode);
+        validator.UseMode(CompositeMode.FailFast);
+        Assert.Equal(CompositeMode.FailFast, validator.Mode);
     }
 
     [Fact]

@@ -40,7 +40,7 @@ public class PropertyValidatorTests
         Assert.NotNull(propertyValidator.This);
         Assert.Equal(propertyValidator.This, propertyValidator);
         Assert.Null(propertyValidator._allowEmptyStrings);
-        Assert.Equal(CompositeMode.All, propertyValidator.Mode);
+        Assert.Null(propertyValidator.Mode);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
@@ -981,9 +981,19 @@ public class PropertyValidatorTests
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
-        Assert.Equal(CompositeMode.All, propertyValidator.Mode);
+        Assert.Null(propertyValidator.Mode);
         propertyValidator.UseMode(CompositeMode.FailFast);
         Assert.Equal(CompositeMode.FailFast, propertyValidator.Mode);
+    }
+
+    [Fact]
+    public void GetMode_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+        Assert.Equal(CompositeMode.All, propertyValidator.GetMode());
+        propertyValidator.UseMode(CompositeMode.FailFast);
+        Assert.Equal(CompositeMode.FailFast, propertyValidator.GetMode());
     }
 
     [Fact]

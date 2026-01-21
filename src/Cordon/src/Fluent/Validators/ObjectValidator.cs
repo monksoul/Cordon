@@ -94,6 +94,12 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     internal ValidatorOptions Options { get; }
 
     /// <summary>
+    ///     <inheritdoc cref="CompositeMode" />
+    /// </summary>
+    /// <remarks>默认值为：<see cref="CompositeMode.All" />。</remarks>
+    public CompositeMode Mode { get; set; } = CompositeMode.All;
+
+    /// <summary>
     ///     验证条件
     /// </summary>
     /// <remarks>当条件满足时才进行验证。</remarks>
@@ -709,6 +715,22 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
     public virtual ObjectValidator<T> CustomOnly() => UseAttributeValidation(false);
+
+    /// <summary>
+    ///     设置验证模式
+    /// </summary>
+    /// <param name="mode">
+    ///     <see cref="CompositeMode" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="ObjectValidator{T}" />
+    /// </returns>
+    public virtual ObjectValidator<T> UseMode(CompositeMode mode)
+    {
+        Mode = mode;
+
+        return this;
+    }
 
     /// <summary>
     ///     获取对象验证结果列表
