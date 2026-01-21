@@ -1247,7 +1247,7 @@ public class PropertyValidatorTests
     public void Clone_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).Required().MinLength(3)
-            .PreProcess(u => u.Trim()).AllowEmptyStrings();
+            .PreProcess(u => u.Trim()).AllowEmptyStrings().UseMode(CompositeMode.FailFast);
 
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var cloned = propertyValidator.Clone(objectValidator) as PropertyValidator<ObjectModel, string?>;
@@ -1255,6 +1255,7 @@ public class PropertyValidatorTests
         Assert.Equal(2, cloned.Validators.Count);
         Assert.NotNull(cloned._preProcessor);
         Assert.True(cloned._allowEmptyStrings);
+        Assert.Equal(CompositeMode.FailFast, cloned.Mode);
     }
 
     [Fact]
