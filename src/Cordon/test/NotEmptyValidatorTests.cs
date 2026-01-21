@@ -12,6 +12,9 @@ public class NotEmptyValidatorTests
         var validator = new NotEmptyValidator();
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} does not allow empty values.", validator._errorMessageResourceAccessor());
+
+        Assert.True(typeof(IHighPriorityValidator).IsAssignableFrom(typeof(NotEmptyValidator)));
+        Assert.Equal(20, ((IHighPriorityValidator)validator).Priority);
     }
 
     [Theory]

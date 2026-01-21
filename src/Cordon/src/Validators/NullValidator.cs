@@ -16,7 +16,7 @@ public class NullValidator : ValidatorBase, IHighPriorityValidator
 
     /// <inheritdoc />
     /// <remarks>默认值为：0。</remarks>
-    public int Priority => 0;
+    int IHighPriorityValidator.Priority => 0;
 
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext) => value is null;

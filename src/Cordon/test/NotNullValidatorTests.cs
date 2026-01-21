@@ -14,7 +14,7 @@ public class NotNullValidatorTests
         Assert.Equal("The field {0} does not allow null values.", validator._errorMessageResourceAccessor());
 
         Assert.True(typeof(IHighPriorityValidator).IsAssignableFrom(typeof(NotNullValidator)));
-        Assert.Equal(0, validator.Priority);
+        Assert.Equal(0, ((IHighPriorityValidator)validator).Priority);
     }
 
     [Theory]

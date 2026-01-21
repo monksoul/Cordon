@@ -16,7 +16,7 @@ public class RequiredValidatorTests
         Assert.Equal("The {0} field is required.", validator._errorMessageResourceAccessor());
 
         Assert.True(typeof(IHighPriorityValidator).IsAssignableFrom(typeof(RequiredValidator)));
-        Assert.Equal(10, validator.Priority);
+        Assert.Equal(10, ((IHighPriorityValidator)validator).Priority);
     }
 
     [Theory]

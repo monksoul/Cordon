@@ -12,6 +12,9 @@ public class EmptyValidatorTests
         var validator = new EmptyValidator();
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be empty.", validator._errorMessageResourceAccessor());
+
+        Assert.True(typeof(IHighPriorityValidator).IsAssignableFrom(typeof(EmptyValidator)));
+        Assert.Equal(20, ((IHighPriorityValidator)validator).Priority);
     }
 
     [Theory]

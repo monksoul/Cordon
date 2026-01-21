@@ -22,7 +22,7 @@ public class RequiredValidator : ValidatorBase, IHighPriorityValidator
 
     /// <inheritdoc />
     /// <remarks>默认值为：10。</remarks>
-    public int Priority => 10;
+    int IHighPriorityValidator.Priority => 10;
 
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext)

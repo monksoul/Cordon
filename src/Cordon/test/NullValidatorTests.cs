@@ -14,7 +14,7 @@ public class NullValidatorTests
         Assert.Equal("The field {0} must be null.", validator._errorMessageResourceAccessor());
 
         Assert.True(typeof(IHighPriorityValidator).IsAssignableFrom(typeof(NullValidator)));
-        Assert.Equal(0, validator.Priority);
+        Assert.Equal(0, ((IHighPriorityValidator)validator).Priority);
     }
 
     [Theory]

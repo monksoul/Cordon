@@ -7,12 +7,16 @@ namespace Cordon;
 /// <summary>
 ///     空集合、数组和字符串验证器
 /// </summary>
-public class EmptyValidator : ValidatorBase
+public class EmptyValidator : ValidatorBase, IHighPriorityValidator
 {
     /// <summary>
     ///     <inheritdoc cref="EmptyValidator" />
     /// </summary>
     public EmptyValidator() => UseResourceKey(() => nameof(ValidationMessages.EmptyValidator_ValidationError));
+
+    /// <inheritdoc />
+    /// <remarks>默认值为：20。</remarks>
+    int IHighPriorityValidator.Priority => 20;
 
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext) =>
