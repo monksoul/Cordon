@@ -294,7 +294,7 @@ public class ValueValidatorValidationTests
     [Fact]
     public void FileExtensions_ReturnOK()
     {
-        var valueValidator = new ValueValidator<string>().FileExtensions("png,jpg,jpeg,gif");
+        var valueValidator = new ValueValidator<string>().FileExtensions();
 
         Assert.Single(valueValidator.Validators);
 
@@ -303,6 +303,16 @@ public class ValueValidatorValidationTests
 
         Assert.False(valueValidator.IsValid("furion.ico"));
         Assert.True(valueValidator.IsValid("furion.png"));
+
+        var valueValidator2 = new ValueValidator<string>().FileExtensions("png,jpg,jpeg,gif");
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator2 = valueValidator2._lastAddedValidator as FileExtensionsValidator;
+        Assert.NotNull(addedValidator2);
+
+        Assert.False(valueValidator2.IsValid("furion.ico"));
+        Assert.True(valueValidator2.IsValid("furion.png"));
     }
 
     [Fact]
@@ -314,10 +324,12 @@ public class ValueValidatorValidationTests
 
         Assert.Single(valueValidator.Validators);
 
-        var addedValidator = valueValidator._lastAddedValidator as CustomValidationValidator;
+        var addedValidator = valueValidator._lastAddedValidator as AttributeValueValidator;
         Assert.NotNull(addedValidator);
-        Assert.Equal(typeof(CustomValidators), addedValidator.ValidatorType);
-        Assert.Equal("ValidateValue", addedValidator.Method);
+        var customValidationAttribute = addedValidator.Attributes[0] as CustomValidationAttribute;
+        Assert.NotNull(customValidationAttribute);
+        Assert.Equal(typeof(CustomValidators), customValidationAttribute.ValidatorType);
+        Assert.Equal("ValidateValue", customValidationAttribute.Method);
 
         Assert.False(valueValidator.IsValid("fu"));
         Assert.True(valueValidator.IsValid("Furion"));
@@ -753,9 +765,21 @@ public class ValueValidatorValidationTests
 
         var addedValidator = valueValidator._lastAddedValidator as MaxLengthValidator;
         Assert.NotNull(addedValidator);
+        Assert.Equal(3, addedValidator.Length);
 
         Assert.False(valueValidator.IsValid("Furion"));
         Assert.True(valueValidator.IsValid("百小僧"));
+
+        var valueValidator2 = new ValueValidator<object>().MaxLength(-1);
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator2 = valueValidator2._lastAddedValidator as MaxLengthValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.Equal(-1, addedValidator2.Length);
+
+        Assert.True(valueValidator2.IsValid("Furion"));
+        Assert.True(valueValidator2.IsValid("百小僧"));
     }
 
     [Fact]
@@ -1535,6 +1559,43 @@ public class ValueValidatorValidationTests
 
         Assert.False(valueValidator.IsValid("monk__soul"));
         Assert.True(valueValidator.IsValid("monksoul"));
+    }
+
+    [Fact]
+    public void WithAttribute_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().WithAttribute(new UserNameAttribute());
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as AttributeValueValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.False(valueValidator.IsValid("monk__soul"));
+        Assert.True(valueValidator.IsValid("monksoul"));
+
+        var validationResults = valueValidator.GetValidationResults("monk__soul");
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal("The field Object is not a valid username.", validationResults[0].ErrorMessage);
+        Assert.Empty(validationResults[0].MemberNames);
+
+        var exception = Assert.Throws<ValidationException>(() =>
+            valueValidator.Validate("monk__soul"));
+        Assert.Equal("The field Object is not a valid username.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        valueValidator.WithName("Value");
+        var validationResults2 = valueValidator.GetValidationResults("monk__soul");
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal("The field Value is not a valid username.", validationResults2[0].ErrorMessage);
+        Assert.Equal("Value", validationResults2[0].MemberNames.FirstOrDefault());
+
+        var exception2 = Assert.Throws<ValidationException>(() =>
+            valueValidator.Validate("monk__soul"));
+        Assert.Equal("The field Value is not a valid username.", exception2.Message);
+        Assert.Equal("Value", exception2.ValidationResult.MemberNames.FirstOrDefault());
     }
 
     [Fact]

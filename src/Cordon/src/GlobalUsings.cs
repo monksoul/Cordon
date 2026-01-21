@@ -7,6 +7,7 @@ global using Cordon.Core.Extensions;
 global using Cordon.Resources;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.DependencyInjection.Extensions;
+global using System.Buffers.Text;
 global using System.Collections;
 global using System.Collections.Concurrent;
 global using System.ComponentModel;

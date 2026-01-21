@@ -14,8 +14,6 @@ public class AllowedValuesValidatorTests
     public void New_ReturnOK()
     {
         var validator = new AllowedValuesValidator("Furion", "Fur", "百小僧");
-        Assert.NotNull(validator._validator);
-        Assert.True(validator._validator.Attributes.First() is AllowedValuesAttribute);
         Assert.Equal(["Furion", "Fur", "百小僧"], validator.Values);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);

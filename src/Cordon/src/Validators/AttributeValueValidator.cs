@@ -7,12 +7,20 @@ namespace Cordon;
 /// <summary>
 ///     单值验证特性验证器
 /// </summary>
-public class AttributeValueValidator : ValidatorBase, IValidatorInitializer
+public class AttributeValueValidator : ValidatorBase, IValidatorInitializer, IDisposable
 {
     /// <summary>
     ///     用于值验证的 <see cref="ValidationContext" /> 占位对象
     /// </summary>
     internal static readonly object _sentinel = new();
+
+    /// <summary>
+    ///     需要监听属性变更的属性名集合
+    /// </summary>
+    internal readonly string[] _observedPropertyNames =
+    [
+        nameof(ErrorMessage), nameof(ErrorMessageResourceType), nameof(ErrorMessageResourceName)
+    ];
 
     /// <summary>
     ///     <see cref="IServiceProvider" /> 委托
@@ -70,6 +78,9 @@ public class AttributeValueValidator : ValidatorBase, IValidatorInitializer
 
         Items = items is not null ? new Dictionary<object, object?>(items) : new Dictionary<object, object?>();
 
+        // 订阅属性变更事件
+        PropertyChanged += OnPropertyChanged;
+
         ErrorMessageResourceAccessor = () => null!;
     }
 
@@ -82,6 +93,13 @@ public class AttributeValueValidator : ValidatorBase, IValidatorInitializer
     ///     共享数据
     /// </summary>
     public IDictionary<object, object?> Items { get; }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
     /// <inheritdoc />
     void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
@@ -105,7 +123,8 @@ public class AttributeValueValidator : ValidatorBase, IValidatorInitializer
             Attributes);
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
-        if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
+        // 注意：当验证特性列表有且只有一个时，跳过以下操作
+        if (validationResults.Count > 0 && Attributes.Length != 1 && (string?)ErrorMessageString is not null)
         {
             validationResults.Insert(0,
                 new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
@@ -125,7 +144,8 @@ public class AttributeValueValidator : ValidatorBase, IValidatorInitializer
                     validationContext?.MemberNames?.FirstOrDefault(), validationContext?.RuleSets), Attributes);
         }
         // 如果验证未通过且配置了自定义错误信息，则重新抛出异常
-        catch (ValidationException e) when (ErrorMessageString is not null)
+        // 注意：当验证特性列表有且只有一个时，跳过以下操作
+        catch (ValidationException e) when (Attributes.Length != 1 && ErrorMessageString is not null)
         {
             throw new ValidationException(
                 new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
@@ -170,5 +190,46 @@ public class AttributeValueValidator : ValidatorBase, IValidatorInitializer
         validationContext.InitializeServiceProvider(_serviceProvider!);
 
         return validationContext;
+    }
+
+    /// <summary>
+    ///     释放资源
+    /// </summary>
+    /// <param name="disposing">是否释放托管资源</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            // 移除属性变更事件
+            PropertyChanged -= OnPropertyChanged;
+        }
+    }
+
+    /// <summary>
+    ///     订阅属性变更事件
+    /// </summary>
+    /// <param name="sender">事件源</param>
+    /// <param name="eventArgs">
+    ///     <see cref="ValidationPropertyChangedEventArgs" />
+    /// </param>
+    internal void OnPropertyChanged(object? sender, ValidationPropertyChangedEventArgs eventArgs)
+    {
+        // 注意：当验证特性列表存在多个时，跳过以下操作
+        if (Attributes.Length != 1)
+        {
+            return;
+        }
+
+        // 检查是否是需要同步的属性名
+        if (!_observedPropertyNames.Contains(eventArgs.PropertyName))
+        {
+            return;
+        }
+
+        // 获取单个验证特性
+        var attribute = Attributes.Single();
+
+        // 应用属性变更到验证特性对应的属性中
+        attribute.GetType().GetProperty(eventArgs.PropertyName!)?.SetValue(attribute, eventArgs.PropertyValue);
     }
 }

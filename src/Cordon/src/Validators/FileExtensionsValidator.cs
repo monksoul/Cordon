@@ -10,30 +10,20 @@ namespace Cordon;
 public class FileExtensionsValidator : ValidatorBase
 {
     /// <summary>
-    ///     <inheritdoc cref="AttributeValueValidator" />
-    /// </summary>
-    internal readonly AttributeValueValidator _validator;
-
-    /// <summary>
     ///     <inheritdoc cref="FileExtensionsValidator" />
     /// </summary>
-    /// <param name="extensions">文件拓展名</param>
-    public FileExtensionsValidator(string extensions)
-    {
-        // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(extensions);
-
-        Extensions = extensions;
-
-        _validator = new AttributeValueValidator(new FileExtensionsAttribute { Extensions = extensions });
-
+    /// <remarks>默认文件拓展名为：<c>png,jpg,jpeg,gif</c>。</remarks>
+    public FileExtensionsValidator() =>
         UseResourceKey(() => nameof(ValidationMessages.FileExtensionsValidator_ValidationError));
-    }
 
     /// <summary>
     ///     文件拓展名
     /// </summary>
-    public string Extensions { get; }
+    public string Extensions
+    {
+        get => string.IsNullOrWhiteSpace(field) ? "png,jpg,jpeg,gif" : field;
+        set;
+    }
 
     /// <summary>
     ///     格式化后的文件拓展名列表
@@ -53,9 +43,19 @@ public class FileExtensionsValidator : ValidatorBase
 
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext) =>
-        _validator.IsValid(value, validationContext);
+        value is null || (value is string valueAsString && ValidateExtension(valueAsString));
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>
         string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, ExtensionsFormatted);
+
+    /// <summary>
+    ///     验证文件拓展名是否在允许的列表中
+    /// </summary>
+    /// <param name="fileName">文件名</param>
+    /// <returns>
+    ///     <see cref="bool" />
+    /// </returns>
+    internal bool ValidateExtension(string fileName) =>
+        ExtensionsParsed.Contains(Path.GetExtension(fileName).ToLowerInvariant());
 }

@@ -324,7 +324,4 @@
     <data name="FileExtensionsValidator_ValidationError" xml:space="preserve">
         <value>The {0} field only accepts files with the following extensions: {1}.</value>
     </data>
-    <data name="CustomValidationValidator_ValidationError" xml:space="preserve">
-        <value>{0} is not valid.</value>
-    </data>
 </root>

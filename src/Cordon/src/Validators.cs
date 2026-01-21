@@ -244,12 +244,12 @@ public static class Validators
     /// <param name="validatorType">执行自定义验证的类型</param>
     /// <param name="method">验证方法</param>
     /// <returns>
-    ///     <see cref="CustomValidationValidator" />
+    ///     <see cref="AttributeValueValidator" />
     /// </returns>
-    public static CustomValidationValidator CustomValidation(
+    public static AttributeValueValidator CustomValidation(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
         Type validatorType, string method) =>
-        new(validatorType, method);
+        AttributeValue(new CustomValidationAttribute(validatorType, method));
 
     /// <summary>
     ///     创建 <see cref="System.DateOnly" /> 验证器
@@ -391,11 +391,20 @@ public static class Validators
     /// <summary>
     ///     创建文件拓展名验证器
     /// </summary>
+    /// <remarks>默认文件拓展名为：<c>png,jpg,jpeg,gif</c>。</remarks>
+    /// <returns>
+    ///     <see cref="FileExtensionsValidator" />
+    /// </returns>
+    public static FileExtensionsValidator FileExtensions() => new();
+
+    /// <summary>
+    ///     创建文件拓展名验证器
+    /// </summary>
     /// <param name="extensions">文件拓展名</param>
     /// <returns>
     ///     <see cref="FileExtensionsValidator" />
     /// </returns>
-    public static FileExtensionsValidator FileExtensions(string extensions) => new(extensions);
+    public static FileExtensionsValidator FileExtensions(string extensions) => new() { Extensions = extensions };
 
     /// <summary>
     ///     创建大于等于验证器
@@ -480,6 +489,14 @@ public static class Validators
     ///     <see cref="LessThanValidator" />
     /// </returns>
     public static LessThanValidator LessThan(IComparable compareValue) => new(compareValue);
+
+    /// <summary>
+    ///     创建最大长度验证器
+    /// </summary>
+    /// <returns>
+    ///     <see cref="MaxLengthValidator" />
+    /// </returns>
+    public static MaxLengthValidator MaxLength() => new();
 
     /// <summary>
     ///     创建最大长度验证器
@@ -1011,7 +1028,9 @@ public static class Validators
     /// <returns>
     ///     <see cref="RegularExpressionValidator" />
     /// </returns>
-    public static RegularExpressionValidator RegularExpression(string pattern, int matchTimeoutInMilliseconds = 2000) =>
+    public static RegularExpressionValidator RegularExpression(
+        [StringSyntax(StringSyntaxAttribute.Regex)]
+        string pattern, int matchTimeoutInMilliseconds = 2000) =>
         new(pattern) { MatchTimeoutInMilliseconds = matchTimeoutInMilliseconds };
 
     /// <summary>
@@ -1022,7 +1041,8 @@ public static class Validators
     /// <returns>
     ///     <see cref="RegularExpressionValidator" />
     /// </returns>
-    public static RegularExpressionValidator Matches(string pattern, int matchTimeoutInMilliseconds = 2000) =>
+    public static RegularExpressionValidator Matches([StringSyntax(StringSyntaxAttribute.Regex)] string pattern,
+        int matchTimeoutInMilliseconds = 2000) =>
         new(pattern) { MatchTimeoutInMilliseconds = matchTimeoutInMilliseconds };
 
     /// <summary>

@@ -10,11 +10,6 @@ namespace Cordon;
 public class LengthValidator : ValidatorBase
 {
     /// <summary>
-    ///     <inheritdoc cref="AttributeValueValidator" />
-    /// </summary>
-    internal readonly AttributeValueValidator _validator;
-
-    /// <summary>
     ///     <inheritdoc cref="LengthValidator" />
     /// </summary>
     /// <param name="minimumLength">最小允许长度</param>
@@ -23,8 +18,6 @@ public class LengthValidator : ValidatorBase
     {
         MinimumLength = minimumLength;
         MaximumLength = maximumLength;
-
-        _validator = new AttributeValueValidator(new LengthAttribute(minimumLength, maximumLength));
 
         UseResourceKey(() => nameof(ValidationMessages.LengthValidator_ValidationError));
     }
@@ -40,10 +33,47 @@ public class LengthValidator : ValidatorBase
     public int MaximumLength { get; }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value, IValidationContext? validationContext) =>
-        _validator.IsValid(value, validationContext);
+    public override bool IsValid(object? value, IValidationContext? validationContext)
+    {
+        // 验证长度参数的合法性
+        EnsureLegalLengths();
+
+        // 空检查
+        if (value is null)
+        {
+            return true;
+        }
+
+        // 尝试获取对象长度
+        if (!value.TryGetCount(out var length))
+        {
+            throw new InvalidCastException(string.Format(CultureInfo.CurrentCulture,
+                "The field of type {0} must be a string, array or ICollection type.", value.GetType()));
+        }
+
+        return (uint)(length - MinimumLength) <= (uint)(MaximumLength - MinimumLength);
+    }
 
     /// <inheritdoc />
-    public override string FormatErrorMessage(string name) =>
-        string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, MinimumLength, MaximumLength);
+    public override string FormatErrorMessage(string name) => string.Format(CultureInfo.CurrentCulture,
+        ErrorMessageString, name, MinimumLength, MaximumLength);
+
+    /// <summary>
+    ///     验证长度参数的合法性
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal void EnsureLegalLengths()
+    {
+        if (MinimumLength < 0)
+        {
+            throw new InvalidOperationException(
+                "LengthValidator must have a MinimumLength value that is zero or greater.");
+        }
+
+        if (MaximumLength < MinimumLength)
+        {
+            throw new InvalidOperationException(
+                "LengthValidator must have a MaximumLength value that is greater than or equal to MinimumLength.");
+        }
+    }
 }

@@ -14,37 +14,9 @@ public class RegularExpressionValidatorTests
         Assert.Equal(2000, validator.MatchTimeoutInMilliseconds);
         Assert.Equal(TimeSpan.FromMilliseconds(2000), validator.MatchTimeout);
 
-        Assert.NotNull(validator._validator);
-        Assert.True(validator._validator.Attributes[0] is RegularExpressionAttribute);
-        Assert.Equal(["MatchTimeoutInMilliseconds"], validator._observedPropertyNames);
-
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must match the regular expression '{1}'.",
             validator._errorMessageResourceAccessor());
-    }
-
-    [Fact]
-    public void Set_MatchTimeoutInMilliseconds_ReturnOK()
-    {
-        var validator = new RegularExpressionValidator("^[1-9]{2,5}$");
-
-        var i = 0;
-        var propertyChangedEventMethod =
-            typeof(RegularExpressionValidator).GetMethod("add_PropertyChanged",
-                BindingFlags.Instance | BindingFlags.NonPublic)!;
-        propertyChangedEventMethod.Invoke(validator, [
-            new EventHandler<ValidationPropertyChangedEventArgs>((_, eventArgs) =>
-            {
-                Assert.Equal("MatchTimeoutInMilliseconds", eventArgs.PropertyName);
-                Assert.Equal(3000, eventArgs.PropertyValue!);
-                i++;
-            })
-        ]);
-
-        validator.MatchTimeoutInMilliseconds = 3000;
-        Assert.Equal(1, i);
-        Assert.Equal(3000,
-            (validator._validator.Attributes[0] as RegularExpressionAttribute)!.MatchTimeoutInMilliseconds);
     }
 
     [Theory]
@@ -59,6 +31,7 @@ public class RegularExpressionValidatorTests
     {
         var validator = new RegularExpressionValidator("^[1-9]{2,5}$");
         Assert.Equal(result, validator.IsValid(value));
+        Assert.NotNull(validator.Regex);
     }
 
     [Fact]
@@ -104,28 +77,18 @@ public class RegularExpressionValidatorTests
     }
 
     [Fact]
-    public void OnPropertyChanged_ReturnOK()
+    public void SetupRegex_Invalid_Parameters()
     {
-        var validator = new RegularExpressionValidator("^[1-9]{2,5}$");
-        var attribute = validator._validator.Attributes[0] as RegularExpressionAttribute;
-        Assert.NotNull(attribute);
+        var validator = new RegularExpressionValidator(null!);
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.SetupRegex());
+        Assert.Equal("The pattern must be set to a valid regular expression.", exception.Message);
 
-        validator.OnPropertyChanged(validator,
-            new ValidationPropertyChangedEventArgs("MatchTimeoutInMilliseconds", 3000));
-        Assert.Equal(3000, attribute.MatchTimeoutInMilliseconds);
-        Assert.Equal(TimeSpan.FromMilliseconds(3000), attribute.MatchTimeout);
-    }
+        var validator2 = new RegularExpressionValidator(string.Empty);
+        var exception2 = Assert.Throws<InvalidOperationException>(() => validator2.SetupRegex());
+        Assert.Equal("The pattern must be set to a valid regular expression.", exception2.Message);
 
-    [Fact]
-    public void Dispose_ReturnOK()
-    {
-        var validator = new RegularExpressionValidator("^[1-9]{2,5}$");
-        var attribute = validator._validator.Attributes[0] as RegularExpressionAttribute;
-        Assert.NotNull(attribute);
-
-        validator.Dispose();
-
-        validator.MatchTimeoutInMilliseconds = 3000;
-        Assert.Equal(2000, attribute.MatchTimeoutInMilliseconds);
+        var validator3 = new RegularExpressionValidator("^[1-9]{2,5}$");
+        validator3.SetupRegex();
+        Assert.NotNull(validator3.Regex);
     }
 }

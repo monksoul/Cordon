@@ -7,31 +7,16 @@ namespace Cordon;
 /// <summary>
 ///     正则表达式验证器
 /// </summary>
-public class RegularExpressionValidator : ValidatorBase, IDisposable
+public class RegularExpressionValidator : ValidatorBase
 {
-    /// <summary>
-    ///     需要监听属性变更的属性名集合
-    /// </summary>
-    internal readonly string[] _observedPropertyNames = [nameof(MatchTimeoutInMilliseconds)];
-
-    /// <summary>
-    ///     <inheritdoc cref="AttributeValueValidator" />
-    /// </summary>
-    internal readonly AttributeValueValidator _validator;
-
     /// <summary>
     ///     <inheritdoc cref="RegularExpressionValidator" />
     /// </summary>
     /// <param name="pattern">正则表达式模式</param>
-    public RegularExpressionValidator(string pattern)
+    public RegularExpressionValidator([StringSyntax(StringSyntaxAttribute.Regex)] string pattern)
     {
         Pattern = pattern;
         MatchTimeoutInMilliseconds = 2000;
-
-        _validator = new AttributeValueValidator(new RegularExpressionAttribute(pattern));
-
-        // 订阅属性变更事件
-        PropertyChanged += OnPropertyChanged;
 
         UseResourceKey(() => nameof(ValidationMessages.RegularExpressionValidator_ValidationError));
     }
@@ -45,68 +30,72 @@ public class RegularExpressionValidator : ValidatorBase, IDisposable
     ///     用于在操作超时前执行单个匹配操作的时间量
     /// </summary>
     /// <remarks>以毫秒为单位，默认值为：2000。</remarks>
-    public int MatchTimeoutInMilliseconds
-    {
-        get;
-        set
-        {
-            field = value;
-
-            // 触发属性变更事件
-            OnPropertyChanged(value);
-        }
-    }
+    public int MatchTimeoutInMilliseconds { get; set; }
 
     /// <summary>
     ///     匹配正则表达式模式时要使用的超时值
     /// </summary>
     public TimeSpan MatchTimeout => TimeSpan.FromMilliseconds(MatchTimeoutInMilliseconds);
 
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <inheritdoc />
-    public override bool IsValid(object? value, IValidationContext? validationContext) =>
-        _validator.IsValid(value, validationContext);
-
-    /// <inheritdoc />
-    public override string FormatErrorMessage(string name) =>
-        string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, Pattern);
-
     /// <summary>
-    ///     释放资源
+    ///     缓存正则表达式 <see cref="Regex" /> 实例
     /// </summary>
-    /// <param name="disposing">是否释放托管资源</param>
-    protected virtual void Dispose(bool disposing)
+    internal Regex? Regex { get; set; }
+
+    /// <inheritdoc />
+    public override bool IsValid(object? value, IValidationContext? validationContext)
     {
-        if (disposing)
+        // 确保 Regex 实例已初始化
+        SetupRegex();
+
+        // 将对象转换为字符串
+        var stringValue = Convert.ToString(value, CultureInfo.CurrentCulture);
+
+        // 空检查
+        if (string.IsNullOrEmpty(stringValue))
         {
-            // 移除属性变更事件
-            PropertyChanged -= OnPropertyChanged;
+            return true;
         }
+
+        // 使用 EnumerateMatches 遍历所有匹配项
+        foreach (var valueMatch in Regex!.EnumerateMatches(stringValue))
+        {
+            // 判断是否完全匹配
+            return valueMatch.Index == 0 && valueMatch.Length == stringValue.Length;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override string FormatErrorMessage(string name)
+    {
+        // 确保 Regex 实例已初始化
+        SetupRegex();
+
+        return string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, Pattern);
     }
 
     /// <summary>
-    ///     订阅属性变更事件
+    ///     初始化 <see cref="Regex" /> 实例
     /// </summary>
-    /// <param name="sender">事件源</param>
-    /// <param name="eventArgs">
-    ///     <see cref="ValidationPropertyChangedEventArgs" />
-    /// </param>
-    internal void OnPropertyChanged(object? sender, ValidationPropertyChangedEventArgs eventArgs)
+    /// <exception cref="InvalidOperationException"></exception>
+    internal void SetupRegex()
     {
-        // 检查是否是需要同步的属性名
-        if (!_observedPropertyNames.Contains(eventArgs.PropertyName))
+        // 空检查
+        if (Regex is not null)
         {
             return;
         }
 
-        // 应用属性变更到 RegularExpressionAttribute 对应的属性中
-        typeof(RegularExpressionAttribute).GetProperty(eventArgs.PropertyName!)
-            ?.SetValue(_validator.Attributes[0], eventArgs.PropertyValue);
+        // 空检查
+        if (string.IsNullOrEmpty(Pattern))
+        {
+            throw new InvalidOperationException("The pattern must be set to a valid regular expression.");
+        }
+
+        Regex = MatchTimeoutInMilliseconds == -1
+            ? new Regex(Pattern)
+            : new Regex(Pattern, default, TimeSpan.FromMilliseconds(MatchTimeoutInMilliseconds));
     }
 }

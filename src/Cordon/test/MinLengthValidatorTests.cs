@@ -10,14 +10,21 @@ public class MinLengthValidatorTests
     public void New_ReturnOK()
     {
         var validator = new MinLengthValidator(5);
-        Assert.NotNull(validator._validator);
-        Assert.True(validator._validator.Attributes.First() is MinLengthAttribute);
         Assert.Equal(5, validator.Length);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal(
             "The field {0} must be a string or array type with a minimum length of '{1}'.",
             validator._errorMessageResourceAccessor());
+    }
+
+    [Fact]
+    public void IsValid_Invalid_Parameters()
+    {
+        var validator = new MinLengthValidator(5);
+        var exception = Assert.Throws<InvalidCastException>(() => validator.IsValid(CompositeMode.All));
+        Assert.Equal("The field of type Cordon.CompositeMode must be a string, array or ICollection type.",
+            exception.Message);
     }
 
     [Theory]
@@ -97,5 +104,13 @@ public class MinLengthValidatorTests
         Assert.Equal(
             "The field data must be a string or array type with a minimum length of '5'.",
             validator.FormatErrorMessage("data"));
+    }
+
+    [Fact]
+    public void EnsureLegalLengths_ReturnOK()
+    {
+        var validator = new MinLengthValidator(-11);
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.EnsureLegalLengths());
+        Assert.Equal("MinLengthValidator must have a Length value that is zero or greater.", exception.Message);
     }
 }

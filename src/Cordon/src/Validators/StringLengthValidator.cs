@@ -7,18 +7,8 @@ namespace Cordon;
 /// <summary>
 ///     字符串长度验证器
 /// </summary>
-public class StringLengthValidator : ValidatorBase, IDisposable
+public class StringLengthValidator : ValidatorBase
 {
-    /// <summary>
-    ///     需要监听属性变更的属性名集合
-    /// </summary>
-    internal readonly string[] _observedPropertyNames = [nameof(MinimumLength)];
-
-    /// <summary>
-    ///     <inheritdoc cref="AttributeValueValidator" />
-    /// </summary>
-    internal readonly AttributeValueValidator _validator;
-
     /// <summary>
     ///     <inheritdoc cref="StringLengthValidator" />
     /// </summary>
@@ -27,12 +17,7 @@ public class StringLengthValidator : ValidatorBase, IDisposable
     {
         MaximumLength = maximumLength;
 
-        _validator = new AttributeValueValidator(new StringLengthAttribute(maximumLength));
-
-        // 订阅属性变更事件
-        PropertyChanged += OnPropertyChanged;
-
-        UseResourceKey(() => nameof(ValidationMessages.StringLengthValidator_ValidationError));
+        UseResourceKey(GetResourceKey);
     }
 
     /// <summary>
@@ -43,65 +28,61 @@ public class StringLengthValidator : ValidatorBase, IDisposable
     /// <summary>
     ///     最小允许长度
     /// </summary>
-    public int MinimumLength
-    {
-        get;
-        set
-        {
-            field = value;
+    public int MinimumLength { get; set; }
 
-            // 触发属性变更事件
-            OnPropertyChanged(value);
+    /// <inheritdoc />
+    public override bool IsValid(object? value, IValidationContext? validationContext)
+    {
+        // 验证长度参数的合法性
+        EnsureLegalLengths();
+
+        // 空检查
+        if (value is null)
+        {
+            return true;
         }
+
+        var length = ((string)value).Length;
+        return length >= MinimumLength && length <= MaximumLength;
     }
 
     /// <inheritdoc />
-    public void Dispose()
+    public override string? FormatErrorMessage(string name)
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+        // 验证长度参数的合法性
+        EnsureLegalLengths();
 
-    /// <inheritdoc />
-    public override bool IsValid(object? value, IValidationContext? validationContext) =>
-        _validator.IsValid(value, validationContext);
-
-    /// <inheritdoc />
-    public override string FormatErrorMessage(string name) => string.Format(CultureInfo.CurrentCulture,
-        (MinimumLength == 0 ? 0 : !CustomErrorMessageSet ? 1 : 0) != 0
-            ? ValidationMessages.StringLengthValidator_ValidationError_MinimumLength
-            : ErrorMessageString, name, MaximumLength, MinimumLength);
-
-    /// <summary>
-    ///     释放资源
-    /// </summary>
-    /// <param name="disposing">是否释放托管资源</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            // 移除属性变更事件
-            PropertyChanged -= OnPropertyChanged;
-        }
+        return string.Format(CultureInfo.CurrentCulture,
+            ErrorMessageString, name, MaximumLength, MinimumLength);
     }
 
     /// <summary>
-    ///     订阅属性变更事件
+    ///     获取错误信息对应的资源键
     /// </summary>
-    /// <param name="sender">事件源</param>
-    /// <param name="eventArgs">
-    ///     <see cref="ValidationPropertyChangedEventArgs" />
-    /// </param>
-    internal void OnPropertyChanged(object? sender, ValidationPropertyChangedEventArgs eventArgs)
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    internal string GetResourceKey() =>
+        MinimumLength != 0 && !CustomErrorMessageSet
+            ? nameof(ValidationMessages.StringLengthValidator_ValidationError_MinimumLength)
+            : nameof(ValidationMessages.StringLengthValidator_ValidationError);
+
+    /// <summary>
+    ///     验证长度参数的合法性
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal void EnsureLegalLengths()
     {
-        // 检查是否是需要同步的属性名
-        if (!_observedPropertyNames.Contains(eventArgs.PropertyName))
+        if (MaximumLength < 0)
         {
-            return;
+            throw new InvalidOperationException("The maximum length must be a nonnegative integer.");
         }
 
-        // 应用属性变更到 StringLengthAttribute 对应的属性中
-        typeof(StringLengthAttribute).GetProperty(eventArgs.PropertyName!)
-            ?.SetValue(_validator.Attributes[0], eventArgs.PropertyValue);
+        if (MaximumLength < MinimumLength)
+        {
+            throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                "The maximum value '{0}' must be greater than or equal to the minimum value '{1}'.", MaximumLength,
+                MinimumLength));
+        }
     }
 }

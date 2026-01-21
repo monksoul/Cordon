@@ -390,7 +390,7 @@ public class PropertyValidatorValidationTests
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .FileExtensions("png,jpg,jpeg,gif");
+            .FileExtensions();
 
         Assert.Single(propertyValidator.Validators);
 
@@ -399,6 +399,18 @@ public class PropertyValidatorValidationTests
 
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "furion.ico" }));
         Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "furion.png" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .FileExtensions("png,jpg,jpeg,gif");
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator2 = propertyValidator2._lastAddedValidator as FileExtensionsValidator;
+        Assert.NotNull(addedValidator2);
+
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = "furion.ico" }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "furion.png" }));
     }
 
     [Fact]
@@ -457,10 +469,12 @@ public class PropertyValidatorValidationTests
 
         Assert.Single(propertyValidator.Validators);
 
-        var addedValidator = propertyValidator._lastAddedValidator as CustomValidationValidator;
+        var addedValidator = propertyValidator._lastAddedValidator as AttributeValueValidator;
         Assert.NotNull(addedValidator);
-        Assert.Equal(typeof(CustomValidators), addedValidator.ValidatorType);
-        Assert.Equal("ValidateValue", addedValidator.Method);
+        var customValidationAttribute = addedValidator.Attributes[0] as CustomValidationAttribute;
+        Assert.NotNull(customValidationAttribute);
+        Assert.Equal(typeof(CustomValidators), customValidationAttribute.ValidatorType);
+        Assert.Equal("ValidateValue", customValidationAttribute.Method);
 
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "fu" }));
         Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "Furion" }));
@@ -1034,9 +1048,23 @@ public class PropertyValidatorValidationTests
 
         var addedValidator = propertyValidator._lastAddedValidator as MaxLengthValidator;
         Assert.NotNull(addedValidator);
+        Assert.Equal(3, addedValidator.Length);
 
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "Furion" }));
         Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "百小僧" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .MaxLength();
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator2 = propertyValidator2._lastAddedValidator as MaxLengthValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.Equal(-1, addedValidator2.Length);
+
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "Furion" }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "百小僧" }));
     }
 
     [Fact]
@@ -2035,6 +2063,45 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void WithAttribute_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .WithAttribute(new UserNameAttribute());
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as AttributeValueValidator;
+        Assert.NotNull(addedValidator);
+
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "monk__soul" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "monksoul" }));
+
+        var validationResults = propertyValidator.GetValidationResults(new ValidationModel { Data1 = "monk__soul" });
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal("The field Data1 is not a valid username.", validationResults[0].ErrorMessage);
+        Assert.Equal("Data1", validationResults[0].MemberNames.First());
+
+        var exception = Assert.Throws<ValidationException>(() =>
+            propertyValidator.Validate(new ValidationModel { Data1 = "monk__soul" }));
+        Assert.Equal("The field Data1 is not a valid username.", exception.Message);
+        Assert.Equal("Data1", exception.ValidationResult.MemberNames.FirstOrDefault());
+
+        propertyValidator.WithName("Prop1");
+        var validationResults2 = propertyValidator.GetValidationResults(new ValidationModel { Data1 = "monk__soul" });
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal("The field Prop1 is not a valid username.", validationResults2[0].ErrorMessage);
+        Assert.Equal("Prop1", validationResults2[0].MemberNames.First());
+
+        var exception2 = Assert.Throws<ValidationException>(() =>
+            propertyValidator.Validate(new ValidationModel { Data1 = "monk__soul" }));
+        Assert.Equal("The field Prop1 is not a valid username.", exception2.Message);
+        Assert.Equal("Prop1", exception2.ValidationResult.MemberNames.FirstOrDefault());
+    }
+
+    [Fact]
     public void WithAttributes_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
@@ -2072,7 +2139,6 @@ public class PropertyValidatorValidationTests
         Assert.Equal("The field Prop1 is not a valid username.", exception2.Message);
         Assert.Equal("Prop1", exception2.ValidationResult.MemberNames.FirstOrDefault());
     }
-
 
     [Fact]
     public void And_ReturnOK()

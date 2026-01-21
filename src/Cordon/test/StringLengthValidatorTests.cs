@@ -13,41 +13,14 @@ public class StringLengthValidatorTests
         Assert.Equal(5, validator.MaximumLength);
         Assert.Equal(0, validator.MinimumLength);
 
-        Assert.NotNull(validator._validator);
-        Assert.True(validator._validator.Attributes[0] is StringLengthAttribute);
-        Assert.Equal(["MinimumLength"], validator._observedPropertyNames);
-
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be a string with a maximum length of '{1}'.",
             validator._errorMessageResourceAccessor());
 
         var validator2 = new StringLengthValidator(5) { MinimumLength = 2 };
         Assert.NotNull(validator2._errorMessageResourceAccessor);
-        Assert.Equal("The field {0} must be a string with a maximum length of '{1}'.",
+        Assert.Equal("The field {0} must be a string with a minimum length of '{2}' and a maximum length of '{1}'.",
             validator2._errorMessageResourceAccessor());
-    }
-
-    [Fact]
-    public void Set_MinimumLength_ReturnOK()
-    {
-        var validator = new StringLengthValidator(5);
-
-        var i = 0;
-        var propertyChangedEventMethod =
-            typeof(StringLengthValidator).GetMethod("add_PropertyChanged",
-                BindingFlags.Instance | BindingFlags.NonPublic)!;
-        propertyChangedEventMethod.Invoke(validator, [
-            new EventHandler<ValidationPropertyChangedEventArgs>((_, eventArgs) =>
-            {
-                Assert.Equal("MinimumLength", eventArgs.PropertyName);
-                Assert.Equal(2, eventArgs.PropertyValue!);
-                i++;
-            })
-        ]);
-
-        validator.MinimumLength = 2;
-        Assert.Equal(1, i);
-        Assert.Equal(2, (validator._validator.Attributes[0] as StringLengthAttribute)!.MinimumLength);
     }
 
     [Theory]
@@ -155,26 +128,25 @@ public class StringLengthValidatorTests
     }
 
     [Fact]
-    public void OnPropertyChanged_ReturnOK()
+    public void GetResourceKey_ReturnOK()
     {
         var validator = new StringLengthValidator(5);
-        var attribute = validator._validator.Attributes[0] as StringLengthAttribute;
-        Assert.NotNull(attribute);
+        Assert.Equal("StringLengthValidator_ValidationError", validator.GetResourceKey());
 
-        validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("MinimumLength", 3000));
-        Assert.Equal(3000, attribute.MinimumLength);
+        var validator2 = new StringLengthValidator(5) { MinimumLength = 10 };
+        Assert.Equal("StringLengthValidator_ValidationError_MinimumLength", validator2.GetResourceKey());
     }
 
     [Fact]
-    public void Dispose_ReturnOK()
+    public void EnsureLegalLengths_ReturnOK()
     {
-        var validator = new StringLengthValidator(5);
-        var attribute = validator._validator.Attributes[0] as StringLengthAttribute;
-        Assert.NotNull(attribute);
+        var validator = new StringLengthValidator(-1);
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.EnsureLegalLengths());
+        Assert.Equal("The maximum length must be a nonnegative integer.", exception.Message);
 
-        validator.Dispose();
-
-        validator.MinimumLength = 3000;
-        Assert.Equal(0, attribute.MinimumLength);
+        var validator2 = new StringLengthValidator(5) { MinimumLength = 6 };
+        var exception2 = Assert.Throws<InvalidOperationException>(() => validator2.EnsureLegalLengths());
+        Assert.Equal("The maximum value '5' must be greater than or equal to the minimum value '6'.",
+            exception2.Message);
     }
 }

@@ -181,17 +181,23 @@ public class ValidatorsTests
     [Fact]
     public void FileExtensions_ReturnOK()
     {
-        var validator = Validators.FileExtensions("png,jpg,jpeg,gif");
+        var validator = Validators.FileExtensions();
         Assert.NotNull(validator);
         Assert.Equal("png,jpg,jpeg,gif", validator.Extensions);
+
+        var validator2 = Validators.FileExtensions("png,jpg,jpeg,gif");
+        Assert.NotNull(validator2);
+        Assert.Equal("png,jpg,jpeg,gif", validator2.Extensions);
     }
 
     [Fact]
     public void CustomValidation_ReturnOK()
     {
         var validator = Validators.CustomValidation(typeof(CustomValidators), nameof(CustomValidators.ValidateValue));
-        Assert.Equal(typeof(CustomValidators), validator.ValidatorType);
-        Assert.Equal("ValidateValue", validator.Method);
+        var customValidationAttribute = validator.Attributes[0] as CustomValidationAttribute;
+        Assert.NotNull(customValidationAttribute);
+        Assert.Equal(typeof(CustomValidators), customValidationAttribute.ValidatorType);
+        Assert.Equal("ValidateValue", customValidationAttribute.Method);
     }
 
     [Fact]
@@ -379,6 +385,9 @@ public class ValidatorsTests
     {
         var validator = Validators.MaxLength(10);
         Assert.Equal(10, validator.Length);
+
+        var validator2 = Validators.MaxLength();
+        Assert.Equal(-1, validator2.Length);
     }
 
     [Fact]

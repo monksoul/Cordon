@@ -12,38 +12,11 @@ public class RequiredValidatorTests
         var validator = new RequiredValidator();
         Assert.False(validator.AllowEmptyStrings);
 
-        Assert.NotNull(validator._validator);
-        Assert.True(validator._validator.Attributes[0] is RequiredAttribute);
-        Assert.Equal(["AllowEmptyStrings"], validator._observedPropertyNames);
-
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The {0} field is required.", validator._errorMessageResourceAccessor());
 
         Assert.True(typeof(IHighPriorityValidator).IsAssignableFrom(typeof(RequiredValidator)));
         Assert.Equal(10, validator.Priority);
-    }
-
-    [Fact]
-    public void Set_AllowEmptyStrings_ReturnOK()
-    {
-        var validator = new RequiredValidator();
-
-        var i = 0;
-        var propertyChangedEventMethod =
-            typeof(RequiredValidator).GetMethod("add_PropertyChanged",
-                BindingFlags.Instance | BindingFlags.NonPublic)!;
-        propertyChangedEventMethod.Invoke(validator, [
-            new EventHandler<ValidationPropertyChangedEventArgs>((_, eventArgs) =>
-            {
-                Assert.Equal("AllowEmptyStrings", eventArgs.PropertyName);
-                Assert.True((bool)eventArgs.PropertyValue!);
-                i++;
-            })
-        ]);
-
-        validator.AllowEmptyStrings = true;
-        Assert.Equal(1, i);
-        Assert.True((validator._validator.Attributes[0] as RequiredAttribute)!.AllowEmptyStrings);
     }
 
     [Theory]
@@ -114,29 +87,5 @@ public class RequiredValidatorTests
         var validator = new RequiredValidator { AllowEmptyStrings = true };
         validator.Validate("Furion", "data");
         validator.Validate(string.Empty, "data");
-    }
-
-    [Fact]
-    public void OnPropertyChanged_ReturnOK()
-    {
-        var validator = new RequiredValidator();
-        var attribute = validator._validator.Attributes[0] as RequiredAttribute;
-        Assert.NotNull(attribute);
-
-        validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("AllowEmptyStrings", true));
-        Assert.True(attribute.AllowEmptyStrings);
-    }
-
-    [Fact]
-    public void Dispose_ReturnOK()
-    {
-        var validator = new RequiredValidator();
-        var attribute = validator._validator.Attributes[0] as RequiredAttribute;
-        Assert.NotNull(attribute);
-
-        validator.Dispose();
-
-        validator.AllowEmptyStrings = true;
-        Assert.False(attribute.AllowEmptyStrings);
     }
 }

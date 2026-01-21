@@ -10,14 +10,26 @@ public class MaxLengthValidatorTests
     public void New_ReturnOK()
     {
         var validator = new MaxLengthValidator(5);
-        Assert.NotNull(validator._validator);
-        Assert.True(validator._validator.Attributes.First() is MaxLengthAttribute);
         Assert.Equal(5, validator.Length);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal(
             "The field {0} must be a string or array type with a maximum length of '{1}'.",
             validator._errorMessageResourceAccessor());
+
+        Assert.Equal(-1, MaxLengthValidator.MaxAllowableLength);
+
+        var validator2 = new MaxLengthValidator();
+        Assert.Equal(-1, validator2.Length);
+    }
+
+    [Fact]
+    public void IsValid_Invalid_Parameters()
+    {
+        var validator = new MaxLengthValidator(5);
+        var exception = Assert.Throws<InvalidCastException>(() => validator.IsValid(CompositeMode.All));
+        Assert.Equal("The field of type Cordon.CompositeMode must be a string, array or ICollection type.",
+            exception.Message);
     }
 
     [Theory]
@@ -97,5 +109,24 @@ public class MaxLengthValidatorTests
         Assert.Equal(
             "The field data must be a string or array type with a maximum length of '5'.",
             validator.FormatErrorMessage("data"));
+    }
+
+    [Fact]
+    public void EnsureLegalLengths_ReturnOK()
+    {
+        var validator = new MaxLengthValidator(0);
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.EnsureLegalLengths());
+        Assert.Equal(
+            "MaxLengthValidator must have a Length value that is greater than zero. Use MaxLength() without parameters to indicate that the string or array can have the maximum allowable length.",
+            exception.Message);
+
+        var validator2 = new MaxLengthValidator(-2);
+        var exception2 = Assert.Throws<InvalidOperationException>(() => validator2.EnsureLegalLengths());
+        Assert.Equal(
+            "MaxLengthValidator must have a Length value that is greater than zero. Use MaxLength() without parameters to indicate that the string or array can have the maximum allowable length.",
+            exception2.Message);
+
+        var validator3 = new MaxLengthValidator(-1);
+        validator3.EnsureLegalLengths();
     }
 }

@@ -10,8 +10,6 @@ public class Base64StringValidatorTests
     public void New_ReturnOK()
     {
         var validator = new Base64StringValidator();
-        Assert.NotNull(validator._validator);
-        Assert.True(validator._validator.Attributes.First() is Base64StringAttribute);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The {0} field is not a valid Base64 encoding.",

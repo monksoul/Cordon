@@ -51,9 +51,9 @@ public class DecimalPlacesValidator : ValidatorBase
         decimal decimalValue;
 
         // 检查是否是否允许字符串数值
-        if (AllowStringValues && value is string stringValue)
+        if (AllowStringValues && value is string valueAsString)
         {
-            if (!decimal.TryParse(stringValue, NumberStyles.Number, CultureInfo.InvariantCulture, out decimalValue))
+            if (!decimal.TryParse(valueAsString, NumberStyles.Number, CultureInfo.InvariantCulture, out decimalValue))
             {
                 return false;
             }

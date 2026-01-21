@@ -10,9 +10,9 @@ namespace Cordon;
 public class MaxLengthValidator : ValidatorBase
 {
     /// <summary>
-    ///     <inheritdoc cref="AttributeValueValidator" />
+    ///     最大有效的长度值
     /// </summary>
-    internal readonly AttributeValueValidator _validator;
+    internal const int MaxAllowableLength = -1;
 
     /// <summary>
     ///     <inheritdoc cref="MaxLengthValidator" />
@@ -21,9 +21,16 @@ public class MaxLengthValidator : ValidatorBase
     public MaxLengthValidator(int length)
     {
         Length = length;
-        _validator = new AttributeValueValidator(new MaxLengthAttribute(Length));
 
         UseResourceKey(() => nameof(ValidationMessages.MaxLengthValidator_ValidationError));
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="MaxLengthValidator" />
+    /// </summary>
+    public MaxLengthValidator()
+        : this(MaxAllowableLength)
+    {
     }
 
     /// <summary>
@@ -32,10 +39,41 @@ public class MaxLengthValidator : ValidatorBase
     public int Length { get; }
 
     /// <inheritdoc />
-    public override bool IsValid(object? value, IValidationContext? validationContext) =>
-        _validator.IsValid(value, validationContext);
+    public override bool IsValid(object? value, IValidationContext? validationContext)
+    {
+        // 验证长度参数的合法性
+        EnsureLegalLengths();
+
+        // 空检查
+        if (value == null)
+        {
+            return true;
+        }
+
+        // 尝试获取对象长度
+        if (!value.TryGetCount(out var length))
+        {
+            throw new InvalidCastException(string.Format(CultureInfo.CurrentCulture,
+                "The field of type {0} must be a string, array or ICollection type.", value.GetType()));
+        }
+
+        return MaxAllowableLength == Length || length <= Length;
+    }
 
     /// <inheritdoc />
     public override string FormatErrorMessage(string name) =>
         string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, Length);
+
+    /// <summary>
+    ///     验证长度参数的合法性
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal void EnsureLegalLengths()
+    {
+        if (Length is 0 or < -1)
+        {
+            throw new InvalidOperationException(
+                "MaxLengthValidator must have a Length value that is greater than zero. Use MaxLength() without parameters to indicate that the string or array can have the maximum allowable length.");
+        }
+    }
 }

@@ -17,14 +17,7 @@ public class RangeValidatorTests
         Assert.Equal(typeof(int), validator.OperandType);
         Assert.False(validator.ParseLimitsInInvariantCulture);
         Assert.False(validator.ConvertValueInInvariantCulture);
-
-        Assert.NotNull(validator._validator);
-        Assert.True(validator._validator.Attributes[0] is RangeAttribute);
-        Assert.Equal(
-        [
-            "MinimumIsExclusive", "MaximumIsExclusive", "ParseLimitsInInvariantCulture",
-            "ConvertValueInInvariantCulture"
-        ], validator._observedPropertyNames);
+        Assert.Null(validator.Conversion);
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be between '{1}' and '{2}'.", validator._errorMessageResourceAccessor());
@@ -33,8 +26,6 @@ public class RangeValidatorTests
         Assert.Equal(11.1, validator2.Minimum);
         Assert.Equal(20.1, validator2.Maximum);
         Assert.Equal(typeof(double), validator2.OperandType);
-        Assert.NotNull(validator2._validator);
-        Assert.True(validator2._validator.Attributes[0] is RangeAttribute);
         Assert.NotNull(validator2._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be between '{1}' and '{2}'.", validator2._errorMessageResourceAccessor());
 
@@ -42,98 +33,8 @@ public class RangeValidatorTests
         Assert.Equal("10", validator3.Minimum);
         Assert.Equal("20", validator3.Maximum);
         Assert.Equal(typeof(int), validator3.OperandType);
-        Assert.NotNull(validator3._validator);
-        Assert.True(validator3._validator.Attributes[0] is RangeAttribute);
         Assert.NotNull(validator3._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be between '{1}' and '{2}'.", validator3._errorMessageResourceAccessor());
-    }
-
-    [Fact]
-    public void Set_MinimumIsExclusive_ReturnOK()
-    {
-        var validator = new RangeValidator(10, 20);
-
-        var i = 0;
-        var propertyChangedEventMethod =
-            typeof(RangeValidator).GetMethod("add_PropertyChanged", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        propertyChangedEventMethod.Invoke(validator, [
-            new EventHandler<ValidationPropertyChangedEventArgs>((_, eventArgs) =>
-            {
-                Assert.Equal("MinimumIsExclusive", eventArgs.PropertyName);
-                Assert.True((bool)eventArgs.PropertyValue!);
-                i++;
-            })
-        ]);
-
-        validator.MinimumIsExclusive = true;
-        Assert.Equal(1, i);
-        Assert.True((validator._validator.Attributes[0] as RangeAttribute)!.MinimumIsExclusive);
-    }
-
-    [Fact]
-    public void Set_MaximumIsExclusive_ReturnOK()
-    {
-        var validator = new RangeValidator(10, 20);
-
-        var i = 0;
-        var propertyChangedEventMethod =
-            typeof(RangeValidator).GetMethod("add_PropertyChanged", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        propertyChangedEventMethod.Invoke(validator, [
-            new EventHandler<ValidationPropertyChangedEventArgs>((_, eventArgs) =>
-            {
-                Assert.Equal("MaximumIsExclusive", eventArgs.PropertyName);
-                Assert.True((bool)eventArgs.PropertyValue!);
-                i++;
-            })
-        ]);
-
-        validator.MaximumIsExclusive = true;
-        Assert.Equal(1, i);
-        Assert.True((validator._validator.Attributes[0] as RangeAttribute)!.MaximumIsExclusive);
-    }
-
-    [Fact]
-    public void Set_ParseLimitsInInvariantCulture_ReturnOK()
-    {
-        var validator = new RangeValidator(10, 20);
-
-        var i = 0;
-        var propertyChangedEventMethod =
-            typeof(RangeValidator).GetMethod("add_PropertyChanged", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        propertyChangedEventMethod.Invoke(validator, [
-            new EventHandler<ValidationPropertyChangedEventArgs>((_, eventArgs) =>
-            {
-                Assert.Equal("ParseLimitsInInvariantCulture", eventArgs.PropertyName);
-                Assert.True((bool)eventArgs.PropertyValue!);
-                i++;
-            })
-        ]);
-
-        validator.ParseLimitsInInvariantCulture = true;
-        Assert.Equal(1, i);
-        Assert.True((validator._validator.Attributes[0] as RangeAttribute)!.ParseLimitsInInvariantCulture);
-    }
-
-    [Fact]
-    public void Set_ConvertValueInInvariantCulture_ReturnOK()
-    {
-        var validator = new RangeValidator(10, 20);
-
-        var i = 0;
-        var propertyChangedEventMethod =
-            typeof(RangeValidator).GetMethod("add_PropertyChanged", BindingFlags.Instance | BindingFlags.NonPublic)!;
-        propertyChangedEventMethod.Invoke(validator, [
-            new EventHandler<ValidationPropertyChangedEventArgs>((_, eventArgs) =>
-            {
-                Assert.Equal("ConvertValueInInvariantCulture", eventArgs.PropertyName);
-                Assert.True((bool)eventArgs.PropertyValue!);
-                i++;
-            })
-        ]);
-
-        validator.ConvertValueInInvariantCulture = true;
-        Assert.Equal(1, i);
-        Assert.True((validator._validator.Attributes[0] as RangeAttribute)!.ConvertValueInInvariantCulture);
     }
 
     [Theory]
@@ -354,46 +255,77 @@ public class RangeValidatorTests
     }
 
     [Fact]
-    public void OnPropertyChanged_ReturnOK()
+    public void Initialize_Invalid_Parameters()
     {
-        var validator = new RangeValidator(10, 20);
-        var attribute = validator._validator.Attributes[0] as RangeAttribute;
-        Assert.NotNull(attribute);
+        var validator = new RangeValidator(10, 9);
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.Initialize(10, 9, _ => 15));
+        Assert.Equal("The maximum value '9' must be greater than or equal to the minimum value '10'.",
+            exception.Message);
 
-        validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("Minimum", 15));
-        Assert.Equal(10, attribute.Minimum);
+        var validator2 = new RangeValidator(10, 10) { MinimumIsExclusive = true };
+        var exception2 = Assert.Throws<InvalidOperationException>(() => validator2.Initialize(10, 10, _ => 15));
+        Assert.Equal("Cannot use exclusive bounds when the maximum value is equal to the minimum value.",
+            exception2.Message);
 
-        validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("Maximum", 30));
-        Assert.Equal(20, attribute.Maximum);
-
-        validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("OperandType", typeof(double)));
-        Assert.Equal(typeof(int), attribute.OperandType);
-
-        validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("MinimumIsExclusive", true));
-        Assert.True(attribute.MinimumIsExclusive);
-
-        validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("MaximumIsExclusive", true));
-        Assert.True(attribute.MaximumIsExclusive);
-
-        validator.OnPropertyChanged(validator,
-            new ValidationPropertyChangedEventArgs("ParseLimitsInInvariantCulture", true));
-        Assert.True(attribute.ParseLimitsInInvariantCulture);
-
-        validator.OnPropertyChanged(validator,
-            new ValidationPropertyChangedEventArgs("ConvertValueInInvariantCulture", true));
-        Assert.True(attribute.ConvertValueInInvariantCulture);
+        var validator3 = new RangeValidator(10, 10) { MaximumIsExclusive = true };
+        var exception3 = Assert.Throws<InvalidOperationException>(() => validator3.Initialize(10, 10, _ => 15));
+        Assert.Equal("Cannot use exclusive bounds when the maximum value is equal to the minimum value.",
+            exception3.Message);
     }
 
     [Fact]
-    public void Dispose_ReturnOK()
+    public void Initialize_ReturnOK()
     {
         var validator = new RangeValidator(10, 20);
-        var attribute = validator._validator.Attributes[0] as RangeAttribute;
-        Assert.NotNull(attribute);
-
-        validator.Dispose();
-
-        validator.MinimumIsExclusive = true;
-        Assert.False(attribute.MinimumIsExclusive);
+        Assert.Null(validator.Conversion);
+        validator.Initialize(10, 20, _ => 15);
+        Assert.Equal(10, validator.Minimum);
+        Assert.Equal(20, validator.Maximum);
+        Assert.NotNull(validator.Conversion);
     }
+
+    [Fact]
+    public void SetupConversion_Invalid_Parameters()
+    {
+        var validator = new RangeValidator(null!, null!, null!);
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.SetupConversion());
+        Assert.Equal("The minimum and maximum values must be set.", exception.Message);
+
+        var validator2 = new RangeValidator(null!, "10", "20");
+        var exception2 = Assert.Throws<InvalidOperationException>(() => validator2.SetupConversion());
+        Assert.Equal("The OperandType must be set when strings are used for minimum and maximum values.",
+            exception2.Message);
+
+        var validator3 = new RangeValidator(typeof(NoComparableClass), "10", "20");
+        var exception3 = Assert.Throws<InvalidOperationException>(() => validator3.SetupConversion());
+        Assert.Equal("The type Cordon.Tests.RangeValidatorTests+NoComparableClass must implement System.IComparable.",
+            exception3.Message);
+    }
+
+    [Fact]
+    public void SetupConversion_ReturnOK()
+    {
+        var validator = new RangeValidator(10, 20);
+        Assert.Null(validator.Conversion);
+        validator.SetupConversion();
+        Assert.NotNull(validator.Conversion);
+        Assert.Equal(10, validator.Minimum);
+        Assert.Equal(20, validator.Maximum);
+
+        var validator2 = new RangeValidator(typeof(int), "10", "20");
+        Assert.Null(validator2.Conversion);
+        validator2.SetupConversion();
+        Assert.NotNull(validator2.Conversion);
+        Assert.Equal(10, validator2.Minimum);
+        Assert.Equal(20, validator2.Maximum);
+    }
+
+    [Fact]
+    public void GetOperandTypeConverter_ReturnOK()
+    {
+        var validator = new RangeValidator(10, 20);
+        Assert.NotNull(validator.GetOperandTypeConverter());
+    }
+
+    public class NoComparableClass;
 }

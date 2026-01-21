@@ -10,8 +10,6 @@ public class LengthValidatorTests
     public void New_ReturnOK()
     {
         var validator = new LengthValidator(5, 10);
-        Assert.NotNull(validator._validator);
-        Assert.True(validator._validator.Attributes.First() is LengthAttribute);
         Assert.Equal(5, validator.MinimumLength);
         Assert.Equal(10, validator.MaximumLength);
 
@@ -19,6 +17,15 @@ public class LengthValidatorTests
         Assert.Equal(
             "The field {0} must be a string or collection type with a minimum length of '{1}' and maximum length of '{2}'.",
             validator._errorMessageResourceAccessor());
+    }
+
+    [Fact]
+    public void IsValid_Invalid_Parameters()
+    {
+        var validator = new LengthValidator(5, 10);
+        var exception = Assert.Throws<InvalidCastException>(() => validator.IsValid(CompositeMode.All));
+        Assert.Equal("The field of type Cordon.CompositeMode must be a string, array or ICollection type.",
+            exception.Message);
     }
 
     [Theory]
@@ -98,5 +105,18 @@ public class LengthValidatorTests
         Assert.Equal(
             "The field data must be a string or collection type with a minimum length of '5' and maximum length of '10'.",
             validator.FormatErrorMessage("data"));
+    }
+
+    [Fact]
+    public void EnsureLegalLengths_ReturnOK()
+    {
+        var validator = new LengthValidator(-1, 10);
+        var exception = Assert.Throws<InvalidOperationException>(() => validator.EnsureLegalLengths());
+        Assert.Equal("LengthValidator must have a MinimumLength value that is zero or greater.", exception.Message);
+
+        var validator2 = new LengthValidator(10, 5);
+        var exception2 = Assert.Throws<InvalidOperationException>(() => validator2.EnsureLegalLengths());
+        Assert.Equal("LengthValidator must have a MaximumLength value that is greater than or equal to MinimumLength.",
+            exception2.Message);
     }
 }

@@ -7,22 +7,14 @@ namespace Cordon;
 /// <summary>
 ///     指定数值范围约束验证器
 /// </summary>
-public class RangeValidator : ValidatorBase, IDisposable
+/// <remarks>
+///     <see
+///         href="https://github.com/dotnet/dotnet/blob/main/src/runtime/src/libraries/System.ComponentModel.Annotations/src/System/ComponentModel/DataAnnotations/RangeAttribute.cs">
+///         参考代码
+///     </see>
+/// </remarks>
+public class RangeValidator : ValidatorBase
 {
-    /// <summary>
-    ///     需要监听属性变更的属性名集合
-    /// </summary>
-    internal readonly string[] _observedPropertyNames =
-    [
-        nameof(MinimumIsExclusive), nameof(MaximumIsExclusive), nameof(ParseLimitsInInvariantCulture),
-        nameof(ConvertValueInInvariantCulture)
-    ];
-
-    /// <summary>
-    ///     <inheritdoc cref="AttributeValueValidator" />
-    /// </summary>
-    internal readonly AttributeValueValidator _validator;
-
     /// <summary>
     ///     <inheritdoc cref="RangeValidator" />
     /// </summary>
@@ -33,11 +25,6 @@ public class RangeValidator : ValidatorBase, IDisposable
         Minimum = minimum;
         Maximum = maximum;
         OperandType = typeof(int);
-
-        _validator = new AttributeValueValidator(new RangeAttribute(minimum, maximum));
-
-        // 订阅属性变更事件
-        PropertyChanged += OnPropertyChanged;
 
         UseResourceKey(GetResourceKey);
     }
@@ -52,11 +39,6 @@ public class RangeValidator : ValidatorBase, IDisposable
         Minimum = minimum;
         Maximum = maximum;
         OperandType = typeof(double);
-
-        _validator = new AttributeValueValidator(new RangeAttribute(minimum, maximum));
-
-        // 订阅属性变更事件
-        PropertyChanged += OnPropertyChanged;
 
         UseResourceKey(GetResourceKey);
     }
@@ -74,55 +56,30 @@ public class RangeValidator : ValidatorBase, IDisposable
         Minimum = minimum;
         Maximum = maximum;
 
-        _validator = new AttributeValueValidator(new RangeAttribute(type, minimum, maximum));
-
-        // 订阅属性变更事件
-        PropertyChanged += OnPropertyChanged;
-
         UseResourceKey(GetResourceKey);
     }
 
     /// <summary>
     ///     允许的最小字段值
     /// </summary>
-    public object Minimum { get; }
+    public object Minimum { get; private set; }
 
     /// <summary>
     ///     允许的最大字段值
     /// </summary>
-    public object Maximum { get; }
+    public object Maximum { get; private set; }
 
     /// <summary>
     ///     是否当值等于 <see cref="Minimum" /> 时验证失败
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
-    public bool MinimumIsExclusive
-    {
-        get;
-        set
-        {
-            field = value;
-
-            // 触发属性变更事件
-            OnPropertyChanged(value);
-        }
-    }
+    public bool MinimumIsExclusive { get; set; }
 
     /// <summary>
     ///     是否当值等于 <see cref="Maximum" /> 时验证失败
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
-    public bool MaximumIsExclusive
-    {
-        get;
-        set
-        {
-            field = value;
-
-            // 触发属性变更事件
-            OnPropertyChanged(value);
-        }
-    }
+    public bool MaximumIsExclusive { get; set; }
 
     /// <summary>
     ///     数据字段值的类型
@@ -134,61 +91,68 @@ public class RangeValidator : ValidatorBase, IDisposable
     ///     判断 <see cref="Minimum" /> 和 <see cref="Maximum" /> 的字符串值是否依据固定区域性而非当前区域性进行解析
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
-    public bool ParseLimitsInInvariantCulture
-    {
-        get;
-        set
-        {
-            field = value;
-
-            // 触发属性变更事件
-            OnPropertyChanged(value);
-        }
-    }
+    public bool ParseLimitsInInvariantCulture { get; set; }
 
     /// <summary>
     ///     验证由构造函数参数 <c>RangeValidator(Type, String, String)</c> 设置的 <c>type</c> 的 <see cref="OperandType" />
     ///     值在进行任何转换时，是否采用的是固定区域性而非当前区域性
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
-    public bool ConvertValueInInvariantCulture
-    {
-        get;
-        set
-        {
-            field = value;
-
-            // 触发属性变更事件
-            OnPropertyChanged(value);
-        }
-    }
-
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <inheritdoc />
-    public override bool IsValid(object? value, IValidationContext? validationContext) =>
-        _validator.IsValid(value, validationContext);
-
-    /// <inheritdoc />
-    public override string FormatErrorMessage(string name) =>
-        string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, Minimum, Maximum);
+    public bool ConvertValueInInvariantCulture { get; set; }
 
     /// <summary>
-    ///     释放资源
+    ///     内部缓存的值转换委托
     /// </summary>
-    /// <param name="disposing">是否释放托管资源</param>
-    protected virtual void Dispose(bool disposing)
+    /// <remarks>用于将任意输入对象转换为目标类型（<see cref="OperandType" />）。</remarks>
+    internal Func<object, object?>? Conversion { get; set; }
+
+    /// <inheritdoc />
+    public override bool IsValid(object? value, IValidationContext? validationContext)
     {
-        if (disposing)
+        // 确保转换逻辑已初始化
+        SetupConversion();
+
+        // 空检查
+        if (value is null or string { Length: 0 })
         {
-            // 移除属性变更事件
-            PropertyChanged -= OnPropertyChanged;
+            return true;
         }
+
+        object? convertedValue;
+
+        try
+        {
+            // 执行类型转换
+            convertedValue = Conversion!(value);
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+        catch (InvalidCastException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
+
+        // 将边界值转为 IComparable 以便通用比较
+        var min = (IComparable)Minimum;
+        var max = (IComparable)Maximum;
+        return
+            (MinimumIsExclusive ? min.CompareTo(convertedValue) < 0 : min.CompareTo(convertedValue) <= 0) &&
+            (MaximumIsExclusive ? max.CompareTo(convertedValue) > 0 : max.CompareTo(convertedValue) >= 0);
+    }
+
+    /// <inheritdoc />
+    public override string FormatErrorMessage(string name)
+    {
+        // 确保转换逻辑已初始化
+        SetupConversion();
+
+        return string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, Minimum, Maximum);
     }
 
     /// <summary>
@@ -209,22 +173,119 @@ public class RangeValidator : ValidatorBase, IDisposable
         };
 
     /// <summary>
-    ///     订阅属性变更事件
+    ///     初始化内部状态
     /// </summary>
-    /// <param name="sender">事件源</param>
-    /// <param name="eventArgs">
-    ///     <see cref="ValidationPropertyChangedEventArgs" />
-    /// </param>
-    internal void OnPropertyChanged(object? sender, ValidationPropertyChangedEventArgs eventArgs)
+    /// <remarks>验证边界有效性，并创建值转换委托。</remarks>
+    /// <param name="minimum">已解析的最小字段值</param>
+    /// <param name="maximum">已解析的最大字段值</param>
+    /// <param name="conversion">将输入值转换为目标类型的委托</param>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal void Initialize(IComparable minimum, IComparable maximum, Func<object, object?> conversion)
     {
-        // 检查是否是需要同步的属性名
-        if (!_observedPropertyNames.Contains(eventArgs.PropertyName))
+        // 获取最小字段值和最大字段值比较结果
+        var cmp = minimum.CompareTo(maximum);
+
+        switch (cmp)
+        {
+            case > 0:
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                    "The maximum value '{0}' must be greater than or equal to the minimum value '{1}'.", maximum,
+                    minimum));
+            case 0 when MinimumIsExclusive || MaximumIsExclusive:
+                throw new InvalidOperationException(
+                    "Cannot use exclusive bounds when the maximum value is equal to the minimum value.");
+        }
+
+        // 保存解析后的边界值和转换委托
+        Minimum = minimum;
+        Maximum = maximum;
+        Conversion = conversion;
+    }
+
+    /// <summary>
+    ///     初始化转换逻辑
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal void SetupConversion()
+    {
+        // 已初始化则直接返回
+        if (Conversion is not null)
         {
             return;
         }
 
-        // 应用属性变更到 RangeAttribute 对应的属性中
-        typeof(RangeAttribute).GetProperty(eventArgs.PropertyName!)
-            ?.SetValue(_validator.Attributes[0], eventArgs.PropertyValue);
+        var minimum = Minimum;
+        var maximum = Maximum;
+
+        // 空检查
+        if (minimum == null || maximum == null)
+        {
+            throw new InvalidOperationException("The minimum and maximum values must be set.");
+        }
+
+        // 根据数据字段值的类型进行初始化
+        var operandType = minimum.GetType();
+        if (operandType == typeof(int))
+        {
+            Initialize((int)minimum, (int)maximum, u => Convert.ToInt32(u, CultureInfo.InvariantCulture));
+        }
+        else if (operandType == typeof(double))
+        {
+            Initialize((double)minimum, (double)maximum, u => Convert.ToDouble(u, CultureInfo.InvariantCulture));
+        }
+        else
+        {
+            var type = OperandType;
+            if (type is null)
+            {
+                throw new InvalidOperationException(
+                    "The OperandType must be set when strings are used for minimum and maximum values.");
+            }
+
+            // 检查目标类型是否可以比较
+            var comparableType = typeof(IComparable);
+            if (!comparableType.IsAssignableFrom(type))
+            {
+                throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture,
+                    "The type {0} must implement {1}.", type.FullName, comparableType.FullName));
+            }
+
+            // 获取目标类型的 TypeConverter
+            var converter = GetOperandTypeConverter();
+
+            // 解析字符串边界值为目标类型实例
+            var min = (IComparable)(ParseLimitsInInvariantCulture
+                ? converter.ConvertFromInvariantString((string)minimum)!
+                : converter.ConvertFromString((string)minimum))!;
+            var max = (IComparable)(ParseLimitsInInvariantCulture
+                ? converter.ConvertFromInvariantString((string)maximum)!
+                : converter.ConvertFromString((string)maximum))!;
+
+            // 构建输入值转换委托
+            Func<object, object?> conversion;
+            if (ConvertValueInInvariantCulture)
+            {
+                conversion = value => value.GetType() == type
+                    ? value
+                    : converter.ConvertFrom(null, CultureInfo.InvariantCulture, value);
+            }
+            else
+            {
+                conversion = value => value.GetType() == type ? value : converter.ConvertFrom(value);
+            }
+
+            Initialize(min, max, conversion);
+        }
     }
+
+    /// <summary>
+    ///     获取与 <see cref="OperandType" /> 关联的 <see cref="TypeConverter" /> 实例
+    /// </summary>
+    /// <remarks>此方法可能触发反射，在 AOT 或裁剪（trimming）环境下需确保类型元数据保留。</remarks>
+    /// <returns>
+    ///     <see cref="TypeConverter" />
+    /// </returns>
+    [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode",
+        Justification = "The ctor that allows this code to be called is marked with RequiresUnreferencedCode.")]
+    internal TypeConverter GetOperandTypeConverter() => TypeDescriptor.GetConverter(OperandType);
 }
