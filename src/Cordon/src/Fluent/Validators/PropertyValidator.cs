@@ -86,6 +86,12 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     internal bool? SuppressAttributeValidation { get; set; }
 
     /// <summary>
+    ///     <inheritdoc cref="CompositeMode" />
+    /// </summary>
+    /// <remarks>默认值为：<see cref="CompositeMode.All" />。</remarks>
+    internal CompositeMode Mode { get; set; } = CompositeMode.All;
+
+    /// <summary>
     ///     显示名称
     /// </summary>
     internal string? DisplayName { get; set; }
@@ -145,8 +151,15 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         var validationContextForProperty = CreateValidationContext(propertyValue, ruleSets);
 
         // 对于 ValidatorProxy<T, TValidator>（对象级代理），传入整个对象；否则传入属性值
-        return Validators.All(u => u.IsValid(u.IsTypedProxy ? instance : propertyValue,
-            u.IsTypedProxy ? validationContext : validationContextForProperty));
+        return Mode switch
+        {
+            CompositeMode.FailFast or CompositeMode.All => Validators.All(u =>
+                u.IsValid(u.IsTypedProxy ? instance : propertyValue,
+                    u.IsTypedProxy ? validationContext : validationContextForProperty)),
+            CompositeMode.Any => Validators.Any(u => u.IsValid(u.IsTypedProxy ? instance : propertyValue,
+                u.IsTypedProxy ? validationContext : validationContextForProperty)),
+            _ => throw new NotSupportedException()
+        };
     }
 
     /// <inheritdoc />
@@ -170,7 +183,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             return null;
         }
 
-        // 初始化验证结果集合
+        // 初始化验证结果列表
         var validationResults = new List<ValidationResult>();
 
         // 检查是否启用属性验证特性验证
@@ -182,11 +195,41 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 创建 ValidationContext 实例（属性）
         var validationContextForProperty = CreateValidationContext(propertyValue, ruleSets);
 
-        // 获取所有验证器验证结果集合
-        // 对于 ValidatorProxy<T, TValidator>（对象级代理），传入整个对象；否则传入属性值
-        validationResults.AddRange(Validators.SelectMany(u =>
-            u.GetValidationResults(u.IsTypedProxy ? instance : propertyValue,
-                u.IsTypedProxy ? validationContext : validationContextForProperty) ?? []));
+        // 初始化链式验证器验证结果列表
+        var customValidationResults = new List<ValidationResult>();
+
+        // 遍历验证器列表
+        foreach (var validator in Validators)
+        {
+            // 对于 ValidatorProxy<T, TValidator>（对象级代理），传入整个对象；否则传入属性值
+            object? validatingObject = validator.IsTypedProxy ? instance : propertyValue;
+            IValidationContext currentValidationContext =
+                validator.IsTypedProxy ? validationContext : validationContextForProperty;
+
+            // 获取对象验证结果列表
+            if (validator.GetValidationResults(validatingObject, currentValidationContext) is { Count: > 0 } results)
+            {
+                // 追加验证结果列表
+                customValidationResults.AddRange(results);
+
+                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
+                if (Mode is CompositeMode.FailFast)
+                {
+                    break;
+                }
+            }
+            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (Mode is CompositeMode.Any)
+            {
+                // 清空验证结果列表
+                customValidationResults.Clear();
+
+                break;
+            }
+        }
+
+        // 合并两个验证结果列表
+        validationResults.AddRange(customValidationResults);
 
         return validationResults.ToResults();
     }
@@ -221,13 +264,44 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 创建 ValidationContext 实例（属性）
         var validationContextForProperty = CreateValidationContext(propertyValue, ruleSets);
 
-        // 遍历验证器集合
+        // 初始化首个验证无效的验证器
+        ValidatorBase? firstFailedValidator = null;
+        object? firstFailedObject = null;
+        IValidationContext? firstFailedValidationContext = null;
+
+        // 遍历验证器列表
         foreach (var validator in Validators)
         {
             // 对于 ValidatorProxy<T, TValidator>（对象级代理），传入整个对象；否则传入属性值
-            validator.Validate(validator.IsTypedProxy ? instance : propertyValue,
-                validator.IsTypedProxy ? validationContext : validationContextForProperty);
+            object? validatingObject = validator.IsTypedProxy ? instance : propertyValue;
+            IValidationContext currentValidationContext =
+                validator.IsTypedProxy ? validationContext : validationContextForProperty;
+
+            // 检查对象是否合法
+            if (!validator.IsValid(validatingObject, currentValidationContext))
+            {
+                // 缓存首个验证无效的验证器
+                if (firstFailedValidator is null)
+                {
+                    firstFailedValidator = validator;
+                    firstFailedObject = validatingObject;
+                    firstFailedValidationContext = currentValidationContext;
+                }
+
+                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
+                if (Mode is CompositeMode.FailFast or CompositeMode.All)
+                {
+                    validator.Validate(validatingObject, currentValidationContext);
+                }
+            }
+            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (Mode is CompositeMode.Any)
+            {
+                return;
+            }
         }
+
+        firstFailedValidator?.Validate(firstFailedObject, firstFailedValidationContext);
     }
 
     /// <inheritdoc />
@@ -455,6 +529,22 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         ArgumentNullException.ThrowIfNull(memberNameProvider);
 
         MemberName = memberNameProvider(_attributeValidator.Property);
+
+        return This;
+    }
+
+    /// <summary>
+    ///     设置验证模式
+    /// </summary>
+    /// <param name="mode">
+    ///     <see cref="CompositeMode" />
+    /// </param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf UseMode(CompositeMode mode)
+    {
+        Mode = mode;
 
         return This;
     }

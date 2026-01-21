@@ -1782,7 +1782,7 @@
                 条件规则
             </summary>
             <param name="Condition">条件委托</param>
-            <param name="Validators">验证器集合</param>
+            <param name="Validators">验证器列表</param>
             <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="M:Cordon.ConditionRule`1.#ctor(System.Func{`0,System.Boolean},System.Collections.Generic.IReadOnlyList{Cordon.ValidatorBase})">
@@ -1790,14 +1790,14 @@
                 条件规则
             </summary>
             <param name="Condition">条件委托</param>
-            <param name="Validators">验证器集合</param>
+            <param name="Validators">验证器列表</param>
             <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="P:Cordon.ConditionRule`1.Condition">
             <summary>条件委托</summary>
         </member>
         <member name="P:Cordon.ConditionRule`1.Validators">
-            <summary>验证器集合</summary>
+            <summary>验证器列表</summary>
         </member>
         <member name="T:Cordon.ConditionResult`1">
             <summary>
@@ -2038,7 +2038,7 @@
         </member>
         <member name="P:Cordon.FluentValidatorBuilder`2.Validators">
             <summary>
-                验证器集合
+                验证器列表
             </summary>
         </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.Cordon#IValidatorInitializer#InitializeServiceProvider(System.Func{System.Type,System.Object})">
@@ -2046,7 +2046,7 @@
         </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.GetValidators">
             <summary>
-                获取验证器集合
+                获取验证器列表
             </summary>
             <returns>
                 <see cref="T:System.Collections.Generic.IReadOnlyList`1" />
@@ -2890,7 +2890,7 @@
             <summary>
                 批量添加添加验证器
             </summary>
-            <param name="validators">验证器集合</param>
+            <param name="validators">验证器列表</param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -2909,7 +2909,7 @@
         </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.Build(System.Action{`1})">
             <summary>
-                构建验证器集合
+                构建验证器列表
             </summary>
             <param name="configure">验证器配置委托</param>
             <returns>
@@ -3567,7 +3567,7 @@
         </member>
         <member name="M:Cordon.ValidationExtensions.ValidateWith``1(System.ComponentModel.DataAnnotations.ValidationContext,System.Action{Cordon.ObjectValidator{``0}})">
             <summary>
-                创建对象验证器验证当前实例并返回验证结果集合
+                创建对象验证器验证当前实例并返回验证结果列表
             </summary>
             <param name="validationContext">
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
@@ -3580,7 +3580,7 @@
         </member>
         <member name="M:Cordon.ValidationExtensions.ValidateWith``1(System.ComponentModel.DataAnnotations.ValidationContext,Cordon.ObjectValidator{``0},System.Boolean)">
             <summary>
-                使用指定对象验证器验证当前实例并返回验证结果集合
+                使用指定对象验证器验证当前实例并返回验证结果列表
             </summary>
             <param name="validationContext">
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
@@ -3598,7 +3598,7 @@
         </member>
         <member name="M:Cordon.ValidationExtensions.ValidateWith``1(System.ComponentModel.DataAnnotations.ValidationContext,Cordon.ValueValidator{``0},System.Boolean)">
             <summary>
-                使用指定单值验证器验证当前实例并返回验证结果集合
+                使用指定单值验证器验证当前实例并返回验证结果列表
             </summary>
             <param name="validationContext">
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
@@ -3616,7 +3616,7 @@
         </member>
         <member name="M:Cordon.ValidationExtensions.ValidateWith``1(System.ComponentModel.DataAnnotations.ValidationContext)">
             <summary>
-                使用指定对象验证器验证当前实例并返回验证结果集合
+                使用指定对象验证器验证当前实例并返回验证结果列表
             </summary>
             <param name="validationContext">
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
@@ -4207,7 +4207,7 @@
         </member>
         <member name="P:Cordon.ObjectValidator`1.Validators">
             <summary>
-                属性验证器集合
+                属性验证器列表
             </summary>
         </member>
         <member name="P:Cordon.ObjectValidator`1.InheritedRuleSets">
@@ -4590,6 +4590,12 @@
                 <see cref="P:Cordon.ValidatorOptions.SuppressAttributeValidation" /> 配置项决定。
             </remarks>
         </member>
+        <member name="P:Cordon.PropertyValidator`3.Mode">
+            <summary>
+                <inheritdoc cref="T:Cordon.CompositeMode" />
+            </summary>
+            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.All" />。</remarks>
+        </member>
         <member name="P:Cordon.PropertyValidator`3.DisplayName">
             <summary>
                 显示名称
@@ -4743,6 +4749,17 @@
                 设置成员名称
             </summary>
             <param name="memberNameProvider">成员名称获取委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.PropertyValidator`3.UseMode(Cordon.CompositeMode)">
+            <summary>
+                设置验证模式
+            </summary>
+            <param name="mode">
+                <see cref="T:Cordon.CompositeMode" />
+            </param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -5184,6 +5201,12 @@
             </summary>
             <remarks>当条件满足时才进行验证。</remarks>
         </member>
+        <member name="P:Cordon.ValueValidator`1.Mode">
+            <summary>
+                <inheritdoc cref="T:Cordon.CompositeMode" />
+            </summary>
+            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.All" />。</remarks>
+        </member>
         <member name="P:Cordon.ValueValidator`1.Cordon#IMemberPathRepairable#MemberPath">
             <inheritdoc />
         </member>
@@ -5294,6 +5317,17 @@
             </summary>
             <remarks>该预处理器仅用于验证，不会修改原始的值。</remarks>
             <param name="preProcess">预处理器</param>
+            <returns>
+                <see cref="T:Cordon.ValueValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.ValueValidator`1.UseMode(Cordon.CompositeMode)">
+            <summary>
+                设置验证模式
+            </summary>
+            <param name="mode">
+                <see cref="T:Cordon.CompositeMode" />
+            </param>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
             </returns>
@@ -8161,7 +8195,7 @@
         </member>
         <member name="M:Cordon.ConditionalValidator`1.GetMatchedValidators(`0)">
             <summary>
-                获取匹配到的验证器集合
+                获取匹配到的验证器列表
             </summary>
             <param name="instance">对象</param>
             <returns>
@@ -8713,18 +8747,18 @@
                                     ○ 7th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 8th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [12].<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 9th capture group.<br/>
@@ -8737,10 +8771,10 @@
                                     ○ 12th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ Match a sequence of expressions.<br/>
@@ -8754,13 +8788,13 @@
                                     ○ 15th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '2'.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 16th capture group.<br/>
                                     ○ 17th capture group.<br/>
@@ -8773,13 +8807,13 @@
                                                 ○ 20th capture group.<br/>
                                                     ○ Match with 3 alternative expressions.<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match a character in the set [13579].<br/>
                                                             ○ Match a character in the set [26].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match a character in the set [2468].<br/>
                                                             ○ Match a character in the set [048].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match '0'.<br/>
                                                             ○ Match a character in the set [48].<br/>
                                             ○ 21st capture group.<br/>
                                                 ○ Match the string "2000".<br/>
@@ -8794,18 +8828,18 @@
                                     ○ 26th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 27th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [12].<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 28th capture group.<br/>
@@ -8814,10 +8848,10 @@
                                     ○ 30th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ 31st capture group.<br/>
@@ -8827,25 +8861,25 @@
                                     ○ 33rd capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '2'.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 34th capture group.<br/>
                                     ○ 35th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [13579].<br/>
                                                 ○ Match a character in the set [26].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [2468].<br/>
                                                 ○ Match a character in the set [048].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                     ○ Match the string "0229".<br/>
                         ○ Match a Unicode digit exactly 2 times.<br/>
@@ -9396,25 +9430,25 @@
             ○ Match '1'.<br/>
             ○ Match with 7 alternative expressions.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '3'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '4'.<br/>
                     ○ Match a character in the set [579].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '5'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '6'.<br/>
                     ○ Match a character in the set [6-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '7'.<br/>
                     ○ Match a character in the set [0-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '8'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '9'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
             ○ Match a Unicode digit exactly 8 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -9444,31 +9478,31 @@
             ○ 1st capture group.<br/>
                 ○ Match with 9 alternative expressions.<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '0'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '1'.<br/>
                         ○ Match a character in the set [0-356].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '2'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '3'.<br/>
                         ○ Match a character in the set [0-6].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '4'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '5'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '6'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '7'.<br/>
                         ○ Match a character in the set [0-5].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '8'.<br/>
                         ○ Match a character in the set [013-6].<br/>
             ○ Match a Unicode digit exactly 4 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -10538,6 +10572,16 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

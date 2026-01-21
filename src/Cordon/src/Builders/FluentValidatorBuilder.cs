@@ -87,7 +87,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public IDictionary<object, object?> Items { get; }
 
     /// <summary>
-    ///     验证器集合
+    ///     验证器列表
     /// </summary>
     internal List<ValidatorBase> Validators { get; }
 
@@ -96,7 +96,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         InitializeServiceProvider(serviceProvider);
 
     /// <summary>
-    ///     获取验证器集合
+    ///     获取验证器列表
     /// </summary>
     /// <returns>
     ///     <see cref="IReadOnlyList{T}" />
@@ -1110,7 +1110,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     批量添加添加验证器
     /// </summary>
-    /// <param name="validators">验证器集合</param>
+    /// <param name="validators">验证器列表</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
@@ -1213,7 +1213,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     }
 
     /// <summary>
-    ///     构建验证器集合
+    ///     构建验证器列表
     /// </summary>
     /// <param name="configure">验证器配置委托</param>
     /// <returns>

@@ -87,7 +87,7 @@ public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
         // 空检查
         ArgumentNullException.ThrowIfNull(value);
 
-        // 初始化验证结果集合
+        // 初始化验证结果列表
         var validationResults = new List<ValidationResult>();
 
         /*

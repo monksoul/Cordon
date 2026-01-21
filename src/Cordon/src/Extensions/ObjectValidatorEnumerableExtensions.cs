@@ -59,7 +59,7 @@ public static class ObjectValidatorEnumerableExtensions
         // 空检查
         ArgumentNullException.ThrowIfNull(validators);
 
-        // 遍历验证器集合
+        // 遍历验证器列表
         foreach (var validator in validators)
         {
             validator.Validate(instance, ruleSets);

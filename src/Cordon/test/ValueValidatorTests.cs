@@ -27,6 +27,7 @@ public class ValueValidatorTests
         Assert.Null(valueValidator._allowEmptyStrings);
         Assert.Null(valueValidator._memberPath);
         Assert.Null(valueValidator.MemberName);
+        Assert.Equal(CompositeMode.All, valueValidator.Mode);
 
         var valueValidator2 = new ValueValidator<string>(new Dictionary<object, object?>());
         Assert.Null(valueValidator2._serviceProvider);
@@ -81,6 +82,17 @@ public class ValueValidatorTests
         Assert.False(valueValidator.IsValid("Fu"));
         Assert.False(valueValidator.IsValid("Fur"));
         Assert.True(valueValidator.IsValid("Furion"));
+    }
+
+    [Fact]
+    public void IsValid_WithMode_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).UseMode(CompositeMode.FailFast);
+
+        Assert.False(valueValidator.IsValid(null));
+        Assert.False(valueValidator.IsValid("Fu"));
+        Assert.True(valueValidator.IsValid("百小僧"));
     }
 
     [Fact]
@@ -220,6 +232,37 @@ public class ValueValidatorTests
     }
 
     [Fact]
+    public void GetValidationResults_WithMode_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).UseMode(CompositeMode.FailFast);
+
+        var validationResults = valueValidator.GetValidationResults(null);
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The Object field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 = valueValidator.GetValidationResults("Fu");
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field Object must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        Assert.Null(valueValidator.GetValidationResults("百小僧"));
+
+        var validationResults3 = valueValidator.UseMode(CompositeMode.All).GetValidationResults("Fu");
+        Assert.NotNull(validationResults3);
+        Assert.Equal(2, validationResults3.Count);
+        Assert.Equal(
+            [
+                "The field Object must be a string or array type with a minimum length of '3'.",
+                "The field Object contains invalid Chinese characters."
+            ],
+            validationResults3.Select(u => u.ErrorMessage));
+    }
+
+    [Fact]
     public void Validate_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().AddValidators(
@@ -336,6 +379,31 @@ public class ValueValidatorTests
         Assert.Empty(exception3.ValidationResult.MemberNames);
 
         valueValidator.Validate("Furion");
+    }
+
+    [Fact]
+    public void Validate_WithMode_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).UseMode(CompositeMode.FailFast);
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.Validate(null));
+        Assert.Equal("The Object field is required.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.Validate("Fu"));
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Empty(exception2.ValidationResult.MemberNames);
+
+        valueValidator.Validate("百小僧");
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() => valueValidator.UseMode(CompositeMode.All).Validate("Fu"));
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '3'.",
+            exception3.Message);
+        Assert.Empty(exception3.ValidationResult.MemberNames);
     }
 
     [Fact]
@@ -545,6 +613,15 @@ public class ValueValidatorTests
 
         valueValidator.PreProcess(null);
         Assert.Null(valueValidator._preProcessor);
+    }
+
+    [Fact]
+    public void UseMode_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>();
+        Assert.Equal(CompositeMode.All, valueValidator.Mode);
+        valueValidator.UseMode(CompositeMode.FailFast);
+        Assert.Equal(CompositeMode.FailFast, valueValidator.Mode);
     }
 
     [Fact]

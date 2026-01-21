@@ -75,6 +75,12 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <remarks>当条件满足时才进行验证。</remarks>
     internal Func<T, ValidationContext<T>, bool>? WhenCondition { get; private set; }
 
+    /// <summary>
+    ///     <inheritdoc cref="CompositeMode" />
+    /// </summary>
+    /// <remarks>默认值为：<see cref="CompositeMode.All" />。</remarks>
+    public CompositeMode Mode { get; set; } = CompositeMode.All;
+
     /// <inheritdoc />
     string? IMemberPathRepairable.MemberPath
     {
@@ -107,8 +113,16 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
             return true;
         }
 
-        return Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets))
-            .All(u => u.IsValid(resolvedValue, validationContext));
+        // 获取规则集匹配的验证器列表
+        var validators = Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets));
+
+        return Mode switch
+        {
+            CompositeMode.FailFast or CompositeMode.All => validators.All(u =>
+                u.IsValid(resolvedValue, validationContext)),
+            CompositeMode.Any => validators.Any(u => u.IsValid(resolvedValue, validationContext)),
+            _ => throw new NotSupportedException()
+        };
     }
 
     /// <inheritdoc />
@@ -129,8 +143,38 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
             return null;
         }
 
-        return Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets))
-            .SelectMany(u => u.GetValidationResults(resolvedValue, validationContext) ?? []).ToResults();
+        // 初始化验证结果列表
+        var validationResults = new List<ValidationResult>();
+
+        // 获取规则集匹配的验证器列表
+        var validators = Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets));
+
+        // 遍历验证器列表
+        foreach (var validator in validators)
+        {
+            // 获取对象验证结果列表
+            if (validator.GetValidationResults(resolvedValue, validationContext) is { Count: > 0 } results)
+            {
+                // 追加验证结果列表
+                validationResults.AddRange(results);
+
+                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
+                if (Mode is CompositeMode.FailFast)
+                {
+                    break;
+                }
+            }
+            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (Mode is CompositeMode.Any)
+            {
+                // 清空验证结果列表
+                validationResults.Clear();
+
+                break;
+            }
+        }
+
+        return validationResults.ToResults();
     }
 
     /// <inheritdoc />
@@ -151,11 +195,35 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
             return;
         }
 
-        // 遍历验证器集合
-        foreach (var validator in Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets)))
+        // 获取规则集匹配的验证器列表
+        var validators = Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets));
+
+        // 初始化首个验证无效的验证器
+        ValidatorBase? firstFailedValidator = null;
+
+        // 遍历验证器列表
+        foreach (var validator in validators)
         {
-            validator.Validate(resolvedValue, validationContext);
+            // 检查对象是否合法
+            if (!validator.IsValid(resolvedValue, validationContext))
+            {
+                // 缓存首个验证无效的验证器
+                firstFailedValidator ??= validator;
+
+                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
+                if (Mode is CompositeMode.FailFast or CompositeMode.All)
+                {
+                    validator.Validate(resolvedValue, validationContext);
+                }
+            }
+            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (Mode is CompositeMode.Any)
+            {
+                return;
+            }
         }
+
+        firstFailedValidator?.Validate(resolvedValue, validationContext);
     }
 
     /// <inheritdoc />
@@ -358,6 +426,22 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     public virtual ValueValidator<T> PreProcess(Func<T, T>? preProcess)
     {
         _preProcessor = preProcess;
+
+        return this;
+    }
+
+    /// <summary>
+    ///     设置验证模式
+    /// </summary>
+    /// <param name="mode">
+    ///     <see cref="CompositeMode" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="ValueValidator{T}" />
+    /// </returns>
+    public virtual ValueValidator<T> UseMode(CompositeMode mode)
+    {
+        Mode = mode;
 
         return this;
     }

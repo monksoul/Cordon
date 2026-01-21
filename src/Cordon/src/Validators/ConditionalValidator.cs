@@ -43,7 +43,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     /// <inheritdoc />
     public override bool IsValid(T? instance, ValidationContext<T> validationContext)
     {
-        // 获取匹配到的验证器集合
+        // 获取匹配到的验证器列表
         var matchedValidators = GetMatchedValidators(instance);
 
         return matchedValidators is null or { Count: 0 } ||
@@ -53,7 +53,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     /// <inheritdoc />
     public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext)
     {
-        // 获取匹配到的验证器集合和成员名称列表
+        // 获取匹配到的验证器列表和成员名称列表
         var matchedValidators = GetMatchedValidators(instance);
 
         // 空检查
@@ -62,7 +62,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
             return null;
         }
 
-        // 获取验证结果集合
+        // 获取验证结果列表
         var validationResults = matchedValidators
             .SelectMany(u => u.GetValidationResults(instance, validationContext) ?? []).ToList();
 
@@ -79,7 +79,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     /// <inheritdoc />
     public override void Validate(T? instance, ValidationContext<T> validationContext)
     {
-        // 获取匹配到的验证器集合
+        // 获取匹配到的验证器列表
         var matchedValidators = GetMatchedValidators(instance);
 
         // 空检查
@@ -88,7 +88,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
             return;
         }
 
-        // 遍历验证器集合
+        // 遍历验证器列表
         foreach (var validator in matchedValidators)
         {
             // 检查对象是否合法
@@ -152,7 +152,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     }
 
     /// <summary>
-    ///     获取匹配到的验证器集合
+    ///     获取匹配到的验证器列表
     /// </summary>
     /// <param name="instance">对象</param>
     /// <returns>
@@ -160,10 +160,10 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     /// </returns>
     internal IReadOnlyList<ValidatorBase>? GetMatchedValidators(T? instance)
     {
-        // 初始化匹配到的验证器集合
+        // 初始化匹配到的验证器列表
         IReadOnlyList<ValidatorBase>? matchedValidators = null;
 
-        // 遍历并查找第一个条件匹配的验证器集合
+        // 遍历并查找第一个条件匹配的验证器列表
         foreach (var (condition, validators) in _conditionResult.ConditionalRules)
         {
             // ReSharper disable once InvertIf
@@ -174,7 +174,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
             }
         }
 
-        // 没有匹配条件时使用默认验证器集合
+        // 没有匹配条件时使用默认验证器列表
         matchedValidators ??= _conditionResult.DefaultRules;
 
         return matchedValidators;

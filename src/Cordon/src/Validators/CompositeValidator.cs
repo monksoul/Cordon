@@ -58,16 +58,16 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
     /// <inheritdoc />
     public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext)
     {
-        // 初始化验证结果集合
+        // 初始化验证结果列表
         var validationResults = new List<ValidationResult>();
 
-        // 遍历验证器集合
+        // 遍历验证器列表
         foreach (var validator in _validators)
         {
             // 获取对象验证结果列表
             if (validator.GetValidationResults(instance, validationContext) is { Count: > 0 } results)
             {
-                // 追加验证结果集合
+                // 追加验证结果列表
                 validationResults.AddRange(results);
 
                 // 检查验证器模式是否是遇到首个验证失败即停止后续验证
@@ -79,7 +79,7 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
             // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
             else if (Mode is CompositeMode.Any)
             {
-                // 清空验证结果集合
+                // 清空验证结果列表
                 validationResults.Clear();
 
                 break;
@@ -102,7 +102,7 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
         // 初始化首个验证无效的验证器
         ValidatorBase? firstFailedValidator = null;
 
-        // 遍历验证器集合
+        // 遍历验证器列表
         foreach (var validator in _validators)
         {
             // 检查对象是否合法

@@ -82,7 +82,7 @@ public static class ValidationExtensions
     }
 
     /// <summary>
-    ///     创建对象验证器验证当前实例并返回验证结果集合
+    ///     创建对象验证器验证当前实例并返回验证结果列表
     /// </summary>
     /// <param name="validationContext">
     ///     <see cref="ValidationContext" />
@@ -110,7 +110,7 @@ public static class ValidationExtensions
     }
 
     /// <summary>
-    ///     使用指定对象验证器验证当前实例并返回验证结果集合
+    ///     使用指定对象验证器验证当前实例并返回验证结果列表
     /// </summary>
     /// <param name="validationContext">
     ///     <see cref="ValidationContext" />
@@ -137,7 +137,7 @@ public static class ValidationExtensions
     }
 
     /// <summary>
-    ///     使用指定单值验证器验证当前实例并返回验证结果集合
+    ///     使用指定单值验证器验证当前实例并返回验证结果列表
     /// </summary>
     /// <param name="validationContext">
     ///     <see cref="ValidationContext" />
@@ -164,7 +164,7 @@ public static class ValidationExtensions
     }
 
     /// <summary>
-    ///     使用指定对象验证器验证当前实例并返回验证结果集合
+    ///     使用指定对象验证器验证当前实例并返回验证结果列表
     /// </summary>
     /// <param name="validationContext">
     ///     <see cref="ValidationContext" />

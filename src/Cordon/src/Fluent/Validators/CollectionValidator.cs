@@ -74,7 +74,7 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
 
-        // 初始化验证结果集合
+        // 初始化验证结果列表
         var validationResults = new List<ValidationResult>();
 
         // 遍历用于执行验证的集合元素

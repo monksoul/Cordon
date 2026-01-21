@@ -40,6 +40,7 @@ public class PropertyValidatorTests
         Assert.NotNull(propertyValidator.This);
         Assert.Equal(propertyValidator.This, propertyValidator);
         Assert.Null(propertyValidator._allowEmptyStrings);
+        Assert.Equal(CompositeMode.All, propertyValidator.Mode);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
@@ -162,6 +163,20 @@ public class PropertyValidatorTests
         Assert.False(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel() }, ["login"]));
         Assert.False(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel { Id = 1 } }, ["login"]));
         Assert.True(propertyValidator.IsValid(new ObjectModel { Sub = new SubModel { Id = 3 } }, ["login"]));
+    }
+
+    [Fact]
+    public void IsValid_WithMode_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).CustomOnly()
+                .UseMode(CompositeMode.FailFast);
+
+        Assert.False(propertyValidator.IsValid(new ObjectModel()));
+        Assert.False(propertyValidator.IsValid(new ObjectModel { FirstName = "Fu" }));
+        Assert.True(propertyValidator.IsValid(new ObjectModel { FirstName = "百小僧" }));
     }
 
     [Fact]
@@ -421,6 +436,41 @@ public class PropertyValidatorTests
     }
 
     [Fact]
+    public void GetValidationResults_WithMode_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).CustomOnly()
+                .UseMode(CompositeMode.FailFast);
+
+        var validationResults = propertyValidator.GetValidationResults(new ObjectModel());
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The FirstName field is required."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        var validationResults2 = propertyValidator.GetValidationResults(new ObjectModel { FirstName = "Fu" });
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal(["The field FirstName must be a string or array type with a minimum length of '3'."],
+            validationResults2.Select(u => u.ErrorMessage));
+
+        Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { FirstName = "百小僧" }));
+
+        var validationResults3 = propertyValidator.UseMode(CompositeMode.All)
+            .GetValidationResults(new ObjectModel { FirstName = "Fu" });
+        Assert.NotNull(validationResults3);
+        Assert.Equal(2, validationResults3.Count);
+        Assert.Equal(
+            [
+                "The field FirstName must be a string or array type with a minimum length of '3'.",
+                "The field FirstName contains invalid Chinese characters."
+            ],
+            validationResults3.Select(u => u.ErrorMessage));
+    }
+
+    [Fact]
     public void Validate_Invalid_Parameters()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
@@ -647,6 +697,35 @@ public class PropertyValidatorTests
         Assert.Equal("Sub.Id", exception2.ValidationResult.MemberNames.First());
 
         propertyValidator.Validate(new ObjectModel { Sub = new SubModel { Id = 3 } }, ["login"]);
+    }
+
+    [Fact]
+    public void Validate_WithMode_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).CustomOnly()
+                .UseMode(CompositeMode.FailFast);
+
+        var exception = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel()));
+        Assert.Equal("The FirstName field is required.", exception.Message);
+        Assert.Equal("FirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel { FirstName = "Fu" }));
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.Validate(new ObjectModel { FirstName = "百小僧" });
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.UseMode(CompositeMode.All).Validate(new ObjectModel { FirstName = "Fu" }));
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception3.Message);
+        Assert.Equal("FirstName", exception3.ValidationResult.MemberNames.First());
     }
 
     [Fact]
@@ -895,6 +974,16 @@ public class PropertyValidatorTests
 
         propertyValidator.PreProcess(null);
         Assert.Null(propertyValidator._preProcessor);
+    }
+
+    [Fact]
+    public void UseMode_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+        Assert.Equal(CompositeMode.All, propertyValidator.Mode);
+        propertyValidator.UseMode(CompositeMode.FailFast);
+        Assert.Equal(CompositeMode.FailFast, propertyValidator.Mode);
     }
 
     [Fact]

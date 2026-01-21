@@ -114,7 +114,7 @@ public class AttributeValueValidator : ValidatorBase, IValidatorInitializer, IDi
     /// <inheritdoc />
     public override List<ValidationResult>? GetValidationResults(object? value, IValidationContext? validationContext)
     {
-        // 初始化验证结果集合和成员名称列表
+        // 初始化验证结果列表和成员名称列表
         var validationResults = new List<ValidationResult>();
 
         Validator.TryValidateValue(value,

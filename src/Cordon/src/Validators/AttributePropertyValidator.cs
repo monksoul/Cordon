@@ -176,7 +176,7 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
         // 获取显示名称
         var displayName = GetDisplayName(validationContext.DisplayName);
 
-        // 初始化验证结果集合
+        // 初始化验证结果列表
         var validationResults = new List<ValidationResult>();
 
         Validator.TryValidateProperty(GetValue(instance),

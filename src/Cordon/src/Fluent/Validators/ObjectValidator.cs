@@ -100,7 +100,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     internal Func<T, ValidationContext<T>, bool>? WhenCondition { get; private set; }
 
     /// <summary>
-    ///     属性验证器集合
+    ///     属性验证器列表
     /// </summary>
     internal List<IPropertyValidator<T>> Validators { get; }
 
@@ -180,7 +180,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
             return null;
         }
 
-        // 初始化验证结果集合
+        // 初始化验证结果列表
         var validationResults = new List<ValidationResult>();
 
         // 检查是否启用对象属性验证特性验证
@@ -190,7 +190,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
             validationResults.AddRange(_attributeValidator.GetValidationResults(instance, validationContext) ?? []);
         }
 
-        // 获取所有属性验证器验证结果集合
+        // 获取所有属性验证器验证结果列表
         validationResults.AddRange(
             Validators.SelectMany(u => u.GetValidationResults(instance, resolvedRuleSets) ?? []));
 
@@ -228,7 +228,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
             _attributeValidator.Validate(instance, validationContext);
         }
 
-        // 遍历属性验证器集合
+        // 遍历属性验证器列表
         foreach (var validator in Validators)
         {
             validator.Validate(instance, resolvedRuleSets);

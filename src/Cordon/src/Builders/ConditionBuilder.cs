@@ -8,7 +8,7 @@ namespace Cordon;
 ///     条件规则
 /// </summary>
 /// <param name="Condition">条件委托</param>
-/// <param name="Validators">验证器集合</param>
+/// <param name="Validators">验证器列表</param>
 /// <typeparam name="T">对象类型</typeparam>
 internal record ConditionRule<T>(Func<T, bool> Condition, IReadOnlyList<ValidatorBase> Validators);
 
