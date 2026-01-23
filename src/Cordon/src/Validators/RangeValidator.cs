@@ -141,6 +141,7 @@ public class RangeValidator : ValidatorBase
         // 将边界值转为 IComparable 以便通用比较
         var min = (IComparable)Minimum;
         var max = (IComparable)Maximum;
+
         return
             (MinimumIsExclusive ? min.CompareTo(convertedValue) < 0 : min.CompareTo(convertedValue) <= 0) &&
             (MaximumIsExclusive ? max.CompareTo(convertedValue) > 0 : max.CompareTo(convertedValue) >= 0);

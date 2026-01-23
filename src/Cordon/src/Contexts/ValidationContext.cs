@@ -68,7 +68,7 @@ public sealed class ValidationContext<T> : IValidationContext, IValidatorInitial
     object? IValidationContext.Instance => Instance;
 
     /// <inheritdoc />
-    public string DisplayName { get; init; } = null!;
+    public string DisplayName { get => field ?? MemberNames?.FirstOrDefault() ?? typeof(T).Name; init; }
 
     /// <inheritdoc />
     public IEnumerable<string>? MemberNames { get; init; }

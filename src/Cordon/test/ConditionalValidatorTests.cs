@@ -218,12 +218,12 @@ public class ConditionalValidatorTests
         var exception = Assert.Throws<ValidationException>(() =>
             validator.ThrowValidationException("monk__soul",
                 validator._conditionResult.ConditionalRules.Last().Validators[0],
-                new LegacyValidationContext { DisplayName = "Value" }));
+                new ValidationContext<string>("monk_soul") { DisplayName = "Value" }));
         Assert.Equal("The Value field is not a valid e-mail address.", exception.Message);
 
         var exception2 = Assert.Throws<ValidationException>(() =>
             validator.ThrowValidationException("monksoul@qq", validator._conditionResult.DefaultRules![0],
-                new LegacyValidationContext { DisplayName = "Value" }));
+                new ValidationContext<string>("monksoul@qq") { DisplayName = "Value" }));
         Assert.Equal("The field Value is not a valid username.", exception2.Message);
     }
 

@@ -19,6 +19,7 @@ public static class Must
     public static bool WithMessage(string message)
     {
         ValidatorException.Throw(message);
+
         return false;
     }
 
@@ -96,20 +97,12 @@ public class MustValidator<T> : ValidatorBase<T>
                 return null;
             }
 
-            return
-            [
-                new ValidationResult(FormatErrorMessage(validationContext.DisplayName), validationContext.MemberNames)
-            ];
+            return [CreateValidationResult(validationContext)];
         }
         // 检查是否是 ValidatorException 异常
         catch (ValidatorException e)
         {
-            return
-            [
-                new ValidationResult(
-                    string.Format(CultureInfo.CurrentCulture, e.Message, validationContext.DisplayName),
-                    validationContext.MemberNames)
-            ];
+            return [CreateValidationResult(validationContext, e.Message)];
         }
     }
 
@@ -121,18 +114,33 @@ public class MustValidator<T> : ValidatorBase<T>
             // 检查条件是否成立
             if (!Condition(instance!, validationContext))
             {
-                throw new ValidationException(
-                    new ValidationResult(FormatErrorMessage(validationContext.DisplayName),
-                        validationContext.MemberNames), null, instance);
+                throw new ValidationException(CreateValidationResult(validationContext), null, instance);
             }
         }
         // 检查是否是 ValidatorException 异常
         catch (ValidatorException e)
         {
-            throw new ValidationException(
-                new ValidationResult(
-                    string.Format(CultureInfo.CurrentCulture, e.Message, validationContext.DisplayName),
-                    validationContext.MemberNames), null, instance);
+            throw new ValidationException(CreateValidationResult(validationContext, e.Message), null, instance);
         }
+    }
+
+    /// <summary>
+    ///     创建验证错误结果
+    /// </summary>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
+    /// <param name="errorMessage">错误消息</param>
+    /// <returns>
+    ///     <see cref="ValidationResult" />
+    /// </returns>
+    internal ValidationResult CreateValidationResult(ValidationContext<T> validationContext,
+        string? errorMessage = null)
+    {
+        var message = errorMessage is null
+            ? FormatErrorMessage(validationContext.DisplayName)
+            : string.Format(CultureInfo.CurrentCulture, errorMessage, validationContext.DisplayName);
+
+        return new ValidationResult(message, validationContext.MemberNames);
     }
 }

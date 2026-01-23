@@ -513,7 +513,7 @@ public class ValidatorBaseTests
         var validationContext = ValidatorBase<string>.CreateValidationContext(null, null);
         Assert.NotNull(validationContext);
         Assert.Null(validationContext.Instance);
-        Assert.Null(validationContext.DisplayName);
+        Assert.Equal("String", validationContext.DisplayName);
         Assert.Null(validationContext.MemberNames);
         Assert.Null(validationContext.RuleSets);
         Assert.Empty(validationContext.Items);

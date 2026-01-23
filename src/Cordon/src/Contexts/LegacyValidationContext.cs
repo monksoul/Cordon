@@ -24,7 +24,7 @@ internal sealed class LegacyValidationContext : IValidationContext
     internal LegacyValidationContext(object? instance, string? displayName, IEnumerable<string>? memberNames)
     {
         Instance = instance;
-        DisplayName = displayName ?? instance?.GetType().Name!;
+        DisplayName = displayName!;
         MemberNames = memberNames;
     }
 
@@ -32,7 +32,7 @@ internal sealed class LegacyValidationContext : IValidationContext
     public object? Instance { get; set; }
 
     /// <inheritdoc />
-    public string DisplayName { get; set; } = null!;
+    public string DisplayName { get => field ?? MemberNames?.FirstOrDefault() ?? Instance?.GetType().Name!; set; }
 
     /// <inheritdoc />
     public IEnumerable<string>? MemberNames { get; set; }

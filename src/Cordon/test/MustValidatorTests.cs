@@ -149,4 +149,17 @@ public class MustValidatorTests
             Must.WithMessage(typeof(TestValidationMessages), "Unknown"));
         Assert.Equal("Unknown", exception3.Message);
     }
+
+    [Fact]
+    public void CreateValidationResult_ReturnOK()
+    {
+        var validator = new MustValidator<int>(u => u > 10);
+        var validationResult = validator.CreateValidationResult(new ValidationContext<int>(10));
+        Assert.NotNull(validationResult);
+        Assert.Equal("The field Int32 is invalid.", validationResult.ErrorMessage);
+
+        var validationResult2 = validator.CreateValidationResult(new ValidationContext<int>(10), "错误消息");
+        Assert.NotNull(validationResult2);
+        Assert.Equal("错误消息", validationResult2.ErrorMessage);
+    }
 }

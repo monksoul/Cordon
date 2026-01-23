@@ -107,11 +107,11 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     ///     <see cref="ValidatorBase" />
     /// </param>
     /// <param name="validationContext">
-    ///     <see cref="IValidationContext" />
+    ///     <see cref="ValidationContext{T}" />
     /// </param>
     /// <exception cref="ValidationException"></exception>
     internal void ThrowValidationException(T? instance, ValidatorBase validator,
-        IValidationContext? validationContext)
+        ValidationContext<T> validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(validator);
@@ -124,8 +124,8 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         else
         {
             throw new ValidationException(
-                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!),
-                    validationContext?.MemberNames), null, instance);
+                new ValidationResult(FormatErrorMessage(validationContext.DisplayName), validationContext.MemberNames),
+                null, instance);
         }
     }
 

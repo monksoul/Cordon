@@ -11,7 +11,7 @@ public class ValidationContextTests
     {
         var validationContext = new ValidationContext<ObjectModel>(null!);
         Assert.Null(validationContext.Instance);
-        Assert.Null(validationContext.DisplayName);
+        Assert.Equal("ObjectModel", validationContext.DisplayName);
         Assert.Null(validationContext.MemberNames);
         Assert.Null(validationContext.RuleSets);
         Assert.Empty(validationContext.Items);

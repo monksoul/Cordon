@@ -1054,7 +1054,7 @@ public class ObjectValidatorTests
         var validationContext = objectValidator.CreateValidationContext(new ObjectModel(), null);
         Assert.NotNull(validationContext);
         Assert.NotNull(validationContext.Instance);
-        Assert.Null(validationContext.DisplayName);
+        Assert.Equal("ObjectModel", validationContext.DisplayName);
         Assert.Null(validationContext.MemberNames);
         Assert.Null(validationContext.RuleSets);
         Assert.Empty(validationContext.Items);
@@ -1066,7 +1066,7 @@ public class ObjectValidatorTests
         var validationContext2 = objectValidator.CreateValidationContext(new ObjectModel(), ["Login"]);
         Assert.NotNull(validationContext2);
         Assert.NotNull(validationContext2.Instance);
-        Assert.Null(validationContext2.DisplayName);
+        Assert.Equal("ObjectModel", validationContext2.DisplayName);
         Assert.Null(validationContext2.MemberNames);
         Assert.Equal<string>(["Login"], validationContext2.RuleSets!);
         Assert.Empty(validationContext2.Items);
