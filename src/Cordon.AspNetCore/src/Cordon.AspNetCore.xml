@@ -6,7 +6,7 @@
     <members>
         <member name="T:Cordon.StringLocalizerValidationExtensions">
             <summary>
-                <see cref="T:Microsoft.Extensions.Localization.IStringLocalizer" /> 拓展类
+                <see cref="T:Microsoft.Extensions.Localization.IStringLocalizer" /> 扩展类
             </summary>
         </member>
         <member name="M:Cordon.StringLocalizerValidationExtensions.GetString(Microsoft.Extensions.Localization.IStringLocalizer,System.String)">
@@ -108,7 +108,7 @@
         </member>
         <member name="T:Microsoft.Extensions.DependencyInjection.ValidationCoreMvcBuilderExtensions">
             <summary>
-                数据验证模块 <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" /> 拓展类
+                数据验证模块 <see cref="T:Microsoft.Extensions.DependencyInjection.IMvcBuilder" /> 扩展类
             </summary>
         </member>
         <member name="M:Microsoft.Extensions.DependencyInjection.ValidationCoreMvcBuilderExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IMvcBuilder,System.Action{Cordon.ValidationBuilder})">

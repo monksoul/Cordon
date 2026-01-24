@@ -5,7 +5,7 @@
 namespace Cordon;
 
 /// <summary>
-///     数据验证模块拓展类
+///     数据验证模块扩展类
 /// </summary>
 public static class ValidationExtensions
 {

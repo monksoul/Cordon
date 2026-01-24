@@ -5,19 +5,19 @@
 namespace Cordon;
 
 /// <summary>
-///     文件拓展名验证器
+///     文件扩展名验证器
 /// </summary>
 public class FileExtensionsValidator : ValidatorBase
 {
     /// <summary>
     ///     <inheritdoc cref="FileExtensionsValidator" />
     /// </summary>
-    /// <remarks>默认文件拓展名为：<c>png,jpg,jpeg,gif</c>。</remarks>
+    /// <remarks>默认文件扩展名为：<c>png,jpg,jpeg,gif</c>。</remarks>
     public FileExtensionsValidator() =>
         UseResourceKey(() => nameof(ValidationMessages.FileExtensionsValidator_ValidationError));
 
     /// <summary>
-    ///     文件拓展名
+    ///     文件扩展名
     /// </summary>
     public string Extensions
     {
@@ -26,18 +26,18 @@ public class FileExtensionsValidator : ValidatorBase
     }
 
     /// <summary>
-    ///     格式化后的文件拓展名列表
+    ///     格式化后的文件扩展名列表
     /// </summary>
     internal string ExtensionsFormatted => ExtensionsParsed.Aggregate((left, right) => left + ", " + right);
 
     /// <summary>
-    ///     标准化后的文件拓展名字符串
+    ///     标准化后的文件扩展名字符串
     /// </summary>
     internal string ExtensionsNormalized =>
         Extensions.Replace(" ", string.Empty).Replace(".", string.Empty).ToLowerInvariant();
 
     /// <summary>
-    ///     解析后的文件拓展名集合
+    ///     解析后的文件扩展名集合
     /// </summary>
     internal IEnumerable<string> ExtensionsParsed => ExtensionsNormalized.Split(',').Select(e => "." + e);
 
@@ -50,7 +50,7 @@ public class FileExtensionsValidator : ValidatorBase
         string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, ExtensionsFormatted);
 
     /// <summary>
-    ///     验证文件拓展名是否在允许的列表中
+    ///     验证文件扩展名是否在允许的列表中
     /// </summary>
     /// <param name="fileName">文件名</param>
     /// <returns>

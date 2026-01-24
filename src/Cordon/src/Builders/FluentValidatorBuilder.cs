@@ -446,18 +446,18 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf Failure() => AddValidator(new FailureValidator());
 
     /// <summary>
-    ///     添加文件拓展名验证器
+    ///     添加文件扩展名验证器
     /// </summary>
-    /// <remarks>默认文件拓展名为：<c>png,jpg,jpeg,gif</c>。</remarks>
+    /// <remarks>默认文件扩展名为：<c>png,jpg,jpeg,gif</c>。</remarks>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf FileExtensions() => AddValidator(new FileExtensionsValidator());
 
     /// <summary>
-    ///     添加文件拓展名验证器
+    ///     添加文件扩展名验证器
     /// </summary>
-    /// <param name="extensions">文件拓展名</param>
+    /// <param name="extensions">文件扩展名</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>

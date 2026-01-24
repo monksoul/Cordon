@@ -389,18 +389,18 @@ public static class Validators
     public static FailureValidator Failure() => new();
 
     /// <summary>
-    ///     创建文件拓展名验证器
+    ///     创建文件扩展名验证器
     /// </summary>
-    /// <remarks>默认文件拓展名为：<c>png,jpg,jpeg,gif</c>。</remarks>
+    /// <remarks>默认文件扩展名为：<c>png,jpg,jpeg,gif</c>。</remarks>
     /// <returns>
     ///     <see cref="FileExtensionsValidator" />
     /// </returns>
     public static FileExtensionsValidator FileExtensions() => new();
 
     /// <summary>
-    ///     创建文件拓展名验证器
+    ///     创建文件扩展名验证器
     /// </summary>
-    /// <param name="extensions">文件拓展名</param>
+    /// <param name="extensions">文件扩展名</param>
     /// <returns>
     ///     <see cref="FileExtensionsValidator" />
     /// </returns>
