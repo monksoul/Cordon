@@ -10,14 +10,14 @@ namespace Cordon;
 public sealed class ValidatorException : Exception
 {
     /// <summary>
-    ///     <inheritdoc cref="ValidationException" />
+    ///     <inheritdoc cref="ValidatorException" />
     /// </summary>
     public ValidatorException()
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="ValidationException" />
+    ///     <inheritdoc cref="ValidatorException" />
     /// </summary>
     /// <param name="errorMessage">错误信息</param>
     public ValidatorException(string? errorMessage)
@@ -26,7 +26,7 @@ public sealed class ValidatorException : Exception
     }
 
     /// <summary>
-    ///     <inheritdoc cref="ValidationException" />
+    ///     <inheritdoc cref="ValidatorException" />
     /// </summary>
     /// <param name="errorMessage">错误信息</param>
     /// <param name="innerException">

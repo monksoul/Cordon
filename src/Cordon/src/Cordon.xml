@@ -1733,6 +1733,9 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1742,14 +1745,11 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
-        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
-            <summary>Supports searching for characters i "!#$%&amp;*@^".</summary>
+            <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
         </member>
         <member name="T:Cordon.ValidationBaseAttribute">
             <summary>
@@ -3456,18 +3456,18 @@
         </member>
         <member name="M:Cordon.ValidatorException.#ctor">
             <summary>
-                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ValidationException" />
+                <inheritdoc cref="T:Cordon.ValidatorException" />
             </summary>
         </member>
         <member name="M:Cordon.ValidatorException.#ctor(System.String)">
             <summary>
-                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ValidationException" />
+                <inheritdoc cref="T:Cordon.ValidatorException" />
             </summary>
             <param name="errorMessage">错误信息</param>
         </member>
         <member name="M:Cordon.ValidatorException.#ctor(System.String,System.Exception)">
             <summary>
-                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ValidationException" />
+                <inheritdoc cref="T:Cordon.ValidatorException" />
             </summary>
             <param name="errorMessage">错误信息</param>
             <param name="innerException">
@@ -3810,7 +3810,6 @@
             <typeparam name="T">对象类型</typeparam>
         </member>
         <member name="T:Cordon.IPropertyValidatorCloneable`1">
-      1">
             <summary>
                 定义属性验证器可克隆行为
             </summary>
@@ -6142,7 +6141,7 @@
             <param name="ruleSets">规则集</param>
             <returns>
                 <see cref="T:System.Collections.Generic.List`1" />
- </returns>
+            </returns>
         </member>
         <member name="M:Cordon.IValidationService.Validate(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
             <summary>
@@ -10627,20 +10626,6 @@
         <member name="M:Microsoft.Extensions.DependencyInjection.ValidationCoreServiceCollectionExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
             <summary>
                 添加数据验证服务
-            </summary>
-            <param name="services">
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-据验证服务
             </summary>
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
