@@ -44,8 +44,8 @@ public class ConditionThenBuilderTests
     public void ThenErrorMessage_ReturnOK()
     {
         var builder =
-            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).ThenMessage("错误消息1")
-                .When(u => u < 10).ThenMessage("错误消息2");
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).ThenMessage("错误信息1")
+                .When(u => u < 10).ThenMessage("错误信息2");
 
         Assert.Equal(2, builder._conditionalRules.Count);
         Assert.Equal(typeof(FailureValidator), builder._conditionalRules.First().Validators[0].GetType());

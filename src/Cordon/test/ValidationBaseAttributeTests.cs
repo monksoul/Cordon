@@ -17,12 +17,12 @@ public class ValidationBaseAttributeTests
         Assert.Equal("验证无效", attribute.FormatErrorMessage("data"));
 
         var attribute2 = new CustomAttribute2();
-        Assert.Equal("错误消息", attribute2.FormatErrorMessage("data"));
+        Assert.Equal("错误信息", attribute2.FormatErrorMessage("data"));
         ValidationBaseAttribute._errorMessageResourceAccessorSetter.Value(attribute2, () => "验证无效");
         Assert.Equal("验证无效", attribute2.FormatErrorMessage("data"));
 
         var attribute3 = new CustomAttribute3();
-        Assert.Equal("错误消息", attribute3.FormatErrorMessage("data"));
+        Assert.Equal("错误信息", attribute3.FormatErrorMessage("data"));
         ValidationBaseAttribute._errorMessageResourceAccessorSetter.Value(attribute3, () => "验证无效");
         Assert.Equal("验证无效", attribute3.FormatErrorMessage("data"));
     }
@@ -64,7 +64,7 @@ public class ValidationBaseAttributeTests
 
     public class CustomAttribute : ValidationBaseAttribute;
 
-    public class CustomAttribute2() : ValidationBaseAttribute("错误消息");
+    public class CustomAttribute2() : ValidationBaseAttribute("错误信息");
 
-    public class CustomAttribute3() : ValidationBaseAttribute(() => "错误消息");
+    public class CustomAttribute3() : ValidationBaseAttribute(() => "错误信息");
 }

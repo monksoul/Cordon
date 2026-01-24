@@ -270,7 +270,7 @@ public class AttributeValueValidatorTests
     public void OnPropertyChanged_ReturnOK()
     {
         var validator = new AttributeValueValidator(new StringLengthAttribute(3), new RequiredAttribute());
-        validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("ErrorMessage", "错误消息"));
+        validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("ErrorMessage", "错误信息"));
         Assert.Null(validator.Attributes[0].ErrorMessage);
         Assert.Null(validator.Attributes[1].ErrorMessage);
 
@@ -285,8 +285,8 @@ public class AttributeValueValidatorTests
         Assert.Null(validator.Attributes[1].ErrorMessageResourceName);
 
         var validator2 = new AttributeValueValidator(new StringLengthAttribute(3));
-        validator2.OnPropertyChanged(validator2, new ValidationPropertyChangedEventArgs("ErrorMessage", "错误消息"));
-        Assert.Equal("错误消息", validator2.Attributes[0].ErrorMessage);
+        validator2.OnPropertyChanged(validator2, new ValidationPropertyChangedEventArgs("ErrorMessage", "错误信息"));
+        Assert.Equal("错误信息", validator2.Attributes[0].ErrorMessage);
 
         validator2.OnPropertyChanged(validator2,
             new ValidationPropertyChangedEventArgs("ErrorMessageResourceType", typeof(TestValidationMessages)));
@@ -301,12 +301,12 @@ public class AttributeValueValidatorTests
     public void Dispose_ReturnOK()
     {
         var validator = new AttributeValueValidator(new StringLengthAttribute(3));
-        validator.ErrorMessage = "错误消息";
-        Assert.Equal("错误消息", validator.Attributes[0].ErrorMessage);
+        validator.ErrorMessage = "错误信息";
+        Assert.Equal("错误信息", validator.Attributes[0].ErrorMessage);
 
         validator.Dispose();
 
-        validator.ErrorMessage = "错误消息2";
-        Assert.Equal("错误消息", validator.Attributes[0].ErrorMessage);
+        validator.ErrorMessage = "错误信息2";
+        Assert.Equal("错误信息", validator.Attributes[0].ErrorMessage);
     }
 }

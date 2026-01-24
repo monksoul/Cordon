@@ -35,7 +35,7 @@ public class PropertyValidatorValidationTests
         using var objectValidator = new ObjectValidator<ValidationModel>();
         var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
 
-        propertyValidator.WithMessage("错误消息");
+        propertyValidator.WithMessage("错误信息");
         propertyValidator.WithMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
 
         propertyValidator.AddValidator(new MinLengthValidator(3));
@@ -358,7 +358,7 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator2 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.String1)
-            .WhenMatch(u => u?.Contains('@') == true, "错误消息1");
+            .WhenMatch(u => u?.Contains('@') == true, "错误信息1");
         Assert.False(propertyValidator2.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { String1 = "monk__soul" }));
 

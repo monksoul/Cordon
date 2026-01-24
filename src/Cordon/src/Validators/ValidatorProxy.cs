@@ -237,7 +237,7 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
         throw new NotSupportedException("Use FormatErrorMessage(string name, T? instance) instead.");
 
     /// <summary>
-    ///     格式化错误消息
+    ///     格式化错误信息
     /// </summary>
     /// <param name="name">显示名称</param>
     /// <param name="instance">对象</param>

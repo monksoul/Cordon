@@ -302,9 +302,9 @@ public abstract class ValidatorBase
     }
 
     /// <summary>
-    ///     是否设置了错误信息
+    ///     判断是否设置了错误信息
     /// </summary>
-    internal bool CustomErrorMessageSet { get; private set; }
+    protected bool CustomErrorMessageSet { get; private set; }
 
     /// <summary>
     ///     是否支持异步操作
@@ -410,7 +410,7 @@ public abstract class ValidatorBase
     }
 
     /// <summary>
-    ///     格式化错误消息
+    ///     格式化错误信息
     /// </summary>
     /// <param name="name">显示名称</param>
     /// <returns>
@@ -422,33 +422,14 @@ public abstract class ValidatorBase
             : string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name);
 
     /// <summary>
-    ///     使用指定资源键设置验证错误消息
-    /// </summary>
-    /// <remarks>支持入口程序集覆盖框架内部资源，若未找到则返回占位符。</remarks>
-    /// <param name="resourceKeyResolver">返回 <see cref="ValidationMessages" /> 中属性名的委托</param>
-    protected void UseResourceKey(Func<string> resourceKeyResolver)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(resourceKeyResolver);
-
-        _errorMessageResourceAccessor = () =>
-        {
-            // 获取 ValidationMessages 中的属性名
-            var resourceKey = resourceKeyResolver();
-
-            return GetResourceString(resourceKey) ?? resourceKey;
-        };
-    }
-
-    /// <summary>
     ///     获取支持外部覆盖的资源字符串
     /// </summary>
-    /// <remarks>支持入口程序集覆盖框架内部资源，若未找到则返回占位符。</remarks>
+    /// <remarks>支持入口程序集覆盖框架内部资源。</remarks>
     /// <param name="resourceKey">资源属性名</param>
     /// <returns>
     ///     <see cref="string" />
     /// </returns>
-    internal static string? GetResourceString(string resourceKey)
+    public static string? GetResourceString(string resourceKey)
     {
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(resourceKey);
@@ -476,7 +457,7 @@ public abstract class ValidatorBase
     /// <returns>
     ///     <see cref="string" />
     /// </returns>
-    internal static string? GetResourceString(
+    public static string? GetResourceString(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceKey)
@@ -489,6 +470,25 @@ public abstract class ValidatorBase
         var property = TryGetPropertyFromAssembly(resourceType.Assembly, resourceType.FullName!, resourceKey);
 
         return property?.GetValue(null, null) as string;
+    }
+
+    /// <summary>
+    ///     使用指定资源键设置验证错误信息
+    /// </summary>
+    /// <remarks>支持入口程序集覆盖框架内部资源，若未找到则返回占位符。</remarks>
+    /// <param name="resourceKeyResolver">返回 <see cref="ValidationMessages" /> 中属性名的委托</param>
+    protected void UseResourceKey(Func<string> resourceKeyResolver)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(resourceKeyResolver);
+
+        _errorMessageResourceAccessor = () =>
+        {
+            // 获取 ValidationMessages 中的属性名
+            var resourceKey = resourceKeyResolver();
+
+            return GetResourceString(resourceKey) ?? resourceKey;
+        };
     }
 
     /// <summary>

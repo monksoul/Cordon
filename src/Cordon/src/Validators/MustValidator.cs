@@ -13,11 +13,12 @@ public static class Must
     /// <summary>
     ///     设置错误信息
     /// </summary>
-    /// <param name="message">错误消息</param>
+    /// <param name="message">错误信息</param>
     /// <returns>Never Return</returns>
     [DoesNotReturn]
     public static bool WithMessage(string message)
     {
+        // 内部抛出 ValidatorException 异常
         ValidatorException.Throw(message);
 
         return false;
@@ -33,8 +34,36 @@ public static class Must
     public static bool WithMessage(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
                                     DynamicallyAccessedMemberTypes.NonPublicProperties)]
+        Type resourceType, string resourceName)
+    {
+        // 内部抛出 ValidatorException 异常
+        ValidatorException.Throw(ValidatorBase.GetResourceString(resourceType, resourceName) ?? resourceName);
+
+        return false;
+    }
+
+    /// <summary>
+    ///     根据错误信息创建一个 <see cref="ValidatorException" /> 验证异常
+    /// </summary>
+    /// <param name="message">错误信息</param>
+    /// <returns>
+    ///     <see cref="ValidatorException" />
+    /// </returns>
+    public static ValidatorException Exception(string message) => new(message);
+
+    /// <summary>
+    ///     根据错误信息资源创建一个 <see cref="ValidatorException" /> 验证异常
+    /// </summary>
+    /// <param name="resourceType">错误信息资源类型</param>
+    /// <param name="resourceName">错误信息资源名称</param>
+    /// <returns>
+    ///     <see cref="ValidatorException" />
+    /// </returns>
+    public static ValidatorException Exception(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
+                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName) =>
-        WithMessage(ValidatorBase.GetResourceString(resourceType, resourceName) ?? resourceName);
+        new(ValidatorBase.GetResourceString(resourceType, resourceName) ?? resourceName);
 }
 
 /// <summary>
@@ -130,7 +159,7 @@ public class MustValidator<T> : ValidatorBase<T>
     /// <param name="validationContext">
     ///     <see cref="ValidationContext{T}" />
     /// </param>
-    /// <param name="errorMessage">错误消息</param>
+    /// <param name="errorMessage">错误信息</param>
     /// <returns>
     ///     <see cref="ValidationResult" />
     /// </returns>

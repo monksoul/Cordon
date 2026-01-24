@@ -31,7 +31,7 @@ public class ValueValidatorValidationTests
     {
         var valueValidator = new ValueValidator<object>();
 
-        valueValidator.WithMessage("错误消息");
+        valueValidator.WithMessage("错误信息");
         valueValidator.WithMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
 
         valueValidator.AddValidator(new MinLengthValidator(3));
@@ -267,7 +267,7 @@ public class ValueValidatorValidationTests
         Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
         Assert.False(valueValidator.IsValid("monk__soul"));
 
-        var valueValidator2 = new ValueValidator<string>().WhenMatch(u => u?.Contains('@') == true, "错误消息1");
+        var valueValidator2 = new ValueValidator<string>().WhenMatch(u => u?.Contains('@') == true, "错误信息1");
         Assert.False(valueValidator2.IsValid("monksoul@outlook.com"));
         Assert.True(valueValidator2.IsValid("monk__soul"));
 

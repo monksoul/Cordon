@@ -7,7 +7,7 @@ namespace Cordon;
 /// <summary>
 ///     全局验证消息覆盖提供器
 /// </summary>
-/// <remarks>用于在运行时替换框架内置的默认验证错误消息。</remarks>
+/// <remarks>用于在运行时替换框架内置的默认验证错误信息。</remarks>
 public static class ValidationMessageProvider
 {
     /// <summary>
@@ -45,7 +45,7 @@ public static class ValidationMessageProvider
     }
 
     /// <summary>
-    ///     使用标准中文验证消息替换框架内置的默认验证错误消息
+    ///     使用标准中文验证消息替换框架内置的默认验证错误信息
     /// </summary>
     public static void UseChineseMessages()
     {

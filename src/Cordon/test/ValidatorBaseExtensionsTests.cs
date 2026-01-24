@@ -22,8 +22,8 @@ public class ValidatorBaseExtensionsTests
     public void WithMessage_ReturnOK()
     {
         var validator = new AgeValidator();
-        validator.WithMessage("自定义错误消息");
-        Assert.Equal("自定义错误消息", validator.ErrorMessage);
+        validator.WithMessage("自定义错误信息");
+        Assert.Equal("自定义错误信息", validator.ErrorMessage);
 
         validator.WithMessage(null);
         Assert.Null(validator.ErrorMessage);

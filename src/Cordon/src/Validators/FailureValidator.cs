@@ -7,7 +7,7 @@ namespace Cordon;
 /// <summary>
 ///     固定失败验证器
 /// </summary>
-/// <remarks>仅用于输出指定错误消息。</remarks>
+/// <remarks>仅用于输出指定错误信息。</remarks>
 public sealed class FailureValidator : ValidatorBase
 {
     /// <inheritdoc />

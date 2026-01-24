@@ -7,7 +7,7 @@ namespace Cordon;
 /// <summary>
 ///     .NET 内置验证特性验证消息覆盖提供器
 /// </summary>
-/// <remarks>用于在运行时替换 .NET 内置验证特性默认验证错误消息。</remarks>
+/// <remarks>用于在运行时替换 .NET 内置验证特性默认验证错误信息。</remarks>
 public static class DataAnnotationMessageProvider
 {
     /// <summary>
@@ -63,7 +63,7 @@ public static class DataAnnotationMessageProvider
     }
 
     /// <summary>
-    ///     使用标准中文验证消息替换 .NET 内置验证特性默认验证错误消息
+    ///     使用标准中文验证消息替换 .NET 内置验证特性默认验证错误信息
     /// </summary>
     public static void UseChineseMessages()
     {
@@ -102,7 +102,7 @@ public static class DataAnnotationMessageProvider
     /// <summary>
     ///     清除所有已注册的验证消息覆盖项
     /// </summary>
-    /// <remarks>恢复 .NET 内置验证特性默认验证错误消息。</remarks>
+    /// <remarks>恢复 .NET 内置验证特性默认验证错误信息。</remarks>
     public static void ClearOverrides()
     {
         lock (_lock)
@@ -179,7 +179,7 @@ public static class DataAnnotationMessageProvider
     /// <summary>
     ///     自定义 <see cref="ResourceManager" />
     /// </summary>
-    /// <remarks>用于返回覆盖 .NET 内置验证特性验证错误消息。</remarks>
+    /// <remarks>用于返回覆盖 .NET 内置验证特性验证错误信息。</remarks>
     /// <param name="overrides">存储资源键到自定义消息的映射</param>
     internal sealed class OverrideResourceManager(ConcurrentDictionary<string, string> overrides) : ResourceManager
     {

@@ -9,7 +9,7 @@ public class StringLocalizerValidationExtensionsTests
     [Fact]
     public void GetString_ReturnOK()
     {
-        Assert.Equal("错误消息", StringLocalizerValidationExtensions.GetString(null, "错误消息"));
-        Assert.Equal("Name 错误消息", StringLocalizerValidationExtensions.GetString(null, "{0} 错误消息", "Name"));
+        Assert.Equal("错误信息", StringLocalizerValidationExtensions.GetString(null, "错误信息"));
+        Assert.Equal("Name 错误信息", StringLocalizerValidationExtensions.GetString(null, "{0} 错误信息", "Name"));
     }
 }

@@ -118,7 +118,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
             return This;
         }
 
-        // 将错误消息设置给最新添加的验证器实例
+        // 将错误信息设置给最新添加的验证器实例
         _lastAddedValidator.WithMessage(errorMessage);
 
         // 重置最新添加的验证器实例
@@ -146,7 +146,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
             return This;
         }
 
-        // 将错误消息设置给最新添加的验证器实例
+        // 将错误信息设置给最新添加的验证器实例
         _lastAddedValidator.WithMessage(resourceType, resourceName);
 
         // 重置最新添加的验证器实例
@@ -268,9 +268,9 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加条件验证器
     /// </summary>
-    /// <remarks>定义满足指定条件时返回指定的错误消息。</remarks>
+    /// <remarks>定义满足指定条件时返回指定的错误信息。</remarks>
     /// <param name="condition">条件委托</param>
-    /// <param name="errorMessage">错误消息</param>
+    /// <param name="errorMessage">错误信息</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
@@ -280,7 +280,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加条件验证器
     /// </summary>
-    /// <remarks>定义满足指定条件时返回指定的错误消息。</remarks>
+    /// <remarks>定义满足指定条件时返回指定的错误信息。</remarks>
     /// <param name="condition">条件委托</param>
     /// <param name="resourceType">错误信息资源类型</param>
     /// <param name="resourceName">错误信息资源名称</param>

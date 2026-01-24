@@ -12,19 +12,19 @@ public class ValidatorExceptionTests
         var exception = new ValidatorException();
         Assert.NotNull(exception);
 
-        var exception2 = new ValidatorException("错误消息");
-        Assert.Equal("错误消息", exception2.Message);
+        var exception2 = new ValidatorException("错误信息");
+        Assert.Equal("错误信息", exception2.Message);
 
-        var exception3 = new ValidatorException("错误消息", new Exception("内部错误消息"));
-        Assert.Equal("错误消息", exception3.Message);
+        var exception3 = new ValidatorException("错误信息", new Exception("内部错误信息"));
+        Assert.Equal("错误信息", exception3.Message);
         Assert.NotNull(exception3.InnerException);
-        Assert.Equal("内部错误消息", exception3.InnerException.Message);
+        Assert.Equal("内部错误信息", exception3.InnerException.Message);
     }
 
     [Fact]
     public void Throw_ReturnOK()
     {
-        var exception = Assert.Throws<ValidatorException>(() => ValidatorException.Throw("错误消息"));
-        Assert.Equal("错误消息", exception.Message);
+        var exception = Assert.Throws<ValidatorException>(() => ValidatorException.Throw("错误信息"));
+        Assert.Equal("错误信息", exception.Message);
     }
 }

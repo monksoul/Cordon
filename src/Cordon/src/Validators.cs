@@ -211,9 +211,9 @@ public static class Validators
     /// <summary>
     ///     创建条件验证器
     /// </summary>
-    /// <remarks>定义满足指定条件时返回指定的错误消息。</remarks>
+    /// <remarks>定义满足指定条件时返回指定的错误信息。</remarks>
     /// <param name="condition">条件委托</param>
-    /// <param name="errorMessage">错误消息</param>
+    /// <param name="errorMessage">错误信息</param>
     /// <typeparam name="T">对象类型</typeparam>
     /// <returns>
     ///     <see cref="ConditionalValidator{T}" />
@@ -224,7 +224,7 @@ public static class Validators
     /// <summary>
     ///     创建条件验证器
     /// </summary>
-    /// <remarks>定义满足指定条件时返回指定的错误消息。</remarks>
+    /// <remarks>定义满足指定条件时返回指定的错误信息。</remarks>
     /// <param name="condition">条件委托</param>
     /// <param name="resourceType">错误信息资源类型</param>
     /// <param name="resourceName">错误信息资源名称</param>

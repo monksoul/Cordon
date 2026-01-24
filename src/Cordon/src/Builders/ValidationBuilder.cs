@@ -133,7 +133,7 @@ public sealed class ValidationBuilder
     /// <summary>
     ///     配置验证消息的全局覆盖项
     /// </summary>
-    /// <remarks>用于在运行时替换框架内置的默认验证错误消息。</remarks>
+    /// <remarks>用于在运行时替换框架内置的默认验证错误信息。</remarks>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ValidationBuilder" />
@@ -156,15 +156,15 @@ public sealed class ValidationBuilder
     }
 
     /// <summary>
-    ///     启用标准中文验证错误消息
+    ///     启用标准中文验证错误信息
     /// </summary>
-    /// <remarks>用于在运行时替换框架内置的默认验证错误消息。</remarks>
+    /// <remarks>用于在运行时替换框架内置的默认验证错误信息。</remarks>
     /// <returns>
     ///     <see cref="ValidationBuilder" />
     /// </returns>
     public ValidationBuilder UseChineseValidationMessages()
     {
-        // 使用标准中文验证消息替换框架内置的默认验证错误消息
+        // 使用标准中文验证消息替换框架内置的默认验证错误信息
         ValidationMessageProvider.UseChineseMessages();
 
         return this;
@@ -173,7 +173,7 @@ public sealed class ValidationBuilder
     /// <summary>
     ///     配置 .NET 内置验证特性验证消息的全局覆盖项
     /// </summary>
-    /// <remarks>用于在运行时替换 .NET 内置验证特性默认验证错误消息。</remarks>
+    /// <remarks>用于在运行时替换 .NET 内置验证特性默认验证错误信息。</remarks>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ValidationBuilder" />
@@ -196,15 +196,15 @@ public sealed class ValidationBuilder
     }
 
     /// <summary>
-    ///     启用 .NET 内置验证特性标准中文验证错误消息
+    ///     启用 .NET 内置验证特性标准中文验证错误信息
     /// </summary>
-    /// <remarks>用于在运行时替换 .NET 内置验证特性默认验证错误消息。</remarks>
+    /// <remarks>用于在运行时替换 .NET 内置验证特性默认验证错误信息。</remarks>
     /// <returns>
     ///     <see cref="ValidationBuilder" />
     /// </returns>
     public ValidationBuilder UseChineseDataAnnotationMessages()
     {
-        // 使用标准中文验证消息替换 .NET 内置验证特性默认验证错误消息
+        // 使用标准中文验证消息替换 .NET 内置验证特性默认验证错误信息
         DataAnnotationMessageProvider.UseChineseMessages();
 
         return this;

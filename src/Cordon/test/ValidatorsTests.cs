@@ -159,7 +159,7 @@ public class ValidatorsTests
         Assert.Single(validator._conditionResult.ConditionalRules);
         Assert.NotNull(validator._conditionResult.DefaultRules);
 
-        var validator2 = Validators.WhenMatch<int>(u => u > 10, "错误消息1");
+        var validator2 = Validators.WhenMatch<int>(u => u > 10, "错误信息1");
         Assert.NotNull(validator2);
         Assert.Single(validator2._conditionResult.ConditionalRules);
         Assert.Null(validator2._conditionResult.DefaultRules);

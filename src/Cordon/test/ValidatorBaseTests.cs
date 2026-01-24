@@ -21,7 +21,9 @@ public class ValidatorBaseTests
         Assert.Null(validator.ErrorMessage);
         Assert.Null(validator.ErrorMessageResourceName);
         Assert.Null(validator.ErrorMessageResourceType);
-        Assert.False(validator.CustomErrorMessageSet);
+        Assert.Equal(false,
+            typeof(ValidatorBase).GetProperty("CustomErrorMessageSet", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(validator));
         Assert.Null(validator.RuleSets);
 
         Assert.Equal("Cordon.Resources.Overrides.ValidationMessages",
@@ -54,7 +56,9 @@ public class ValidatorBaseTests
         Assert.Null(validator.ErrorMessage);
         Assert.Null(validator.ErrorMessageResourceName);
         Assert.Null(validator.ErrorMessageResourceType);
-        Assert.False(validator.CustomErrorMessageSet);
+        Assert.Equal(false,
+            typeof(ValidatorBase).GetProperty("CustomErrorMessageSet", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(validator));
 
         var validatorType = typeof(TestValidator);
 
@@ -90,7 +94,9 @@ public class ValidatorBaseTests
         validator.ErrorMessage = "自定义错误信息";
         Assert.NotNull(validator._errorMessage);
         Assert.Null(validator._errorMessageResourceAccessor);
-        Assert.True(validator.CustomErrorMessageSet);
+        Assert.Equal(true,
+            typeof(ValidatorBase).GetProperty("CustomErrorMessageSet", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(validator));
         Assert.Equal(1, i);
     }
 
@@ -114,7 +120,9 @@ public class ValidatorBaseTests
         validator.ErrorMessageResourceName = "TestValidator_ValidationError";
         Assert.NotNull(validator._errorMessageResourceName);
         Assert.Null(validator._errorMessageResourceAccessor);
-        Assert.True(validator.CustomErrorMessageSet);
+        Assert.Equal(true,
+            typeof(ValidatorBase).GetProperty("CustomErrorMessageSet", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(validator));
         Assert.Equal(1, i);
     }
 
@@ -138,7 +146,9 @@ public class ValidatorBaseTests
         validator.ErrorMessageResourceType = typeof(TestValidationMessages);
         Assert.NotNull(validator._errorMessageResourceType);
         Assert.Null(validator._errorMessageResourceAccessor);
-        Assert.True(validator.CustomErrorMessageSet);
+        Assert.Equal(true,
+            typeof(ValidatorBase).GetProperty("CustomErrorMessageSet", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(validator));
         Assert.Equal(1, i);
     }
 

@@ -138,8 +138,8 @@ public class MustValidatorTests
     [Fact]
     public void Must_StaticClass_ReturnOK()
     {
-        var exception = Assert.Throws<ValidatorException>(() => Must.WithMessage("错误消息"));
-        Assert.Equal("错误消息", exception.Message);
+        var exception = Assert.Throws<ValidatorException>(() => Must.WithMessage("错误信息"));
+        Assert.Equal("错误信息", exception.Message);
 
         var exception2 = Assert.Throws<ValidatorException>(() =>
             Must.WithMessage(typeof(TestValidationMessages), "TestValidator_ValidationError"));
@@ -148,6 +148,33 @@ public class MustValidatorTests
         var exception3 = Assert.Throws<ValidatorException>(() =>
             Must.WithMessage(typeof(TestValidationMessages), "Unknown"));
         Assert.Equal("Unknown", exception3.Message);
+
+        try
+        {
+            throw Must.Exception("错误信息");
+        }
+        catch (Exception e)
+        {
+            Assert.Equal("错误信息", e.Message);
+        }
+
+        try
+        {
+            throw Must.Exception(typeof(TestValidationMessages), "TestValidator_ValidationError");
+        }
+        catch (Exception e)
+        {
+            Assert.Equal("单元测试{0}错误信息", e.Message);
+        }
+
+        try
+        {
+            throw Must.Exception(typeof(TestValidationMessages), "Unknown");
+        }
+        catch (Exception e)
+        {
+            Assert.Equal("Unknown", e.Message);
+        }
     }
 
     [Fact]
@@ -158,8 +185,8 @@ public class MustValidatorTests
         Assert.NotNull(validationResult);
         Assert.Equal("The field Int32 is invalid.", validationResult.ErrorMessage);
 
-        var validationResult2 = validator.CreateValidationResult(new ValidationContext<int>(10), "错误消息");
+        var validationResult2 = validator.CreateValidationResult(new ValidationContext<int>(10), "错误信息");
         Assert.NotNull(validationResult2);
-        Assert.Equal("错误消息", validationResult2.ErrorMessage);
+        Assert.Equal("错误信息", validationResult2.ErrorMessage);
     }
 }
