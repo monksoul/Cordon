@@ -5,7 +5,7 @@
 namespace Cordon;
 
 /// <summary>
-///     .NET 内置验证特性验证消息覆盖提供器
+///     .NET 内置验证特性验证信息覆盖提供器
 /// </summary>
 /// <remarks>用于在运行时替换 .NET 内置验证特性默认验证错误信息。</remarks>
 public static class DataAnnotationMessageProvider
@@ -26,15 +26,15 @@ public static class DataAnnotationMessageProvider
     internal static FieldInfo? _resourceManagerField;
 
     /// <summary>
-    ///     存储资源键到自定义消息的映射
+    ///     存储资源键到自定义信息的映射
     /// </summary>
     internal static readonly ConcurrentDictionary<string, string> _overrides = new();
 
     /// <summary>
-    ///     注册一个验证消息覆盖项
+    ///     注册一个验证信息覆盖项
     /// </summary>
     /// <param name="resourceKey">资源属性名</param>
-    /// <param name="message">消息模板，支持 {0} 占位符</param>
+    /// <param name="message">信息模板，支持 {0} 占位符</param>
     public static void AddOverride(string resourceKey, string message)
     {
         // 空检查
@@ -43,14 +43,14 @@ public static class DataAnnotationMessageProvider
 
         _overrides[resourceKey] = message;
 
-        // 应用当前所有覆盖消息到 .NET 内部资源管理器
+        // 应用当前所有覆盖信息到 .NET 内部资源管理器
         ApplyOverrides();
     }
 
     /// <summary>
-    ///     批量注册多个验证消息覆盖项
+    ///     批量注册多个验证信息覆盖项
     /// </summary>
-    /// <param name="overrides">包含资源键到消息模板映射的字典</param>
+    /// <param name="overrides">包含资源键到信息模板映射的字典</param>
     public static void AddOverrides(IDictionary<string, string> overrides)
     {
         // 空检查
@@ -63,7 +63,7 @@ public static class DataAnnotationMessageProvider
     }
 
     /// <summary>
-    ///     使用标准中文验证消息替换 .NET 内置验证特性默认验证错误信息
+    ///     使用标准中文验证信息替换 .NET 内置验证特性默认验证错误信息
     /// </summary>
     public static void UseChineseMessages()
     {
@@ -100,7 +100,7 @@ public static class DataAnnotationMessageProvider
     }
 
     /// <summary>
-    ///     清除所有已注册的验证消息覆盖项
+    ///     清除所有已注册的验证信息覆盖项
     /// </summary>
     /// <remarks>恢复 .NET 内置验证特性默认验证错误信息。</remarks>
     public static void ClearOverrides()
@@ -122,7 +122,7 @@ public static class DataAnnotationMessageProvider
     }
 
     /// <summary>
-    ///     尝试根据资源键获取已注册的覆盖消息
+    ///     尝试根据资源键获取已注册的覆盖信息
     /// </summary>
     /// <param name="resourceKey">资源属性名</param>
     /// <returns>
@@ -137,7 +137,7 @@ public static class DataAnnotationMessageProvider
     }
 
     /// <summary>
-    ///     应用当前所有覆盖消息到 .NET 内部资源管理器
+    ///     应用当前所有覆盖信息到 .NET 内部资源管理器
     /// </summary>
     /// <remarks>仅在首次调用时执行注入操作，确保线程安全和幂等性。</remarks>
     internal static void ApplyOverrides()
@@ -180,7 +180,7 @@ public static class DataAnnotationMessageProvider
     ///     自定义 <see cref="ResourceManager" />
     /// </summary>
     /// <remarks>用于返回覆盖 .NET 内置验证特性验证错误信息。</remarks>
-    /// <param name="overrides">存储资源键到自定义消息的映射</param>
+    /// <param name="overrides">存储资源键到自定义信息的映射</param>
     internal sealed class OverrideResourceManager(ConcurrentDictionary<string, string> overrides) : ResourceManager
     {
         /// <inheritdoc />

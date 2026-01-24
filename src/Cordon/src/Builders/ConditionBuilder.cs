@@ -111,7 +111,7 @@ public class ConditionBuilder<T>
     /// <summary>
     ///     配置默认错误信息
     /// </summary>
-    /// <remarks>当所有条件均不满足时直接返回该消息，不执行任何验证逻辑。</remarks>
+    /// <remarks>当所有条件均不满足时直接返回该错误信息，不执行任何验证逻辑。</remarks>
     /// <param name="errorMessage">错误信息</param>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
@@ -126,7 +126,7 @@ public class ConditionBuilder<T>
     /// <summary>
     ///     配置默认错误信息
     /// </summary>
-    /// <remarks>当所有条件均不满足时直接返回该消息，不执行任何验证逻辑。</remarks>
+    /// <remarks>当所有条件均不满足时直接返回该错误信息，不执行任何验证逻辑。</remarks>
     /// <param name="resourceType">错误信息资源类型</param>
     /// <param name="resourceName">错误信息资源名称</param>
     /// <returns>

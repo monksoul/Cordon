@@ -5,21 +5,21 @@
 namespace Cordon;
 
 /// <summary>
-///     全局验证消息覆盖提供器
+///     全局验证信息覆盖提供器
 /// </summary>
 /// <remarks>用于在运行时替换框架内置的默认验证错误信息。</remarks>
 public static class ValidationMessageProvider
 {
     /// <summary>
-    ///     存储资源键到自定义消息的映射
+    ///     存储资源键到自定义信息的映射
     /// </summary>
     internal static readonly ConcurrentDictionary<string, string> _overrides = new();
 
     /// <summary>
-    ///     注册一个验证消息覆盖项
+    ///     注册一个验证信息覆盖项
     /// </summary>
     /// <param name="resourceKey">资源属性名</param>
-    /// <param name="message">消息模板，支持 {0} 占位符</param>
+    /// <param name="message">信息模板，支持 {0} 占位符</param>
     public static void AddOverride(string resourceKey, string message)
     {
         // 空检查
@@ -30,9 +30,9 @@ public static class ValidationMessageProvider
     }
 
     /// <summary>
-    ///     批量注册多个验证消息覆盖项
+    ///     批量注册多个验证信息覆盖项
     /// </summary>
-    /// <param name="overrides">包含资源键到消息模板映射的字典</param>
+    /// <param name="overrides">包含资源键到信息模板映射的字典</param>
     public static void AddOverrides(IDictionary<string, string> overrides)
     {
         // 空检查
@@ -45,7 +45,7 @@ public static class ValidationMessageProvider
     }
 
     /// <summary>
-    ///     使用标准中文验证消息替换框架内置的默认验证错误信息
+    ///     使用标准中文验证信息替换框架内置的默认验证错误信息
     /// </summary>
     public static void UseChineseMessages()
     {
@@ -128,12 +128,12 @@ public static class ValidationMessageProvider
     }
 
     /// <summary>
-    ///     清除所有已注册的验证消息覆盖项
+    ///     清除所有已注册的验证信息覆盖项
     /// </summary>
     public static void ClearOverrides() => _overrides.Clear();
 
     /// <summary>
-    ///     尝试根据资源键获取已注册的覆盖消息
+    ///     尝试根据资源键获取已注册的覆盖信息
     /// </summary>
     /// <param name="resourceKey">资源属性名</param>
     /// <returns>

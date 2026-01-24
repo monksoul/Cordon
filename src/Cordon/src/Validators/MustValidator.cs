@@ -7,19 +7,19 @@ namespace Cordon;
 /// <summary>
 ///     <see cref="MustValidator{T}" /> 内部静态类
 /// </summary>
-/// <remarks>可通过 <see cref="Must.WithMessage(string)" /> 或 <see cref="Must.WithMessage(Type,string)" /> 设置不满足条件时的异常消息。</remarks>
+/// <remarks>可通过 <see cref="Must.WithMessage(string)" /> 或 <see cref="Must.WithMessage(Type,string)" /> 设置不满足条件时的异常信息。</remarks>
 public static class Must
 {
     /// <summary>
     ///     设置错误信息
     /// </summary>
-    /// <param name="message">错误信息</param>
+    /// <param name="errorMessage">错误信息</param>
     /// <returns>Never Return</returns>
     [DoesNotReturn]
-    public static bool WithMessage(string message)
+    public static bool WithMessage(string? errorMessage)
     {
         // 内部抛出 ValidatorException 异常
-        ValidatorException.Throw(message);
+        ValidatorException.Throw(errorMessage);
 
         return false;
     }
@@ -45,11 +45,11 @@ public static class Must
     /// <summary>
     ///     根据错误信息创建一个 <see cref="ValidatorException" /> 验证异常
     /// </summary>
-    /// <param name="message">错误信息</param>
+    /// <param name="errorMessage">错误信息</param>
     /// <returns>
     ///     <see cref="ValidatorException" />
     /// </returns>
-    public static ValidatorException Exception(string message) => new(message);
+    public static ValidatorException Exception(string? errorMessage) => new(errorMessage);
 
     /// <summary>
     ///     根据错误信息资源创建一个 <see cref="ValidatorException" /> 验证异常

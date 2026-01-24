@@ -19,28 +19,28 @@ public sealed class ValidatorException : Exception
     /// <summary>
     ///     <inheritdoc cref="ValidationException" />
     /// </summary>
-    /// <param name="message">错误信息</param>
-    public ValidatorException(string message)
-        : base(message)
+    /// <param name="errorMessage">错误信息</param>
+    public ValidatorException(string? errorMessage)
+        : base(errorMessage)
     {
     }
 
     /// <summary>
     ///     <inheritdoc cref="ValidationException" />
     /// </summary>
-    /// <param name="message">错误信息</param>
+    /// <param name="errorMessage">错误信息</param>
     /// <param name="innerException">
     ///     <see cref="Exception" />
     /// </param>
-    public ValidatorException(string message, Exception innerException)
-        : base(message, innerException)
+    public ValidatorException(string? errorMessage, Exception innerException)
+        : base(errorMessage, innerException)
     {
     }
 
     /// <summary>
     ///     抛出 <see cref="ValidatorException" /> 异常
     /// </summary>
-    /// <param name="message">错误信息</param>
+    /// <param name="errorMessage">错误信息</param>
     [DoesNotReturn]
-    public static void Throw(string message) => throw new ValidatorException(message);
+    public static void Throw(string? errorMessage) => throw new ValidatorException(errorMessage);
 }
