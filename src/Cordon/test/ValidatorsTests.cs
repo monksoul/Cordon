@@ -137,6 +137,11 @@ public class ValidatorsTests
             Validators.Composite<string>(u => u.ChineseName().AllowedValues("百签", "百小僧"), CompositeMode.Any);
         Assert.Equal(2, validator2._validators.Count);
         Assert.Equal(CompositeMode.Any, validator2.Mode);
+
+        var validator3 =
+            Validators.Composite<string>([new ChineseNameValidator(), new AllowedValuesValidator("百签", "百小僧")]);
+        Assert.Equal(2, validator3._validators.Count);
+        Assert.Equal(CompositeMode.FailFast, validator3.Mode);
     }
 
     [Fact]
@@ -148,27 +153,6 @@ public class ValidatorsTests
         Assert.NotNull(validator._conditionResult);
         Assert.Single(validator._conditionResult.ConditionalRules);
         Assert.NotNull(validator._conditionResult.DefaultRules);
-    }
-
-    [Fact]
-    public void WhenMatch_ReturnOK()
-    {
-        var validator = Validators.WhenMatch<int>(u => u > 10, b => b.Age(), b => b.Min(5));
-        Assert.NotNull(validator);
-        Assert.NotNull(validator._conditionResult);
-        Assert.Single(validator._conditionResult.ConditionalRules);
-        Assert.NotNull(validator._conditionResult.DefaultRules);
-
-        var validator2 = Validators.WhenMatch<int>(u => u > 10, "错误信息1");
-        Assert.NotNull(validator2);
-        Assert.Single(validator2._conditionResult.ConditionalRules);
-        Assert.Null(validator2._conditionResult.DefaultRules);
-
-        var validator3 =
-            Validators.WhenMatch<int>(u => u > 10, typeof(TestValidationMessages), "TestValidator_ValidationError");
-        Assert.NotNull(validator3);
-        Assert.Single(validator3._conditionResult.ConditionalRules);
-        Assert.Null(validator3._conditionResult.DefaultRules);
     }
 
     [Fact]

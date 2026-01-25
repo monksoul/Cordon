@@ -12,15 +12,16 @@ public class ConditionBuilderTests
         var conditionBuilder = new ConditionBuilder<int>();
         Assert.NotNull(conditionBuilder._conditionalRules);
         Assert.Empty(conditionBuilder._conditionalRules);
-        Assert.Null(conditionBuilder.defaultRules);
+        Assert.Null(conditionBuilder._defaultRules);
     }
 
     [Fact]
     public void When_Invalid_Parameters()
     {
         var conditionBuilder = new ConditionBuilder<int>();
-        Assert.Throws<ArgumentNullException>(() => conditionBuilder.When(null!).Then(null!));
-        Assert.Throws<ArgumentNullException>(() => conditionBuilder.When(u => u > 10).Then(null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            conditionBuilder.When(null!).Then((Action<FluentValidatorBuilder<int>>)null!));
+        Assert.Throws<ArgumentNullException>(() => conditionBuilder.When(u => u > 10).Then((ValidatorBase[])null!));
     }
 
     [Fact]
@@ -35,26 +36,12 @@ public class ConditionBuilderTests
     }
 
     [Fact]
-    public void WhenMatch_ReturnOK()
-    {
-        var conditionBuilder = new ConditionBuilder<int>();
-        conditionBuilder.WhenMatch(u => u > 10, u => u.Min(10));
-        Assert.Single(conditionBuilder._conditionalRules);
-
-        var conditionBuilder2 = new ConditionBuilder<int>();
-        conditionBuilder2.WhenMatch(u => u > 10, "验证失败");
-        Assert.Single(conditionBuilder2._conditionalRules);
-
-        var conditionBuilder3 = new ConditionBuilder<int>();
-        conditionBuilder3.WhenMatch(u => u > 10, typeof(TestValidationMessages), "TestValidator_ValidationError");
-        Assert.Single(conditionBuilder3._conditionalRules);
-    }
-
-    [Fact]
     public void Otherwise_Invalid_Parameters()
     {
         var conditionBuilder = new ConditionBuilder<int>();
-        Assert.Throws<ArgumentNullException>(() => conditionBuilder.Otherwise(null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            conditionBuilder.Otherwise((Action<FluentValidatorBuilder<int>>)null!));
+        Assert.Throws<ArgumentNullException>(() => conditionBuilder.Otherwise((ValidatorBase[])null!));
     }
 
     [Fact]
@@ -62,7 +49,21 @@ public class ConditionBuilderTests
     {
         var conditionBuilder = new ConditionBuilder<int>();
         conditionBuilder.When(u => u > 10).Then(b => b.Min(10)).Otherwise(b => b.Min(50));
-        Assert.NotNull(conditionBuilder.defaultRules);
+        Assert.NotNull(conditionBuilder._defaultRules);
+        Assert.Single(conditionBuilder._defaultRules);
+
+        var addValidator = conditionBuilder._defaultRules[0] as CompositeValidator<int>;
+        Assert.NotNull(addValidator);
+        Assert.Equal(CompositeMode.FailFast, addValidator.Mode);
+
+        var conditionBuilder2 = new ConditionBuilder<int>();
+        conditionBuilder2.When(u => u > 10).Then(b => b.Min(10)).Otherwise([new MinValidator(50)]);
+        Assert.NotNull(conditionBuilder2._defaultRules);
+        Assert.Single(conditionBuilder2._defaultRules);
+
+        var addValidator2 = conditionBuilder2._defaultRules[0] as CompositeValidator<int>;
+        Assert.NotNull(addValidator2);
+        Assert.Equal(CompositeMode.FailFast, addValidator2.Mode);
     }
 
     [Fact]
@@ -70,14 +71,28 @@ public class ConditionBuilderTests
     {
         var conditionBuilder = new ConditionBuilder<int>();
         conditionBuilder.When(u => u > 10).ThenMessage("错误信息").OtherwiseMessage("默认错误信息");
-        Assert.NotNull(conditionBuilder.defaultRules);
-        Assert.Equal(typeof(FailureValidator), conditionBuilder.defaultRules[0].GetType());
+        Assert.NotNull(conditionBuilder._defaultRules);
+        Assert.Equal(typeof(FailureValidator), conditionBuilder._defaultRules[0].GetType());
 
         var conditionBuilder2 = new ConditionBuilder<int>();
         conditionBuilder2.When(u => u > 10).ThenMessage("错误信息")
             .OtherwiseMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
-        Assert.NotNull(conditionBuilder2.defaultRules);
-        Assert.Equal(typeof(FailureValidator), conditionBuilder2.defaultRules[0].GetType());
+        Assert.NotNull(conditionBuilder2._defaultRules);
+        Assert.Equal(typeof(FailureValidator), conditionBuilder2._defaultRules[0].GetType());
+    }
+
+    [Fact]
+    public void Clear_ReturnOK()
+    {
+        var conditionBuilder = new ConditionBuilder<int>();
+        conditionBuilder.When(u => u > 10).Then(b => b.Min(10)).Otherwise(b => b.Min(50));
+        Assert.Single(conditionBuilder._conditionalRules);
+        Assert.NotNull(conditionBuilder._defaultRules);
+        Assert.Single(conditionBuilder._defaultRules);
+
+        conditionBuilder.Clear();
+        Assert.Empty(conditionBuilder._conditionalRules);
+        Assert.Null(conditionBuilder._defaultRules);
     }
 
     [Fact]

@@ -268,9 +268,13 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
-    public void Composite_Invalid_Parameters() =>
+    public void Composite_Invalid_Parameters()
+    {
         Assert.Throws<ArgumentNullException>(() => new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.Data1).Composite(null!));
+            .RuleFor(u => u.Data1).Composite((Action<FluentValidatorBuilder<object>>)null!));
+        Assert.Throws<ArgumentNullException>(() => new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1).Composite((ValidatorBase[])null!));
+    }
 
     [Fact]
     public void Composite_ReturnOK()
@@ -302,6 +306,20 @@ public class PropertyValidatorValidationTests
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = null }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "monksoul@outlook.com" }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "monksoul" }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Composite([new NotNullValidator(), new MinLengthValidator(3)]);
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 = propertyValidator3._lastAddedValidator as CompositeValidator<object>;
+        Assert.NotNull(addedValidator3);
+        Assert.Equal(2, addedValidator3._validators.Count);
+
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Data1 = null }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Data1 = "Fu" }));
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { Data1 = "百小僧" }));
     }
 
     [Fact]
@@ -339,34 +357,6 @@ public class PropertyValidatorValidationTests
 
         Assert.True(propertyValidator2.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
         Assert.False(propertyValidator2.IsValid(new ValidationModel { String1 = "monk__soul" }));
-    }
-
-    [Fact]
-    public void WhenMatch_ReturnOK()
-    {
-        var propertyValidator = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.String1)
-            .WhenMatch(u => u?.Contains('@') == true, b => b.EmailAddress(), b => b.UserName());
-
-        Assert.Single(propertyValidator.Validators);
-
-        var addedValidator = propertyValidator._lastAddedValidator as ConditionalValidator<string>;
-        Assert.NotNull(addedValidator);
-
-        Assert.True(propertyValidator.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
-        Assert.False(propertyValidator.IsValid(new ValidationModel { String1 = "monk__soul" }));
-
-        var propertyValidator2 = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.String1)
-            .WhenMatch(u => u?.Contains('@') == true, "错误信息1");
-        Assert.False(propertyValidator2.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
-        Assert.True(propertyValidator2.IsValid(new ValidationModel { String1 = "monk__soul" }));
-
-        var propertyValidator3 = new ObjectValidator<ValidationModel>()
-            .RuleFor(u => u.String1)
-            .WhenMatch(u => u?.Contains('@') == true, typeof(TestValidationMessages), "TestValidator_ValidationError");
-        Assert.False(propertyValidator3.IsValid(new ValidationModel { String1 = "monksoul@outlook.com" }));
-        Assert.True(propertyValidator3.IsValid(new ValidationModel { String1 = "monk__soul" }));
     }
 
     [Fact]

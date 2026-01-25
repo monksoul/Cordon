@@ -18,13 +18,25 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
     /// <summary>
     ///     <inheritdoc cref="CompositeValidator{T}" />
     /// </summary>
+    /// <param name="validators">验证器列表</param>
+    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    public CompositeValidator(ValidatorBase[] validators, CompositeMode mode = CompositeMode.FailFast)
+        : this(u => u.AddValidators(validators), mode)
+    {
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="CompositeValidator{T}" />
+    /// </summary>
     /// <param name="configure">验证器配置委托</param>
-    public CompositeValidator(Action<FluentValidatorBuilder<T>> configure)
+    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    public CompositeValidator(Action<FluentValidatorBuilder<T>> configure, CompositeMode mode = CompositeMode.FailFast)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
         _validators = new FluentValidatorBuilder<T>().Build(configure);
+        Mode = mode;
 
         ErrorMessageResourceAccessor = () => null!;
     }
@@ -33,7 +45,7 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
     ///     <inheritdoc cref="CompositeMode" />
     /// </summary>
     /// <remarks>默认值为：<see cref="CompositeMode.FailFast" />。</remarks>
-    public CompositeMode Mode { get; set; } = CompositeMode.FailFast;
+    public CompositeMode Mode { get; set; }
 
     /// <inheritdoc />
     public void Dispose()

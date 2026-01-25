@@ -140,9 +140,13 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
             return;
         }
 
+        // 获取所有验证器列表
+        var validators =
+            (_conditionResult.DefaultRules ?? []).Concat(
+                _conditionResult.ConditionalRules.SelectMany(u => u.Validators));
+
         // 释放所有验证器资源
-        foreach (var validator in (_conditionResult.DefaultRules ?? []).Concat(
-                     _conditionResult.ConditionalRules.SelectMany(u => u.Validators)))
+        foreach (var validator in validators)
         {
             if (validator is IDisposable disposable)
             {
@@ -183,9 +187,13 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
     internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
     {
+        // 获取所有验证器列表
+        var validators =
+            (_conditionResult.DefaultRules ?? []).Concat(
+                _conditionResult.ConditionalRules.SelectMany(u => u.Validators));
+
         // 遍历所有验证器并尝试同步 IServiceProvider 委托
-        foreach (var validator in (_conditionResult.DefaultRules ?? []).Concat(
-                     _conditionResult.ConditionalRules.SelectMany(u => u.Validators)))
+        foreach (var validator in validators)
         {
             // 检查验证器是否实现 IValidatorInitializer 接口
             if (validator is IValidatorInitializer initializer)

@@ -222,14 +222,24 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加组合验证器
     /// </summary>
+    /// <param name="validators">验证器列表</param>
+    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Composite(ValidatorBase[] validators, CompositeMode mode = CompositeMode.FailFast) =>
+        AddValidator(new CompositeValidator<T>(validators, mode));
+
+    /// <summary>
+    ///     添加组合验证器
+    /// </summary>
     /// <param name="configure">验证器配置委托</param>
     /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf Composite(Action<FluentValidatorBuilder<T>> configure,
-        CompositeMode mode = CompositeMode.FailFast) =>
-        AddValidator(new CompositeValidator<T>(configure) { Mode = mode });
+        CompositeMode mode = CompositeMode.FailFast) => AddValidator(new CompositeValidator<T>(configure, mode));
 
     /// <summary>
     ///     添加条件验证器
@@ -240,58 +250,6 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// </returns>
     public virtual TSelf Conditional(Action<ConditionBuilder<T>> buildConditions) =>
         AddValidator(new ConditionalValidator<T>(buildConditions));
-
-    /// <summary>
-    ///     添加条件验证器
-    /// </summary>
-    /// <remarks>定义满足指定条件时执行的验证规则。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <param name="thenConfigure">验证器配置委托</param>
-    /// <param name="otherwiseConfigure">验证器配置委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf WhenMatch(Func<T, bool> condition, Action<FluentValidatorBuilder<T>> thenConfigure,
-        Action<FluentValidatorBuilder<T>>? otherwiseConfigure = null) =>
-        Conditional(builder =>
-        {
-            // 构建 ConditionBuilder<T> 实例
-            var conditionBuilder = builder.When(condition).Then(thenConfigure);
-
-            // 空检查
-            if (otherwiseConfigure is not null)
-            {
-                conditionBuilder.Otherwise(otherwiseConfigure);
-            }
-        });
-
-    /// <summary>
-    ///     添加条件验证器
-    /// </summary>
-    /// <remarks>定义满足指定条件时返回指定的错误信息。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <param name="errorMessage">错误信息</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf WhenMatch(Func<T, bool> condition, string? errorMessage) =>
-        Conditional(builder => builder.When(condition).ThenMessage(errorMessage));
-
-    /// <summary>
-    ///     添加条件验证器
-    /// </summary>
-    /// <remarks>定义满足指定条件时返回指定的错误信息。</remarks>
-    /// <param name="condition">条件委托</param>
-    /// <param name="resourceType">错误信息资源类型</param>
-    /// <param name="resourceName">错误信息资源名称</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf WhenMatch(Func<T, bool> condition,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
-                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName) =>
-        Conditional(builder => builder.When(condition).ThenMessage(resourceType, resourceName));
 
     /// <summary>
     ///     添加自定义验证特性验证器

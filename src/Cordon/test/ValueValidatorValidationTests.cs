@@ -199,9 +199,14 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
-    public void Composite_Invalid_Parameters() =>
+    public void Composite_Invalid_Parameters()
+    {
         Assert.Throws<ArgumentNullException>(() =>
-            new ValueValidator<object>().Composite(null!));
+            new ValueValidator<object>().Composite((Action<FluentValidatorBuilder<object>>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<object>().Composite((ValidatorBase[])null!));
+    }
 
     [Fact]
     public void Composite_ReturnOK()
@@ -230,6 +235,19 @@ public class ValueValidatorValidationTests
         Assert.True(valueValidator2.IsValid(null));
         Assert.True(valueValidator2.IsValid("monksoul@outlook.com"));
         Assert.True(valueValidator2.IsValid("monksoul"));
+
+        var valueValidator3 =
+            new ValueValidator<object>().Composite([new NotNullValidator(), new MinLengthValidator(3)]);
+
+        Assert.Single(valueValidator3.Validators);
+
+        var addedValidator3 = valueValidator3._lastAddedValidator as CompositeValidator<object>;
+        Assert.NotNull(addedValidator3);
+        Assert.Equal(2, addedValidator3._validators.Count);
+
+        Assert.False(valueValidator3.IsValid(null));
+        Assert.False(valueValidator3.IsValid("Fu"));
+        Assert.True(valueValidator3.IsValid("百小僧"));
     }
 
     [Fact]
@@ -251,30 +269,6 @@ public class ValueValidatorValidationTests
 
         Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
         Assert.False(valueValidator.IsValid("monk__soul"));
-    }
-
-    [Fact]
-    public void WhenMatch_ReturnOK()
-    {
-        var valueValidator = new ValueValidator<string>().WhenMatch(u => u?.Contains('@') == true,
-            b => b.EmailAddress(), b => b.UserName());
-
-        Assert.Single(valueValidator.Validators);
-
-        var addedValidator = valueValidator._lastAddedValidator as ConditionalValidator<string>;
-        Assert.NotNull(addedValidator);
-
-        Assert.True(valueValidator.IsValid("monksoul@outlook.com"));
-        Assert.False(valueValidator.IsValid("monk__soul"));
-
-        var valueValidator2 = new ValueValidator<string>().WhenMatch(u => u?.Contains('@') == true, "错误信息1");
-        Assert.False(valueValidator2.IsValid("monksoul@outlook.com"));
-        Assert.True(valueValidator2.IsValid("monk__soul"));
-
-        var valueValidator3 = new ValueValidator<string>().WhenMatch(u => u?.Contains('@') == true,
-            typeof(TestValidationMessages), "TestValidator_ValidationError");
-        Assert.False(valueValidator3.IsValid("monksoul@outlook.com"));
-        Assert.True(valueValidator3.IsValid("monk__soul"));
     }
 
     [Fact]

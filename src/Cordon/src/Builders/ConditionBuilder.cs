@@ -37,7 +37,7 @@ public class ConditionBuilder<T>
     ///     默认验证规则
     /// </summary>
     /// <remarks>当所有条件均不满足时使用。</remarks>
-    internal IReadOnlyList<ValidatorBase>? defaultRules;
+    internal List<ValidatorBase>? _defaultRules;
 
     /// <summary>
     ///     定义满足指定的条件委托
@@ -55,55 +55,34 @@ public class ConditionBuilder<T>
     }
 
     /// <summary>
-    ///     定义满足指定条件时执行的验证规则
+    ///     配置默认验证规则
     /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <param name="thenConfigure">验证器配置委托</param>
+    /// <remarks>当所有条件均不满足时使用。</remarks>
+    /// <param name="configure">验证器配置委托</param>
+    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
     /// <returns>
-    ///     <see cref="ConditionThenBuilder{T}" />
+    ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
-    public ConditionBuilder<T> WhenMatch(Func<T, bool> condition, Action<FluentValidatorBuilder<T>> thenConfigure) =>
-        When(condition).Then(thenConfigure);
+    public ConditionBuilder<T> Otherwise(Action<FluentValidatorBuilder<T>> configure,
+        CompositeMode mode = CompositeMode.FailFast)
+    {
+        _defaultRules = [new CompositeValidator<T>(configure, mode)];
 
-    /// <summary>
-    ///     定义满足指定条件时返回指定的错误信息
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <param name="errorMessage">错误信息</param>
-    /// <returns>
-    ///     <see cref="ConditionThenBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> WhenMatch(Func<T, bool> condition, string? errorMessage) =>
-        When(condition).ThenMessage(errorMessage);
-
-    /// <summary>
-    ///     定义满足指定条件时返回指定的错误信息
-    /// </summary>
-    /// <param name="condition">条件委托</param>
-    /// <param name="resourceType">错误信息资源类型</param>
-    /// <param name="resourceName">错误信息资源名称</param>
-    /// <returns>
-    ///     <see cref="ConditionThenBuilder{T}" />
-    /// </returns>
-    public ConditionBuilder<T> WhenMatch(Func<T, bool> condition,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties |
-                                    DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type resourceType, string resourceName) => When(condition).ThenMessage(resourceType, resourceName);
+        return this;
+    }
 
     /// <summary>
     ///     配置默认验证规则
     /// </summary>
     /// <remarks>当所有条件均不满足时使用。</remarks>
-    /// <param name="configure">验证器配置委托</param>
+    /// <param name="validators">验证器列表</param>
+    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
-    public ConditionBuilder<T> Otherwise(Action<FluentValidatorBuilder<T>> configure)
+    public ConditionBuilder<T> Otherwise(ValidatorBase[] validators, CompositeMode mode = CompositeMode.FailFast)
     {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
-
-        defaultRules = new FluentValidatorBuilder<T>().Build(configure);
+        _defaultRules = [new CompositeValidator<T>(validators, mode)];
 
         return this;
     }
@@ -118,7 +97,7 @@ public class ConditionBuilder<T>
     /// </returns>
     public ConditionBuilder<T> OtherwiseMessage(string? errorMessage)
     {
-        defaultRules = [new FailureValidator().WithMessage(errorMessage)];
+        _defaultRules = [new FailureValidator().WithMessage(errorMessage)];
 
         return this;
     }
@@ -137,9 +116,20 @@ public class ConditionBuilder<T>
             DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName)
     {
-        defaultRules = [new FailureValidator().WithMessage(resourceType, resourceName)];
+        _defaultRules = [new FailureValidator().WithMessage(resourceType, resourceName)];
 
         return this;
+    }
+
+    /// <summary>
+    ///     清除
+    /// </summary>
+    public void Clear()
+    {
+        _conditionalRules.Clear();
+
+        _defaultRules?.Clear();
+        _defaultRules = null;
     }
 
     /// <summary>
@@ -154,7 +144,7 @@ public class ConditionBuilder<T>
         // 调用条件验证构建器配置委托
         buildConditions?.Invoke(this);
 
-        return new ConditionResult<T>(_conditionalRules, defaultRules);
+        return new ConditionResult<T>(_conditionalRules, _defaultRules);
     }
 }
 
@@ -193,16 +183,31 @@ public sealed class ConditionThenBuilder<T>
     ///     配置满足条件时执行的验证规则
     /// </summary>
     /// <param name="configure">验证器配置委托</param>
+    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
-    public ConditionBuilder<T> Then(Action<FluentValidatorBuilder<T>> configure)
+    public ConditionBuilder<T> Then(Action<FluentValidatorBuilder<T>> configure,
+        CompositeMode mode = CompositeMode.FailFast)
     {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
+        _conditionBuilder._conditionalRules.Add(new ConditionRule<T>(_condition,
+            [new CompositeValidator<T>(configure, mode)]));
 
-        _conditionBuilder._conditionalRules.Add(
-            new ConditionRule<T>(_condition, new FluentValidatorBuilder<T>().Build(configure)));
+        return _conditionBuilder;
+    }
+
+    /// <summary>
+    ///     配置满足条件时执行的验证规则
+    /// </summary>
+    /// <param name="validators">验证器列表</param>
+    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <returns>
+    ///     <see cref="ConditionBuilder{T}" />
+    /// </returns>
+    public ConditionBuilder<T> Then(ValidatorBase[] validators, CompositeMode mode = CompositeMode.FailFast)
+    {
+        _conditionBuilder._conditionalRules.Add(new ConditionRule<T>(_condition,
+            [new CompositeValidator<T>(validators, mode)]));
 
         return _conditionBuilder;
     }

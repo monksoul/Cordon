@@ -7,8 +7,14 @@ namespace Cordon.Tests;
 public class CompositeValidatorTests
 {
     [Fact]
-    public void New_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => new CompositeValidator<string>(null!));
+    public void New_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new CompositeValidator<string>((Action<FluentValidatorBuilder<string>>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new CompositeValidator<string>((ValidatorBase[])null!));
+    }
 
     [Fact]
     public void New_ReturnOK()
@@ -17,6 +23,7 @@ public class CompositeValidatorTests
         Assert.NotNull(validator);
         Assert.NotNull(validator._validators);
         Assert.Empty(validator._validators);
+        Assert.Equal(CompositeMode.FailFast, validator.Mode);
 
         var validator2 =
             new CompositeValidator<string>(u => u.Chinese().Required().NotNull());
@@ -29,6 +36,18 @@ public class CompositeValidatorTests
 
         Assert.NotNull(validator2._errorMessageResourceAccessor);
         Assert.Null(validator2._errorMessageResourceAccessor());
+
+        var validator3 =
+            new CompositeValidator<string>([new ChineseValidator(), new RequiredValidator(), new NotNullValidator()]);
+
+        Assert.NotNull(validator3._validators);
+        Assert.Equal(3, validator3._validators.Count);
+        Assert.Equal([typeof(NotNullValidator), typeof(RequiredValidator), typeof(ChineseValidator)],
+            validator3._validators.Select(u => u.GetType()));
+        Assert.Equal(CompositeMode.FailFast, validator3.Mode);
+
+        var validator4 = new CompositeValidator<string>(_ => { }, CompositeMode.All);
+        Assert.Equal(CompositeMode.All, validator4.Mode);
     }
 
     [Fact]

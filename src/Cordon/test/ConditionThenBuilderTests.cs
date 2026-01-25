@@ -27,7 +27,8 @@ public class ConditionThenBuilderTests
     public void Then_Invalid_Parameters()
     {
         var builder = new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10);
-        Assert.Throws<ArgumentNullException>(() => builder.Then(null!));
+        Assert.Throws<ArgumentNullException>(() => builder.Then((Action<FluentValidatorBuilder<int>>)null!));
+        Assert.Throws<ArgumentNullException>(() => builder.Then((ValidatorBase[])null!));
     }
 
     [Fact]
@@ -37,7 +38,37 @@ public class ConditionThenBuilderTests
             new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).Then(u => u.Min(10).Max(100));
 
         Assert.Single(builder._conditionalRules);
-        Assert.Equal(2, builder._conditionalRules.First().Validators.Count);
+        Assert.Single(builder._conditionalRules.First().Validators);
+
+        var builder2 =
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).Then([
+                new MinValidator(10), new MaxValidator(100)
+            ]);
+
+        Assert.Single(builder2._conditionalRules);
+        Assert.Single(builder2._conditionalRules.First().Validators);
+
+        var builder3 =
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).Then(u => u.Min(10).Max(100),
+                CompositeMode.All);
+
+        Assert.Single(builder3._conditionalRules);
+        Assert.Single(builder3._conditionalRules.First().Validators);
+        var addedValidator = builder3._conditionalRules.First().Validators[0] as CompositeValidator<int>;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(CompositeMode.All, addedValidator.Mode);
+
+        var builder4 =
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).Then([
+                    new MinValidator(10), new MaxValidator(100)
+                ],
+                CompositeMode.All);
+
+        Assert.Single(builder4._conditionalRules);
+        Assert.Single(builder4._conditionalRules.First().Validators);
+        var addedValidator2 = builder4._conditionalRules.First().Validators[0] as CompositeValidator<int>;
+        Assert.NotNull(addedValidator2);
+        Assert.Equal(CompositeMode.All, addedValidator2.Mode);
     }
 
     [Fact]

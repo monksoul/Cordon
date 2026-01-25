@@ -234,12 +234,16 @@ public class ConditionalValidatorTests
             builder.When(u => u.Contains('@')).Then(b => b.WithAttributes(new RequiredAttribute()))
                 .Otherwise(b => b.WithAttributes(new UserNameAttribute())));
 
-        var conditionAttributeValueValidator =
+        var conditionCompositeValidator =
             validator._conditionResult.ConditionalRules.SelectMany(u => u.Validators).First() as
-                AttributeValueValidator;
+                CompositeValidator<string>;
+        Assert.NotNull(conditionCompositeValidator);
+        var conditionAttributeValueValidator = conditionCompositeValidator._validators[0] as AttributeValueValidator;
         Assert.NotNull(conditionAttributeValueValidator);
-        var defaultAttributeValueValidator =
-            validator._conditionResult.DefaultRules?[0] as AttributeValueValidator;
+
+        var defaultCompositeValidator = validator._conditionResult.DefaultRules?[0] as CompositeValidator<string>;
+        Assert.NotNull(defaultCompositeValidator);
+        var defaultAttributeValueValidator = defaultCompositeValidator._validators[0] as AttributeValueValidator;
         Assert.NotNull(defaultAttributeValueValidator);
 
         Assert.Null(conditionAttributeValueValidator._serviceProvider);
@@ -261,12 +265,12 @@ public class ConditionalValidatorTests
         var matchedValidators = validator.GetMatchedValidators("monksoul@outlook");
         Assert.NotNull(matchedValidators);
         Assert.Single(matchedValidators);
-        Assert.True(matchedValidators[0] is EmailAddressValidator);
+        Assert.True(matchedValidators[0] is CompositeValidator<string>);
 
         var matchedValidators2 = validator.GetMatchedValidators("monk__soul");
         Assert.NotNull(matchedValidators2);
         Assert.Single(matchedValidators2);
-        Assert.True(matchedValidators2[0] is UserNameValidator);
+        Assert.True(matchedValidators2[0] is CompositeValidator<string>);
 
         var validator2 = new ConditionalValidator<string>(_ => { });
         var matchedValidators3 = validator2.GetMatchedValidators("monksoul@outlook.com");
