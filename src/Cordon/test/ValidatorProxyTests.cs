@@ -148,12 +148,9 @@ public class ValidatorProxyTests
         var attributeValueValidator = GetProxyValidator(validator);
 
         Assert.NotNull(attributeValueValidator);
-        Assert.Null(attributeValueValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
-
-        Assert.NotNull(attributeValueValidator._serviceProvider);
     }
 
     private static TValidator? GetProxyValidator<TValidator>(ValidatorProxy<TValidator> validator)

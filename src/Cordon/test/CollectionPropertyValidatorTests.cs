@@ -420,22 +420,16 @@ public class CollectionPropertyValidatorTests
                 .WithAttributes(new RequiredAttribute());
 
         Assert.Null(propertyValidator._serviceProvider);
-        Assert.Null(propertyValidator._attributeValidator._serviceProvider);
         Assert.Null(subValidator._serviceProvider);
         var valueValidator = propertyValidator.Validators.FirstOrDefault() as AttributeValueValidator;
         Assert.NotNull(valueValidator);
-        Assert.Null(valueValidator._serviceProvider);
-
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
         propertyValidator2.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(propertyValidator._serviceProvider);
-        Assert.NotNull(propertyValidator._attributeValidator._serviceProvider);
         Assert.NotNull(subValidator._serviceProvider);
-        Assert.NotNull(valueValidator);
-        Assert.NotNull(valueValidator._serviceProvider);
     }
 
     [Fact]

@@ -510,18 +510,10 @@ public class ValidatorsTests
     public void AttributeObject_ReturnOK()
     {
         var validator = Validators.AttributeObject();
-        Assert.Null(validator._serviceProvider);
-        Assert.Empty(validator.Items);
+        Assert.True(validator.ValidateAllProperties);
 
-        var validator2 = Validators.AttributeObject(new Dictionary<object, object?>());
-        Assert.Null(validator2._serviceProvider);
-        Assert.Empty(validator2.Items);
-
-        var services = new ServiceCollection();
-        using var serviceProvider = services.BuildServiceProvider();
-        var validator3 = Validators.AttributeObject(serviceProvider, new Dictionary<object, object?>());
-        Assert.NotNull(validator3._serviceProvider);
-        Assert.NotNull(validator3.Items);
+        var validator2 = Validators.AttributeObject(false);
+        Assert.False(validator2.ValidateAllProperties);
     }
 
     [Fact]
@@ -553,41 +545,9 @@ public class ValidatorsTests
     {
         var validator = Validators.AttributeProperty<ObjectModel>(u => u.Name);
         Assert.NotNull(validator.Property);
-        Assert.Null(validator._serviceProvider);
-        Assert.Empty(validator.Items);
 
-        var services = new ServiceCollection();
-        using var serviceProvider = services.BuildServiceProvider();
-
-        var validator2 =
-            Validators.AttributeProperty<ObjectModel>(u => u.Name, new Dictionary<object, object?>());
+        var validator2 = Validators.AttributeProperty<ObjectModel, string?>(u => u.Name);
         Assert.NotNull(validator2.Property);
-        Assert.Null(validator2._serviceProvider);
-        Assert.NotNull(validator2.Items);
-
-        var validator3 =
-            Validators.AttributeProperty<ObjectModel>(u => u.Name, serviceProvider, new Dictionary<object, object?>());
-        Assert.NotNull(validator3.Property);
-        Assert.NotNull(validator3._serviceProvider);
-        Assert.NotNull(validator3.Items);
-
-        var validator4 = Validators.AttributeProperty<ObjectModel, string?>(u => u.Name);
-        Assert.NotNull(validator4.Property);
-        Assert.Null(validator4._serviceProvider);
-        Assert.Empty(validator4.Items);
-
-        var validator5 =
-            Validators.AttributeProperty<ObjectModel, string?>(u => u.Name, new Dictionary<object, object?>());
-        Assert.NotNull(validator5.Property);
-        Assert.Null(validator5._serviceProvider);
-        Assert.NotNull(validator5.Items);
-
-        var validator6 =
-            Validators.AttributeProperty<ObjectModel, string?>(u => u.Name, serviceProvider,
-                new Dictionary<object, object?>());
-        Assert.NotNull(validator6.Property);
-        Assert.NotNull(validator6._serviceProvider);
-        Assert.NotNull(validator6.Items);
     }
 
     [Fact]
@@ -889,31 +849,15 @@ public class ValidatorsTests
     {
         var validator = Validators.AttributeValue(new ChineseAttribute());
         Assert.Single(validator.Attributes);
-        Assert.Null(validator._serviceProvider);
-        Assert.Empty(validator.Items);
-
-        var services = new ServiceCollection();
-        using var serviceProvider = services.BuildServiceProvider();
-        var validator2 = Validators.AttributeValue([new ChineseAttribute()], new Dictionary<object, object?>());
-        Assert.Single(validator2.Attributes);
-        Assert.Null(validator2._serviceProvider);
-        Assert.NotNull(validator2.Items);
-
-        var validator3 = Validators.AttributeValue([new ChineseAttribute()], serviceProvider,
-            new Dictionary<object, object?>());
-        Assert.Single(validator3.Attributes);
-        Assert.NotNull(validator3._serviceProvider);
-        Assert.NotNull(validator3.Items);
     }
 
     [Fact]
     public void Service_ReturnOK()
     {
-        Assert.NotNull(Validators._defaultValidationService);
         var validationService = Validators.Service();
         Assert.NotNull(validationService);
         var validationService2 = Validators.Service();
-        Assert.StrictEqual(validationService, validationService2);
+        Assert.NotEqual(validationService, validationService2);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         var validationService3 = Validators.Service(serviceProvider);

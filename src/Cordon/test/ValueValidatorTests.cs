@@ -725,7 +725,6 @@ public class ValueValidatorTests
         Assert.Null(valueValidator._serviceProvider);
         var attributeValueValidator = valueValidator.Validators[0] as AttributeValueValidator;
         Assert.NotNull(attributeValueValidator);
-        Assert.Null(attributeValueValidator._serviceProvider);
         Assert.Null(subValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
@@ -734,13 +733,11 @@ public class ValueValidatorTests
         Assert.NotNull(valueValidator._serviceProvider);
         var attributeValueValidator2 = valueValidator.Validators[0] as AttributeValueValidator;
         Assert.NotNull(attributeValueValidator2);
-        Assert.NotNull(attributeValueValidator2._serviceProvider);
         Assert.NotNull(subValidator._serviceProvider);
 
         valueValidator.WithAttributes(new UserNameAttribute());
         var attributeValueValidator3 = valueValidator.Validators[2] as AttributeValueValidator;
         Assert.NotNull(attributeValueValidator3);
-        Assert.NotNull(attributeValueValidator3._serviceProvider);
     }
 
     [Fact]

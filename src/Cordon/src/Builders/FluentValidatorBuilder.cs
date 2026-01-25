@@ -1063,7 +1063,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf WithAttributes(params ValidationAttribute[] attributes) =>
-        AddValidator(new AttributeValueValidator(attributes, null, Items));
+        AddValidator(new AttributeValueValidator(attributes));
 
     /// <summary>
     ///     批量添加添加验证器

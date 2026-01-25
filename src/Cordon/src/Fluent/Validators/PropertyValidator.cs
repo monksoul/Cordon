@@ -68,7 +68,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         _objectValidator = objectValidator;
 
         // 初始化 AttributePropertyValidator 实例
-        _attributeValidator = new AttributePropertyValidator<T, TProperty>(selector!, null, objectValidator.Items);
+        _attributeValidator = new AttributePropertyValidator<T, TProperty>(selector!);
     }
 
     /// <summary>
@@ -313,10 +313,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     }
 
     /// <inheritdoc />
-    void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
-        InitializeServiceProvider(serviceProvider);
-
-    /// <inheritdoc />
     bool IObjectValidator.IsValid(object? instance, string?[]? ruleSets) => IsValid((T?)instance, ruleSets);
 
     /// <inheritdoc />
@@ -332,16 +328,6 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
 
     /// <inheritdoc />
     void IValidationAttributeConfigurable.UseAttributeValidation(bool enabled) => UseAttributeValidation(enabled);
-
-    /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
-    internal override void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
-    {
-        // 同步基类 IServiceProvider 委托
-        base.InitializeServiceProvider(serviceProvider);
-
-        // 同步 _attributeValidator 实例 IServiceProvider 委托
-        _attributeValidator.InitializeServiceProvider(serviceProvider);
-    }
 
     /// <summary>
     ///     设置属性级别对象验证器

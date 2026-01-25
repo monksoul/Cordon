@@ -24,8 +24,6 @@ public class PropertyValidatorTests
         Assert.NotNull(propertyValidator._objectValidator);
         Assert.Equal(objectValidator, propertyValidator._objectValidator);
         Assert.NotNull(propertyValidator._attributeValidator);
-        Assert.Null(propertyValidator._attributeValidator._serviceProvider);
-        Assert.Empty(propertyValidator._attributeValidator.Items);
         Assert.NotNull(propertyValidator.Validators);
         Assert.Null(propertyValidator._lastAddedValidator);
         Assert.Empty(propertyValidator.Validators);
@@ -52,8 +50,6 @@ public class PropertyValidatorTests
         Assert.NotNull(propertyValidator2._objectValidator);
         Assert.Equal(objectValidator2, propertyValidator2._objectValidator);
         Assert.NotNull(propertyValidator2._attributeValidator);
-        Assert.Null(propertyValidator2._attributeValidator._serviceProvider); // RuleFor 时同步
-        Assert.NotNull(propertyValidator2._attributeValidator.Items);
     }
 
     [Fact]
@@ -1206,20 +1202,16 @@ public class PropertyValidatorTests
                 .WithAttributes(new RequiredAttribute()).SetValidator(subValidator);
 
         Assert.Null(propertyValidator._serviceProvider);
-        Assert.Null(propertyValidator._attributeValidator._serviceProvider);
         Assert.Null(subValidator._serviceProvider);
         var valueValidator = propertyValidator.Validators[0] as AttributeValueValidator;
         Assert.NotNull(valueValidator);
-        Assert.Null(valueValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         propertyValidator.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(propertyValidator._serviceProvider);
-        Assert.NotNull(propertyValidator._attributeValidator._serviceProvider);
         Assert.NotNull(subValidator._serviceProvider);
         Assert.NotNull(valueValidator);
-        Assert.NotNull(valueValidator._serviceProvider);
     }
 
     [Fact]

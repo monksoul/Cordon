@@ -277,12 +277,9 @@ public class ValidatorProxyOfTTests
         var attributeObjectValidator = GetProxyValidator(validator)(instance, null!);
 
         Assert.NotNull(attributeObjectValidator);
-        Assert.Null(attributeObjectValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
-
-        Assert.NotNull(attributeObjectValidator._serviceProvider);
     }
 
     private static Func<T, ValidationContext<T>, TValidator> GetProxyValidator<T, TValidator>(

@@ -21,30 +21,6 @@ public class AttributePropertyValidator<T, TProperty> : AttributePropertyValidat
     }
 
     /// <summary>
-    ///     <inheritdoc cref="AttributePropertyValidator{T,TProperty}" />
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    /// <param name="items">共享数据</param>
-    public AttributePropertyValidator(Expression<Func<T, TProperty>> selector, IDictionary<object, object?>? items)
-        : base(ConvertExpression(selector), items)
-    {
-    }
-
-    /// <summary>
-    ///     <inheritdoc cref="AttributePropertyValidator{T,TProperty}" />
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    /// <param name="serviceProvider">
-    ///     <see cref="IServiceProvider" />
-    /// </param>
-    /// <param name="items">共享数据</param>
-    public AttributePropertyValidator(Expression<Func<T, TProperty>> selector, IServiceProvider? serviceProvider,
-        IDictionary<object, object?>? items)
-        : base(ConvertExpression(selector), serviceProvider, items)
-    {
-    }
-
-    /// <summary>
     ///     将属性表达式转换为 <![CDATA[Func<T, object?>]]> 类型
     /// </summary>
     /// <param name="selector">属性选择器</param>
@@ -80,7 +56,7 @@ public class AttributePropertyValidator<T, TProperty> : AttributePropertyValidat
 ///     属性验证特性验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitializer
+public class AttributePropertyValidator<T> : ValidatorBase<T>
 {
     /// <summary>
     ///     属性值访问器
@@ -88,54 +64,16 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
     internal readonly Func<T, object?> _getter;
 
     /// <summary>
-    ///     <see cref="IServiceProvider" /> 委托
-    /// </summary>
-    internal Func<Type, object?>? _serviceProvider;
-
-    /// <summary>
     ///     <inheritdoc cref="AttributePropertyValidator{T}" />
     /// </summary>
     /// <param name="selector">属性选择器</param>
     public AttributePropertyValidator(Expression<Func<T, object?>> selector)
-        // ReSharper disable once IntroduceOptionalParameters.Global
-        : this(selector, null, null)
-    {
-    }
-
-    /// <summary>
-    ///     <inheritdoc cref="AttributePropertyValidator{T}" />
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    /// <param name="items">共享数据</param>
-    public AttributePropertyValidator(Expression<Func<T, object?>> selector, IDictionary<object, object?>? items)
-        : this(selector, null, items)
-    {
-    }
-
-    /// <summary>
-    ///     <inheritdoc cref="AttributePropertyValidator{T}" />
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    /// <param name="serviceProvider">
-    ///     <see cref="IServiceProvider" />
-    /// </param>
-    /// <param name="items">共享数据</param>
-    public AttributePropertyValidator(Expression<Func<T, object?>> selector, IServiceProvider? serviceProvider,
-        IDictionary<object, object?>? items)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(selector);
 
         Property = selector.GetProperty();
         _getter = selector.Compile();
-
-        // 空检查
-        if (serviceProvider is not null)
-        {
-            _serviceProvider = serviceProvider.GetService;
-        }
-
-        Items = items is not null ? new Dictionary<object, object?>(items) : new Dictionary<object, object?>();
 
         ErrorMessageResourceAccessor = () => null!;
     }
@@ -144,15 +82,6 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
     ///     <inheritdoc cref="PropertyInfo" />
     /// </summary>
     public PropertyInfo Property { get; }
-
-    /// <summary>
-    ///     共享数据
-    /// </summary>
-    public IDictionary<object, object?> Items { get; }
-
-    /// <inheritdoc />
-    void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
-        InitializeServiceProvider(serviceProvider);
 
     /// <inheritdoc />
     public override bool IsValid(T? instance, ValidationContext<T> validationContext)
@@ -164,7 +93,7 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
         var displayName = GetDisplayName(validationContext.DisplayName);
 
         return Validator.TryValidateProperty(GetValue(instance),
-            CreateValidationContext(instance, displayName, validationContext.RuleSets), null);
+            CreateValidationContext(instance, displayName, validationContext), null);
     }
 
     /// <inheritdoc />
@@ -180,7 +109,7 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
         var validationResults = new List<ValidationResult>();
 
         Validator.TryValidateProperty(GetValue(instance),
-            CreateValidationContext(instance, displayName, validationContext.RuleSets), validationResults);
+            CreateValidationContext(instance, displayName, validationContext), validationResults);
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
@@ -205,7 +134,7 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
         try
         {
             Validator.ValidateProperty(GetValue(instance),
-                CreateValidationContext(instance, displayName, validationContext.RuleSets));
+                CreateValidationContext(instance, displayName, validationContext));
         }
         // 如果验证未通过且配置了自定义错误信息，则重新抛出异常
         catch (ValidationException e) when (ErrorMessageString is not null)
@@ -253,22 +182,24 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
     /// </returns>
     public string GetMemberName() => Property.Name;
 
-    /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
-    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) => _serviceProvider = serviceProvider;
-
     /// <summary>
     ///     创建 <see cref="ValidationContext" /> 实例
     /// </summary>
-    /// <param name="value">对象</param>
+    /// <param name="instance">对象</param>
     /// <param name="name">显示名称</param>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="context">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
     /// <returns>
     ///     <see cref="ValidationContext" />
     /// </returns>
-    internal ValidationContext CreateValidationContext(object value, string? name, string?[]? ruleSets)
+    internal ValidationContext CreateValidationContext(object instance, string? name, ValidationContext<T> context)
     {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(instance);
+
         // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext(value, Items) { MemberName = Property.Name };
+        var validationContext = new ValidationContext(instance, context, context.Items) { MemberName = Property.Name };
 
         // 空检查
         if (name is not null)
@@ -277,14 +208,11 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>, IValidatorInitial
         }
 
         // 空检查
-        if (ruleSets is not null)
+        if (context.RuleSets is not null)
         {
             // 设置规则集
-            validationContext.WithRuleSets(ruleSets);
+            validationContext.WithRuleSets(context.RuleSets);
         }
-
-        // 同步 IServiceProvider 委托
-        validationContext.InitializeServiceProvider(_serviceProvider!);
 
         return validationContext;
     }

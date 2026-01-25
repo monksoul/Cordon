@@ -8,49 +8,12 @@ namespace Cordon;
 ///     对象验证特性验证器
 /// </summary>
 /// <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
-public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
+public class AttributeObjectValidator : ValidatorBase
 {
     /// <summary>
-    ///     <see cref="IServiceProvider" /> 委托
-    /// </summary>
-    internal Func<Type, object?>? _serviceProvider;
-
-    /// <summary>
     ///     <inheritdoc cref="AttributeObjectValidator" />
     /// </summary>
-    public AttributeObjectValidator()
-        : this(null, null)
-    {
-    }
-
-    /// <summary>
-    ///     <inheritdoc cref="AttributeObjectValidator" />
-    /// </summary>
-    /// <param name="items">共享数据</param>
-    public AttributeObjectValidator(IDictionary<object, object?>? items)
-        : this(null, items)
-    {
-    }
-
-    /// <summary>
-    ///     <inheritdoc cref="AttributeObjectValidator" />
-    /// </summary>
-    /// <param name="serviceProvider">
-    ///     <see cref="IServiceProvider" />
-    /// </param>
-    /// <param name="items">共享数据</param>
-    public AttributeObjectValidator(IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
-    {
-        // 空检查
-        if (serviceProvider is not null)
-        {
-            _serviceProvider = serviceProvider.GetService;
-        }
-
-        Items = items is not null ? new Dictionary<object, object?>(items) : new Dictionary<object, object?>();
-
-        ErrorMessageResourceAccessor = () => null!;
-    }
+    public AttributeObjectValidator() => ErrorMessageResourceAccessor = () => null!;
 
     /// <summary>
     ///     是否验证所有属性的验证特性
@@ -62,22 +25,13 @@ public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
     /// </remarks>
     public bool ValidateAllProperties { get; set; } = true;
 
-    /// <summary>
-    ///     共享数据
-    /// </summary>
-    public IDictionary<object, object?> Items { get; }
-
-    /// <inheritdoc />
-    void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
-        InitializeServiceProvider(serviceProvider);
-
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(value);
 
-        return Validator.TryValidateObject(value, CreateValidationContext(value, validationContext?.RuleSets), null,
+        return Validator.TryValidateObject(value, CreateValidationContext(value, validationContext), null,
             ValidateAllProperties);
     }
 
@@ -97,8 +51,8 @@ public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
          * 参考源码：
          * https://github.com/dotnet/runtime/blob/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.ComponentModel.Annotations/src/System/ComponentModel/DataAnnotations/Validator.cs#L423-L430
          */
-        Validator.TryValidateObject(value, CreateValidationContext(value, validationContext?.RuleSets),
-            validationResults, ValidateAllProperties);
+        Validator.TryValidateObject(value, CreateValidationContext(value, validationContext), validationResults,
+            ValidateAllProperties);
 
         // 如果验证未通过且配置了自定义错误信息，则在首部添加自定义错误信息
         if (validationResults.Count > 0 && (string?)ErrorMessageString is not null)
@@ -119,8 +73,7 @@ public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
 
         try
         {
-            Validator.ValidateObject(value, CreateValidationContext(value, validationContext?.RuleSets),
-                ValidateAllProperties);
+            Validator.ValidateObject(value, CreateValidationContext(value, validationContext), ValidateAllProperties);
         }
         // 如果验证未通过且配置了自定义错误信息，则重新抛出异常
         catch (ValidationException e) when (ErrorMessageString is not null)
@@ -131,31 +84,39 @@ public class AttributeObjectValidator : ValidatorBase, IValidatorInitializer
         }
     }
 
-    /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
-    internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) => _serviceProvider = serviceProvider;
-
     /// <summary>
     ///     创建 <see cref="ValidationContext" /> 实例
     /// </summary>
     /// <param name="value">对象</param>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="context">
+    ///     <see cref="IValidationContext" />
+    /// </param>
     /// <returns>
     ///     <see cref="ValidationContext" />
     /// </returns>
-    internal ValidationContext CreateValidationContext(object value, string?[]? ruleSets)
+    internal static ValidationContext CreateValidationContext(object value, IValidationContext? context)
     {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(value);
+
         // 初始化 ValidationContext 实例
-        var validationContext = new ValidationContext(value, Items);
+        var validationContext = new ValidationContext(value, context, context?.Items)
+        {
+            MemberName = context?.MemberNames?.FirstOrDefault()
+        };
 
         // 空检查
-        if (ruleSets is not null)
+        if (context?.DisplayName is not null)
         {
-            // 设置规则集
-            validationContext.WithRuleSets(ruleSets);
+            validationContext.DisplayName = context.DisplayName;
         }
 
-        // 同步 IServiceProvider 委托
-        validationContext.InitializeServiceProvider(_serviceProvider!);
+        // 空检查
+        if (context?.RuleSets is not null)
+        {
+            // 设置规则集
+            validationContext.WithRuleSets(context.RuleSets);
+        }
 
         return validationContext;
     }

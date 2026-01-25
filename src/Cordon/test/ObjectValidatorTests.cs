@@ -21,7 +21,6 @@ public class ObjectValidatorTests
         Assert.Empty(validator.Validators);
         Assert.NotNull(validator._attributeValidator);
         Assert.True(validator._attributeValidator.ValidateAllProperties);
-        Assert.Null(validator._attributeValidator._serviceProvider);
         Assert.NotNull(validator._ruleSetStack);
         Assert.Empty(validator._ruleSetStack);
         Assert.Null(validator.WhenCondition);
@@ -38,7 +37,6 @@ public class ObjectValidatorTests
         Assert.Empty(validator2.Validators);
         Assert.NotNull(validator2._attributeValidator);
         Assert.True(validator2._attributeValidator.ValidateAllProperties);
-        Assert.Null(validator2._attributeValidator._serviceProvider);
         Assert.NotNull(validator2._ruleSetStack);
         Assert.Empty(validator2._ruleSetStack);
         Assert.Null(validator2.WhenCondition);
@@ -53,14 +51,11 @@ public class ObjectValidatorTests
         using var serviceProvider = services.BuildServiceProvider();
         using var validator3 = new ObjectValidator<ObjectModel>(serviceProvider, new Dictionary<object, object?>());
         Assert.NotNull(validator3._serviceProvider);
-        Assert.NotNull(validator3._attributeValidator._serviceProvider);
         Assert.NotNull(validator3.Items);
-        Assert.NotNull(validator3._attributeValidator.Items);
 
         using var validator4 =
             new ObjectValidator<ObjectModel>(new Dictionary<object, object?>());
         Assert.NotNull(validator4.Items);
-        Assert.NotNull(validator4._attributeValidator.Items);
     }
 
     [Fact]
@@ -497,17 +492,14 @@ public class ObjectValidatorTests
         var propertyValidator = validator.RuleFor(u => u.Name);
 
         Assert.Null(propertyValidator._serviceProvider);
-        Assert.Null(propertyValidator._attributeValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(propertyValidator._serviceProvider);
-        Assert.NotNull(propertyValidator._attributeValidator._serviceProvider);
 
         var propertyValidator2 = validator.RuleFor(u => u.Id);
         Assert.NotNull(propertyValidator2._serviceProvider);
-        Assert.NotNull(propertyValidator2._attributeValidator._serviceProvider);
     }
 
     [Fact]
@@ -610,17 +602,14 @@ public class ObjectValidatorTests
         var propertyValidator = validator.RuleForCollection(u => u.Children);
 
         Assert.Null(propertyValidator._serviceProvider);
-        Assert.Null(propertyValidator._attributeValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(propertyValidator._serviceProvider);
-        Assert.NotNull(propertyValidator._attributeValidator._serviceProvider);
 
         var propertyValidator2 = validator.RuleForCollection(u => u.Children);
         Assert.NotNull(propertyValidator2._serviceProvider);
-        Assert.NotNull(propertyValidator2._attributeValidator._serviceProvider);
     }
 
     [Fact]
@@ -928,28 +917,24 @@ public class ObjectValidatorTests
         var validator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).Required().UserName().End();
 
         Assert.Null(validator._serviceProvider);
-        Assert.Null(validator._attributeValidator._serviceProvider);
 
         foreach (var pValidator in validator.Validators.Select(propertyValidator =>
                      propertyValidator as PropertyValidator<ObjectModel, string?>))
         {
             Assert.NotNull(pValidator);
             Assert.Null(pValidator._serviceProvider);
-            Assert.Null(pValidator._attributeValidator._serviceProvider);
         }
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
 
         Assert.NotNull(validator._serviceProvider);
-        Assert.NotNull(validator._attributeValidator._serviceProvider);
 
         foreach (var pValidator in validator.Validators.Select(propertyValidator =>
                      propertyValidator as PropertyValidator<ObjectModel, string?>))
         {
             Assert.NotNull(pValidator);
             Assert.NotNull(pValidator._serviceProvider);
-            Assert.NotNull(pValidator._attributeValidator._serviceProvider);
         }
     }
 

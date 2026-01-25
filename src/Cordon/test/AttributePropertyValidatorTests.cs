@@ -16,8 +16,6 @@ public class AttributePropertyValidatorTests
         var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
         Assert.NotNull(validator.Property);
         Assert.Equal("Name", validator.Property.Name);
-        Assert.Empty(validator.Items);
-        Assert.Null(validator._serviceProvider);
 
         Assert.NotNull(validator._getter);
         Assert.Equal("Furion", validator._getter(new PropertyClassTest { Name = "Furion" }));
@@ -27,39 +25,7 @@ public class AttributePropertyValidatorTests
 
         var validator2 = new AttributePropertyValidator<PropertyClassTest, string?>(u => u.Name);
         Assert.NotNull(validator2.Property);
-        Assert.Null(validator2._serviceProvider);
         Assert.Equal("Name", validator2.Property.Name);
-
-        var validator3 =
-            new AttributePropertyValidator<PropertyClassTest>(u => u.Name,
-                new Dictionary<object, object?> { { "id", 1 } });
-        Assert.Null(validator3._serviceProvider);
-        Assert.NotNull(validator3.Items);
-        Assert.Single(validator3.Items);
-
-        var validator4 =
-            new AttributePropertyValidator<PropertyClassTest, string?>(u => u.Name,
-                new Dictionary<object, object?> { { "id", 1 } });
-        Assert.Null(validator4._serviceProvider);
-        Assert.NotNull(validator4.Items);
-        Assert.Single(validator4.Items);
-
-        var services = new ServiceCollection();
-        using var serviceProvider = services.BuildServiceProvider();
-
-        var validator5 =
-            new AttributePropertyValidator<PropertyClassTest>(u => u.Name, serviceProvider,
-                new Dictionary<object, object?> { { "id", 1 } });
-        Assert.NotNull(validator5._serviceProvider);
-        Assert.NotNull(validator5.Items);
-        Assert.Single(validator5.Items);
-
-        var validator6 =
-            new AttributePropertyValidator<PropertyClassTest, string?>(u => u.Name, serviceProvider,
-                new Dictionary<object, object?> { { "id", 1 } });
-        Assert.NotNull(validator6._serviceProvider);
-        Assert.NotNull(validator6.Items);
-        Assert.Single(validator6.Items);
     }
 
     [Fact]
@@ -217,56 +183,41 @@ public class AttributePropertyValidatorTests
     }
 
     [Fact]
-    public void InitializeServiceProvider_ReturnOK()
-    {
-        var validator = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name);
-        Assert.Null(validator._serviceProvider);
-
-        using var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        validator.InitializeServiceProvider(serviceProvider.GetService);
-
-        Assert.NotNull(validator._serviceProvider);
-
-        validator.InitializeServiceProvider(null);
-        Assert.Null(validator._serviceProvider);
-    }
+    public void CreateValidationContext_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            new AttributePropertyValidator<PropertyClassTest>(u => u.Name).CreateValidationContext(null!, null,
+                new ValidationContext<PropertyClassTest>(new PropertyClassTest())));
 
     [Fact]
     public void CreateValidationContext_ReturnOK()
     {
-        var validator = new AttributePropertyValidator<PropertyClassTest2>(u => u.Name);
+        var model = new PropertyClassTest();
+        var validator = new AttributePropertyValidator<PropertyClassTest>(u => u.Name);
 
-        var validationContext = validator.CreateValidationContext(new ObjectClassTest(), "DisplayName", null);
-        Assert.Equal("DisplayName", validationContext.DisplayName);
+        var validationContext =
+            validator.CreateValidationContext(model, null, new ValidationContext<PropertyClassTest>(model));
+        Assert.NotNull(validationContext);
+        Assert.Empty(validationContext.Items);
+        Assert.Null(validationContext.GetService<IServiceProvider>());
         Assert.Equal("Name", validationContext.MemberName);
-
-        var validationContext2 = validator.CreateValidationContext(new ObjectClassTest(), null, null);
-        Assert.Equal("Name", validationContext2.DisplayName);
-        Assert.Equal("Name", validationContext2.MemberName);
-
-        var serviceProviderField = typeof(ValidationContext).GetField("_serviceProvider",
-            BindingFlags.NonPublic | BindingFlags.Instance);
-        Assert.NotNull(serviceProviderField);
-
-        Assert.Null(validator._serviceProvider);
-        Assert.Null(serviceProviderField.GetValue(validationContext2));
+        Assert.Equal("Name", validationContext.DisplayName);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
-        validator.InitializeServiceProvider(serviceProvider.GetService);
-        Assert.NotNull(validator._serviceProvider);
-
-        var validationContext3 = validator.CreateValidationContext(new ObjectClassTest(), null, null);
-        Assert.NotNull(validator._serviceProvider);
-        Assert.NotNull(serviceProviderField.GetValue(validationContext3));
-
-        var validationContext4 = validator.CreateValidationContext(new ObjectClassTest(), null, ["login"]);
-        Assert.NotNull(validator._serviceProvider);
-        Assert.NotNull(serviceProviderField.GetValue(validationContext4));
-        Assert.Single(validationContext4.Items);
+        var validationContext2 = validator.CreateValidationContext(model, "CustomDisplayName",
+            new ValidationContext<PropertyClassTest>(model, serviceProvider, null)
+            {
+                RuleSets = ["login"], MemberNames = ["Model"], DisplayName = "ModelDisplay"
+            });
+        Assert.NotNull(validationContext2);
+        Assert.Single(validationContext2.Items);
         var metadata =
-            validationContext4.Items[Constants.ValidationOptionsKey] as ValidationOptionsMetadata;
+            validationContext2.Items[Constants.ValidationOptionsKey] as ValidationOptionsMetadata;
         Assert.NotNull(metadata);
         Assert.Equal(["login"], (string[]?)metadata.RuleSets!);
+
+        Assert.NotNull(validationContext2.GetService<IServiceProvider>());
+        Assert.Equal("Name", validationContext2.MemberName);
+        Assert.Equal("CustomDisplayName", validationContext2.DisplayName);
     }
 }
 

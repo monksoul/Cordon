@@ -19,11 +19,13 @@ public class ValidationServiceTests
         Assert.NotNull(validationService);
         Assert.NotNull(validationService._serviceProvider);
         Assert.NotNull(validationService._attributeValidator);
+        Assert.Empty(validationService.Items);
 
         var validationService2 = new ValidationService();
         Assert.NotNull(validationService2);
         Assert.Null(validationService2._serviceProvider);
         Assert.NotNull(validationService2._attributeValidator);
+        Assert.Empty(validationService2.Items);
     }
 
     [Fact]
@@ -276,14 +278,16 @@ public class ValidationServiceTests
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
         var validationService = new ValidationService(serviceProvider);
+        validationService.Items.Add("Name", "Furion");
 
         var validationContext = validationService.CreateValidationContext(new ObjectModel(), null);
         Assert.NotNull(validationContext);
-        Assert.Empty(validationContext.Items);
         Assert.NotNull(validationContext.GetService(typeof(IServiceProvider)));
+        Assert.Single(validationContext.Items);
+        Assert.Equal("Furion", validationContext.Items["Name"]);
 
         var validationContext2 = validationService.CreateValidationContext(new ObjectModel(), ["login"]);
-        Assert.Empty(validationContext2.Items);
+        Assert.Single(validationContext2.Items);
         Assert.Equal(["login"], (string[]?)validationContext2.RuleSets!);
     }
 
@@ -291,14 +295,16 @@ public class ValidationServiceTests
     public void CreateValidationContext_WithNoDI_ReturnOK()
     {
         var validationService = new ValidationService();
+        validationService.Items.Add("Name", "Furion");
 
         var validationContext = validationService.CreateValidationContext(new ObjectModel(), null);
         Assert.NotNull(validationContext);
-        Assert.Empty(validationContext.Items);
         Assert.Null(validationContext.GetService(typeof(IServiceProvider)));
+        Assert.Single(validationContext.Items);
+        Assert.Equal("Furion", validationContext.Items["Name"]);
 
         var validationContext2 = validationService.CreateValidationContext(new ObjectModel(), ["login"]);
-        Assert.Empty(validationContext2.Items);
+        Assert.Single(validationContext2.Items);
         Assert.Equal(["login"], (string[]?)validationContext2.RuleSets!);
     }
 

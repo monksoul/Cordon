@@ -227,10 +227,6 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <inheritdoc />
-    void IValidatorInitializer.InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
-        InitializeServiceProvider(serviceProvider);
-
-    /// <inheritdoc />
     bool IObjectValidator.IsValid(object? instance, string?[]? ruleSets) => IsValid((T?)instance, ruleSets);
 
     /// <inheritdoc />

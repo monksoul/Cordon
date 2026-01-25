@@ -246,14 +246,8 @@ public class ConditionalValidatorTests
         var defaultAttributeValueValidator = defaultCompositeValidator._validators[0] as AttributeValueValidator;
         Assert.NotNull(defaultAttributeValueValidator);
 
-        Assert.Null(conditionAttributeValueValidator._serviceProvider);
-        Assert.Null(defaultAttributeValueValidator._serviceProvider);
-
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
-
-        Assert.NotNull(conditionAttributeValueValidator._serviceProvider);
-        Assert.NotNull(defaultAttributeValueValidator._serviceProvider);
     }
 
     [Fact]

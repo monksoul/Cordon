@@ -10,12 +10,6 @@ namespace Cordon;
 public static class Validators
 {
     /// <summary>
-    ///     默认的 <see cref="IValidationService" /> 实例
-    /// </summary>
-    /// <remarks>避免重复创建实例。</remarks>
-    internal static readonly IValidationService _defaultValidationService = new ValidationService();
-
-    /// <summary>
     ///     创建对象验证器
     /// </summary>
     /// <typeparam name="T">对象类型</typeparam>
@@ -714,34 +708,15 @@ public static class Validators
     ///     创建对象验证特性验证器
     /// </summary>
     /// <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
-    /// <returns>
-    ///     <see cref="AttributeObjectValidator" />
-    /// </returns>
-    public static AttributeObjectValidator AttributeObject() => new();
-
-    /// <summary>
-    ///     创建对象验证特性验证器
-    /// </summary>
-    /// <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
-    /// <param name="items">共享数据</param>
-    /// <returns>
-    ///     <see cref="AttributeObjectValidator" />
-    /// </returns>
-    public static AttributeObjectValidator AttributeObject(IDictionary<object, object?>? items) => new(items);
-
-    /// <summary>
-    ///     创建对象验证特性验证器
-    /// </summary>
-    /// <remarks>支持使用 <c>[ValidateNever]</c> 特性来跳过对特定属性的验证，仅限于 ASP.NET Core 应用项目。</remarks>
-    /// <param name="serviceProvider">
-    ///     <see cref="IServiceProvider" />
+    /// <param name="validateAllProperties">
+    ///     是否验证所有属性的验证特性。该属性用于控制是否执行属性级别的验证逻辑，默认值为 <c>true</c>。若设置为 <c>true</c>，则会同时验证所有属性以及
+    ///     <see cref="IValidatableObject.Validate" /> 方法；若设置为 <c>false</c>，则仅验证 <see cref="IValidatableObject.Validate" /> 方法。
     /// </param>
-    /// <param name="items">共享数据</param>
     /// <returns>
     ///     <see cref="AttributeObjectValidator" />
     /// </returns>
-    public static AttributeObjectValidator AttributeObject(IServiceProvider? serviceProvider,
-        IDictionary<object, object?>? items) => new(serviceProvider, items);
+    public static AttributeObjectValidator AttributeObject(bool validateAllProperties = true) =>
+        new() { ValidateAllProperties = validateAllProperties };
 
     /// <summary>
     ///     创建密码验证器
@@ -783,35 +758,6 @@ public static class Validators
     ///     创建属性验证特性验证器
     /// </summary>
     /// <param name="selector">属性选择器</param>
-    /// <param name="items">共享数据</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <returns>
-    ///     <see cref="AttributePropertyValidator{T}" />
-    /// </returns>
-    public static AttributePropertyValidator<T> AttributeProperty<T>(Expression<Func<T, object?>> selector,
-        IDictionary<object, object?>? items)
-        where T : class => new(selector, items);
-
-    /// <summary>
-    ///     创建属性验证特性验证器
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    /// <param name="serviceProvider">
-    ///     <see cref="IServiceProvider" />
-    /// </param>
-    /// <param name="items">共享数据</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <returns>
-    ///     <see cref="AttributePropertyValidator{T}" />
-    /// </returns>
-    public static AttributePropertyValidator<T> AttributeProperty<T>(Expression<Func<T, object?>> selector,
-        IServiceProvider? serviceProvider, IDictionary<object, object?>? items)
-        where T : class => new(selector, serviceProvider, items);
-
-    /// <summary>
-    ///     创建属性验证特性验证器
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
     /// <typeparam name="T">对象类型</typeparam>
     /// <typeparam name="TProperty">属性类型</typeparam>
     /// <returns>
@@ -820,37 +766,6 @@ public static class Validators
     public static AttributePropertyValidator<T, TProperty> AttributeProperty<T, TProperty>(
         Expression<Func<T, TProperty>> selector) where T : class =>
         new(selector);
-
-    /// <summary>
-    ///     创建属性验证特性验证器
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    /// <param name="items">共享数据</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <typeparam name="TProperty">属性类型</typeparam>
-    /// <returns>
-    ///     <see cref="AttributePropertyValidator{T,TProperty}" />
-    /// </returns>
-    public static AttributePropertyValidator<T, TProperty> AttributeProperty<T, TProperty>(
-        Expression<Func<T, TProperty>> selector, IDictionary<object, object?>? items) where T : class =>
-        new(selector, items);
-
-    /// <summary>
-    ///     创建属性验证特性验证器
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    /// <param name="serviceProvider">
-    ///     <see cref="IServiceProvider" />
-    /// </param>
-    /// <param name="items">共享数据</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <typeparam name="TProperty">属性类型</typeparam>
-    /// <returns>
-    ///     <see cref="AttributePropertyValidator{T,TProperty}" />
-    /// </returns>
-    public static AttributePropertyValidator<T, TProperty> AttributeProperty<T, TProperty>(
-        Expression<Func<T, TProperty>> selector, IServiceProvider? serviceProvider,
-        IDictionary<object, object?>? items) where T : class => new(selector, serviceProvider, items);
 
     /// <summary>
     ///     创建指定数值范围约束验证器
@@ -1167,32 +1082,6 @@ public static class Validators
     public static AttributeValueValidator AttributeValue(params ValidationAttribute[] attributes) => new(attributes);
 
     /// <summary>
-    ///     创建单值验证特性验证器
-    /// </summary>
-    /// <param name="attributes">验证特性列表</param>
-    /// <param name="items">共享数据</param>
-    /// <returns>
-    ///     <see cref="AttributeValueValidator" />
-    /// </returns>
-    public static AttributeValueValidator AttributeValue(ValidationAttribute[] attributes,
-        IDictionary<object, object?>? items) => new(attributes, items);
-
-    /// <summary>
-    ///     创建单值验证特性验证器
-    /// </summary>
-    /// <param name="attributes">验证特性列表</param>
-    /// <param name="serviceProvider">
-    ///     <see cref="IServiceProvider" />
-    /// </param>
-    /// <param name="items">共享数据</param>
-    /// <returns>
-    ///     <see cref="AttributeValueValidator" />
-    /// </returns>
-    public static AttributeValueValidator AttributeValue(ValidationAttribute[] attributes,
-        IServiceProvider? serviceProvider, IDictionary<object, object?>? items) =>
-        new(attributes, serviceProvider, items);
-
-    /// <summary>
     ///     创建指定对象类型的数据验证服务
     /// </summary>
     /// <param name="serviceProvider">
@@ -1202,5 +1091,5 @@ public static class Validators
     ///     <see cref="IValidationService" />
     /// </returns>
     public static IValidationService Service(IServiceProvider? serviceProvider = null) =>
-        serviceProvider is null ? _defaultValidationService : new ValidationService(serviceProvider);
+        serviceProvider is null ? new ValidationService() : new ValidationService(serviceProvider);
 }

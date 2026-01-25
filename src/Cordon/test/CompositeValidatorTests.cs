@@ -317,11 +317,8 @@ public class CompositeValidatorTests
         var validator = new CompositeValidator<string>(u => u.WithAttributes(new RequiredAttribute()));
         var attributeValueValidator = validator._validators[0] as AttributeValueValidator;
         Assert.NotNull(attributeValueValidator);
-        Assert.Null(attributeValueValidator._serviceProvider);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
-
-        Assert.NotNull(attributeValueValidator._serviceProvider);
     }
 }
