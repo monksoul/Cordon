@@ -9,15 +9,15 @@ public class CompareValidatorTests
     [Fact]
     public void New_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => new CompareValidator<ObjectModel, string?>(null!, (string)null!));
-        Assert.Throws<ArgumentException>(() => new CompareValidator<ObjectModel, string?>(null!, string.Empty));
-        Assert.Throws<ArgumentException>(() => new CompareValidator<ObjectModel, string?>(null!, "  "));
+        Assert.Throws<ArgumentNullException>(() => new CompareValidator<ObjectModel>(null!, (string)null!));
+        Assert.Throws<ArgumentException>(() => new CompareValidator<ObjectModel>(null!, string.Empty));
+        Assert.Throws<ArgumentException>(() => new CompareValidator<ObjectModel>(null!, "  "));
 
         Assert.Throws<ArgumentNullException>(() =>
-            new CompareValidator<ObjectModel, string?>(null!, (Expression<Func<ObjectModel, object?>>)null!));
+            new CompareValidator<ObjectModel>(null!, (Expression<Func<ObjectModel, object?>>)null!));
 
         Assert.Throws<ArgumentException>(() =>
-            new CompareValidator<ObjectModel, string?>(null!, "UnknownProperty"));
+            new CompareValidator<ObjectModel>(null!, "UnknownProperty"));
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class CompareValidatorTests
     {
         var model = new ObjectModel { Password = "password", ConfirmPassword = "password1" };
 
-        var validator = new CompareValidator<ObjectModel, string?>(u => u.Password, u => u.ConfirmPassword);
+        var validator = new CompareValidator<ObjectModel>(u => u.Password, u => u.ConfirmPassword);
         Assert.NotNull(validator._propertyGetter);
         Assert.Equal("password", validator._propertyGetter(model));
         Assert.NotNull(validator._otherPropertyGetter);
@@ -39,7 +39,7 @@ public class CompareValidatorTests
         Assert.Equal("'{0}' and '{1}' do not match.", validator._errorMessageResourceAccessor());
 
         var validator2 =
-            new CompareValidator<ObjectModel, string?>(u => u.Password, nameof(ObjectModel.ConfirmPassword));
+            new CompareValidator<ObjectModel>(u => u.Password, nameof(ObjectModel.ConfirmPassword));
         Assert.NotNull(validator2._propertyGetter);
         Assert.Equal("password", validator2._propertyGetter(model));
         Assert.NotNull(validator2._otherPropertyGetter);
@@ -53,7 +53,7 @@ public class CompareValidatorTests
     [Fact]
     public void IsValid_Invalid_Parameters()
     {
-        var validator = new CompareValidator<ObjectModel, string?>(u => u.Password, u => u.ConfirmPassword);
+        var validator = new CompareValidator<ObjectModel>(u => u.Password, u => u.ConfirmPassword);
         Assert.Throws<ArgumentNullException>(() => validator.IsValid(null));
     }
 
@@ -67,21 +67,21 @@ public class CompareValidatorTests
     {
         var model = new ObjectModel { Password = value1, ConfirmPassword = value2 };
 
-        var validator = new CompareValidator<ObjectModel, string?>(u => u.Password, u => u.ConfirmPassword);
+        var validator = new CompareValidator<ObjectModel>(u => u.Password, u => u.ConfirmPassword);
         Assert.Equal(result, validator.IsValid(model));
     }
 
     [Fact]
     public void GetValidationResults_Invalid_Parameters()
     {
-        var validator = new CompareValidator<ObjectModel, string?>(u => u.Password, u => u.ConfirmPassword);
+        var validator = new CompareValidator<ObjectModel>(u => u.Password, u => u.ConfirmPassword);
         Assert.Throws<ArgumentNullException>(() => validator.GetValidationResults(null, "data"));
     }
 
     [Fact]
     public void GetValidationResults_ReturnOK()
     {
-        var validator = new CompareValidator<ObjectModel, string?>(u => u.Password, u => u.ConfirmPassword);
+        var validator = new CompareValidator<ObjectModel>(u => u.Password, u => u.ConfirmPassword);
         Assert.Null(
             validator.GetValidationResults(new ObjectModel { Password = "password", ConfirmPassword = "password" },
                 "Password"));
@@ -105,14 +105,14 @@ public class CompareValidatorTests
     [Fact]
     public void Validate_Invalid_Parameters()
     {
-        var validator = new CompareValidator<ObjectModel, string?>(u => u.Password, u => u.ConfirmPassword);
+        var validator = new CompareValidator<ObjectModel>(u => u.Password, u => u.ConfirmPassword);
         Assert.Throws<ArgumentNullException>(() => validator.Validate(null, "data"));
     }
 
     [Fact]
     public void Validate_ReturnOK()
     {
-        var validator = new CompareValidator<ObjectModel, string?>(u => u.Password, u => u.ConfirmPassword);
+        var validator = new CompareValidator<ObjectModel>(u => u.Password, u => u.ConfirmPassword);
         validator.Validate(new ObjectModel { Password = "password", ConfirmPassword = "password" },
             "Password");
 
@@ -129,44 +129,44 @@ public class CompareValidatorTests
     [Fact]
     public void FormatErrorMessage_ReturnOK()
     {
-        var validator = new CompareValidator<ObjectModel, string?>(u => u.Password, u => u.ConfirmPassword);
+        var validator = new CompareValidator<ObjectModel>(u => u.Password, u => u.ConfirmPassword);
         Assert.Equal("'Password' and 'ConfirmPassword' do not match.", validator.FormatErrorMessage("Password"));
     }
 
     [Fact]
     public void GetDisplayNameForProperty_Invalid_Parameters() =>
         Assert.Throws<ArgumentNullException>(() =>
-            CompareValidator<ObjectModel, string?>.GetDisplayNameForProperty(null!));
+            CompareValidator<ObjectModel>.GetDisplayNameForProperty(null!));
 
     [Fact]
     public void GetDisplayNameForProperty_ReturnOK()
     {
         var property = typeof(ObjectModel).GetProperty(nameof(ObjectModel.Password));
         Assert.NotNull(property);
-        Assert.Equal("Password", CompareValidator<ObjectModel, string?>.GetDisplayNameForProperty(property));
+        Assert.Equal("Password", CompareValidator<ObjectModel>.GetDisplayNameForProperty(property));
 
         var property2 = typeof(ObjectModel).GetProperty(nameof(ObjectModel.NewPassword));
         Assert.NotNull(property2);
-        Assert.Equal("NPassword", CompareValidator<ObjectModel, string?>.GetDisplayNameForProperty(property2));
+        Assert.Equal("NPassword", CompareValidator<ObjectModel>.GetDisplayNameForProperty(property2));
     }
 
     [Fact]
     public void CreatePropertySelector_Invalid_Parameters()
     {
         Assert.Throws<ArgumentNullException>(() =>
-            CompareValidator<ObjectModel, string?>.CreatePropertySelector(null!));
+            CompareValidator<ObjectModel>.CreatePropertySelector(null!));
 
         Assert.Throws<ArgumentException>(() =>
-            CompareValidator<ObjectModel, string?>.CreatePropertySelector(string.Empty));
+            CompareValidator<ObjectModel>.CreatePropertySelector(string.Empty));
 
         Assert.Throws<ArgumentException>(() =>
-            CompareValidator<ObjectModel, string?>.CreatePropertySelector(" "));
+            CompareValidator<ObjectModel>.CreatePropertySelector(" "));
     }
 
     [Fact]
     public void CreatePropertySelector_ReturnOK()
     {
-        var selector = CompareValidator<ObjectModel, string?>.CreatePropertySelector("Password");
+        var selector = CompareValidator<ObjectModel>.CreatePropertySelector("Password");
         Assert.NotNull(selector);
         var getter = selector.Compile();
         Assert.Equal("password", getter(new ObjectModel { Password = "password" }));

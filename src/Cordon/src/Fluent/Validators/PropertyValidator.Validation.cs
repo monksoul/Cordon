@@ -72,8 +72,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf Conditional(
-        Action<ConditionBuilder<TProperty>, ValidationContext<T>> buildConditions)
+    public virtual TSelf Conditional(Action<ConditionBuilder<TProperty>, ValidationContext<T>> buildConditions)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(buildConditions);
@@ -85,16 +84,17 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <summary>
     ///     添加比较两个属性验证器
     /// </summary>
-    /// <param name="selector">属性选择器</param>
+    /// <param name="propertySelector">其他属性选择器</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf Compare(Expression<Func<T, object?>> selector)
+    public virtual TSelf Compare(Expression<Func<T, object?>> propertySelector)
     {
         // 空检查
-        ArgumentNullException.ThrowIfNull(selector);
+        ArgumentNullException.ThrowIfNull(propertySelector);
 
-        return ValidatorProxy<CompareValidator<T, TProperty>>(_ => [_selector, selector], instance => instance);
+        return ValidatorProxy<CompareValidator<T>>(_ => [_selector.AsObjectSelector(), propertySelector],
+            instance => instance);
     }
 
     /// <summary>
@@ -109,7 +109,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
-        return ValidatorProxy<CompareValidator<T, TProperty>>(_ => [_selector, propertyName], instance => instance);
+        return ValidatorProxy<CompareValidator<T>>(_ => [_selector.AsObjectSelector(), propertyName],
+            instance => instance);
     }
 
     /// <summary>
@@ -134,8 +135,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf GreaterThanOrEqualTo(
-        Func<ValidationContext<T>, IComparable> compareValueAccessor)
+    public virtual TSelf GreaterThanOrEqualTo(Func<ValidationContext<T>, IComparable> compareValueAccessor)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(compareValueAccessor);
@@ -150,8 +150,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf GreaterThan(
-        Func<ValidationContext<T>, IComparable> compareValueAccessor)
+    public virtual TSelf GreaterThan(Func<ValidationContext<T>, IComparable> compareValueAccessor)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(compareValueAccessor);
@@ -166,8 +165,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf LessThanOrEqualTo(
-        Func<ValidationContext<T>, IComparable> compareValueAccessor)
+    public virtual TSelf LessThanOrEqualTo(Func<ValidationContext<T>, IComparable> compareValueAccessor)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(compareValueAccessor);
@@ -182,8 +180,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf LessThan(
-        Func<ValidationContext<T>, IComparable> compareValueAccessor)
+    public virtual TSelf LessThan(Func<ValidationContext<T>, IComparable> compareValueAccessor)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(compareValueAccessor);
@@ -319,9 +316,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
         // 初始化 ValidatorProxy<T, TValidator> 实例
         var validatorProxy = new ValidatorProxy<T, TValidator>(
             validatingObjectFactory ?? (instance => GetValidatingValue(instance)),
-            constructorArgsFactory is null
-                ? null
-                : (_, context) => constructorArgsFactory(context));
+            constructorArgsFactory is null ? null : (_, context) => constructorArgsFactory(context));
 
         // 空检查
         if (configure is not null)

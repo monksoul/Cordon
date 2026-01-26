@@ -63,6 +63,16 @@ public class EnumAttributeTests
         Assert.Null(attribute4.ErrorMessage);
         Assert.NotNull(attribute4._validator);
         Assert.True(attribute4._validator.SupportFlags);
+
+        var attribute5 = new EnumAttribute();
+        Assert.Null(attribute5.EnumType);
+        Assert.False(attribute5._supportFlags);
+        Assert.Null(attribute5._validator);
+
+        var attribute6 = new EnumAttribute { SupportFlags = true };
+        Assert.Null(attribute6.EnumType);
+        Assert.True(attribute6._supportFlags);
+        Assert.Null(attribute6._validator);
     }
 
     [Fact]
@@ -79,6 +89,9 @@ public class EnumAttributeTests
 
         var model4 = new TestModel { Data = MyFlagsEnum.Enum1, Data2 = MyEnum.Enum1 };
         Assert.False(Validator.TryValidateObject(model4, new ValidationContext(model4), null, true));
+
+        var model5 = new TestModel2 { Data = MyEnum.Enum1 };
+        Assert.True(Validator.TryValidateObject(model5, new ValidationContext(model5), null, true));
     }
 
     [Fact]
@@ -111,6 +124,11 @@ public class EnumAttributeTests
             validationResults4[0].ErrorMessage);
         Assert.Equal("The field Data2 must be a valid combination of values defined in enum MyFlagsEnum.",
             validationResults4[1].ErrorMessage);
+
+        var model5 = new TestModel2 { Data = MyEnum.Enum1 };
+        var validationResults5 = new List<ValidationResult>();
+        Assert.True(Validator.TryValidateObject(model5, new ValidationContext(model5), validationResults5, true));
+        Assert.Empty(validationResults5);
     }
 
     [Fact]
@@ -139,6 +157,9 @@ public class EnumAttributeTests
                 Validator.ValidateObject(model4, new ValidationContext(model4), true));
         Assert.Equal("The field Data must be a defined value of enum MyEnum.",
             exception3.ValidationResult.ErrorMessage);
+
+        var model5 = new TestModel2 { Data = MyEnum.Enum1 };
+        Validator.ValidateObject(model5, new ValidationContext(model5), true);
     }
 
     [Fact]
@@ -163,11 +184,29 @@ public class EnumAttributeTests
         Assert.Equal("EnumValidator_ValidationError_SupportFlags", attribute2.GetResourceKey());
     }
 
+    [Fact]
+    public void GetMemberType_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => EnumAttribute.GetMemberType(null!));
+
+    [Fact]
+    public void GetMemberType_ReturnOK()
+    {
+        var memberType =
+            EnumAttribute.GetMemberType(
+                new ValidationContext(new TestModel2()) { MemberName = nameof(TestModel2.Data) });
+        Assert.Equal(typeof(MyEnum), memberType);
+    }
+
     public class TestModel
     {
         [Enum<MyEnum>] public object? Data { get; set; }
 
         [Enum<MyFlagsEnum>(SupportFlags = true)]
         public object? Data2 { get; set; }
+    }
+
+    public class TestModel2
+    {
+        [Enum] public MyEnum Data { get; set; }
     }
 }

@@ -8,8 +8,7 @@ namespace Cordon;
 ///     比较两个属性验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-/// <typeparam name="TProperty">属性类型</typeparam>
-public class CompareValidator<T, TProperty> : ValidatorBase<T>
+public class CompareValidator<T> : ValidatorBase<T>
 {
     /// <summary>
     ///     属性值访问器
@@ -19,24 +18,24 @@ public class CompareValidator<T, TProperty> : ValidatorBase<T>
     /// <summary>
     ///     其他属性值访问器
     /// </summary>
-    internal readonly Func<T, TProperty> _propertyGetter;
+    internal readonly Func<T, object?> _propertyGetter;
 
     /// <summary>
-    ///     <inheritdoc cref="CompareValidator{T,TProperty}" />
+    ///     <inheritdoc cref="CompareValidator{T}" />
     /// </summary>
     /// <param name="propertySelector">属性选择器</param>
     /// <param name="otherPropertyName">其他属性的名称</param>
-    public CompareValidator(Expression<Func<T, TProperty>> propertySelector, string otherPropertyName)
+    public CompareValidator(Expression<Func<T, object?>> propertySelector, string otherPropertyName)
         : this(propertySelector, CreatePropertySelector(otherPropertyName))
     {
     }
 
     /// <summary>
-    ///     <inheritdoc cref="CompareValidator{T,TProperty}" />
+    ///     <inheritdoc cref="CompareValidator{T}" />
     /// </summary>
     /// <param name="propertySelector">属性选择器</param>
     /// <param name="otherPropertySelector">其他属性选择器</param>
-    public CompareValidator(Expression<Func<T, TProperty>> propertySelector,
+    public CompareValidator(Expression<Func<T, object?>> propertySelector,
         Expression<Func<T, object?>> otherPropertySelector)
     {
         // 空检查
@@ -89,8 +88,8 @@ public class CompareValidator<T, TProperty> : ValidatorBase<T>
         // 空检查
         ArgumentNullException.ThrowIfNull(property);
 
-        return property.GetCustomAttribute<DisplayAttribute>(false)?.GetName() ??
-               property.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName ?? property.Name;
+        return property.GetCustomAttribute<DisplayAttribute>(true)?.GetName() ??
+               property.GetCustomAttribute<DisplayNameAttribute>(true)?.DisplayName ?? property.Name;
     }
 
     /// <summary>

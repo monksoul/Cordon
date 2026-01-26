@@ -429,7 +429,7 @@ public class PropertyValidatorValidationTests
 
         var addedValidator =
             propertyValidator._lastAddedValidator as
-                ValidatorProxy<ValidationModel, CompareValidator<ValidationModel, string?>>;
+                ValidatorProxy<ValidationModel, CompareValidator<ValidationModel>>;
         Assert.NotNull(addedValidator);
 
         Assert.False(propertyValidator.IsValid(new ValidationModel { String1 = "password", String2 = "password1" }));
@@ -443,7 +443,7 @@ public class PropertyValidatorValidationTests
 
         var addedValidator2 =
             propertyValidator2._lastAddedValidator as
-                ValidatorProxy<ValidationModel, CompareValidator<ValidationModel, string?>>;
+                ValidatorProxy<ValidationModel, CompareValidator<ValidationModel>>;
         Assert.NotNull(addedValidator2);
 
         Assert.False(propertyValidator2.IsValid(new ValidationModel { String1 = "password", String2 = "password1" }));

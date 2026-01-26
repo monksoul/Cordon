@@ -171,6 +171,23 @@ public class ValidationExtensionsTests
             validationResults3.First().ErrorMessage);
     }
 
+
+    [Fact]
+    public void ConvertExpression_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() =>
+            ValidationExtensions.AsObjectSelector<ObjectModel, string?>(null!));
+
+    [Fact]
+    public void ConvertExpression_ReturnOK()
+    {
+        var expression = ValidationExtensions.AsObjectSelector<ObjectModel, string?>(u => u.Name);
+        Assert.NotNull(expression);
+
+        var getter = expression.Compile();
+        Assert.Equal("Furion", getter(new ObjectModel { Name = "Furion" }));
+    }
+
+
     public class ObjectModel : IValidatableObject
     {
         [Min(1)] public int Id { get; set; }

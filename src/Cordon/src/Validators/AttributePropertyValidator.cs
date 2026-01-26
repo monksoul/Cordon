@@ -8,54 +8,6 @@ namespace Cordon;
 ///     属性验证特性验证器
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-/// <typeparam name="TProperty">属性类型</typeparam>
-public class AttributePropertyValidator<T, TProperty> : AttributePropertyValidator<T>
-{
-    /// <summary>
-    ///     <inheritdoc cref="AttributePropertyValidator{T,TProperty}" />
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    public AttributePropertyValidator(Expression<Func<T, TProperty>> selector)
-        : base(ConvertExpression(selector))
-    {
-    }
-
-    /// <summary>
-    ///     将属性表达式转换为 <![CDATA[Func<T, object?>]]> 类型
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    /// <returns>
-    ///     <see cref="Expression{TDelegate}" />
-    /// </returns>
-    internal static Expression<Func<T, object?>> ConvertExpression(Expression<Func<T, TProperty>> selector)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(selector);
-
-        return Expression.Lambda<Func<T, object?>>(Expression.Convert(selector.Body, typeof(object)),
-            selector.Parameters);
-    }
-
-    /// <summary>
-    ///     获取属性值
-    /// </summary>
-    /// <param name="instance">对象</param>
-    /// <returns>
-    ///     <typeparamref name="TProperty" />
-    /// </returns>
-    public new TProperty GetValue(T instance)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(instance);
-
-        return (TProperty)base.GetValue(instance)!;
-    }
-}
-
-/// <summary>
-///     属性验证特性验证器
-/// </summary>
-/// <typeparam name="T">对象类型</typeparam>
 public class AttributePropertyValidator<T> : ValidatorBase<T>
 {
     /// <summary>
@@ -171,8 +123,8 @@ public class AttributePropertyValidator<T> : ValidatorBase<T>
     ///     <see cref="string" />
     /// </returns>
     public string GetDisplayName(string? name) =>
-        name ?? Property.GetCustomAttribute<DisplayAttribute>(false)?.GetName() ??
-        Property.GetCustomAttribute<DisplayNameAttribute>(false)?.DisplayName ?? GetMemberName();
+        name ?? Property.GetCustomAttribute<DisplayAttribute>(true)?.GetName() ??
+        Property.GetCustomAttribute<DisplayNameAttribute>(true)?.DisplayName ?? GetMemberName();
 
     /// <summary>
     ///     获取成员名称

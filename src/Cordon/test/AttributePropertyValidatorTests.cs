@@ -22,10 +22,6 @@ public class AttributePropertyValidatorTests
 
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Null(validator._errorMessageResourceAccessor());
-
-        var validator2 = new AttributePropertyValidator<PropertyClassTest, string?>(u => u.Name);
-        Assert.NotNull(validator2.Property);
-        Assert.Equal("Name", validator2.Property.Name);
     }
 
     [Fact]
@@ -139,24 +135,6 @@ public class AttributePropertyValidatorTests
         Assert.Null(validator.GetValue(new PropertyClassTest { Name = null }));
         Assert.Equal("Furion", validator.GetValue(new PropertyClassTest { Name = "Furion" }));
         Assert.Equal("OK", validator.GetValue(new PropertyClassTest { Name = "OK" }));
-
-        var validator2 = new AttributePropertyValidator<PropertyClassTest, string?>(u => u.Name);
-        Assert.Equal("Furion", validator2.GetValue(new PropertyClassTest { Name = "Furion" }));
-    }
-
-    [Fact]
-    public void ConvertExpression_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() =>
-            AttributePropertyValidator<PropertyClassTest, string?>.ConvertExpression(null!));
-
-    [Fact]
-    public void ConvertExpression_ReturnOK()
-    {
-        var expression = AttributePropertyValidator<PropertyClassTest, string?>.ConvertExpression(u => u.Name);
-        Assert.NotNull(expression);
-
-        var getter = expression.Compile();
-        Assert.Equal("Furion", getter(new PropertyClassTest { Name = "Furion" }));
     }
 
     [Fact]

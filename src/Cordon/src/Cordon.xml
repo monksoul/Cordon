@@ -373,8 +373,18 @@
                 枚举验证特性
             </summary>
         </member>
+        <member name="F:System.ComponentModel.DataAnnotations.EnumAttribute._supportFlags">
+            <summary>
+                是否支持 Flags 模式
+            </summary>
+        </member>
         <member name="F:System.ComponentModel.DataAnnotations.EnumAttribute._validator">
             <inheritdoc cref="T:Cordon.EnumValidator" />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.#ctor">
+            <summary>
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EnumAttribute" />
+            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.#ctor(System.Type)">
             <summary>
@@ -392,7 +402,7 @@
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.IsValid(System.Object)">
+        <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.IsValid(System.Object,System.ComponentModel.DataAnnotations.ValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.FormatErrorMessage(System.String)">
@@ -404,6 +414,17 @@
             </summary>
             <returns>
                 <see cref="T:System.String" />
+            </returns>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.GetMemberType(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+                从 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" /> 推断成员类型
+            </summary>
+            <param name="validationContext">
+                <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
+            </param>
+            <returns>
+                <see cref="T:System.Type" />
             </returns>
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.EqualToAttribute">
@@ -3600,6 +3621,17 @@
                 <see cref="T:System.Collections.Generic.IEnumerable`1" />
             </returns>
         </member>
+        <member name="M:Cordon.ValidationExtensions.AsObjectSelector``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
+            <summary>
+                将强类型的属性选择表达式（如 <c>x => x.Age</c>）转换为返回 <see cref="T:System.Object" /> 的通用表达式
+            </summary>
+            <param name="selector">属性选择器</param>
+            <typeparam name="T">对象类型</typeparam>
+            <typeparam name="TProperty">属性类型</typeparam>
+            <returns>
+                <see cref="T:System.Linq.Expressions.Expression`1" />
+            </returns>
+        </member>
         <member name="T:Cordon.ValidatorBaseExtensions">
             <summary>
                 <see cref="T:Cordon.ValidatorBase" /> 扩展类
@@ -4535,7 +4567,7 @@
             <inheritdoc cref="T:Cordon.PropertyValidator`3" />
         </member>
         <member name="F:Cordon.PropertyValidator`3._attributeValidator">
-            <inheritdoc cref="T:Cordon.AttributePropertyValidator`2" />
+            <inheritdoc cref="T:Cordon.AttributePropertyValidator`1" />
         </member>
         <member name="F:Cordon.PropertyValidator`3._objectValidator">
             <inheritdoc cref="T:Cordon.ObjectValidator`1" />
@@ -4903,7 +4935,7 @@
             <summary>
                 添加比较两个属性验证器
             </summary>
-            <param name="selector">属性选择器</param>
+            <param name="propertySelector">其他属性选择器</param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -6318,6 +6350,28 @@
                 <see cref="T:Cordon.ColorValueValidator" />
             </returns>
         </member>
+        <member name="M:Cordon.Validators.Compare``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}},System.Linq.Expressions.Expression{System.Func{``0,System.Object}})">
+            <summary>
+                创建比较两个属性验证器
+            </summary>
+            <param name="propertySelector">属性选择器</param>
+            <param name="otherPropertySelector">其他属性选择器</param>
+            <typeparam name="T">对象类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.CompareValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.Compare``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}},System.String)">
+            <summary>
+                创建比较两个属性验证器
+            </summary>
+            <param name="propertySelector">属性选择器</param>
+            <param name="otherPropertyName">其他属性的名称</param>
+            <typeparam name="T">对象类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.CompareValidator`1" />
+            </returns>
+        </member>
         <member name="M:Cordon.Validators.Composite``1(Cordon.ValidatorBase[],Cordon.CompositeMode)">
             <summary>
                 创建组合验证器
@@ -6844,17 +6898,6 @@
                 <see cref="T:Cordon.AttributePropertyValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.AttributeProperty``2(System.Linq.Expressions.Expression{System.Func{``0,``1}})">
-            <summary>
-                创建属性验证特性验证器
-            </summary>
-            <param name="selector">属性选择器</param>
-            <typeparam name="T">对象类型</typeparam>
-            <typeparam name="TProperty">属性类型</typeparam>
-            <returns>
-                <see cref="T:Cordon.AttributePropertyValidator`2" />
-            </returns>
-        </member>
         <member name="M:Cordon.Validators.Range(System.Int32,System.Int32,System.Action{Cordon.RangeValidator})">
             <summary>
                 创建指定数值范围约束验证器
@@ -7200,37 +7243,6 @@
             </param>
             <returns>
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationContext" />
-            </returns>
-        </member>
-        <member name="T:Cordon.AttributePropertyValidator`2">
-            <summary>
-                属性验证特性验证器
-            </summary>
-            <typeparam name="T">对象类型</typeparam>
-            <typeparam name="TProperty">属性类型</typeparam>
-        </member>
-        <member name="M:Cordon.AttributePropertyValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}})">
-            <summary>
-                <inheritdoc cref="T:Cordon.AttributePropertyValidator`2" />
-            </summary>
-            <param name="selector">属性选择器</param>
-        </member>
-        <member name="M:Cordon.AttributePropertyValidator`2.ConvertExpression(System.Linq.Expressions.Expression{System.Func{`0,`1}})">
-            <summary>
-                将属性表达式转换为 <![CDATA[Func<T, object?>]]> 类型
-            </summary>
-            <param name="selector">属性选择器</param>
-            <returns>
-                <see cref="T:System.Linq.Expressions.Expression`1" />
-            </returns>
-        </member>
-        <member name="M:Cordon.AttributePropertyValidator`2.GetValue(`0)">
-            <summary>
-                获取属性值
-            </summary>
-            <param name="instance">对象</param>
-            <returns>
-                <typeparamref name="TProperty" />
             </returns>
         </member>
         <member name="T:Cordon.AttributePropertyValidator`1">
@@ -7714,54 +7726,53 @@
             </code>
             </remarks>
         </member>
-        <member name="T:Cordon.CompareValidator`2">
+        <member name="T:Cordon.CompareValidator`1">
             <summary>
                 比较两个属性验证器
             </summary>
             <typeparam name="T">对象类型</typeparam>
-            <typeparam name="TProperty">属性类型</typeparam>
         </member>
-        <member name="F:Cordon.CompareValidator`2._otherPropertyGetter">
+        <member name="F:Cordon.CompareValidator`1._otherPropertyGetter">
             <summary>
                 属性值访问器
             </summary>
         </member>
-        <member name="F:Cordon.CompareValidator`2._propertyGetter">
+        <member name="F:Cordon.CompareValidator`1._propertyGetter">
             <summary>
                 其他属性值访问器
             </summary>
         </member>
-        <member name="M:Cordon.CompareValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},System.String)">
+        <member name="M:Cordon.CompareValidator`1.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Object}},System.String)">
             <summary>
-                <inheritdoc cref="T:Cordon.CompareValidator`2" />
+                <inheritdoc cref="T:Cordon.CompareValidator`1" />
             </summary>
             <param name="propertySelector">属性选择器</param>
             <param name="otherPropertyName">其他属性的名称</param>
         </member>
-        <member name="M:Cordon.CompareValidator`2.#ctor(System.Linq.Expressions.Expression{System.Func{`0,`1}},System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
+        <member name="M:Cordon.CompareValidator`1.#ctor(System.Linq.Expressions.Expression{System.Func{`0,System.Object}},System.Linq.Expressions.Expression{System.Func{`0,System.Object}})">
             <summary>
-                <inheritdoc cref="T:Cordon.CompareValidator`2" />
+                <inheritdoc cref="T:Cordon.CompareValidator`1" />
             </summary>
             <param name="propertySelector">属性选择器</param>
             <param name="otherPropertySelector">其他属性选择器</param>
         </member>
-        <member name="P:Cordon.CompareValidator`2.Property">
+        <member name="P:Cordon.CompareValidator`1.Property">
             <summary>
                 <inheritdoc cref="T:System.Reflection.PropertyInfo" />
             </summary>
         </member>
-        <member name="P:Cordon.CompareValidator`2.OtherProperty">
+        <member name="P:Cordon.CompareValidator`1.OtherProperty">
             <summary>
                 <inheritdoc cref="T:System.Reflection.PropertyInfo" />
             </summary>
         </member>
-        <member name="M:Cordon.CompareValidator`2.IsValid(`0,Cordon.ValidationContext{`0})">
+        <member name="M:Cordon.CompareValidator`1.IsValid(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.CompareValidator`2.FormatErrorMessage(System.String)">
+        <member name="M:Cordon.CompareValidator`1.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.CompareValidator`2.GetDisplayNameForProperty(System.Reflection.PropertyInfo)">
+        <member name="M:Cordon.CompareValidator`1.GetDisplayNameForProperty(System.Reflection.PropertyInfo)">
             <summary>
                 获取属性显示名称
             </summary>
@@ -7772,7 +7783,7 @@
                 <see cref="T:System.String" />
             </returns>
         </member>
-        <member name="M:Cordon.CompareValidator`2.CreatePropertySelector(System.String)">
+        <member name="M:Cordon.CompareValidator`1.CreatePropertySelector(System.String)">
             <summary>
                 为指定属性创建属性选择器表达式
             </summary>
@@ -8517,18 +8528,18 @@
                                     ○ 7th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 8th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [12].<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 9th capture group.<br/>
@@ -8541,10 +8552,10 @@
                                     ○ 12th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ Match a sequence of expressions.<br/>
@@ -8558,13 +8569,13 @@
                                     ○ 15th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '2'.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 16th capture group.<br/>
                                     ○ 17th capture group.<br/>
@@ -8577,13 +8588,13 @@
                                                 ○ 20th capture group.<br/>
                                                     ○ Match with 3 alternative expressions.<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match a character in the set [13579].<br/>
                                                             ○ Match a character in the set [26].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match a character in the set [2468].<br/>
                                                             ○ Match a character in the set [048].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match an empty string.<br/>
+                                                            ○ Match '0'.<br/>
                                                             ○ Match a character in the set [48].<br/>
                                             ○ 21st capture group.<br/>
                                                 ○ Match the string "2000".<br/>
@@ -8598,18 +8609,18 @@
                                     ○ 26th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 27th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [12].<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 28th capture group.<br/>
@@ -8618,10 +8629,10 @@
                                     ○ 30th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ 31st capture group.<br/>
@@ -8631,25 +8642,25 @@
                                     ○ 33rd capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '1'.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '2'.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 34th capture group.<br/>
                                     ○ 35th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [13579].<br/>
                                                 ○ Match a character in the set [26].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match a character in the set [2468].<br/>
                                                 ○ Match a character in the set [048].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match an empty string.<br/>
+                                                ○ Match '0'.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                     ○ Match the string "0229".<br/>
                         ○ Match a Unicode digit exactly 2 times.<br/>
@@ -9231,25 +9242,25 @@
             ○ Match '1'.<br/>
             ○ Match with 7 alternative expressions.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '3'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '4'.<br/>
                     ○ Match a character in the set [579].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '5'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '6'.<br/>
                     ○ Match a character in the set [6-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '7'.<br/>
                     ○ Match a character in the set [0-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '8'.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match an empty string.<br/>
+                    ○ Match '9'.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
             ○ Match a Unicode digit exactly 8 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -9279,31 +9290,31 @@
             ○ 1st capture group.<br/>
                 ○ Match with 9 alternative expressions.<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '0'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '1'.<br/>
                         ○ Match a character in the set [0-356].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '2'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '3'.<br/>
                         ○ Match a character in the set [0-6].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '4'.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '5'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '6'.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '7'.<br/>
                         ○ Match a character in the set [0-5].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match an empty string.<br/>
+                        ○ Match '8'.<br/>
                         ○ Match a character in the set [013-6].<br/>
             ○ Match a Unicode digit exactly 4 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -10373,6 +10384,16 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

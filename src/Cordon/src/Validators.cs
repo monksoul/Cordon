@@ -154,6 +154,30 @@ public static class Validators
     public static ColorValueValidator ColorValue(bool fullMode = false) => new() { FullMode = fullMode };
 
     /// <summary>
+    ///     创建比较两个属性验证器
+    /// </summary>
+    /// <param name="propertySelector">属性选择器</param>
+    /// <param name="otherPropertySelector">其他属性选择器</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="CompareValidator{T}" />
+    /// </returns>
+    public static CompareValidator<T> Compare<T>(Expression<Func<T, object?>> propertySelector,
+        Expression<Func<T, object?>> otherPropertySelector) => new(propertySelector, otherPropertySelector);
+
+    /// <summary>
+    ///     创建比较两个属性验证器
+    /// </summary>
+    /// <param name="propertySelector">属性选择器</param>
+    /// <param name="otherPropertyName">其他属性的名称</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="CompareValidator{T}" />
+    /// </returns>
+    public static CompareValidator<T> Compare<T>(Expression<Func<T, object?>> propertySelector,
+        string otherPropertyName) => new(propertySelector, otherPropertyName);
+
+    /// <summary>
     ///     创建组合验证器
     /// </summary>
     /// <param name="validators">验证器列表</param>
@@ -753,19 +777,6 @@ public static class Validators
     /// </returns>
     public static AttributePropertyValidator<T> AttributeProperty<T>(Expression<Func<T, object?>> selector)
         where T : class => new(selector);
-
-    /// <summary>
-    ///     创建属性验证特性验证器
-    /// </summary>
-    /// <param name="selector">属性选择器</param>
-    /// <typeparam name="T">对象类型</typeparam>
-    /// <typeparam name="TProperty">属性类型</typeparam>
-    /// <returns>
-    ///     <see cref="AttributePropertyValidator{T,TProperty}" />
-    /// </returns>
-    public static AttributePropertyValidator<T, TProperty> AttributeProperty<T, TProperty>(
-        Expression<Func<T, TProperty>> selector) where T : class =>
-        new(selector);
 
     /// <summary>
     ///     创建指定数值范围约束验证器

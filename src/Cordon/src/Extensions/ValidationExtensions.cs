@@ -194,4 +194,23 @@ public static class ValidationExtensions
 
         return validator.ToResults(validationContext);
     }
+
+    /// <summary>
+    ///     将强类型的属性选择表达式（如 <c>x => x.Age</c>）转换为返回 <see cref="object" /> 的通用表达式
+    /// </summary>
+    /// <param name="selector">属性选择器</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <typeparam name="TProperty">属性类型</typeparam>
+    /// <returns>
+    ///     <see cref="Expression{TDelegate}" />
+    /// </returns>
+    internal static Expression<Func<T, object?>> AsObjectSelector<T, TProperty>(
+        this Expression<Func<T, TProperty>> selector)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(selector);
+
+        return Expression.Lambda<Func<T, object?>>(Expression.Convert(selector.Body, typeof(object)),
+            selector.Parameters);
+    }
 }

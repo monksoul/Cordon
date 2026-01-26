@@ -127,6 +127,18 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void Compare_ReturnOK()
+    {
+        var validator = Validators.Compare<ObjectModel>(u => u.Name, u => u.OtherName);
+        Assert.NotNull(validator.Property);
+        Assert.NotNull(validator.OtherProperty);
+
+        var validator2 = Validators.Compare<ObjectModel>(u => u.Name, nameof(ObjectModel.OtherName));
+        Assert.NotNull(validator2.Property);
+        Assert.NotNull(validator2.OtherProperty);
+    }
+
+    [Fact]
     public void Composite_ReturnOK()
     {
         var validator = Validators.Composite<string>(u => u.ChineseName().AllowedValues("百签", "百小僧"));
@@ -545,9 +557,6 @@ public class ValidatorsTests
     {
         var validator = Validators.AttributeProperty<ObjectModel>(u => u.Name);
         Assert.NotNull(validator.Property);
-
-        var validator2 = Validators.AttributeProperty<ObjectModel, string?>(u => u.Name);
-        Assert.NotNull(validator2.Property);
     }
 
     [Fact]
@@ -867,6 +876,7 @@ public class ValidatorsTests
     public class ObjectModel
     {
         public string? Name { get; set; }
+        public string? OtherName { get; set; }
     }
 
     public static class CustomValidators

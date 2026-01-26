@@ -28,8 +28,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     IPropertyValidator<T>
     where TSelf : PropertyValidator<T, TProperty, TSelf>
 {
-    /// <inheritdoc cref="AttributePropertyValidator{T,TProperty}" />
-    internal readonly AttributePropertyValidator<T, TProperty> _attributeValidator;
+    /// <inheritdoc cref="AttributePropertyValidator{T}" />
+    internal readonly AttributePropertyValidator<T> _attributeValidator;
 
     /// <inheritdoc cref="ObjectValidator{T}" />
     internal readonly ObjectValidator<T> _objectValidator;
@@ -68,7 +68,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         _objectValidator = objectValidator;
 
         // 初始化 AttributePropertyValidator 实例
-        _attributeValidator = new AttributePropertyValidator<T, TProperty>(selector!);
+        _attributeValidator = new AttributePropertyValidator<T>(selector.AsObjectSelector());
     }
 
     /// <summary>
@@ -616,7 +616,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     /// <returns>
     ///     <typeparamref name="TProperty" />
     /// </returns>
-    internal TProperty GetValue(T instance) => _attributeValidator.GetValue(instance)!;
+    internal TProperty GetValue(T instance) => (TProperty)_attributeValidator.GetValue(instance)!;
 
     /// <summary>
     ///     获取用于执行验证的属性值
