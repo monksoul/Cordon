@@ -73,6 +73,10 @@ public class ObjectValidatorProxy<T> : ValidatorBase<T>, IValidatorInitializer, 
     public override void Validate(T? instance, ValidationContext<T> validationContext) =>
         _objectValidator.Validate(instance, validationContext.RuleSets);
 
+    /// <inheritdoc />
+    public override ValidatorResult<T> TryValidate(T? instance, ValidationContext<T> validationContext) =>
+        _objectValidator.TryValidate(instance, validationContext.RuleSets);
+
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
     internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
         _objectValidator.InitializeServiceProvider(serviceProvider);

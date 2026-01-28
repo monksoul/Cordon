@@ -136,6 +136,56 @@ public class CollectionValidatorTests
     }
 
     [Fact]
+    public void TryValidate_Invalid_Parameters()
+    {
+        var collectionValidator = new CollectionValidator<string?>(new ValueValidator<string?>());
+        Assert.Throws<ArgumentNullException>(() => collectionValidator.TryValidate(null!).ThrowIfInvalid());
+    }
+
+    [Fact]
+    public void TryValidate_ReturnOK()
+    {
+        var collectionValidator =
+            new CollectionValidator<string?>(new ValueValidator<string?>().Required().MinLength(2));
+
+        collectionValidator.TryValidate(["Furion", "Fur"]).ThrowIfInvalid();
+
+        var exception =
+            Assert.Throws<ValidationException>(() =>
+                collectionValidator.TryValidate(["Furion", null]).ThrowIfInvalid());
+        Assert.Equal("The String field is required.", exception.Message);
+        Assert.Equal("[1]", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => collectionValidator.TryValidate(["Furion", "F"]).ThrowIfInvalid());
+        Assert.Equal("The field String must be a string or array type with a minimum length of '2'.",
+            exception2.Message);
+        Assert.Equal("[1]", exception2.ValidationResult.MemberNames.First());
+    }
+
+    [Fact]
+    public void TryValidate_WithMemberPath_ReturnOK()
+    {
+        var collectionValidator =
+            new CollectionValidator<string?>(new ValueValidator<string?>().Required().MinLength(2));
+        collectionValidator.RepairMemberPaths("Hobbies");
+
+        collectionValidator.TryValidate(["Furion", "Fur"]).ThrowIfInvalid();
+
+        var exception =
+            Assert.Throws<ValidationException>(() =>
+                collectionValidator.TryValidate(["Furion", null]).ThrowIfInvalid());
+        Assert.Equal("The String field is required.", exception.Message);
+        Assert.Equal("Hobbies[1]", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => collectionValidator.TryValidate(["Furion", "F"]).ThrowIfInvalid());
+        Assert.Equal("The field String must be a string or array type with a minimum length of '2'.",
+            exception2.Message);
+        Assert.Equal("Hobbies[1]", exception2.ValidationResult.MemberNames.First());
+    }
+
+    [Fact]
     public void Where_ReturnOK()
     {
         var collectionValidator = new CollectionValidator<string?>(new ValueValidator<string?>());

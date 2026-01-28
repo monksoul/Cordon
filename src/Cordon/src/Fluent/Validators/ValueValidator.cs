@@ -227,6 +227,16 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <inheritdoc />
+    public ValidatorResult<T> TryValidate(T? instance, string?[]? ruleSets = null)
+    {
+        // 获取对象验证结果列表
+        var validationResults = GetValidationResults(instance, ruleSets);
+        var isValid = validationResults is null or { Count: 0 };
+
+        return new ValidatorResult<T>(isValid, validationResults, instance);
+    }
+
+    /// <inheritdoc />
     bool IObjectValidator.IsValid(object? instance, string?[]? ruleSets) => IsValid((T?)instance, ruleSets);
 
     /// <inheritdoc />
@@ -235,6 +245,10 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
 
     /// <inheritdoc />
     void IObjectValidator.Validate(object? instance, string?[]? ruleSets) => Validate((T?)instance, ruleSets);
+
+    /// <inheritdoc />
+    ValidatorResult IObjectValidator.TryValidate(object? instance, string?[]? ruleSets) =>
+        TryValidate((T?)instance, ruleSets);
 
     /// <inheritdoc />
     public virtual List<ValidationResult> ToResults(ValidationContext validationContext,

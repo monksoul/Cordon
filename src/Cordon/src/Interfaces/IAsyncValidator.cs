@@ -36,11 +36,23 @@ public interface IAsyncValidator
     /// <summary>
     ///     执行验证
     /// </summary>
-    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
+    /// <remarks>验证失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="value">对象</param>
     /// <param name="validationContext">
     ///     <see cref="IValidationContext" />
     /// </param>
     /// <exception cref="ValidationException"></exception>
     Task ValidateAsync(object? value, IValidationContext? validationContext);
+
+    /// <summary>
+    ///     尝试执行验证
+    /// </summary>
+    /// <param name="value">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="IValidationContext" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="ValidatorResult" />
+    /// </returns>
+    Task<ValidatorResult> TryValidateAsync(object? value, IValidationContext? validationContext);
 }

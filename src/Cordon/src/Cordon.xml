@@ -3504,7 +3504,7 @@
             <summary>
                 执行验证
             </summary>
-            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <remarks>验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="validators"><see cref="T:Cordon.IObjectValidator`1" /> 集合</param>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
@@ -3668,6 +3668,17 @@
                 <typeparamref name="TValidator" />
             </returns>
         </member>
+        <member name="T:Cordon.ValidatorResultExtensions">
+            <summary>
+                <see cref="T:Cordon.ValidatorResult" /> 扩展类
+            </summary>
+        </member>
+        <member name="M:Cordon.ValidatorResultExtensions.ThrowIfInvalid(System.Collections.Generic.List{Cordon.ValidatorResult})">
+            <summary>
+                验证验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常
+            </summary>
+            <param name="validatorResults"><see cref="T:Cordon.ValidatorResult" />列表</param>
+        </member>
         <member name="T:Cordon.ValidateWithAttribute`1">
             <summary>
                 指定对象验证器验证特性
@@ -3755,10 +3766,20 @@
             <summary>
                 执行验证
             </summary>
-            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <remarks>验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
+        </member>
+        <member name="M:Cordon.IObjectValidator.TryValidate(System.Object,System.String[])">
+            <summary>
+                尝试执行验证
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:Cordon.ValidatorResult" />
+            </returns>
         </member>
         <member name="M:Cordon.IObjectValidator.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
             <summary>
@@ -3802,10 +3823,20 @@
             <summary>
                 执行验证
             </summary>
-            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <remarks>验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
+        </member>
+        <member name="M:Cordon.IObjectValidator`1.TryValidate(`0,System.String[])">
+            <summary>
+                尝试执行验证
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:Cordon.ValidatorResult`1" />
+            </returns>
         </member>
         <member name="T:Cordon.IPropertyValidator`1">
             <summary>
@@ -3922,6 +3953,9 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectValidatorProxy`1.Validate(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ObjectValidatorProxy`1.TryValidate(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectValidatorProxy`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
@@ -4091,6 +4125,9 @@
         <member name="M:Cordon.CollectionValidator`1.Validate(System.Collections.Generic.IEnumerable{`0},System.String[])">
             <inheritdoc />
         </member>
+        <member name="M:Cordon.CollectionValidator`1.TryValidate(System.Collections.Generic.IEnumerable{`0},System.String[])">
+            <inheritdoc />
+        </member>
         <member name="M:Cordon.CollectionValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
@@ -4106,6 +4143,9 @@
         <member name="M:Cordon.CollectionValidator`1.Cordon#IObjectValidator#Validate(System.Object,System.String[])">
             <inheritdoc />
         </member>
+        <member name="M:Cordon.CollectionValidator`1.Cordon#IObjectValidator#TryValidate(System.Object,System.String[])">
+            <inheritdoc />
+        </member>
         <member name="M:Cordon.CollectionValidator`1.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
             <inheritdoc />
         </member>
@@ -4116,6 +4156,9 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.CollectionValidator`1.Validate(System.Collections.Generic.IEnumerable{`0},Cordon.ValidationContext{System.Collections.Generic.IEnumerable{`0}})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.CollectionValidator`1.TryValidate(System.Collections.Generic.IEnumerable{`0},Cordon.ValidationContext{System.Collections.Generic.IEnumerable{`0}})">
             <inheritdoc />
         </member>
         <member name="M:Cordon.CollectionValidator`1.Where(System.Func{`0,System.Boolean})">
@@ -4250,6 +4293,9 @@
         <member name="M:Cordon.ObjectValidator`1.Validate(`0,System.String[])">
             <inheritdoc />
         </member>
+        <member name="M:Cordon.ObjectValidator`1.TryValidate(`0,System.String[])">
+            <inheritdoc />
+        </member>
         <member name="M:Cordon.ObjectValidator`1.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc />
         </member>
@@ -4260,6 +4306,9 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectValidator`1.Cordon#IObjectValidator#Validate(System.Object,System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ObjectValidator`1.Cordon#IObjectValidator#TryValidate(System.Object,System.String[])">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectValidator`1.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
@@ -4278,6 +4327,9 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectValidator`1.Validate(`0,Cordon.ValidationContext{`0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ObjectValidator`1.TryValidate(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ObjectValidator`1.RuleFor``1(System.Linq.Expressions.Expression{System.Func{`0,``0}},System.Action{Cordon.PropertyValidator{`0,``0}})">
@@ -4653,6 +4705,9 @@
         <member name="M:Cordon.PropertyValidator`3.Validate(`0,System.String[])">
             <inheritdoc />
         </member>
+        <member name="M:Cordon.PropertyValidator`3.TryValidate(`0,System.String[])">
+            <inheritdoc />
+        </member>
         <member name="M:Cordon.PropertyValidator`3.Cordon#IObjectValidator#IsValid(System.Object,System.String[])">
             <inheritdoc />
         </member>
@@ -4660,6 +4715,9 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.PropertyValidator`3.Cordon#IObjectValidator#Validate(System.Object,System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.PropertyValidator`3.Cordon#IObjectValidator#TryValidate(System.Object,System.String[])">
             <inheritdoc />
         </member>
         <member name="M:Cordon.PropertyValidator`3.Cordon#IPropertyValidatorCloneable{T}#Clone(Cordon.ObjectValidator{`0})">
@@ -5247,6 +5305,9 @@
         <member name="M:Cordon.ValueValidator`1.Validate(`0,System.String[])">
             <inheritdoc />
         </member>
+        <member name="M:Cordon.ValueValidator`1.TryValidate(`0,System.String[])">
+            <inheritdoc />
+        </member>
         <member name="M:Cordon.ValueValidator`1.Cordon#IObjectValidator#IsValid(System.Object,System.String[])">
             <inheritdoc />
         </member>
@@ -5254,6 +5315,9 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValueValidator`1.Cordon#IObjectValidator#Validate(System.Object,System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ValueValidator`1.Cordon#IObjectValidator#TryValidate(System.Object,System.String[])">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValueValidator`1.ToResults(System.ComponentModel.DataAnnotations.ValidationContext,System.Boolean)">
@@ -5504,12 +5568,24 @@
             <summary>
                 执行验证
             </summary>
-            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <remarks>验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="value">对象</param>
             <param name="validationContext">
                 <see cref="T:Cordon.IValidationContext" />
             </param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
+        </member>
+        <member name="M:Cordon.IAsyncValidator.TryValidateAsync(System.Object,Cordon.IValidationContext)">
+            <summary>
+                尝试执行验证
+            </summary>
+            <param name="value">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
+            <returns>
+                <see cref="T:Cordon.ValidatorResult" />
+            </returns>
         </member>
         <member name="T:Cordon.IHighPriorityValidator">
             <summary>
@@ -5565,6 +5641,59 @@
             <summary>
                 已更改属性的值
             </summary>
+        </member>
+        <member name="T:Cordon.ValidatorResult`1">
+            <inheritdoc cref="T:Cordon.ValidatorResult" />
+            <typeparam name="T">对象类型</typeparam>
+        </member>
+        <member name="M:Cordon.ValidatorResult`1.#ctor(System.Boolean,System.Collections.Generic.List{System.ComponentModel.DataAnnotations.ValidationResult},`0)">
+            <summary>
+                <inheritdoc cref="T:Cordon.ValidatorResult`1" />
+            </summary>
+            <param name="isValid">验证是否通过</param>
+            <param name="validationResults">验证结果列表</param>
+            <param name="instance">验证的对象</param>
+        </member>
+        <member name="P:Cordon.ValidatorResult`1.Instance">
+            <summary>
+                验证的对象
+            </summary>
+        </member>
+        <member name="T:Cordon.ValidatorResult">
+            <summary>
+                验证器执行结果
+            </summary>
+        </member>
+        <member name="M:Cordon.ValidatorResult.#ctor(System.Boolean,System.Collections.Generic.List{System.ComponentModel.DataAnnotations.ValidationResult},System.Object)">
+            <summary>
+                <inheritdoc cref="T:Cordon.ValidatorResult" />
+            </summary>
+            <param name="isValid">验证是否通过</param>
+            <param name="validationResults">验证结果列表</param>
+            <param name="instance">验证的对象</param>
+        </member>
+        <member name="P:Cordon.ValidatorResult.IsValid">
+            <summary>
+                验证是否通过
+            </summary>
+        </member>
+        <member name="P:Cordon.ValidatorResult.ValidationResults">
+            <summary>
+                验证结果列表
+            </summary>
+        </member>
+        <member name="P:Cordon.ValidatorResult.Instance">
+            <summary>
+                验证的对象
+            </summary>
+        </member>
+        <member name="M:Cordon.ValidatorResult.ThrowIfInvalid">
+            <summary>
+                验证验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常
+            </summary>
+            <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException">
+                当 <see cref="P:Cordon.ValidatorResult.IsValid" /> 为 <see langword="false" /> 时。
+            </exception>
         </member>
         <member name="T:Cordon.ValidatorOptions">
             <summary>
@@ -6118,10 +6247,20 @@
             <summary>
                 执行验证
             </summary>
-            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <remarks>验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="instance">对象</param>
             <param name="ruleSets">规则集</param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
+        </member>
+        <member name="M:Cordon.IValidationService.TryValidate(System.Object,System.String[])">
+            <summary>
+                尝试执行验证
+            </summary>
+            <param name="instance">对象</param>
+            <param name="ruleSets">规则集</param>
+            <returns>
+                <see cref="T:Cordon.ValidatorResult" />
+            </returns>
         </member>
         <member name="M:Cordon.IValidationService.IsValid(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
             <summary>
@@ -6147,10 +6286,18 @@
             <summary>
                 验证多个对象
             </summary>
-            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <remarks>验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="instances">对象集合</param>
             <param name="ruleSets">规则集</param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
+        </member>
+        <member name="M:Cordon.IValidationService.TryValidate(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
+            <summary>
+                尝试验证多个对象
+            </summary>
+            <param name="instances">对象集合</param>
+            <param name="ruleSets">规则集</param>
+            <returns><see cref="T:Cordon.ValidatorResult" />列表</returns>
         </member>
         <member name="T:Cordon.ValidationService">
             <inheritdoc />
@@ -6188,6 +6335,9 @@
         <member name="M:Cordon.ValidationService.Validate(System.Object,System.String[])">
             <inheritdoc />
         </member>
+        <member name="M:Cordon.ValidationService.TryValidate(System.Object,System.String[])">
+            <inheritdoc />
+        </member>
         <member name="M:Cordon.ValidationService.IsValid(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
             <inheritdoc />
         </member>
@@ -6195,6 +6345,9 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValidationService.Validate(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ValidationService.TryValidate(System.Collections.Generic.IEnumerable{System.Object},System.String[])">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValidationService.CreateValidationContext(System.Object,System.String[])">
@@ -9885,12 +10038,24 @@
             <summary>
                 执行验证
             </summary>
-            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <remarks>验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="instance">对象</param>
             <param name="validationContext">
                 <see cref="T:Cordon.ValidationContext`1" />
             </param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
+        </member>
+        <member name="M:Cordon.ValidatorBase`1.TryValidate(`0,Cordon.ValidationContext{`0})">
+            <summary>
+                尝试执行验证
+            </summary>
+            <param name="instance">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
+            <returns>
+                <see cref="T:Cordon.ValidatorResult`1" />
+            </returns>
         </member>
         <member name="M:Cordon.ValidatorBase`1.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
@@ -9899,6 +10064,9 @@
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValidatorBase`1.Validate(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.ValidatorBase`1.TryValidate(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
         <member name="M:Cordon.ValidatorBase`1.ConvertValue(System.Object)">
@@ -10070,7 +10238,7 @@
             <summary>
                 执行验证
             </summary>
-            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <remarks>验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="value">对象</param>
             <param name="name">显示名称</param>
             <param name="memberNames">成员名称列表</param>
@@ -10080,12 +10248,35 @@
             <summary>
                 执行验证
             </summary>
-            <remarks>失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
+            <remarks>验证失败时抛出 <see cref="T:System.ComponentModel.DataAnnotations.ValidationException" /> 异常。</remarks>
             <param name="value">对象</param>
             <param name="validationContext">
                 <see cref="T:Cordon.IValidationContext" />
             </param>
             <exception cref="T:System.ComponentModel.DataAnnotations.ValidationException"></exception>
+        </member>
+        <member name="M:Cordon.ValidatorBase.TryValidate(System.Object,System.String,System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+                尝试执行验证
+            </summary>
+            <param name="value">对象</param>
+            <param name="name">显示名称</param>
+            <param name="memberNames">成员名称列表</param>
+            <returns>
+                <see cref="T:Cordon.ValidatorResult" />
+            </returns>
+        </member>
+        <member name="M:Cordon.ValidatorBase.TryValidate(System.Object,Cordon.IValidationContext)">
+            <summary>
+                尝试执行验证
+            </summary>
+            <param name="value">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.IValidationContext" />
+            </param>
+            <returns>
+                <see cref="T:Cordon.ValidatorResult" />
+            </returns>
         </member>
         <member name="M:Cordon.ValidatorBase.FormatErrorMessage(System.String)">
             <summary>

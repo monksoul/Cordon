@@ -48,7 +48,7 @@ public static class ObjectValidatorEnumerableExtensions
     /// <summary>
     ///     执行验证
     /// </summary>
-    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
+    /// <remarks>验证失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="validators"><see cref="IObjectValidator{T}" /> 集合</param>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>

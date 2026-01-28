@@ -37,11 +37,21 @@ public interface IValidationService
     /// <summary>
     ///     执行验证
     /// </summary>
-    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
+    /// <remarks>验证失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
     /// <exception cref="ValidationException"></exception>
     void Validate(object? instance, string?[]? ruleSets = null);
+
+    /// <summary>
+    ///     尝试执行验证
+    /// </summary>
+    /// <param name="instance">对象</param>
+    /// <param name="ruleSets">规则集</param>
+    /// <returns>
+    ///     <see cref="ValidatorResult" />
+    /// </returns>
+    ValidatorResult TryValidate(object? instance, string?[]? ruleSets = null);
 
     /// <summary>
     ///     检查多个对象合法性
@@ -66,9 +76,17 @@ public interface IValidationService
     /// <summary>
     ///     验证多个对象
     /// </summary>
-    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
+    /// <remarks>验证失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="instances">对象集合</param>
     /// <param name="ruleSets">规则集</param>
     /// <exception cref="ValidationException"></exception>
     void Validate(IEnumerable<object?> instances, string?[]? ruleSets = null);
+
+    /// <summary>
+    ///     尝试验证多个对象
+    /// </summary>
+    /// <param name="instances">对象集合</param>
+    /// <param name="ruleSets">规则集</param>
+    /// <returns><see cref="ValidatorResult" />列表</returns>
+    List<ValidatorResult> TryValidate(IEnumerable<object?> instances, string?[]? ruleSets = null);
 }

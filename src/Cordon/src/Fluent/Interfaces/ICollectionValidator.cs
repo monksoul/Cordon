@@ -8,4 +8,4 @@ namespace Cordon;
 ///     集合验证器服务
 /// </summary>
 /// <typeparam name="TElement">元素类型</typeparam>
-public interface ICollectionValidator<in TElement> : IObjectValidator<IEnumerable<TElement>>, IMemberPathRepairable;
+public interface ICollectionValidator<TElement> : IObjectValidator<IEnumerable<TElement>>, IMemberPathRepairable;

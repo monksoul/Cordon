@@ -263,6 +263,87 @@ public class ValidationServiceTests
     }
 
     [Fact]
+    public void TryValidate_Invalid_Parameters()
+    {
+        var services = new ServiceCollection();
+        using var serviceProvider = services.BuildServiceProvider();
+
+        var validationService = new ValidationService(serviceProvider);
+
+        Assert.Throws<ArgumentNullException>(() => validationService.TryValidate(null!));
+        Assert.Throws<ArgumentNullException>(() => validationService.TryValidate((object?)null));
+        Assert.Throws<ArgumentNullException>(() => validationService.TryValidate([null]));
+    }
+
+    [Fact]
+    public void TryValidate_ReturnOK()
+    {
+        var services = new ServiceCollection();
+        using var serviceProvider = services.BuildServiceProvider();
+
+        var validationService = new ValidationService(serviceProvider);
+
+        var exception =
+            Assert.Throws<ValidationException>(() => validationService.TryValidate(new ObjectModel()).ThrowIfInvalid());
+        Assert.Equal("The Name field is required.", exception.Message);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() =>
+                validationService.TryValidate(new ObjectModel { Name = "Furion" }).ThrowIfInvalid());
+        Assert.Equal("The SomeProperty field is required.", exception2.Message);
+
+        var exception3 = Assert.Throws<ValidationException>(() =>
+            validationService.TryValidate(new ObjectModel { Name = "Furion", SomeProperty = "百小僧" }).ThrowIfInvalid());
+        Assert.Equal("The SomeProperty field is not a valid e-mail address.",
+            exception3.Message);
+
+        validationService.TryValidate(new ObjectModel { Name = "Furion", SomeProperty = "monksoul@outlook.com" })
+            .ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithNoDI_ReturnOK()
+    {
+        var validationService = new ValidationService();
+
+        var exception =
+            Assert.Throws<ValidationException>(() => validationService.TryValidate(new ObjectModel()).ThrowIfInvalid());
+        Assert.Equal("The Name field is required.", exception.Message);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() =>
+                validationService.TryValidate(new ObjectModel { Name = "Furion" }).ThrowIfInvalid());
+        Assert.Equal("The SomeProperty field is required.", exception2.Message);
+
+        var exception3 = Assert.Throws<ValidationException>(() =>
+            validationService.TryValidate(new ObjectModel { Name = "Furion", SomeProperty = "百小僧" }).ThrowIfInvalid());
+        Assert.Equal("The SomeProperty field is not a valid e-mail address.",
+            exception3.Message);
+
+        validationService.TryValidate(new ObjectModel { Name = "Furion", SomeProperty = "monksoul@outlook.com" })
+            .ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithMany_ReturnOK()
+    {
+        var services = new ServiceCollection();
+        using var serviceProvider = services.BuildServiceProvider();
+
+        var validationService = new ValidationService(serviceProvider);
+
+        var exception =
+            Assert.Throws<ValidationException>(() =>
+                validationService.TryValidate([new ObjectModel(), new OtherModel()]).ThrowIfInvalid());
+        Assert.Equal("The Name field is required.", exception.Message);
+
+        validationService.TryValidate([
+            new ObjectModel { Name = "Furion", SomeProperty = "monksoul@outlook.com" },
+            new OtherModel { Name = "Furion" }
+        ]).ThrowIfInvalid();
+    }
+
+    [Fact]
     public void CreateValidationContext_Invalid_Parameters()
     {
         var services = new ServiceCollection();

@@ -725,6 +725,284 @@ public class PropertyValidatorTests
     }
 
     [Fact]
+    public void TryValidate_Invalid_Parameters()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
+
+        Assert.Throws<ArgumentNullException>(() => propertyValidator.TryValidate(null!).ThrowIfInvalid());
+    }
+
+    [Fact]
+    public void TryValidate_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3));
+
+        var exception =
+            Assert.Throws<ValidationException>(() => propertyValidator.TryValidate(new ObjectModel()).ThrowIfInvalid());
+        Assert.Equal("The FirstName field is required.", exception.Message);
+        Assert.Equal("FirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel { FirstName = "Fu" }).ThrowIfInvalid());
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.TryValidate(new ObjectModel { FirstName = "Furion" }).ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithRuleSet_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator) { RuleSets = ["rule"] }
+                .AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3));
+
+        propertyValidator.TryValidate(new ObjectModel()).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { FirstName = "Fu" }).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { FirstName = "Furion" }).ThrowIfInvalid();
+
+        var exception = Assert.Throws<ValidationException>(() =>
+            propertyValidator.TryValidate(new ObjectModel(), ["*"]).ThrowIfInvalid());
+        Assert.Equal("The FirstName field is required.", exception.Message);
+        Assert.Equal("FirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel { FirstName = "Fu" }, ["*"]).ThrowIfInvalid());
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.TryValidate(new ObjectModel { FirstName = "Furion" }).ThrowIfInvalid();
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel(), ["rule"]).ThrowIfInvalid());
+        Assert.Equal("The FirstName field is required.", exception3.Message);
+        Assert.Equal("FirstName", exception3.ValidationResult.MemberNames.First());
+
+        var exception4 = Assert.Throws<ValidationException>(() =>
+            propertyValidator.TryValidate(new ObjectModel { FirstName = "Fu" }, ["rule"]).ThrowIfInvalid());
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception4.Message);
+        Assert.Equal("FirstName", exception4.ValidationResult.MemberNames.First());
+
+        propertyValidator.TryValidate(new ObjectModel { FirstName = "Furion" }, ["rule"]).ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithSuppressAttributeValidation_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(2));
+
+        var exception =
+            Assert.Throws<ValidationException>(() => propertyValidator.TryValidate(new ObjectModel()).ThrowIfInvalid());
+        Assert.Equal("The Name field is required.", exception.Message);
+        Assert.Equal("Name", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel { Name = "Fu" }).ThrowIfInvalid());
+        Assert.Equal("The field Name must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("Name", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.TryValidate(new ObjectModel { Name = "Furion" }).ThrowIfInvalid();
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel(), ["*"]).ThrowIfInvalid());
+        Assert.Equal("The Name field is required.", exception3.Message);
+        Assert.Equal("Name", exception3.ValidationResult.MemberNames.First());
+
+        var exception4 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel { Name = "Fu" }, ["*"]).ThrowIfInvalid());
+        Assert.Equal("The field Name must be a string or array type with a minimum length of '3'.",
+            exception4.Message);
+        Assert.Equal("Name", exception4.ValidationResult.MemberNames.First());
+
+        propertyValidator.TryValidate(new ObjectModel { Name = "Furion" }).ThrowIfInvalid();
+
+        propertyValidator.TryValidate(new ObjectModel(), ["rule"]).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { Name = "Fu" }, ["rule"]).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { Name = "Furion" }, ["rule"]).ThrowIfInvalid();
+
+        propertyValidator.SkipAttributeValidation();
+
+        var exception5 =
+            Assert.Throws<ValidationException>(() => propertyValidator.TryValidate(new ObjectModel()).ThrowIfInvalid());
+        Assert.Equal("The Name field is required.", exception5.Message);
+        Assert.Equal("Name", exception5.ValidationResult.MemberNames.First());
+        propertyValidator.TryValidate(new ObjectModel { Name = "Fu" }).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { Name = "Furion" }).ThrowIfInvalid();
+
+        var exception6 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel(), ["*"]).ThrowIfInvalid());
+        Assert.Equal("The Name field is required.", exception6.Message);
+        Assert.Equal("Name", exception6.ValidationResult.MemberNames.First());
+        propertyValidator.TryValidate(new ObjectModel { Name = "Fu" }, ["*"]).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { Name = "Furion" }, ["*"]).ThrowIfInvalid();
+
+        propertyValidator.TryValidate(new ObjectModel(), ["rule"]).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { Name = "Fu" }, ["rule"]).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { Name = "Furion" }, ["rule"]).ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithDisplayName_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName");
+
+        var exception =
+            Assert.Throws<ValidationException>(() => propertyValidator.TryValidate(new ObjectModel()).ThrowIfInvalid());
+        Assert.Equal("The MyFirstName field is required.", exception.Message);
+        Assert.Equal("FirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel { FirstName = "Fu" }).ThrowIfInvalid());
+        Assert.Equal("The field MyFirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
+    }
+
+    [Fact]
+    public void TryValidate_WithName_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                new RequiredValidator(), new MinLengthValidator(3)).WithName("MyFirstName");
+
+        var exception =
+            Assert.Throws<ValidationException>(() => propertyValidator.TryValidate(new ObjectModel()).ThrowIfInvalid());
+        Assert.Equal("The MyFirstName field is required.", exception.Message);
+        Assert.Equal("MyFirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel { FirstName = "Fu" }).ThrowIfInvalid());
+        Assert.Equal("The field MyFirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("MyFirstName", exception2.ValidationResult.MemberNames.First());
+
+        var propertyValidator2 =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3)).WithName("MyFirstName")
+                .WithDisplayName("DisplayFirstName");
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator2.TryValidate(new ObjectModel()).ThrowIfInvalid());
+        Assert.Equal("The DisplayFirstName field is required.", exception3.Message);
+        Assert.Equal("MyFirstName", exception3.ValidationResult.MemberNames.First());
+
+        var exception4 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator2.TryValidate(new ObjectModel { FirstName = "Fu" }).ThrowIfInvalid());
+        Assert.Equal("The field DisplayFirstName must be a string or array type with a minimum length of '3'.",
+            exception4.Message);
+        Assert.Equal("MyFirstName", exception4.ValidationResult.MemberNames.First());
+    }
+
+    [Fact]
+    public void TryValidate_WithPropertyValidator_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator).SetValidator(
+                new SubModelValidator());
+
+        var exception =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel { Sub = new SubModel() }).ThrowIfInvalid());
+        Assert.Equal("The field Id must be greater than or equal to '3'.", exception.Message);
+        Assert.Equal("Sub.Id", exception.ValidationResult.MemberNames.First());
+
+        var exception2 = Assert.Throws<ValidationException>(() =>
+            propertyValidator.TryValidate(new ObjectModel { Sub = new SubModel { Id = 1 } }).ThrowIfInvalid());
+        Assert.Equal("The field Id must be greater than or equal to '3'.", exception2.Message);
+        Assert.Equal("Sub.Id", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.TryValidate(new ObjectModel { Sub = new SubModel { Id = 3 } }).ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithPropertyValidator_WithRuleSet_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, SubModel>(u => u.Sub, objectValidator) { RuleSets = ["login"] }
+                .SetValidator(new SubModelValidator());
+
+        propertyValidator.TryValidate(new ObjectModel { Sub = new SubModel() }).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { Sub = new SubModel { Id = 1 } }).ThrowIfInvalid();
+        propertyValidator.TryValidate(new ObjectModel { Sub = new SubModel { Id = 3 } }).ThrowIfInvalid();
+
+        var exception =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel { Sub = new SubModel() }, ["login"]).ThrowIfInvalid());
+        Assert.Equal("The field Id must be greater than or equal to '3'.", exception.Message);
+        Assert.Equal("Sub.Id", exception.ValidationResult.MemberNames.First());
+
+        var exception2 = Assert.Throws<ValidationException>(() =>
+            propertyValidator.TryValidate(new ObjectModel { Sub = new SubModel { Id = 1 } }, ["login"])
+                .ThrowIfInvalid());
+        Assert.Equal("The field Id must be greater than or equal to '3'.", exception2.Message);
+        Assert.Equal("Sub.Id", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.TryValidate(new ObjectModel { Sub = new SubModel { Id = 3 } }, ["login"]).ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithMode_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>();
+        var propertyValidator =
+            new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
+                    new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).CustomOnly()
+                .UseMode(CompositeMode.FailFast);
+
+        var exception =
+            Assert.Throws<ValidationException>(() => propertyValidator.TryValidate(new ObjectModel()).ThrowIfInvalid());
+        Assert.Equal("The FirstName field is required.", exception.Message);
+        Assert.Equal("FirstName", exception.ValidationResult.MemberNames.First());
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.TryValidate(new ObjectModel { FirstName = "Fu" }).ThrowIfInvalid());
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal("FirstName", exception2.ValidationResult.MemberNames.First());
+
+        propertyValidator.TryValidate(new ObjectModel { FirstName = "百小僧" }).ThrowIfInvalid();
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() =>
+                propertyValidator.UseMode(CompositeMode.All).TryValidate(new ObjectModel { FirstName = "Fu" })
+                    .ThrowIfInvalid());
+        Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
+            exception3.Message);
+        Assert.Equal("FirstName", exception3.ValidationResult.MemberNames.First());
+    }
+
+    [Fact]
     public void AddValidators_Invalid_Parameters()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();

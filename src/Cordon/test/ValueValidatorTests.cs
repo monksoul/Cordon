@@ -407,6 +407,152 @@ public class ValueValidatorTests
     }
 
     [Fact]
+    public void TryValidate_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3));
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.TryValidate(null).ThrowIfInvalid());
+        Assert.Equal("The Object field is required.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate("Fu").ThrowIfInvalid());
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Empty(exception2.ValidationResult.MemberNames);
+
+        valueValidator.TryValidate("Fur").ThrowIfInvalid();
+        valueValidator.TryValidate("Furion").ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithRuleSet_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3)).RuleSet("new", v =>
+        {
+            v.Required().MinLength(5);
+        });
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.TryValidate(null).ThrowIfInvalid());
+        Assert.Equal("The Object field is required.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate("Fu").ThrowIfInvalid());
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Empty(exception2.ValidationResult.MemberNames);
+
+        valueValidator.TryValidate("Fur").ThrowIfInvalid();
+        valueValidator.TryValidate("Furion").ThrowIfInvalid();
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate(null, ["new"]).ThrowIfInvalid());
+        Assert.Equal("The Object field is required.", exception3.Message);
+        Assert.Empty(exception3.ValidationResult.MemberNames);
+
+        var exception4 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate("Fu", ["new"]).ThrowIfInvalid());
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '5'.",
+            exception4.Message);
+        Assert.Empty(exception4.ValidationResult.MemberNames);
+
+        var exception5 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate("Fur", ["new"]).ThrowIfInvalid());
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '5'.",
+            exception5.Message);
+        Assert.Empty(exception5.ValidationResult.MemberNames);
+
+        valueValidator.TryValidate("Furion", ["new"]).ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithDisplayName_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName");
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.TryValidate(null).ThrowIfInvalid());
+        Assert.Equal("The MyFirstName field is required.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate("Fu").ThrowIfInvalid());
+        Assert.Equal("The field MyFirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Empty(exception2.ValidationResult.MemberNames);
+    }
+
+    [Fact]
+    public void TryValidate_WithDisplayName_WithName_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3)).WithDisplayName("MyFirstName").WithName("MName");
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.TryValidate(null).ThrowIfInvalid());
+        Assert.Equal("The MyFirstName field is required.", exception.Message);
+        Assert.Equal(["MName"], exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate("Fu").ThrowIfInvalid());
+        Assert.Equal("The field MyFirstName must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Equal(["MName"], exception2.ValidationResult.MemberNames);
+    }
+
+    [Fact]
+    public void TryValidate_WithValueValidator_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string>().Required().MinLength(3)
+            .SetValidator(new StringValueValidator());
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.TryValidate(null).ThrowIfInvalid());
+        Assert.Equal("The String field is required.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate("Fu").ThrowIfInvalid());
+        Assert.Equal("The field String must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Empty(exception2.ValidationResult.MemberNames);
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate("Fur").ThrowIfInvalid());
+        Assert.Equal("The field String cannot be equal to 'Fur'.", exception3.Message);
+        Assert.Empty(exception3.ValidationResult.MemberNames);
+
+        valueValidator.TryValidate("Furion").ThrowIfInvalid();
+    }
+
+    [Fact]
+    public void TryValidate_WithMode_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().AddValidators(
+            new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).UseMode(CompositeMode.FailFast);
+
+        var exception = Assert.Throws<ValidationException>(() => valueValidator.TryValidate(null).ThrowIfInvalid());
+        Assert.Equal("The Object field is required.", exception.Message);
+        Assert.Empty(exception.ValidationResult.MemberNames);
+
+        var exception2 =
+            Assert.Throws<ValidationException>(() => valueValidator.TryValidate("Fu").ThrowIfInvalid());
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '3'.",
+            exception2.Message);
+        Assert.Empty(exception2.ValidationResult.MemberNames);
+
+        valueValidator.TryValidate("百小僧").ThrowIfInvalid();
+
+        var exception3 =
+            Assert.Throws<ValidationException>(() =>
+                valueValidator.UseMode(CompositeMode.All).TryValidate("Fu").ThrowIfInvalid());
+        Assert.Equal("The field Object must be a string or array type with a minimum length of '3'.",
+            exception3.Message);
+        Assert.Empty(exception3.ValidationResult.MemberNames);
+    }
+
+    [Fact]
     public void AddValidator_Invalid_Parameters()
     {
         var valueValidator = new ValueValidator<string>();

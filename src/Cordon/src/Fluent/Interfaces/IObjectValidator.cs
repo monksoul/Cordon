@@ -32,11 +32,21 @@ public interface IObjectValidator : IValidatorInitializer, IDisposable
     /// <summary>
     ///     执行验证
     /// </summary>
-    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
+    /// <remarks>验证失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
     /// <exception cref="ValidationException"></exception>
     void Validate(object? instance, string?[]? ruleSets = null);
+
+    /// <summary>
+    ///     尝试执行验证
+    /// </summary>
+    /// <param name="instance">对象</param>
+    /// <param name="ruleSets">规则集</param>
+    /// <returns>
+    ///     <see cref="ValidatorResult" />
+    /// </returns>
+    ValidatorResult TryValidate(object? instance, string?[]? ruleSets = null);
 
     /// <summary>
     ///     获取对象验证结果列表
@@ -55,7 +65,7 @@ public interface IObjectValidator : IValidatorInitializer, IDisposable
 ///     <inheritdoc cref="IObjectValidator" />
 /// </summary>
 /// <typeparam name="T">对象类型</typeparam>
-public interface IObjectValidator<in T> : IObjectValidator
+public interface IObjectValidator<T> : IObjectValidator
 {
     /// <summary>
     ///     检查对象是否合法
@@ -80,9 +90,19 @@ public interface IObjectValidator<in T> : IObjectValidator
     /// <summary>
     ///     执行验证
     /// </summary>
-    /// <remarks>失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
+    /// <remarks>验证失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="instance">对象</param>
     /// <param name="ruleSets">规则集</param>
     /// <exception cref="ValidationException"></exception>
     void Validate(T? instance, string?[]? ruleSets = null);
+
+    /// <summary>
+    ///     尝试执行验证
+    /// </summary>
+    /// <param name="instance">对象</param>
+    /// <param name="ruleSets">规则集</param>
+    /// <returns>
+    ///     <see cref="ValidatorResult{T}" />
+    /// </returns>
+    ValidatorResult<T> TryValidate(T? instance, string?[]? ruleSets = null);
 }

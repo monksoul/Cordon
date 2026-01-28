@@ -134,6 +134,19 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
     }
 
     /// <inheritdoc />
+    public ValidatorResult<IEnumerable<TElement>> TryValidate(IEnumerable<TElement>? instance,
+        string?[]? ruleSets = null)
+    {
+        // 获取对象验证结果列表
+        // ReSharper disable once PossibleMultipleEnumeration
+        var validationResults = GetValidationResults(instance, ruleSets);
+        var isValid = validationResults is null or { Count: 0 };
+
+        // ReSharper disable once PossibleMultipleEnumeration
+        return new ValidatorResult<IEnumerable<TElement>>(isValid, validationResults, instance);
+    }
+
+    /// <inheritdoc />
     public virtual void InitializeServiceProvider(Func<Type, object?>? serviceProvider) =>
         _elementValidator.InitializeServiceProvider(serviceProvider);
 
@@ -155,6 +168,10 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
     /// <inheritdoc />
     void IObjectValidator.Validate(object? instance, string?[]? ruleSets) =>
         Validate((IEnumerable<TElement>?)instance, ruleSets);
+
+    /// <inheritdoc />
+    ValidatorResult IObjectValidator.TryValidate(object? instance, string?[]? ruleSets) =>
+        TryValidate((IEnumerable<TElement>?)instance, ruleSets);
 
     /// <inheritdoc />
     public List<ValidationResult> ToResults(ValidationContext validationContext, bool disposeAfterValidation = true)
@@ -225,6 +242,19 @@ public class CollectionValidator<TElement> : ValidatorBase<IEnumerable<TElement>
         }
 
         Validate(instance, validationContext.RuleSets);
+    }
+
+    /// <inheritdoc />
+    public override ValidatorResult<IEnumerable<TElement>> TryValidate(IEnumerable<TElement>? instance,
+        ValidationContext<IEnumerable<TElement>> validationContext)
+    {
+        // 检查是否是嵌套验证器
+        if (instance is null && IsNested)
+        {
+            return new ValidatorResult<IEnumerable<TElement>>(true, null, instance);
+        }
+
+        return TryValidate(instance, validationContext.RuleSets);
     }
 
     /// <summary>

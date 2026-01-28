@@ -84,6 +84,29 @@ public class ObjectValidatorProxyTests
     }
 
     [Fact]
+    public void TryValidate_ReturnOK()
+    {
+        var objectValidatorProxy =
+            new ObjectValidatorProxy<string?>(new ValueValidator<string?>().Required().MinLength(2));
+
+        objectValidatorProxy.TryValidate("Furion", new ValidationContext<string?>("Furion")).ThrowIfInvalid();
+
+        var exception = Assert.Throws<ValidationException>(() =>
+            objectValidatorProxy.TryValidate(null, new ValidationContext<string?>(null!)).ThrowIfInvalid());
+        Assert.Equal("The String field is required.", exception.Message);
+
+        var exception2 = Assert.Throws<ValidationException>(() =>
+            objectValidatorProxy.TryValidate("F", new ValidationContext<string?>("F")).ThrowIfInvalid());
+        Assert.Equal("The field String must be a string or array type with a minimum length of '2'.",
+            exception2.Message);
+
+        var objectValidatorProxy2 =
+            new ObjectValidatorProxy<string?>(new ValueValidator<string?>().MinLength(2));
+
+        objectValidatorProxy2.TryValidate(null, new ValidationContext<string?>(null!)).ThrowIfInvalid();
+    }
+
+    [Fact]
     public void RepairMemberPaths_ReturnOK()
     {
         var objectValidatorProxy = new ObjectValidatorProxy<string?>(new ValueValidator<string?>());

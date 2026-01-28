@@ -246,6 +246,16 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     }
 
     /// <inheritdoc />
+    public ValidatorResult<T> TryValidate(T? instance, string?[]? ruleSets = null)
+    {
+        // 获取对象验证结果列表
+        var validationResults = GetValidationResults(instance, ruleSets);
+        var isValid = validationResults is null or { Count: 0 };
+
+        return new ValidatorResult<T>(isValid, validationResults, instance);
+    }
+
+    /// <inheritdoc />
     public virtual void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
     {
         _serviceProvider = serviceProvider;
@@ -270,6 +280,10 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
 
     /// <inheritdoc />
     void IObjectValidator.Validate(object? instance, string?[]? ruleSets) => Validate((T?)instance, ruleSets);
+
+    /// <inheritdoc />
+    ValidatorResult IObjectValidator.TryValidate(object? instance, string?[]? ruleSets) =>
+        TryValidate((T?)instance, ruleSets);
 
     /// <inheritdoc />
     public virtual List<ValidationResult> ToResults(ValidationContext validationContext,
@@ -344,6 +358,18 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         }
 
         Validate(instance, validationContext.RuleSets);
+    }
+
+    /// <inheritdoc />
+    public override ValidatorResult<T> TryValidate(T? instance, ValidationContext<T> validationContext)
+    {
+        // 检查是否是嵌套验证器
+        if (instance is null && IsNested)
+        {
+            return new ValidatorResult<T>(true, null, instance);
+        }
+
+        return TryValidate(instance, validationContext.RuleSets);
     }
 
     /// <summary>

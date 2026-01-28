@@ -497,6 +497,32 @@ public class ValidatorBaseTests
     }
 
     [Fact]
+    public void TryValidateOfT_Invalid_Parameters()
+    {
+        var validator = new TestOfTValidator();
+        Assert.Throws<InvalidCastException>(() => validator.TryValidate(5, "data"));
+    }
+
+    [Fact]
+    public void TryValidate_ReturnOK()
+    {
+        var validator = new TestValidator();
+        validator.Validate("Furion", "data");
+        var exception =
+            Assert.Throws<ValidationException>(() => validator.TryValidate("Validation", "data").ThrowIfInvalid());
+        Assert.Equal("单元测试data错误信息", exception.Message);
+
+        var validator2 = new TestOfTValidator();
+        validator2.Validate("Furion", "data");
+        var exception2 =
+            Assert.Throws<ValidationException>(() => validator2.TryValidate("Validation", "data").ThrowIfInvalid());
+        Assert.Equal("单元测试data错误信息", exception2.Message);
+        var exception3 =
+            Assert.Throws<ValidationException>(() => validator2.TryValidate("Validation", "data").ThrowIfInvalid());
+        Assert.Equal("单元测试data错误信息", exception3.Message);
+    }
+
+    [Fact]
     public void FormatErrorMessage_ReturnOK()
     {
         var validator = new TestValidator();
