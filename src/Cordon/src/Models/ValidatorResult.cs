@@ -59,7 +59,7 @@ public class ValidatorResult
     public object? Instance { get; }
 
     /// <summary>
-    ///     验证验证失败时抛出 <see cref="ValidationException" /> 异常
+    ///     验证失败时抛出 <see cref="ValidationException" /> 异常
     /// </summary>
     /// <exception cref="ValidationException">
     ///     当 <see cref="IsValid" /> 为 <see langword="false" /> 时。

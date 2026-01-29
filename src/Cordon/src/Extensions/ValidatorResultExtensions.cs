@@ -10,7 +10,7 @@ namespace Cordon;
 public static class ValidatorResultExtensions
 {
     /// <summary>
-    ///     验证验证失败时抛出 <see cref="ValidationException" /> 异常
+    ///     验证失败时抛出 <see cref="ValidationException" /> 异常
     /// </summary>
     /// <param name="validatorResults"><see cref="ValidatorResult" />列表</param>
     public static void ThrowIfInvalid(this List<ValidatorResult> validatorResults)
