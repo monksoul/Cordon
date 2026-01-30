@@ -4,14 +4,14 @@
 
 namespace Cordon.Tests;
 
-public class ColorValueValidatorTests
+public class ColorValidatorTests
 {
     [Fact]
     public void New_ReturnOK()
     {
-        var validator = new ColorValueValidator();
+        var validator = new ColorValidator();
         Assert.NotNull(validator._errorMessageResourceAccessor);
-        Assert.Equal("The field {0} is not a valid color value.", validator._errorMessageResourceAccessor());
+        Assert.Equal("The field {0} is not a valid color.", validator._errorMessageResourceAccessor());
     }
 
     [Theory]
@@ -39,7 +39,7 @@ public class ColorValueValidatorTests
     [InlineData("#FF0000FF", false)]
     public void IsValid_ReturnOK(object? value, bool result)
     {
-        var validator = new ColorValueValidator();
+        var validator = new ColorValidator();
         Assert.Equal(result, validator.IsValid(value));
     }
 
@@ -68,20 +68,20 @@ public class ColorValueValidatorTests
     [InlineData("#FF0000FF", true)]
     public void IsValid_WithFullMode_ReturnOK(object? value, bool result)
     {
-        var validator = new ColorValueValidator { FullMode = true };
+        var validator = new ColorValidator { FullMode = true };
         Assert.Equal(result, validator.IsValid(value));
     }
 
     [Fact]
     public void GetValidationResults_ReturnOK()
     {
-        var validator = new ColorValueValidator();
+        var validator = new ColorValidator();
         Assert.Null(validator.GetValidationResults("#ffffff", "data"));
 
         var validationResults = validator.GetValidationResults("#ff", "data");
         Assert.NotNull(validationResults);
         Assert.Single(validationResults);
-        Assert.Equal("The field data is not a valid color value.", validationResults.First().ErrorMessage);
+        Assert.Equal("The field data is not a valid color.", validationResults.First().ErrorMessage);
 
         validator.ErrorMessage = "数据无效";
         var validationResults2 = validator.GetValidationResults("#ff", "data");
@@ -93,11 +93,11 @@ public class ColorValueValidatorTests
     [Fact]
     public void Validate_ReturnOK()
     {
-        var validator = new ColorValueValidator();
+        var validator = new ColorValidator();
         validator.Validate("#ffffff", "data");
 
         var exception = Assert.Throws<ValidationException>(() => validator.Validate("#ff", "data"));
-        Assert.Equal("The field data is not a valid color value.", exception.Message);
+        Assert.Equal("The field data is not a valid color.", exception.Message);
 
         validator.ErrorMessage = "数据无效";
         var exception2 = Assert.Throws<ValidationException>(() => validator.Validate("#ff", "data"));

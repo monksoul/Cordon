@@ -117,12 +117,12 @@ public class ValidatorsTests
     }
 
     [Fact]
-    public void ColorValue_ReturnOK()
+    public void Color_ReturnOK()
     {
-        var validator = Validators.ColorValue();
+        var validator = Validators.Color();
         Assert.False(validator.FullMode);
 
-        var validator2 = Validators.ColorValue(true);
+        var validator2 = Validators.Color(true);
         Assert.True(validator2.FullMode);
     }
 

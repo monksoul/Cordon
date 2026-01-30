@@ -10,6 +10,11 @@ namespace Cordon;
 public class AgeValidator : ValidatorBase
 {
     /// <summary>
+    ///     最大年龄
+    /// </summary>
+    internal const int MaxAge = 120;
+
+    /// <summary>
     ///     <inheritdoc cref="AgeValidator" />
     /// </summary>
     public AgeValidator() => UseResourceKey(GetResourceKey);
@@ -35,20 +40,20 @@ public class AgeValidator : ValidatorBase
             return true;
         }
 
-        // 尝试将值解析为合法年龄（0-120）
+        // 尝试将值解析为合法年龄
         int? parsedAge = value switch
         {
-            int i and >= 0 and <= 120 => i,
-            uint u and <= 120 => (int)u,
-            long l and >= 0 and <= 120 => (int)l,
-            ulong ul and <= 120 => (int)ul,
-            short s and >= 0 and <= 120 => s,
-            ushort us and <= 120 => us,
+            int i and >= 0 and <= MaxAge => i,
+            uint u and <= MaxAge => (int)u,
+            long l and >= 0 and <= MaxAge => (int)l,
+            ulong ul and <= MaxAge => (int)ul,
+            short s and >= 0 and <= MaxAge => s,
+            ushort us and <= MaxAge => us,
             byte b => b,
-            sbyte sb and >= 0 and <= 120 => sb,
+            sbyte sb and >= 0 and <= MaxAge => sb,
             string str when AllowStringValues &&
                             int.TryParse(str, NumberStyles.Integer, CultureInfo.InvariantCulture, out var age) &&
-                            age is >= 0 and <= 120 => age,
+                            age is >= 0 and <= MaxAge => age,
             _ => null
         };
 

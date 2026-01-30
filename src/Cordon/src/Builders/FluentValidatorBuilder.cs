@@ -216,8 +216,8 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf ColorValue(bool fullMode = false) =>
-        AddValidator(new ColorValueValidator { FullMode = fullMode });
+    public virtual TSelf Color(bool fullMode = false) =>
+        AddValidator(new ColorValidator { FullMode = fullMode });
 
     /// <summary>
     ///     添加组合验证器

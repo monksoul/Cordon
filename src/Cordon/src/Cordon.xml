@@ -92,26 +92,26 @@
         <member name="M:System.ComponentModel.DataAnnotations.ChineseNameAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
-        <member name="T:System.ComponentModel.DataAnnotations.ColorValueAttribute">
+        <member name="T:System.ComponentModel.DataAnnotations.ColorAttribute">
             <summary>
                 颜色值验证特性
             </summary>
         </member>
-        <member name="F:System.ComponentModel.DataAnnotations.ColorValueAttribute._validator">
-            <inheritdoc cref="T:Cordon.ColorValueValidator" />
+        <member name="F:System.ComponentModel.DataAnnotations.ColorAttribute._validator">
+            <inheritdoc cref="T:Cordon.ColorValidator" />
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.ColorValueAttribute.#ctor">
+        <member name="M:System.ComponentModel.DataAnnotations.ColorAttribute.#ctor">
             <summary>
-                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ColorValueAttribute" />
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ColorAttribute" />
             </summary>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.ColorValueAttribute.FullMode">
+        <member name="P:System.ComponentModel.DataAnnotations.ColorAttribute.FullMode">
             <summary>
                 是否启用完整模式
             </summary>
             <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA；若未启用，则仅支持十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.ColorValueAttribute.IsValid(System.Object)">
+        <member name="M:System.ComponentModel.DataAnnotations.ColorAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.ComparisonAttribute">
@@ -364,6 +364,7 @@
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EnumAttribute" />
             </summary>
+            <typeparam name="TEnum">枚举类型</typeparam>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute`1.#ctor">
             <inheritdoc />
@@ -385,11 +386,13 @@
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EnumAttribute" />
             </summary>
+            <remarks>自动推断枚举类型。</remarks>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.EnumAttribute.#ctor(System.Type)">
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.EnumAttribute" />
             </summary>
+            <param name="enumType">枚举类型</param>
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.EnumAttribute.EnumType">
             <summary>
@@ -2140,7 +2143,7 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.ColorValue(System.Boolean)">
+        <member name="M:Cordon.FluentValidatorBuilder`2.Color(System.Boolean)">
             <summary>
                 添加颜色值验证器
             </summary>
@@ -5913,9 +5916,9 @@
               Looks up a localized string similar to The field {0} contains invalid Chinese characters..
             </summary>
         </member>
-        <member name="P:Cordon.Resources.ValidationMessages.ColorValueValidator_ValidationError">
+        <member name="P:Cordon.Resources.ValidationMessages.ColorValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} is not a valid color value..
+              Looks up a localized string similar to The field {0} is not a valid color..
             </summary>
         </member>
         <member name="P:Cordon.Resources.ValidationMessages.CompareValidator_ValidationError">
@@ -6492,7 +6495,7 @@
                 <see cref="T:Cordon.ChineseValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.ColorValue(System.Boolean)">
+        <member name="M:Cordon.Validators.Color(System.Boolean)">
             <summary>
                 创建颜色值验证器
             </summary>
@@ -6500,7 +6503,7 @@
                 是否启用完整模式。在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA；若未启用，则仅支持十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>
             </param>
             <returns>
-                <see cref="T:Cordon.ColorValueValidator" />
+                <see cref="T:Cordon.ColorValidator" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.Compare``1(System.Linq.Expressions.Expression{System.Func{``0,System.Object}},System.Linq.Expressions.Expression{System.Func{``0,System.Object}})">
@@ -7309,6 +7312,11 @@
                 年龄（0-120 岁）验证器
             </summary>
         </member>
+        <member name="F:Cordon.AgeValidator.MaxAge">
+            <summary>
+                最大年龄
+            </summary>
+        </member>
         <member name="M:Cordon.AgeValidator.#ctor">
             <summary>
                 <inheritdoc cref="T:Cordon.AgeValidator" />
@@ -7655,26 +7663,26 @@
             </code>
             </remarks>
         </member>
-        <member name="T:Cordon.ColorValueValidator">
+        <member name="T:Cordon.ColorValidator">
             <summary>
                 颜色值验证器
             </summary>
         </member>
-        <member name="M:Cordon.ColorValueValidator.#ctor">
+        <member name="M:Cordon.ColorValidator.#ctor">
             <summary>
-                <inheritdoc cref="T:Cordon.ColorValueValidator" />
+                <inheritdoc cref="T:Cordon.ColorValidator" />
             </summary>
         </member>
-        <member name="P:Cordon.ColorValueValidator.FullMode">
+        <member name="P:Cordon.ColorValidator.FullMode">
             <summary>
                 是否启用完整模式
             </summary>
             <remarks>在完整模式下，支持的颜色格式包括：十六进制颜色、RGB、RGBA、HSL 和 HSLA；若未启用，则仅支持十六进制颜色、RGB 和 RGBA。默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.ColorValueValidator.IsValid(System.Object,Cordon.IValidationContext)">
+        <member name="M:Cordon.ColorValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ColorValueValidator.Regex">
+        <member name="M:Cordon.ColorValidator.Regex">
             <remarks>
             Pattern:<br/>
             <code>^(?:#(?:(?:[0-9a-fA-F]{3}){1,2}|[0-9a-fA-F]{8})|rgba?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hsla?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hwb\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|oklch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\)|oklab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\))$</code><br/>
@@ -7832,7 +7840,7 @@
             </code>
             </remarks>
         </member>
-        <member name="M:Cordon.ColorValueValidator.StandardRegex">
+        <member name="M:Cordon.ColorValidator.StandardRegex">
             <remarks>
             Pattern:<br/>
             <code>^(?:#(?:[0-9a-fA-F]{3}){1,2}|rgba?\\((?:\\s*(?:\\d+%?)\\s*,){2}\\s*(?:\\d+%?)\\s*(?:,\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+))?\\))$</code><br/>

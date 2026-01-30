@@ -135,9 +135,9 @@
     <data name="ChineseValidator_ValidationError" xml:space="preserve">
         <value>The field {0} contains invalid Chinese characters.</value>
     </data>
-    <data name="ColorValueValidator_ValidationError" xml:space="preserve">
-    <value>The field {0} is not a valid color value.</value>
-  </data>
+    <data name="ColorValidator_ValidationError" xml:space="preserve">
+        <value>The field {0} is not a valid color.</value>
+    </data>
     <data name="DateTimeValidator_ValidationError" xml:space="preserve">
         <value>The field {0} must be a valid datetime.</value>
     </data>

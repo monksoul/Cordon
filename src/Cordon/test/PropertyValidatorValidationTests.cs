@@ -238,15 +238,15 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
-    public void ColorValue_ReturnOK()
+    public void Color_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .ColorValue();
+            .Color();
 
         Assert.Single(propertyValidator.Validators);
 
-        var addedValidator = propertyValidator._lastAddedValidator as ColorValueValidator;
+        var addedValidator = propertyValidator._lastAddedValidator as ColorValidator;
         Assert.NotNull(addedValidator);
         Assert.False(addedValidator.FullMode);
 
@@ -255,11 +255,11 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator2 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .ColorValue(true);
+            .Color(true);
 
         Assert.Single(propertyValidator2.Validators);
 
-        var addedValidator2 = propertyValidator2._lastAddedValidator as ColorValueValidator;
+        var addedValidator2 = propertyValidator2._lastAddedValidator as ColorValidator;
         Assert.NotNull(addedValidator2);
         Assert.True(addedValidator2.FullMode);
 

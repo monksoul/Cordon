@@ -123,11 +123,11 @@ namespace Cordon.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The field {0} is not a valid color value..
+        ///   Looks up a localized string similar to The field {0} is not a valid color..
         /// </summary>
-        internal static string ColorValueValidator_ValidationError {
+        internal static string ColorValidator_ValidationError {
             get {
-                return ResourceManager.GetString("ColorValueValidator_ValidationError", resourceCulture);
+                return ResourceManager.GetString("ColorValidator_ValidationError", resourceCulture);
             }
         }
         

@@ -7,6 +7,7 @@ namespace System.ComponentModel.DataAnnotations;
 /// <summary>
 ///     <inheritdoc cref="EnumAttribute" />
 /// </summary>
+/// <typeparam name="TEnum">枚举类型</typeparam>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class EnumAttribute<TEnum> : EnumAttribute
     where TEnum : struct, Enum
@@ -34,6 +35,7 @@ public class EnumAttribute : ValidationBaseAttribute
     /// <summary>
     ///     <inheritdoc cref="EnumAttribute" />
     /// </summary>
+    /// <remarks>自动推断枚举类型。</remarks>
     public EnumAttribute()
     {
         _supportFlags = false;
@@ -44,6 +46,7 @@ public class EnumAttribute : ValidationBaseAttribute
     /// <summary>
     ///     <inheritdoc cref="EnumAttribute" />
     /// </summary>
+    /// <param name="enumType">枚举类型</param>
     public EnumAttribute(Type enumType)
         : this()
     {
@@ -119,13 +122,13 @@ public class EnumAttribute : ValidationBaseAttribute
         // 空检查
         ArgumentNullException.ThrowIfNull(validationContext);
 
-        // 参数验证场景
+        // 检查该特性是否标注在参数上
         if (string.IsNullOrEmpty(validationContext.MemberName) || (Type?)validationContext.ObjectType is null)
         {
             return validationContext.ObjectType;
         }
 
-        //获取成员信息
+        // 获取成员信息
         var memberInfo = validationContext.ObjectType
             .GetMember(validationContext.MemberName, BindingFlags.Public | BindingFlags.Instance).FirstOrDefault();
 

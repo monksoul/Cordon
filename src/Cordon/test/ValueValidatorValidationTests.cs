@@ -173,24 +173,24 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
-    public void ColorValue_ReturnOK()
+    public void Color_ReturnOK()
     {
-        var valueValidator = new ValueValidator<object>().ColorValue();
+        var valueValidator = new ValueValidator<object>().Color();
 
         Assert.Single(valueValidator.Validators);
 
-        var addedValidator = valueValidator._lastAddedValidator as ColorValueValidator;
+        var addedValidator = valueValidator._lastAddedValidator as ColorValidator;
         Assert.NotNull(addedValidator);
         Assert.False(addedValidator.FullMode);
 
         Assert.False(valueValidator.IsValid("hsl(0, 100%, 50%)"));
         Assert.True(valueValidator.IsValid("#ffffff"));
 
-        var valueValidator2 = new ValueValidator<object>().ColorValue(true);
+        var valueValidator2 = new ValueValidator<object>().Color(true);
 
         Assert.Single(valueValidator2.Validators);
 
-        var addedValidator2 = valueValidator2._lastAddedValidator as ColorValueValidator;
+        var addedValidator2 = valueValidator2._lastAddedValidator as ColorValidator;
         Assert.NotNull(addedValidator2);
         Assert.True(addedValidator2.FullMode);
 

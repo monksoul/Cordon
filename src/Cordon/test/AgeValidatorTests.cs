@@ -20,6 +20,8 @@ public class AgeValidatorTests
         Assert.True(validator2.AllowStringValues);
         Assert.NotNull(validator2._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be at least 18 years old.", validator2._errorMessageResourceAccessor());
+
+        Assert.Equal(120, AgeValidator.MaxAge);
     }
 
     [Theory]

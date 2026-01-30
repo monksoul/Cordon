@@ -8,19 +8,19 @@ namespace System.ComponentModel.DataAnnotations;
 ///     颜色值验证特性
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public class ColorValueAttribute : ValidationBaseAttribute
+public class ColorAttribute : ValidationBaseAttribute
 {
-    /// <inheritdoc cref="ColorValueValidator" />
-    internal readonly ColorValueValidator _validator;
+    /// <inheritdoc cref="ColorValidator" />
+    internal readonly ColorValidator _validator;
 
     /// <summary>
-    ///     <inheritdoc cref="ColorValueAttribute" />
+    ///     <inheritdoc cref="ColorAttribute" />
     /// </summary>
-    public ColorValueAttribute()
+    public ColorAttribute()
     {
-        _validator = new ColorValueValidator();
+        _validator = new ColorValidator();
 
-        UseResourceKey(() => nameof(ValidationMessages.ColorValueValidator_ValidationError));
+        UseResourceKey(() => nameof(ValidationMessages.ColorValidator_ValidationError));
     }
 
     /// <summary>

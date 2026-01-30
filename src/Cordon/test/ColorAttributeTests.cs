@@ -4,12 +4,12 @@
 
 namespace Cordon.Tests;
 
-public class ColorValueAttributeTests
+public class ColorAttributeTests
 {
     [Fact]
     public void Attribute_Metadata()
     {
-        var attributeType = typeof(ColorValueAttribute);
+        var attributeType = typeof(ColorAttribute);
         Assert.True(typeof(ValidationAttribute).IsAssignableFrom(attributeType));
 
         var attributeUsageAttribute = attributeType.GetCustomAttribute<AttributeUsageAttribute>();
@@ -23,13 +23,13 @@ public class ColorValueAttributeTests
     [Fact]
     public void New_ReturnOK()
     {
-        var attribute = new ColorValueAttribute();
+        var attribute = new ColorAttribute();
         Assert.False(attribute.FullMode);
         Assert.Null(attribute.ErrorMessage);
         Assert.NotNull(attribute._validator);
         Assert.False(attribute._validator.FullMode);
 
-        var attribute2 = new ColorValueAttribute { FullMode = true };
+        var attribute2 = new ColorAttribute { FullMode = true };
         Assert.True(attribute2.FullMode);
         Assert.Null(attribute2.ErrorMessage);
         Assert.NotNull(attribute2._validator);
@@ -58,7 +58,7 @@ public class ColorValueAttributeTests
         var validationResults2 = new List<ValidationResult>();
         Assert.False(Validator.TryValidateObject(model2, new ValidationContext(model2), validationResults2, true));
         Assert.Single(validationResults2);
-        Assert.Equal("The field Data is not a valid color value.", validationResults2[0].ErrorMessage);
+        Assert.Equal("The field Data is not a valid color.", validationResults2[0].ErrorMessage);
     }
 
     [Fact]
@@ -71,20 +71,20 @@ public class ColorValueAttributeTests
         var exception =
             Assert.Throws<ValidationException>(() =>
                 Validator.ValidateObject(model2, new ValidationContext(model2), true));
-        Assert.Equal("The field Data is not a valid color value.", exception.ValidationResult.ErrorMessage);
+        Assert.Equal("The field Data is not a valid color.", exception.ValidationResult.ErrorMessage);
     }
 
     [Fact]
     public void FormatErrorMessage_ReturnOK()
     {
-        var attribute = new ColorValueAttribute();
-        Assert.Equal("The field data is not a valid color value.", attribute.FormatErrorMessage("data"));
+        var attribute = new ColorAttribute();
+        Assert.Equal("The field data is not a valid color.", attribute.FormatErrorMessage("data"));
     }
 
     public class TestModel
     {
-        [ColorValue] public string? Data { get; set; }
+        [Color] public string? Data { get; set; }
 
-        [ColorValue(FullMode = true)] public string? Data2 { get; set; }
+        [Color(FullMode = true)] public string? Data2 { get; set; }
     }
 }
