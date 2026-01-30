@@ -56,7 +56,7 @@ public static class ValidationMessageProvider
             { "BankCardValidator_ValidationError", "字段 {0} 不是有效的银行卡号。" },
             { "ChineseNameValidator_ValidationError", "字段 {0} 不是有效的中文姓名。" },
             { "ChineseValidator_ValidationError", "字段 {0} 包含无效的中文字符。" },
-            { "ColorValidator_ValidationError", "字段 {0} 不是有效的颜色值。" },
+            { "ColorValidator_ValidationError", "字段 {0} 不是有效的颜色。" },
             { "DateTimeValidator_ValidationError", "字段 {0} 必须是有效的日期时间。" },
             { "DomainValidator_ValidationError", "字段 {0} 不是有效的域名。" },
             { "EndsWithValidator_ValidationError", "字段 {0} 未以字符串“{1}”结尾。" },

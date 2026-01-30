@@ -22,4 +22,5 @@ global using System.Reflection.Emit;
 global using System.Resources;
 global using System.Runtime.CompilerServices;
 global using System.Text.Json;
+global using System.Text.Json.Serialization;
 global using System.Text.RegularExpressions;

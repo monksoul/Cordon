@@ -2,6 +2,8 @@
 // 
 // 此源代码遵循位于源代码树根目录中的 LICENSE 文件的许可证。
 
+using System.Text.Json.Serialization;
+
 namespace Cordon.Tests;
 
 public class PropertyValidatorValidationTests
@@ -93,6 +95,23 @@ public class PropertyValidatorValidationTests
 
         propertyValidator.WithName(p => p.Name);
         Assert.Equal("Data1", propertyValidator.MemberName);
+    }
+
+    [Fact]
+    public void WithNameFromJsonProperty_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ValidationModel>();
+        var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
+        Assert.Null(propertyValidator.MemberName);
+
+        propertyValidator.WithNameFromJsonProperty();
+        Assert.Null(propertyValidator.MemberName);
+
+        var propertyValidator2 = new PropertyValidator<ValidationModel, object?>(u => u.Data3, objectValidator);
+        Assert.Null(propertyValidator2.MemberName);
+
+        propertyValidator2.WithNameFromJsonProperty();
+        Assert.Equal("C-Data3", propertyValidator2.MemberName);
     }
 
     [Fact]
@@ -2265,6 +2284,8 @@ public class PropertyValidatorValidationTests
         public object? Data1 { get; set; }
 
         public object? Data2 { get; set; }
+
+        [JsonPropertyName("C-Data3")] public object? Data3 { get; set; }
 
         public int Number1 { get; set; }
         public int Number2 { get; set; }

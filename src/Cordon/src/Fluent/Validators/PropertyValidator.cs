@@ -542,6 +542,36 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     }
 
     /// <summary>
+    ///     使用 <see cref="JsonPropertyNameAttribute" /> 作为成员名称
+    /// </summary>
+    /// <remarks>如果未定义则跳过设置。参考文献：https://learn.microsoft.com/zh-cn/aspnet/core/mvc/models/validation?view=aspnetcore-10.0#use-json-property-names-in-validation-errors。</remarks>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf WithNameFromJsonProperty()
+    {
+        // 获取 PropertyInfo 实例
+        var property = _attributeValidator.Property;
+
+        // 检查属性是否标注 [JsonPropertyName] 特性
+        if (!property.IsDefined(typeof(JsonPropertyNameAttribute), true))
+        {
+            return This;
+        }
+
+        // 获取 JsonPropertyNameAttribute 实例
+        var jsonPropertyNameAttribute = property.GetCustomAttribute<JsonPropertyNameAttribute>(true);
+
+        // 空检查
+        if (!string.IsNullOrWhiteSpace(jsonPropertyNameAttribute?.Name))
+        {
+            MemberName = jsonPropertyNameAttribute.Name;
+        }
+
+        return This;
+    }
+
+    /// <summary>
     ///     设置验证模式
     /// </summary>
     /// <param name="mode">
