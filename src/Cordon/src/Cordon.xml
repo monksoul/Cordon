@@ -10382,16 +10382,16 @@
                 <see cref="T:Cordon.ValidatorBase" />
             </typeparam>
         </member>
+        <member name="F:Cordon.ValidatorProxy`1._validator">
+            <summary>
+                <typeparamref name="TValidator" /> 实例
+            </summary>
+        </member>
         <member name="M:Cordon.ValidatorProxy`1.#ctor(System.Object[])">
             <summary>
                 <inheritdoc cref="T:Cordon.ValidatorProxy`1" />
             </summary>
             <param name="constructorArgs"><typeparamref name="TValidator" /> 构造函数参数列表</param>
-        </member>
-        <member name="P:Cordon.ValidatorProxy`1.Validator">
-            <summary>
-                <typeparamref name="TValidator" /> 实例
-            </summary>
         </member>
         <member name="M:Cordon.ValidatorProxy`1.Dispose">
             <inheritdoc />
@@ -10520,6 +10520,12 @@
                 <see cref="T:System.String" />
             </returns>
         </member>
+        <member name="M:Cordon.ValidatorProxy`2.Dispose(System.Boolean)">
+            <summary>
+                释放资源
+            </summary>
+            <param name="disposing">是否释放托管资源</param>
+        </member>
         <member name="M:Cordon.ValidatorProxy`2.GetValidator(`0,Cordon.ValidationContext{`0})">
             <summary>
                 获取或创建被代理的验证器实例
@@ -10549,12 +10555,6 @@
             <param name="validator">
                 <typeparamref name="TValidator" />
             </param>
-        </member>
-        <member name="M:Cordon.ValidatorProxy`2.Dispose(System.Boolean)">
-            <summary>
-                释放资源
-            </summary>
-            <param name="disposing">是否释放托管资源</param>
         </member>
         <member name="M:Cordon.ValidatorProxy`2.OnPropertyChanged(System.Object,Cordon.ValidationPropertyChangedEventArgs)">
             <summary>
@@ -10592,6 +10592,16 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

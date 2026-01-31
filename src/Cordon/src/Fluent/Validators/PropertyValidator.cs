@@ -563,7 +563,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         var jsonPropertyNameAttribute = property.GetCustomAttribute<JsonPropertyNameAttribute>(true);
 
         // 空检查
-        if (!string.IsNullOrWhiteSpace(jsonPropertyNameAttribute?.Name))
+        if (!string.IsNullOrEmpty(jsonPropertyNameAttribute?.Name))
         {
             MemberName = jsonPropertyNameAttribute.Name;
         }

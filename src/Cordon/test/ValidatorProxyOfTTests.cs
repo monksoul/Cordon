@@ -40,29 +40,23 @@ public class ValidatorProxyOfTTests
     public void GetValidator_Invalid_Parameters()
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
-        var getValidatorMethod =
-            validator.GetType().GetMethod("GetValidator", BindingFlags.NonPublic | BindingFlags.Instance);
-        Assert.NotNull(getValidatorMethod);
-
-        var exception =
-            Assert.Throws<TargetInvocationException>(() => getValidatorMethod.Invoke(validator, [null, null]));
-        Assert.IsType<ArgumentNullException>(exception.InnerException);
+        Assert.Throws<ArgumentNullException>(() => validator.GetValidator(null!, null!));
+        Assert.Throws<ArgumentNullException>(() => validator.GetValidator(new ValidatorProxyClass(), null!));
     }
 
     [Fact]
     public void GetValidator_ReturnOK()
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
-        var getValidator = GetProxyValidator(validator);
 
         var instance = new ValidatorProxyClass { Value = "monksoul@qq.com" };
-        var proxyValidator = getValidator(instance, null!);
+        var proxyValidator = validator.GetValidator(instance, new ValidationContext<ValidatorProxyClass>(instance));
         Assert.NotNull(proxyValidator);
 
         Assert.Single(validator._validatorCache);
         Assert.Equal(RuntimeHelpers.GetHashCode(instance), validator._validatorCache.Keys.First());
 
-        var proxyValidator2 = getValidator(instance, null!);
+        var proxyValidator2 = validator.GetValidator(instance, new ValidationContext<ValidatorProxyClass>(instance));
         Assert.NotNull(proxyValidator2);
 
         Assert.Same(proxyValidator, proxyValidator2);
@@ -79,9 +73,8 @@ public class ValidatorProxyOfTTests
         Assert.Equal("ErrorMessage", validator._propertyChanges.Keys.First());
         Assert.Equal("数据无效", validator._propertyChanges.Values.First());
 
-        var getValidator = GetProxyValidator(validator);
         var instance = new ValidatorProxyClass { Value = "monksoul@qq.com" };
-        var proxyValidator = getValidator(instance, null!);
+        var proxyValidator = validator.GetValidator(instance, new ValidationContext<ValidatorProxyClass>(instance));
 
         Assert.Equal("数据无效", proxyValidator.ErrorMessage);
     }
@@ -106,9 +99,8 @@ public class ValidatorProxyOfTTests
 
         Assert.Empty(validator._validatorCache);
 
-        var getValidator = GetProxyValidator(validator);
         var instance = new ValidatorProxyClass { Value = "monksoul@qq.com" };
-        var proxyValidator = getValidator(instance, null!);
+        var proxyValidator = validator.GetValidator(instance, new ValidationContext<ValidatorProxyClass>(instance));
         Assert.Equal("数据无效", proxyValidator.ErrorMessage);
 
         Assert.Single(validator._validatorCache);
@@ -187,35 +179,24 @@ public class ValidatorProxyOfTTests
     public void FormatErrorMessage_ReturnOK()
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
+        var instance = new ValidatorProxyClass { Value = "monksoul@qq" };
         Assert.Equal("The data field is not a valid e-mail address.",
-            validator.FormatErrorMessage("data", new ValidatorProxyClass { Value = "monksoul@qq" }, null!));
+            validator.FormatErrorMessage("data", instance, new ValidationContext<ValidatorProxyClass>(instance)));
     }
 
     [Fact]
     public void GetValidatingObject_Invalid_Parameters()
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
-        var getValidationValueMethod =
-            validator.GetType()
-                .GetMethod("GetValidatingObject", BindingFlags.NonPublic | BindingFlags.Instance);
-        Assert.NotNull(getValidationValueMethod);
-
-        var exception =
-            Assert.Throws<TargetInvocationException>(() => getValidationValueMethod.Invoke(validator, [null]));
-        Assert.IsType<ArgumentNullException>(exception.InnerException);
+        Assert.Throws<ArgumentNullException>(() => validator.GetValidatingObject(null!));
     }
 
     [Fact]
     public void GetValidatingObject_ReturnOK()
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
-        var getValidationValueMethod =
-            validator.GetType()
-                .GetMethod("GetValidatingObject", BindingFlags.NonPublic | BindingFlags.Instance);
-        Assert.NotNull(getValidationValueMethod);
-
         var instance = new ValidatorProxyClass { Value = "monksoul@outlook.com" };
-        Assert.Equal("monksoul@outlook.com", getValidationValueMethod.Invoke(validator, [instance]));
+        Assert.Equal("monksoul@outlook.com", validator.GetValidatingObject(instance));
     }
 
     [Fact]
@@ -229,9 +210,8 @@ public class ValidatorProxyOfTTests
     public void ApplyPropertyChanges_ReturnOK()
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
-        var getValidator = GetProxyValidator(validator);
         var instance = new ValidatorProxyClass { Value = "monksoul@qq.com" };
-        var proxyValidator = getValidator(instance, null!);
+        var proxyValidator = validator.GetValidator(instance, new ValidationContext<ValidatorProxyClass>(instance));
 
         Assert.Null(proxyValidator.ErrorMessage);
         validator._propertyChanges.TryAdd("ErrorMessage", "数据无效");
@@ -243,9 +223,8 @@ public class ValidatorProxyOfTTests
     public void OnPropertyChanged_ReturnOK()
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
-        var getValidator = GetProxyValidator(validator);
         var instance = new ValidatorProxyClass { Value = "monksoul@qq.com" };
-        _ = getValidator(instance, null!);
+        _ = validator.GetValidator(instance, new ValidationContext<ValidatorProxyClass>(instance));
 
         Assert.Single(validator._validatorCache);
 
@@ -260,7 +239,7 @@ public class ValidatorProxyOfTTests
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, EmailAddressValidator>(u => u.Value);
         var instance = new ValidatorProxyClass { Value = "monksoul@qq.com" };
-        var proxyValidator = GetProxyValidator(validator)(instance, null!);
+        var proxyValidator = validator.GetValidator(instance, new ValidationContext<ValidatorProxyClass>(instance));
         Assert.NotNull(proxyValidator);
 
         validator.Dispose();
@@ -274,23 +253,13 @@ public class ValidatorProxyOfTTests
     {
         var validator = new ValidatorProxy<ValidatorProxyClass, AttributeObjectValidator>(u => u);
         var instance = new ValidatorProxyClass { Value = "monksoul@qq.com" };
-        var attributeObjectValidator = GetProxyValidator(validator)(instance, null!);
+        var attributeObjectValidator =
+            validator.GetValidator(instance, new ValidationContext<ValidatorProxyClass>(instance));
 
         Assert.NotNull(attributeObjectValidator);
 
         using var serviceProvider = new ServiceCollection().BuildServiceProvider();
         validator.InitializeServiceProvider(serviceProvider.GetService);
-    }
-
-    private static Func<T, ValidationContext<T>, TValidator> GetProxyValidator<T, TValidator>(
-        ValidatorProxy<T, TValidator> validator)
-        where TValidator : ValidatorBase
-    {
-        var getValidatorMethod =
-            validator.GetType().GetMethod("GetValidator", BindingFlags.NonPublic | BindingFlags.Instance);
-        Assert.NotNull(getValidatorMethod);
-
-        return getValidatorMethod.CreateDelegate<Func<T, ValidationContext<T>, TValidator>>(validator);
     }
 }
 

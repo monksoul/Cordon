@@ -14,23 +14,23 @@ public class ValidatorProxy<TValidator> : ValidatorBase, IValidatorInitializer, 
     where TValidator : ValidatorBase
 {
     /// <summary>
+    ///     <typeparamref name="TValidator" /> 实例
+    /// </summary>
+    internal readonly TValidator _validator;
+
+    /// <summary>
     ///     <inheritdoc cref="ValidatorProxy{TValidator}" />
     /// </summary>
     /// <param name="constructorArgs"><typeparamref name="TValidator" /> 构造函数参数列表</param>
     public ValidatorProxy(params object?[]? constructorArgs)
     {
-        Validator = (TValidator)Activator.CreateInstance(typeof(TValidator), constructorArgs)!;
+        _validator = (TValidator)Activator.CreateInstance(typeof(TValidator), constructorArgs)!;
 
         // 订阅属性变更事件
         PropertyChanged += OnPropertyChanged;
 
         ErrorMessageResourceAccessor = () => null!;
     }
-
-    /// <summary>
-    ///     <typeparamref name="TValidator" /> 实例
-    /// </summary>
-    protected TValidator Validator { get; }
 
     /// <inheritdoc />
     public void Dispose()
@@ -55,26 +55,26 @@ public class ValidatorProxy<TValidator> : ValidatorBase, IValidatorInitializer, 
         // 空检查
         ArgumentNullException.ThrowIfNull(predicate);
 
-        predicate(Validator);
+        predicate(_validator);
 
         return this;
     }
 
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext) =>
-        Validator.IsValid(value, validationContext);
+        _validator.IsValid(value, validationContext);
 
     /// <inheritdoc />
     public override List<ValidationResult>?
         GetValidationResults(object? value, IValidationContext? validationContext) =>
-        Validator.GetValidationResults(value, validationContext);
+        _validator.GetValidationResults(value, validationContext);
 
     /// <inheritdoc />
     public override void Validate(object? value, IValidationContext? validationContext) =>
-        Validator.Validate(value, validationContext);
+        _validator.Validate(value, validationContext);
 
     /// <inheritdoc />
-    public override string? FormatErrorMessage(string name) => Validator.FormatErrorMessage(name);
+    public override string? FormatErrorMessage(string name) => _validator.FormatErrorMessage(name);
 
     /// <summary>
     ///     释放资源
@@ -91,7 +91,7 @@ public class ValidatorProxy<TValidator> : ValidatorBase, IValidatorInitializer, 
         PropertyChanged -= OnPropertyChanged;
 
         // 释放验证器资源
-        if (Validator is IDisposable disposable)
+        if (_validator is IDisposable disposable)
         {
             disposable.Dispose();
         }
@@ -117,14 +117,14 @@ public class ValidatorProxy<TValidator> : ValidatorBase, IValidatorInitializer, 
         }
 
         // 设置验证器实例属性值
-        validatorProperty.SetValue(Validator, eventArgs.PropertyValue);
+        validatorProperty.SetValue(_validator, eventArgs.PropertyValue);
     }
 
     /// <inheritdoc cref="IValidatorInitializer.InitializeServiceProvider" />
     internal void InitializeServiceProvider(Func<Type, object?>? serviceProvider)
     {
         // 检查验证器是否实现 IValidatorInitializer 接口
-        if (Validator is IValidatorInitializer initializer)
+        if (_validator is IValidatorInitializer initializer)
         {
             // 同步 IServiceProvider 委托
             initializer.InitializeServiceProvider(serviceProvider);
@@ -251,6 +251,30 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
         GetValidator(instance, validationContext).FormatErrorMessage(name);
 
     /// <summary>
+    ///     释放资源
+    /// </summary>
+    /// <param name="disposing">是否释放托管资源</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing)
+        {
+            return;
+        }
+
+        // 移除属性变更事件
+        PropertyChanged -= OnPropertyChanged;
+
+        // 释放所有验证器资源
+        foreach (var validator in _validatorCache.Values)
+        {
+            if (validator is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+    }
+
+    /// <summary>
     ///     获取或创建被代理的验证器实例
     /// </summary>
     /// <param name="instance">对象</param>
@@ -260,10 +284,11 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
     /// <returns>
     ///     <typeparamref name="TValidator" />
     /// </returns>
-    protected TValidator GetValidator(T? instance, ValidationContext<T> validationContext)
+    internal TValidator GetValidator(T? instance, ValidationContext<T> validationContext)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
+        ArgumentNullException.ThrowIfNull(validationContext);
 
         return _validatorCache.GetOrAdd(RuntimeHelpers.GetHashCode(instance), _ =>
         {
@@ -294,7 +319,7 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
     /// <returns>
     ///     <see cref="object" />
     /// </returns>
-    protected object? GetValidatingObject(T? instance)
+    internal object? GetValidatingObject(T? instance)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(instance);
@@ -330,29 +355,6 @@ public class ValidatorProxy<T, TValidator> : ValidatorBase<T>, IValidatorInitial
         }
     }
 
-    /// <summary>
-    ///     释放资源
-    /// </summary>
-    /// <param name="disposing">是否释放托管资源</param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposing)
-        {
-            return;
-        }
-
-        // 移除属性变更事件
-        PropertyChanged -= OnPropertyChanged;
-
-        // 释放所有验证器资源
-        foreach (var validator in _validatorCache.Values)
-        {
-            if (validator is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
-    }
 
     /// <summary>
     ///     订阅属性变更事件
