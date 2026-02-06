@@ -208,5 +208,7 @@ public class EnumAttributeTests
     public class TestModel2
     {
         [Enum] public MyEnum Data { get; set; }
+
+        [Enum] public MyEnum? Data2 { get; set; }
     }
 }

@@ -132,11 +132,15 @@ public class EnumAttribute : ValidationBaseAttribute
         var memberInfo = validationContext.ObjectType
             .GetMember(validationContext.MemberName, BindingFlags.Public | BindingFlags.Instance).FirstOrDefault();
 
-        return memberInfo switch
+        // 获取成员类型
+        var memberType = memberInfo switch
         {
             PropertyInfo pi => pi.PropertyType,
             FieldInfo fi => fi.FieldType,
             _ => null
         };
+
+        // 处理可空类型
+        return memberType is null ? memberType : Nullable.GetUnderlyingType(memberType) ?? memberType;
     }
 }

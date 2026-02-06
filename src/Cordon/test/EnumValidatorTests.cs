@@ -46,6 +46,10 @@ public class EnumValidatorTests
         Assert.NotNull(validator2._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be a valid combination of values defined in enum {1}.",
             validator2._errorMessageResourceAccessor());
+
+        var validator3 = new EnumValidator(typeof(MyEnum?));
+        Assert.NotNull(validator3.EnumType);
+        Assert.Equal(typeof(MyEnum), validator3.EnumType);
     }
 
     [Theory]

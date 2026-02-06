@@ -32,14 +32,18 @@ public class EnumValidator : ValidatorBase
         // 空检查
         ArgumentNullException.ThrowIfNull(enumType);
 
+        // 处理可空枚举类型
+        var resolvedEnumType = Nullable.GetUnderlyingType(enumType) ?? enumType;
+
         // 检查是否是枚举
-        if (!enumType.IsEnum)
+        if (!resolvedEnumType.IsEnum)
         {
             // ReSharper disable once LocalizableElement
-            throw new ArgumentException($"The type '{enumType.Name}' is not an enumeration type.", nameof(enumType));
+            throw new ArgumentException($"The type '{resolvedEnumType.Name}' is not an enumeration type.",
+                nameof(enumType));
         }
 
-        EnumType = enumType;
+        EnumType = resolvedEnumType;
 
         UseResourceKey(GetResourceKey);
     }
