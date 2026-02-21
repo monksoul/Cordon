@@ -32,19 +32,21 @@ public class DateTimeAttributeTests
         Assert.Empty(attribute._validator.Formats);
         Assert.Equal(CultureInfo.InvariantCulture, attribute._validator.Provider);
         Assert.Equal(DateTimeStyles.None, attribute._validator.Style);
+        Assert.Empty(attribute.FormatsFormatted);
 
-        var attribute2 = new DateTimeAttribute("yyyy/MM/dd HH:mm:ss")
+        var attribute2 = new DateTimeAttribute("yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss")
         {
             Provider = CultureInfo.CurrentCulture, Style = DateTimeStyles.AllowTrailingWhite
         };
-        Assert.Equal(["yyyy/MM/dd HH:mm:ss"], attribute2.Formats);
+        Assert.Equal(["yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss"], attribute2.Formats);
         Assert.Equal(CultureInfo.CurrentCulture, attribute2.Provider);
         Assert.Equal(DateTimeStyles.AllowTrailingWhite, attribute2.Style);
         Assert.Null(attribute2.ErrorMessage);
         Assert.NotNull(attribute2._validator);
-        Assert.Equal(["yyyy/MM/dd HH:mm:ss"], attribute2._validator.Formats);
+        Assert.Equal(["yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss"], attribute2._validator.Formats);
         Assert.Equal(CultureInfo.CurrentCulture, attribute2._validator.Provider);
         Assert.Equal(DateTimeStyles.AllowTrailingWhite, attribute2._validator.Style);
+        Assert.Equal("'yyyy-MM-dd HH:mm:ss', 'yyyy/MM/dd HH:mm:ss'", attribute2.FormatsFormatted);
     }
 
     [Fact]

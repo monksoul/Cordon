@@ -19,6 +19,7 @@ public class TimeOnlyValidatorTest
         Assert.Equal(CultureInfo.InvariantCulture, validator.Provider);
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be a valid time.", validator._errorMessageResourceAccessor());
+        Assert.Empty(validator.FormatsFormatted);
 
         var validator2 = new TimeOnlyValidator("HH:mm:ss", "HH时mm分ss秒");
         Assert.Equal(2, validator2.Formats.Length);
@@ -26,6 +27,7 @@ public class TimeOnlyValidatorTest
         Assert.NotNull(validator2._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be a valid time in the following format(s): {1}.",
             validator2._errorMessageResourceAccessor());
+        Assert.Equal("'HH:mm:ss', 'HH时mm分ss秒'", validator2.FormatsFormatted);
     }
 
     [Theory]

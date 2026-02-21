@@ -19,6 +19,7 @@ public class DateOnlyValidatorTests
         Assert.Equal(CultureInfo.InvariantCulture, validator.Provider);
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be a valid date.", validator._errorMessageResourceAccessor());
+        Assert.Empty(validator.FormatsFormatted);
 
         var validator2 = new DateOnlyValidator("yyyy-MM-dd", "yyyy/MM/dd");
         Assert.Equal(2, validator2.Formats.Length);
@@ -26,6 +27,7 @@ public class DateOnlyValidatorTests
         Assert.NotNull(validator2._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be a valid date in the following format(s): {1}.",
             validator2._errorMessageResourceAccessor());
+        Assert.Equal("'yyyy-MM-dd', 'yyyy/MM/dd'", validator2.FormatsFormatted);
     }
 
     [Theory]

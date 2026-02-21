@@ -19,13 +19,15 @@ public class DateTimeValidatorTests
         Assert.Equal(CultureInfo.InvariantCulture, validator.Provider);
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be a valid datetime.", validator._errorMessageResourceAccessor());
+        Assert.Empty(validator.FormatsFormatted);
 
-        var validator2 = new DateTimeValidator("yyyy-MM-dd", "yyyy/MM/dd");
+        var validator2 = new DateTimeValidator("yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss");
         Assert.Equal(2, validator2.Formats.Length);
-        Assert.Equal(["yyyy-MM-dd", "yyyy/MM/dd"], validator2.Formats);
+        Assert.Equal(["yyyy-MM-dd HH:mm:ss", "yyyy/MM/dd HH:mm:ss"], validator2.Formats);
         Assert.NotNull(validator2._errorMessageResourceAccessor);
         Assert.Equal("The field {0} must be a valid datetime in the following format(s): {1}.",
             validator2._errorMessageResourceAccessor());
+        Assert.Equal("'yyyy-MM-dd HH:mm:ss', 'yyyy/MM/dd HH:mm:ss'", validator2.FormatsFormatted);
     }
 
     [Theory]

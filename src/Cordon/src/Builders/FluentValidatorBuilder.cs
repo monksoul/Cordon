@@ -267,7 +267,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加 <see cref="System.DateOnly" /> 验证器
     /// </summary>
-    /// <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+    /// <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
@@ -276,9 +276,9 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加 <see cref="System.DateOnly" /> 验证器
     /// </summary>
-    /// <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+    /// <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
     /// <param name="provider">格式提供器</param>
-    /// <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
+    /// <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
@@ -289,7 +289,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加 <see cref="System.DateTime" /> 验证器
     /// </summary>
-    /// <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+    /// <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
@@ -298,9 +298,9 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加 <see cref="System.DateTime" /> 验证器
     /// </summary>
-    /// <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+    /// <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
     /// <param name="provider">格式提供器</param>
-    /// <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
+    /// <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
@@ -995,7 +995,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// </summary>
     /// <param name="formats">允许的时间格式（如 "HH:mm:ss"）</param>
     /// <param name="provider">格式提供器</param>
-    /// <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
+    /// <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>

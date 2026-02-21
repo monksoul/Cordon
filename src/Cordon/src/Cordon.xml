@@ -165,11 +165,11 @@
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.DateOnlyAttribute" />
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.DateOnlyAttribute.Formats">
             <summary>
-                允许的日期格式（如 "yyyy-MM-dd"）
+                允许的日期格式列表（如 "yyyy-MM-dd"）
             </summary>
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.DateOnlyAttribute.Provider">
@@ -182,7 +182,12 @@
             <summary>
                 日期解析样式
             </summary>
-            <remarks>需与 <see cref="P:System.ComponentModel.DataAnnotations.DateOnlyAttribute.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+            <remarks>需与 <see cref="P:System.ComponentModel.DataAnnotations.DateOnlyAttribute.Formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.DateOnlyAttribute.FormatsFormatted">
+            <summary>
+                格式化后的允许的日期格式列表
+            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.DateOnlyAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -210,11 +215,11 @@
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.DateTimeAttribute" />
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.DateTimeAttribute.Formats">
             <summary>
-                允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）
+                允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）
             </summary>
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.DateTimeAttribute.Provider">
@@ -227,7 +232,12 @@
             <summary>
                 日期解析样式
             </summary>
-            <remarks>需与 <see cref="P:System.ComponentModel.DataAnnotations.DateTimeAttribute.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+            <remarks>需与 <see cref="P:System.ComponentModel.DataAnnotations.DateTimeAttribute.Formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.DateTimeAttribute.FormatsFormatted">
+            <summary>
+                格式化后的允许的日期格式列表
+            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.DateTimeAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -1126,7 +1136,12 @@
             <summary>
                 日期解析样式
             </summary>
-            <remarks>需与 <see cref="P:System.ComponentModel.DataAnnotations.TimeOnlyAttribute.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+            <remarks>需与 <see cref="P:System.ComponentModel.DataAnnotations.TimeOnlyAttribute.Formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.TimeOnlyAttribute.FormatsFormatted">
+            <summary>
+                格式化后的允许的日期格式列表
+            </summary>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.TimeOnlyAttribute.IsValid(System.Object)">
             <inheritdoc />
@@ -1757,6 +1772,9 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1766,11 +1784,8 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
-        </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -2197,7 +2212,7 @@
             <summary>
                 添加 <see cref="T:System.DateOnly" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -2206,9 +2221,9 @@
             <summary>
                 添加 <see cref="T:System.DateOnly" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
             <param name="provider">格式提供器</param>
-            <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
+            <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -2217,7 +2232,7 @@
             <summary>
                 添加 <see cref="T:System.DateTime" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -2226,9 +2241,9 @@
             <summary>
                 添加 <see cref="T:System.DateTime" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
             <param name="provider">格式提供器</param>
-            <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
+            <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -2829,7 +2844,7 @@
             </summary>
             <param name="formats">允许的时间格式（如 "HH:mm:ss"）</param>
             <param name="provider">格式提供器</param>
-            <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
+            <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -6583,7 +6598,7 @@
             <summary>
                 创建 <see cref="T:System.DateOnly" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
             <returns>
                 <see cref="T:Cordon.DateOnlyValidator" />
             </returns>
@@ -6592,9 +6607,9 @@
             <summary>
                 创建 <see cref="T:System.DateOnly" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
             <param name="provider">格式提供器</param>
-            <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
+            <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
             <returns>
                 <see cref="T:Cordon.DateOnlyValidator" />
             </returns>
@@ -6603,7 +6618,7 @@
             <summary>
                 创建 <see cref="T:System.DateTime" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
             <returns>
                 <see cref="T:Cordon.DateTimeValidator" />
             </returns>
@@ -6612,9 +6627,9 @@
             <summary>
                 创建 <see cref="T:System.DateTime" /> 验证器
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
             <param name="provider">格式提供器</param>
-            <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
+            <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
             <returns>
                 <see cref="T:Cordon.DateTimeValidator" />
             </returns>
@@ -7248,7 +7263,7 @@
             </summary>
             <param name="formats">允许的时间格式（如 "HH:mm:ss"）</param>
             <param name="provider">格式提供器</param>
-            <param name="style">日期解析样式，需与 <paramref name="provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
+            <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
             <returns>
                 <see cref="T:Cordon.TimeOnlyValidator" />
             </returns>
@@ -7705,8 +7720,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
+                            ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7728,7 +7743,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character greedily any number of times.<br/>
+                            ○ Match a whitespace character atomically any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -7753,7 +7768,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character greedily any number of times.<br/>
+                                    ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -7814,13 +7829,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7834,13 +7849,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7862,7 +7877,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7887,10 +7902,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit greedily at least once.<br/>
+                                    ○ Match a Unicode digit atomically at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit greedily at least once.<br/>
+                                ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -8165,11 +8180,11 @@
             <summary>
                 <inheritdoc cref="T:Cordon.DateOnlyValidator" />
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
         </member>
         <member name="P:Cordon.DateOnlyValidator.Formats">
             <summary>
-                允许的日期格式（如 "yyyy-MM-dd"）
+                允许的日期格式列表（如 "yyyy-MM-dd"）
             </summary>
         </member>
         <member name="P:Cordon.DateOnlyValidator.Provider">
@@ -8182,7 +8197,12 @@
             <summary>
                 日期解析样式
             </summary>
-            <remarks>需与 <see cref="P:Cordon.DateOnlyValidator.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+            <remarks>需与 <see cref="P:Cordon.DateOnlyValidator.Formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+        </member>
+        <member name="P:Cordon.DateOnlyValidator.FormatsFormatted">
+            <summary>
+                格式化后的允许的日期格式列表
+            </summary>
         </member>
         <member name="M:Cordon.DateOnlyValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
@@ -8216,11 +8236,11 @@
             <summary>
                 <inheritdoc cref="T:Cordon.DateTimeValidator" />
             </summary>
-            <param name="formats">允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）</param>
+            <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
         </member>
         <member name="P:Cordon.DateTimeValidator.Formats">
             <summary>
-                允许的日期格式（如 "yyyy-MM-dd HH:mm:ss"）
+                允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）
             </summary>
         </member>
         <member name="P:Cordon.DateTimeValidator.Provider">
@@ -8233,7 +8253,12 @@
             <summary>
                 日期解析样式
             </summary>
-            <remarks>需与 <see cref="P:Cordon.DateTimeValidator.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+            <remarks>需与 <see cref="P:Cordon.DateTimeValidator.Formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+        </member>
+        <member name="P:Cordon.DateTimeValidator.FormatsFormatted">
+            <summary>
+                格式化后的允许的日期格式列表
+            </summary>
         </member>
         <member name="M:Cordon.DateTimeValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
@@ -8349,12 +8374,12 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Loop greedily at least once.<br/>
                 ○ 1st capture group.<br/>
-                    ○ Match a character in the set [0-9A-Za-z].<br/>
+                    ○ Match an ASCII letter or digit.<br/>
                     ○ Optional (greedy).<br/>
-                        ○ Match a character in the set [-0-9A-Za-z] greedily at most 61 times.<br/>
-                        ○ Match a character in the set [0-9A-Za-z].<br/>
+                        ○ Match a character in the set [\-0-9A-Za-z] greedily at most 61 times.<br/>
+                        ○ Match an ASCII letter or digit.<br/>
                     ○ Match '.'.<br/>
-            ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
+            ○ Match an ASCII letter atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8407,9 +8432,9 @@
                     ○ 7th capture group.<br/>
                         ○ Loop greedily at least once.<br/>
                             ○ 8th capture group.<br/>
-                                ○ Match a character in the set [-0-9A-Za-z] atomically at least once.<br/>
+                                ○ Match a character in the set [\-0-9A-Za-z] atomically at least once.<br/>
                                 ○ Match '.'.<br/>
-                        ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
+                        ○ Match an ASCII letter atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9053,7 +9078,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
+            ○ Match a hexadecimal digit exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9067,8 +9092,8 @@
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
-                    ○ Match a character in the set [0-9A-Fa-f] exactly 16 times.<br/>
-                    ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
+                    ○ Match a hexadecimal digit exactly 16 times.<br/>
+                    ○ Match a hexadecimal digit exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9350,7 +9375,7 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [A-Za-z].<br/>
+                ○ Match an ASCII letter.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
                 ○ Match a Unicode digit.<br/>
@@ -9909,7 +9934,12 @@
             <summary>
                 日期解析样式
             </summary>
-            <remarks>需与 <see cref="P:Cordon.TimeOnlyValidator.Provider" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+            <remarks>需与 <see cref="P:Cordon.TimeOnlyValidator.Formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" />。</remarks>
+        </member>
+        <member name="P:Cordon.TimeOnlyValidator.FormatsFormatted">
+            <summary>
+                格式化后的允许的日期格式列表
+            </summary>
         </member>
         <member name="M:Cordon.TimeOnlyValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
@@ -9994,12 +10024,12 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a character in the set [A-Za-z].<br/>
+            ○ Match an ASCII letter.<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [-_] exactly 2 times.<br/>
-            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match a character in the set [0-9A-Za-z].<br/>
+                ○ Match a character in the set [\-_] exactly 2 times.<br/>
+            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match an ASCII letter or digit.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -10592,16 +10622,6 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>
