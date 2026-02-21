@@ -5,14 +5,14 @@
 namespace Cordon;
 
 /// <summary>
-///     时间格式 <see cref="System.TimeOnly" /> 验证器
+///     时间格式 <see cref="TimeOnly" /> 时间验证器
 /// </summary>
 public class TimeOnlyValidator : ValidatorBase
 {
     /// <summary>
     ///     <inheritdoc cref="TimeOnlyValidator" />
     /// </summary>
-    /// <param name="formats">允许的时间格式（如 "HH:mm:ss"）</param>
+    /// <param name="formats">允许的时间格式列表（如 "HH:mm:ss"）</param>
     public TimeOnlyValidator(params string[] formats)
     {
         // 空检查
@@ -24,7 +24,7 @@ public class TimeOnlyValidator : ValidatorBase
     }
 
     /// <summary>
-    ///     允许的时间格式（如 "HH:mm:ss"）
+    ///     允许的时间格式列表（如 "HH:mm:ss"）
     /// </summary>
     public string[] Formats { get; }
 
@@ -35,13 +35,13 @@ public class TimeOnlyValidator : ValidatorBase
     public IFormatProvider? Provider { get; set; } = CultureInfo.InvariantCulture;
 
     /// <summary>
-    ///     日期解析样式
+    ///     时间解析样式
     /// </summary>
     /// <remarks>需与 <see cref="Formats" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" />。</remarks>
     public DateTimeStyles Style { get; set; } = DateTimeStyles.None;
 
     /// <summary>
-    ///     格式化后的允许的日期格式列表
+    ///     格式化后的允许的时间格式列表
     /// </summary>
     internal string FormatsFormatted => string.Join(", ", Formats.Select(u => $"'{u}'"));
 

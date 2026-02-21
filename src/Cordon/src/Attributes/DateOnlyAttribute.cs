@@ -5,7 +5,7 @@
 namespace System.ComponentModel.DataAnnotations;
 
 /// <summary>
-///     <see cref="DateOnly" /> 验证特性
+///     <see cref="DateOnly" /> 日期验证特性
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class DateOnlyAttribute : ValidationBaseAttribute

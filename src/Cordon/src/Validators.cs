@@ -226,7 +226,7 @@ public static class Validators
         AttributeValue(new CustomValidationAttribute(validatorType, method));
 
     /// <summary>
-    ///     创建 <see cref="System.DateOnly" /> 验证器
+    ///     创建 <see cref="System.DateOnly" /> 日期验证器
     /// </summary>
     /// <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
     /// <returns>
@@ -235,7 +235,7 @@ public static class Validators
     public static DateOnlyValidator DateOnly(params string[] formats) => new(formats);
 
     /// <summary>
-    ///     创建 <see cref="System.DateOnly" /> 验证器
+    ///     创建 <see cref="System.DateOnly" /> 日期验证器
     /// </summary>
     /// <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd"）</param>
     /// <param name="provider">格式提供器</param>
@@ -247,20 +247,20 @@ public static class Validators
         DateTimeStyles style = DateTimeStyles.None) => new(formats) { Provider = provider, Style = style };
 
     /// <summary>
-    ///     创建 <see cref="System.DateTime" /> 验证器
+    ///     创建 <see cref="System.DateTime" /> 时刻验证器
     /// </summary>
-    /// <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
+    /// <param name="formats">允许的日期时间格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
     /// <returns>
     ///     <see cref="DateTimeValidator" />
     /// </returns>
     public static DateTimeValidator DateTime(params string[] formats) => new(formats);
 
     /// <summary>
-    ///     创建 <see cref="System.DateTime" /> 验证器
+    ///     创建 <see cref="System.DateTime" /> 时刻验证器
     /// </summary>
-    /// <param name="formats">允许的日期格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
+    /// <param name="formats">允许的日期时间格式列表（如 "yyyy-MM-dd HH:mm:ss"）</param>
     /// <param name="provider">格式提供器</param>
-    /// <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
+    /// <param name="style">日期时间解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
     /// <returns>
     ///     <see cref="DateTimeValidator" />
     /// </returns>
@@ -1015,20 +1015,20 @@ public static class Validators
     public static TelephoneValidator Telephone() => new();
 
     /// <summary>
-    ///     创建时间格式 <see cref="System.TimeOnly" /> 验证器
+    ///     创建时间格式 <see cref="System.TimeOnly" /> 时间验证器
     /// </summary>
-    /// <param name="formats">允许的时间格式（如 "HH:mm:ss"）</param>
+    /// <param name="formats">允许的时间格式列表（如 "HH:mm:ss"）</param>
     /// <returns>
     ///     <see cref="TimeOnlyValidator" />
     /// </returns>
     public static TimeOnlyValidator TimeOnly(params string[] formats) => new(formats);
 
     /// <summary>
-    ///     创建时间格式 <see cref="System.TimeOnly" /> 验证器
+    ///     创建时间格式 <see cref="System.TimeOnly" /> 时间验证器
     /// </summary>
-    /// <param name="formats">允许的时间格式（如 "HH:mm:ss"）</param>
+    /// <param name="formats">允许的时间格式列表（如 "HH:mm:ss"）</param>
     /// <param name="provider">格式提供器</param>
-    /// <param name="style">日期解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
+    /// <param name="style">时间解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="DateTimeStyles.None" /></param>
     /// <returns>
     ///     <see cref="TimeOnlyValidator" />
     /// </returns>

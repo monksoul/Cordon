@@ -5,7 +5,7 @@
 namespace Cordon;
 
 /// <summary>
-///     <see cref="DateOnly" /> 验证器
+///     <see cref="DateOnly" /> 日期验证器
 /// </summary>
 public class DateOnlyValidator : ValidatorBase
 {
