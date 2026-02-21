@@ -36,15 +36,16 @@ public class TimeOnlyAttributeTests
 
         var attribute2 = new TimeOnlyAttribute("HH:mm:ss", "HH时mm分ss秒")
         {
-            Provider = CultureInfo.CurrentCulture, Style = DateTimeStyles.AllowTrailingWhite
+            Culture = "en-GB", Style = DateTimeStyles.AllowTrailingWhite
         };
+        var enGbCulture = CultureInfo.GetCultureInfo("en-GB");
         Assert.Equal(["HH:mm:ss", "HH时mm分ss秒"], attribute2.Formats);
-        Assert.Equal(CultureInfo.CurrentCulture, attribute2.Provider);
+        Assert.Equal(enGbCulture, attribute2.Provider);
         Assert.Equal(DateTimeStyles.AllowTrailingWhite, attribute2.Style);
         Assert.Null(attribute2.ErrorMessage);
         Assert.NotNull(attribute2._validator);
         Assert.Equal(["HH:mm:ss", "HH时mm分ss秒"], attribute2._validator.Formats);
-        Assert.Equal(CultureInfo.CurrentCulture, attribute2._validator.Provider);
+        Assert.Equal(enGbCulture, attribute2._validator.Provider);
         Assert.Equal(DateTimeStyles.AllowTrailingWhite, attribute2._validator.Style);
         Assert.Equal("'HH:mm:ss', 'HH时mm分ss秒'", attribute2.FormatsFormatted);
     }

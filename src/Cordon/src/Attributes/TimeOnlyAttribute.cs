@@ -34,18 +34,23 @@ public class TimeOnlyAttribute : ValidationBaseAttribute
     public string[] Formats { get; }
 
     /// <summary>
-    ///     格式提供器
+    ///     区域性（格式提供器）
     /// </summary>
-    /// <remarks>默认值为：<see cref="CultureInfo.InvariantCulture" /></remarks>
-    public IFormatProvider? Provider
+    public string? Culture
     {
         get;
         set
         {
             field = value;
-            _validator.Provider = value;
+            _validator.Provider = string.IsNullOrEmpty(value) ? null : CultureInfo.GetCultureInfo(value);
         }
-    } = CultureInfo.InvariantCulture;
+    }
+
+    /// <summary>
+    ///     格式提供器
+    /// </summary>
+    /// <remarks>使用 <see cref="Culture" /> 进行指定。</remarks>
+    public IFormatProvider? Provider => _validator.Provider;
 
     /// <summary>
     ///     日期解析样式

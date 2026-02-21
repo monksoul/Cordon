@@ -25,6 +25,7 @@ public class DateOnlyAttributeTests
     {
         var attribute = new DateOnlyAttribute();
         Assert.Empty(attribute.Formats);
+        Assert.Null(attribute.Culture);
         Assert.Equal(CultureInfo.InvariantCulture, attribute.Provider);
         Assert.Equal(DateTimeStyles.None, attribute.Style);
         Assert.Null(attribute.ErrorMessage);
@@ -36,15 +37,17 @@ public class DateOnlyAttributeTests
 
         var attribute2 = new DateOnlyAttribute("yyyy-MM-dd", "yyyy/MM/dd")
         {
-            Provider = CultureInfo.CurrentCulture, Style = DateTimeStyles.AllowTrailingWhite
+            Culture = "en-GB", Style = DateTimeStyles.AllowTrailingWhite
         };
+        var enGbCulture = CultureInfo.GetCultureInfo("en-GB");
         Assert.Equal(["yyyy-MM-dd", "yyyy/MM/dd"], attribute2.Formats);
-        Assert.Equal(CultureInfo.CurrentCulture, attribute2.Provider);
+        Assert.Equal("en-GB", attribute2.Culture);
+        Assert.Equal(enGbCulture, attribute2.Provider);
         Assert.Equal(DateTimeStyles.AllowTrailingWhite, attribute2.Style);
         Assert.Null(attribute2.ErrorMessage);
         Assert.NotNull(attribute2._validator);
         Assert.Equal(["yyyy-MM-dd", "yyyy/MM/dd"], attribute2._validator.Formats);
-        Assert.Equal(CultureInfo.CurrentCulture, attribute2._validator.Provider);
+        Assert.Equal(enGbCulture, attribute2._validator.Provider);
         Assert.Equal(DateTimeStyles.AllowTrailingWhite, attribute2._validator.Style);
         Assert.Equal("'yyyy-MM-dd', 'yyyy/MM/dd'", attribute2.FormatsFormatted);
     }
