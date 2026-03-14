@@ -392,7 +392,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <summary>
     ///     设置验证条件
     /// </summary>
-    /// <remarks>当条件满足时才验证。</remarks>
+    /// <remarks>
+    ///     <para>当条件满足时才验证。</para>
+    ///     <para>如果在添加任何验证器之前调用此方法，则它将作为值级别的条件，应用于之后添加的所有验证器。</para>
+    ///     <para>如果在添加验证器之后调用，则它仅作为最近添加的验证器的条件。请注意，如果同时使用 <c>WithMessage</c>，应确保此方法在 <c>WithMessage</c> 之前调用，以确保条件正确应用于该验证器。</para>
+    /// </remarks>
     /// <param name="condition">条件委托</param>
     /// <returns>
     ///     <see cref="ValueValidator{T}" />
@@ -402,15 +406,17 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
-        WhenCondition = (u, _) => condition(u);
-
-        return this;
+        return When((u, _) => condition(u));
     }
 
     /// <summary>
     ///     设置验证条件
     /// </summary>
-    /// <remarks>当条件满足时才验证。</remarks>
+    /// <remarks>
+    ///     <para>当条件满足时才验证。</para>
+    ///     <para>如果在添加任何验证器之前调用此方法，则它将作为值级别的条件，应用于之后添加的所有验证器。</para>
+    ///     <para>如果在添加验证器之后调用，则它仅作为最近添加的验证器的条件。请注意，如果同时使用 <c>WithMessage</c>，应确保此方法在 <c>WithMessage</c> 之前调用，以确保条件正确应用于该验证器。</para>
+    /// </remarks>
     /// <param name="condition">条件委托</param>
     /// <returns>
     ///     <see cref="ValueValidator{T}" />
@@ -420,7 +426,29 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
-        WhenCondition = condition;
+        // 空检查
+        if (_lastAddedValidator is null)
+        {
+            WhenCondition = condition;
+        }
+        else
+        {
+            // TODO: 注意以下可能存在重复包装的情况
+
+            // 获取最近添加的验证器在列表中的索引
+            var lastValidatorIndex = Validators.LastIndexOf(_lastAddedValidator);
+            var originalValidator = _lastAddedValidator;
+
+            // 创建条件验证器包装器
+            var conditionalValidatorWrapper = new ConditionalValidator<T>(builder =>
+                builder.When(condition).Then(t => t.AddValidator(originalValidator)));
+
+            // 替换最近添加的验证器
+            Validators[lastValidatorIndex] = conditionalValidatorWrapper;
+
+            // 同步最近添加的验证器
+            _lastAddedValidator = conditionalValidatorWrapper;
+        }
 
         return this;
     }

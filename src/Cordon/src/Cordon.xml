@@ -1839,7 +1839,7 @@
             <param name="Validators">验证器列表</param>
             <typeparam name="T">对象类型</typeparam>
         </member>
-        <member name="M:Cordon.ConditionRule`1.#ctor(System.Func{`0,System.Boolean},System.Collections.Generic.IReadOnlyList{Cordon.ValidatorBase})">
+        <member name="M:Cordon.ConditionRule`1.#ctor(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean},System.Collections.Generic.IReadOnlyList{Cordon.ValidatorBase})">
             <summary>
                 条件规则
             </summary>
@@ -1893,6 +1893,15 @@
             <remarks>当所有条件均不满足时使用。</remarks>
         </member>
         <member name="M:Cordon.ConditionBuilder`1.When(System.Func{`0,System.Boolean})">
+            <summary>
+                定义满足指定的条件委托
+            </summary>
+            <param name="condition">条件委托</param>
+            <returns>
+                <see cref="T:Cordon.ConditionThenBuilder`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.ConditionBuilder`1.When(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 定义满足指定的条件委托
             </summary>
@@ -1972,7 +1981,7 @@
         <member name="F:Cordon.ConditionThenBuilder`1._conditionBuilder">
             <inheritdoc cref="T:Cordon.ConditionBuilder`1" />
         </member>
-        <member name="M:Cordon.ConditionThenBuilder`1.#ctor(Cordon.ConditionBuilder{`0},System.Func{`0,System.Boolean})">
+        <member name="M:Cordon.ConditionThenBuilder`1.#ctor(Cordon.ConditionBuilder{`0},System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
             <summary>
                 构造函数
             </summary>
@@ -4797,7 +4806,11 @@
             <summary>
                 设置验证条件
             </summary>
-            <remarks>当条件满足时才验证。</remarks>
+            <remarks>
+                <para>当条件满足时才验证。</para>
+                <para>如果在添加任何验证器之前调用此方法，则它将作为属性级别的条件，应用于之后添加的所有验证器。</para>
+                <para>如果在添加验证器之后调用，则它仅作为最近添加的验证器的条件。请注意，如果同时使用 <c>WithMessage</c>，应确保此方法在 <c>WithMessage</c> 之前调用，以确保条件正确应用于该验证器。</para>
+            </remarks>
             <param name="condition">条件委托</param>
             <returns>
                 <typeparamref name="TSelf" />
@@ -4807,7 +4820,11 @@
             <summary>
                 设置验证条件
             </summary>
-            <remarks>当条件满足时才验证。</remarks>
+            <remarks>
+                <para>当条件满足时才验证。</para>
+                <para>如果在添加任何验证器之前调用此方法，则它将作为属性级别的条件，应用于之后添加的所有验证器。</para>
+                <para>如果在添加验证器之后调用，则它仅作为最近添加的验证器的条件。请注意，如果同时使用 <c>WithMessage</c>，应确保此方法在 <c>WithMessage</c> 之前调用，以确保条件正确应用于该验证器。</para>
+            </remarks>
             <param name="condition">条件委托</param>
             <returns>
                 <typeparamref name="TSelf" />
@@ -5263,6 +5280,20 @@
                 <see cref="T:System.Collections.Generic.List`1" />
             </returns>
         </member>
+        <member name="M:Cordon.PropertyValidator`3.CreateValidatorProxy``1(System.Func{Cordon.ValidationContext{`0},System.Object[]},System.Func{`0,System.Object},System.Action{``0})">
+            <summary>
+                创建验证器代理实例
+            </summary>
+            <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
+            <param name="validatingObjectFactory">用于执行验证的对象工厂</param>
+            <param name="configure">配置验证器实例</param>
+            <typeparam name="TValidator">
+                <see cref="T:Cordon.ValidatorBase" />
+            </typeparam>
+            <returns>
+                <see cref="T:Cordon.ValidatorProxy`2" />
+            </returns>
+        </member>
         <member name="T:Cordon.ValueValidator`1">
             <summary>
                 单值验证器
@@ -5423,7 +5454,11 @@
             <summary>
                 设置验证条件
             </summary>
-            <remarks>当条件满足时才验证。</remarks>
+            <remarks>
+                <para>当条件满足时才验证。</para>
+                <para>如果在添加任何验证器之前调用此方法，则它将作为值级别的条件，应用于之后添加的所有验证器。</para>
+                <para>如果在添加验证器之后调用，则它仅作为最近添加的验证器的条件。请注意，如果同时使用 <c>WithMessage</c>，应确保此方法在 <c>WithMessage</c> 之前调用，以确保条件正确应用于该验证器。</para>
+            </remarks>
             <param name="condition">条件委托</param>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
@@ -5433,7 +5468,11 @@
             <summary>
                 设置验证条件
             </summary>
-            <remarks>当条件满足时才验证。</remarks>
+            <remarks>
+                <para>当条件满足时才验证。</para>
+                <para>如果在添加任何验证器之前调用此方法，则它将作为值级别的条件，应用于之后添加的所有验证器。</para>
+                <para>如果在添加验证器之后调用，则它仅作为最近添加的验证器的条件。请注意，如果同时使用 <c>WithMessage</c>，应确保此方法在 <c>WithMessage</c> 之前调用，以确保条件正确应用于该验证器。</para>
+            </remarks>
             <param name="condition">条件委托</param>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
@@ -8174,11 +8213,14 @@
             </summary>
             <param name="disposing">是否释放托管资源</param>
         </member>
-        <member name="M:Cordon.ConditionalValidator`1.GetMatchedValidators(`0)">
+        <member name="M:Cordon.ConditionalValidator`1.GetMatchedValidators(`0,Cordon.ValidationContext{`0})">
             <summary>
                 获取匹配到的验证器列表
             </summary>
             <param name="instance">对象</param>
+            <param name="validationContext">
+                <see cref="T:Cordon.ValidationContext`1" />
+            </param>
             <returns>
                 <see cref="T:System.Collections.Generic.IReadOnlyList`1" />
             </returns>
@@ -10637,6 +10679,22 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+       <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

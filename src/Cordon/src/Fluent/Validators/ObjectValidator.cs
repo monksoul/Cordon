@@ -620,9 +620,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
 
-        WhenCondition = (instance, _) => condition(instance);
-
-        return this;
+        return When((u, _) => condition(u));
     }
 
     /// <summary>

@@ -16,17 +16,17 @@ public class ConditionThenBuilderTests
     [Fact]
     public void New_ReturnOK()
     {
-        var builder = new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10);
+        var builder = new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10);
         Assert.NotNull(builder._condition);
-        Assert.False(builder._condition(9));
-        Assert.True(builder._condition(11));
+        Assert.False(builder._condition(9, new ValidationContext<int>(9)));
+        Assert.True(builder._condition(11, new ValidationContext<int>(11)));
         Assert.NotNull(builder._conditionBuilder);
     }
 
     [Fact]
     public void Then_Invalid_Parameters()
     {
-        var builder = new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10);
+        var builder = new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10);
         Assert.Throws<ArgumentNullException>(() => builder.Then((Action<FluentValidatorBuilder<int>>)null!));
         Assert.Throws<ArgumentNullException>(() => builder.Then((ValidatorBase[])null!));
     }
@@ -35,13 +35,13 @@ public class ConditionThenBuilderTests
     public void Then_ReturnOK()
     {
         var builder =
-            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).Then(u => u.Min(10).Max(100));
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10).Then(u => u.Min(10).Max(100));
 
         Assert.Single(builder._conditionalRules);
         Assert.Single(builder._conditionalRules.First().Validators);
 
         var builder2 =
-            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).Then([
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10).Then([
                 new MinValidator(10), new MaxValidator(100)
             ]);
 
@@ -49,7 +49,7 @@ public class ConditionThenBuilderTests
         Assert.Single(builder2._conditionalRules.First().Validators);
 
         var builder3 =
-            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).Then(u => u.Min(10).Max(100),
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10).Then(u => u.Min(10).Max(100),
                 CompositeMode.All);
 
         Assert.Single(builder3._conditionalRules);
@@ -59,7 +59,7 @@ public class ConditionThenBuilderTests
         Assert.Equal(CompositeMode.All, addedValidator.Mode);
 
         var builder4 =
-            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).Then([
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10).Then([
                     new MinValidator(10), new MaxValidator(100)
                 ],
                 CompositeMode.All);
@@ -75,14 +75,14 @@ public class ConditionThenBuilderTests
     public void ThenErrorMessage_ReturnOK()
     {
         var builder =
-            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10).ThenMessage("错误信息1")
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10).ThenMessage("错误信息1")
                 .When(u => u < 10).ThenMessage("错误信息2");
 
         Assert.Equal(2, builder._conditionalRules.Count);
         Assert.Equal(typeof(FailureValidator), builder._conditionalRules.First().Validators[0].GetType());
 
         var builder2 =
-            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), u => u > 10)
+            new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10)
                 .ThenMessage(typeof(TestValidationMessages), "TestValidator_ValidationError")
                 .When(u => u < 10).ThenMessage(typeof(TestValidationMessages), "TestValidator_ValidationError2");
 

@@ -750,6 +750,30 @@ public class ValueValidatorTests
     }
 
     [Fact]
+    public void When_AfterValidator_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<string?>();
+
+        valueValidator.When(u => u is not null)
+            .MinLength(5).When(s => s is not null && s.StartsWith('F'))
+            .Required()
+            .EmailAddress().When(s => s is not null && s.Contains('@'));
+
+        Assert.NotNull(valueValidator.WhenCondition);
+        Assert.Equal(3, valueValidator.Validators.Count);
+        Assert.True(valueValidator.Validators[0] is RequiredValidator);
+        Assert.True(valueValidator.Validators[1] is ConditionalValidator<string?>);
+        Assert.True(valueValidator.Validators[2] is ConditionalValidator<string?>);
+
+        Assert.True(valueValidator.IsValid(null));
+        Assert.True(valueValidator.IsValid("百签"));
+        Assert.False(valueValidator.IsValid("F百签"));
+        Assert.True(valueValidator.IsValid("Furion"));
+        Assert.False(valueValidator.IsValid("Furion@"));
+        Assert.True(valueValidator.IsValid("Furion@outlook.com"));
+    }
+
+    [Fact]
     public void PreProcess_ReturnOK()
     {
         var valueValidator = new ValueValidator<string>();

@@ -311,21 +311,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     public virtual TSelf ValidatorProxy<TValidator>(
         Func<ValidationContext<T>, object?[]?>? constructorArgsFactory = null,
         Func<T, object?>? validatingObjectFactory = null, Action<TValidator>? configure = null)
-        where TValidator : ValidatorBase
-    {
-        // 初始化 ValidatorProxy<T, TValidator> 实例
-        var validatorProxy = new ValidatorProxy<T, TValidator>(
-            validatingObjectFactory ?? (instance => GetValidatingValue(instance)),
-            constructorArgsFactory is null ? null : (_, context) => constructorArgsFactory(context));
-
-        // 空检查
-        if (configure is not null)
-        {
-            validatorProxy.Configure(configure);
-        }
-
-        return AddValidator(validatorProxy);
-    }
+        where TValidator : ValidatorBase =>
+        AddValidator(CreateValidatorProxy(constructorArgsFactory, validatingObjectFactory, configure));
 
     /// <summary>
     ///     结束当前属性验证器的配置，返回到对象验证器以继续链式操作
@@ -431,4 +418,35 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// </returns>
     public virtual List<ValidationResult> ToResults(bool disposeAfterValidation = true) =>
         _objectValidator.ToResults(disposeAfterValidation);
+
+    /// <summary>
+    ///     创建验证器代理实例
+    /// </summary>
+    /// <param name="constructorArgsFactory"><typeparamref name="TValidator" /> 构造函数参数工厂</param>
+    /// <param name="validatingObjectFactory">用于执行验证的对象工厂</param>
+    /// <param name="configure">配置验证器实例</param>
+    /// <typeparam name="TValidator">
+    ///     <see cref="ValidatorBase" />
+    /// </typeparam>
+    /// <returns>
+    ///     <see cref="ValidatorProxy{T,TValidator}" />
+    /// </returns>
+    public ValidatorProxy<T, TValidator> CreateValidatorProxy<TValidator>(
+        Func<ValidationContext<T>, object?[]?>? constructorArgsFactory = null,
+        Func<T, object?>? validatingObjectFactory = null, Action<TValidator>? configure = null)
+        where TValidator : ValidatorBase
+    {
+        // 初始化 ValidatorProxy<T, TValidator> 实例
+        var validatorProxy = new ValidatorProxy<T, TValidator>(
+            validatingObjectFactory ?? (instance => GetValidatingValue(instance)),
+            constructorArgsFactory is null ? null : (_, context) => constructorArgsFactory(context));
+
+        // 空检查
+        if (configure is not null)
+        {
+            validatorProxy.Configure(configure);
+        }
+
+        return validatorProxy;
+    }
 }

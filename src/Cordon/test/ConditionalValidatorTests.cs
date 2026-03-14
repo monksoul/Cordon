@@ -256,18 +256,21 @@ public class ConditionalValidatorTests
         var validator = new ConditionalValidator<string>(builder =>
             builder.When(u => u.Contains('@')).Then(b => b.EmailAddress()).Otherwise(b => b.UserName()));
 
-        var matchedValidators = validator.GetMatchedValidators("monksoul@outlook");
+        var matchedValidators =
+            validator.GetMatchedValidators("monksoul@outlook", new ValidationContext<string>("monksoul@outlook"));
         Assert.NotNull(matchedValidators);
         Assert.Single(matchedValidators);
         Assert.True(matchedValidators[0] is CompositeValidator<string>);
 
-        var matchedValidators2 = validator.GetMatchedValidators("monk__soul");
+        var matchedValidators2 =
+            validator.GetMatchedValidators("monk__soul", new ValidationContext<string>("monk__soul"));
         Assert.NotNull(matchedValidators2);
         Assert.Single(matchedValidators2);
         Assert.True(matchedValidators2[0] is CompositeValidator<string>);
 
         var validator2 = new ConditionalValidator<string>(_ => { });
-        var matchedValidators3 = validator2.GetMatchedValidators("monksoul@outlook.com");
+        var matchedValidators3 =
+            validator2.GetMatchedValidators("monksoul@outlook.com", new ValidationContext<string>("monksoul@outlook"));
         Assert.Null(matchedValidators3);
     }
 }

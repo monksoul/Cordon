@@ -2072,6 +2072,21 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void CreateValidatorProxy_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ValidationModel>();
+        var propertyValidator = new PropertyValidator<ValidationModel, object?>(u => u.Data1, objectValidator);
+
+        var validatorProxy1 =
+            propertyValidator.CreateValidatorProxy<UserNameValidator>();
+        Assert.NotNull(validatorProxy1);
+
+        var validatorProxy2 =
+            propertyValidator.CreateValidatorProxy<EqualToValidator>(context => [context.Instance.Data2]);
+        Assert.NotNull(validatorProxy2);
+    }
+
+    [Fact]
     public void WithAttribute_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()

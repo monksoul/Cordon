@@ -20,7 +20,10 @@ public class ConditionBuilderTests
     {
         var conditionBuilder = new ConditionBuilder<int>();
         Assert.Throws<ArgumentNullException>(() =>
-            conditionBuilder.When(null!).Then((Action<FluentValidatorBuilder<int>>)null!));
+            conditionBuilder.When((Func<int, ValidationContext<int>, bool>)null!)
+                .Then((Action<FluentValidatorBuilder<int>>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            conditionBuilder.When((Func<int, bool>)null!).Then((Action<FluentValidatorBuilder<int>>)null!));
         Assert.Throws<ArgumentNullException>(() => conditionBuilder.When(u => u > 10).Then((ValidatorBase[])null!));
     }
 
@@ -33,6 +36,9 @@ public class ConditionBuilderTests
 
         conditionBuilder.When(u => u > 100).Then(b => b.Min(50));
         Assert.Equal(2, conditionBuilder._conditionalRules.Count);
+
+        conditionBuilder.When((u, _) => u > 100).Then(b => b.Min(50));
+        Assert.Equal(3, conditionBuilder._conditionalRules.Count);
     }
 
     [Fact]

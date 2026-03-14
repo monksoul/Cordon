@@ -1238,6 +1238,31 @@ public class PropertyValidatorTests
     }
 
     [Fact]
+    public void When_AfterValidator_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<WhenModel>();
+        var propertyValidator = new PropertyValidator<WhenModel, string?>(u => u.Name, objectValidator);
+
+        propertyValidator.When(u => u is not null)
+            .MinLength(5).When(s => s is not null && s.StartsWith('F'))
+            .Required()
+            .EmailAddress().When(s => s is not null && s.Contains('@'));
+
+        Assert.NotNull(propertyValidator.WhenCondition);
+        Assert.Equal(3, propertyValidator.Validators.Count);
+        Assert.True(propertyValidator.Validators[0] is RequiredValidator);
+        Assert.True(propertyValidator.Validators[1] is ValidatorProxy<WhenModel, ConditionalValidator<string?>>);
+        Assert.True(propertyValidator.Validators[2] is ValidatorProxy<WhenModel, ConditionalValidator<string?>>);
+
+        Assert.True(propertyValidator.IsValid(new WhenModel()));
+        Assert.True(propertyValidator.IsValid(new WhenModel { Name = "百签" }));
+        Assert.False(propertyValidator.IsValid(new WhenModel { Name = "F百签" }));
+        Assert.True(propertyValidator.IsValid(new WhenModel { Name = "Furion" }));
+        Assert.False(propertyValidator.IsValid(new WhenModel { Name = "Furion@" }));
+        Assert.True(propertyValidator.IsValid(new WhenModel { Name = "Furion@outlook.com" }));
+    }
+
+    [Fact]
     public void PreProcess_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
@@ -1604,5 +1629,10 @@ public class PropertyValidatorTests
     public class Child
     {
         public int Id { get; set; }
+    }
+
+    public class WhenModel
+    {
+        public string? Name { get; set; }
     }
 }

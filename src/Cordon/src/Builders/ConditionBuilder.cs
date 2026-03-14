@@ -10,7 +10,9 @@ namespace Cordon;
 /// <param name="Condition">条件委托</param>
 /// <param name="Validators">验证器列表</param>
 /// <typeparam name="T">对象类型</typeparam>
-internal record ConditionRule<T>(Func<T, bool> Condition, IReadOnlyList<ValidatorBase> Validators);
+internal record ConditionRule<T>(
+    Func<T, ValidationContext<T>, bool> Condition,
+    IReadOnlyList<ValidatorBase> Validators);
 
 /// <summary>
 ///     <see cref="ConditionBuilder{T}" /> 构建结果
@@ -47,6 +49,21 @@ public class ConditionBuilder<T>
     ///     <see cref="ConditionThenBuilder{T}" />
     /// </returns>
     public ConditionThenBuilder<T> When(Func<T, bool> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return When((p, _) => condition(p));
+    }
+
+    /// <summary>
+    ///     定义满足指定的条件委托
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <see cref="ConditionThenBuilder{T}" />
+    /// </returns>
+    public ConditionThenBuilder<T> When(Func<T, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(condition);
@@ -157,7 +174,7 @@ public sealed class ConditionThenBuilder<T>
     /// <summary>
     ///     条件委托
     /// </summary>
-    internal readonly Func<T, bool> _condition;
+    internal readonly Func<T, ValidationContext<T>, bool> _condition;
 
     /// <inheritdoc cref="ConditionBuilder{T}" />
     internal readonly ConditionBuilder<T> _conditionBuilder;
@@ -169,7 +186,7 @@ public sealed class ConditionThenBuilder<T>
     ///     <see cref="ConditionBuilder{T}" />
     /// </param>
     /// <param name="condition">条件委托</param>
-    internal ConditionThenBuilder(ConditionBuilder<T> conditionBuilder, Func<T, bool> condition)
+    internal ConditionThenBuilder(ConditionBuilder<T> conditionBuilder, Func<T, ValidationContext<T>, bool> condition)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(conditionBuilder);

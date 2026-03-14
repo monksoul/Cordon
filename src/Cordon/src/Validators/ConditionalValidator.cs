@@ -44,7 +44,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     public override bool IsValid(T? instance, ValidationContext<T> validationContext)
     {
         // 获取匹配到的验证器列表
-        var matchedValidators = GetMatchedValidators(instance);
+        var matchedValidators = GetMatchedValidators(instance, validationContext);
 
         return matchedValidators is null or { Count: 0 } ||
                matchedValidators.All(u => u.IsValid(instance, validationContext));
@@ -54,7 +54,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     public override List<ValidationResult>? GetValidationResults(T? instance, ValidationContext<T> validationContext)
     {
         // 获取匹配到的验证器列表和成员名称列表
-        var matchedValidators = GetMatchedValidators(instance);
+        var matchedValidators = GetMatchedValidators(instance, validationContext);
 
         // 空检查
         if (matchedValidators is null or { Count: 0 })
@@ -80,7 +80,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     public override void Validate(T? instance, ValidationContext<T> validationContext)
     {
         // 获取匹配到的验证器列表
-        var matchedValidators = GetMatchedValidators(instance);
+        var matchedValidators = GetMatchedValidators(instance, validationContext);
 
         // 空检查
         if (matchedValidators is null or { Count: 0 })
@@ -159,10 +159,13 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
     ///     获取匹配到的验证器列表
     /// </summary>
     /// <param name="instance">对象</param>
+    /// <param name="validationContext">
+    ///     <see cref="ValidationContext{T}" />
+    /// </param>
     /// <returns>
     ///     <see cref="IReadOnlyList{T}" />
     /// </returns>
-    internal IReadOnlyList<ValidatorBase>? GetMatchedValidators(T? instance)
+    internal IReadOnlyList<ValidatorBase>? GetMatchedValidators(T? instance, ValidationContext<T> validationContext)
     {
         // 初始化匹配到的验证器列表
         IReadOnlyList<ValidatorBase>? matchedValidators = null;
@@ -171,7 +174,7 @@ public class ConditionalValidator<T> : ValidatorBase<T>, IValidatorInitializer, 
         foreach (var (condition, validators) in _conditionResult.ConditionalRules)
         {
             // ReSharper disable once InvertIf
-            if (condition(instance!))
+            if (condition(instance!, validationContext))
             {
                 matchedValidators = validators;
                 break;
