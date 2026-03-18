@@ -4,15 +4,15 @@
 
 namespace Cordon.Tests;
 
-public class CompositeModeTests
+public class CascadeModeTests
 {
     [Fact]
     public void Definition_ReturnOK()
     {
-        var names = Enum.GetNames(typeof(CompositeMode));
-        Assert.Equal(3, names.Length);
+        var names = Enum.GetNames(typeof(CascadeMode));
+        Assert.Equal(2, names.Length);
 
-        var strings = new[] { nameof(CompositeMode.FailFast), nameof(CompositeMode.All), nameof(CompositeMode.Any) };
+        var strings = new[] { nameof(CascadeMode.All), nameof(RuleMode.FailFast) };
         Assert.True(strings.SequenceEqual(names));
     }
 }

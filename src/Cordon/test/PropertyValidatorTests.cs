@@ -38,7 +38,7 @@ public class PropertyValidatorTests
         Assert.NotNull(propertyValidator.This);
         Assert.Equal(propertyValidator.This, propertyValidator);
         Assert.Null(propertyValidator._allowEmptyStrings);
-        Assert.Null(propertyValidator.Mode);
+        Assert.Null(propertyValidator.RuleMode);
 
         var services = new ServiceCollection();
         using var serviceProvider = services.BuildServiceProvider();
@@ -168,7 +168,7 @@ public class PropertyValidatorTests
         var propertyValidator =
             new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
                     new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).CustomOnly()
-                .UseMode(CompositeMode.FailFast);
+                .UseRuleMode(RuleMode.FailFast);
 
         Assert.False(propertyValidator.IsValid(new ObjectModel()));
         Assert.False(propertyValidator.IsValid(new ObjectModel { FirstName = "Fu" }));
@@ -438,7 +438,7 @@ public class PropertyValidatorTests
         var propertyValidator =
             new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
                     new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).CustomOnly()
-                .UseMode(CompositeMode.FailFast);
+                .UseRuleMode(RuleMode.FailFast);
 
         var validationResults = propertyValidator.GetValidationResults(new ObjectModel());
         Assert.NotNull(validationResults);
@@ -454,7 +454,7 @@ public class PropertyValidatorTests
 
         Assert.Null(propertyValidator.GetValidationResults(new ObjectModel { FirstName = "百小僧" }));
 
-        var validationResults3 = propertyValidator.UseMode(CompositeMode.All)
+        var validationResults3 = propertyValidator.UseRuleMode(RuleMode.All)
             .GetValidationResults(new ObjectModel { FirstName = "Fu" });
         Assert.NotNull(validationResults3);
         Assert.Equal(2, validationResults3.Count);
@@ -702,7 +702,7 @@ public class PropertyValidatorTests
         var propertyValidator =
             new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
                     new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).CustomOnly()
-                .UseMode(CompositeMode.FailFast);
+                .UseRuleMode(RuleMode.FailFast);
 
         var exception = Assert.Throws<ValidationException>(() => propertyValidator.Validate(new ObjectModel()));
         Assert.Equal("The FirstName field is required.", exception.Message);
@@ -718,7 +718,7 @@ public class PropertyValidatorTests
 
         var exception3 =
             Assert.Throws<ValidationException>(() =>
-                propertyValidator.UseMode(CompositeMode.All).Validate(new ObjectModel { FirstName = "Fu" }));
+                propertyValidator.UseRuleMode(RuleMode.All).Validate(new ObjectModel { FirstName = "Fu" }));
         Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
             exception3.Message);
         Assert.Equal("FirstName", exception3.ValidationResult.MemberNames.First());
@@ -977,7 +977,7 @@ public class PropertyValidatorTests
         var propertyValidator =
             new PropertyValidator<ObjectModel, string?>(u => u.FirstName, objectValidator).AddValidators(
                     new RequiredValidator(), new MinLengthValidator(3), new ChineseValidator()).CustomOnly()
-                .UseMode(CompositeMode.FailFast);
+                .UseRuleMode(RuleMode.FailFast);
 
         var exception =
             Assert.Throws<ValidationException>(() => propertyValidator.TryValidate(new ObjectModel()).ThrowIfInvalid());
@@ -995,7 +995,7 @@ public class PropertyValidatorTests
 
         var exception3 =
             Assert.Throws<ValidationException>(() =>
-                propertyValidator.UseMode(CompositeMode.All).TryValidate(new ObjectModel { FirstName = "Fu" })
+                propertyValidator.UseRuleMode(RuleMode.All).TryValidate(new ObjectModel { FirstName = "Fu" })
                     .ThrowIfInvalid());
         Assert.Equal("The field FirstName must be a string or array type with a minimum length of '3'.",
             exception3.Message);
@@ -1276,23 +1276,23 @@ public class PropertyValidatorTests
     }
 
     [Fact]
-    public void UseMode_ReturnOK()
+    public void UseRuleMode_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
-        Assert.Null(propertyValidator.Mode);
-        propertyValidator.UseMode(CompositeMode.FailFast);
-        Assert.Equal(CompositeMode.FailFast, propertyValidator.Mode);
+        Assert.Null(propertyValidator.RuleMode);
+        propertyValidator.UseRuleMode(RuleMode.FailFast);
+        Assert.Equal(RuleMode.FailFast, propertyValidator.RuleMode);
     }
 
     [Fact]
-    public void GetMode_ReturnOK()
+    public void GetRuleMode_ReturnOK()
     {
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var propertyValidator = new PropertyValidator<ObjectModel, string?>(u => u.Name, objectValidator);
-        Assert.Equal(CompositeMode.All, propertyValidator.GetMode());
-        propertyValidator.UseMode(CompositeMode.FailFast);
-        Assert.Equal(CompositeMode.FailFast, propertyValidator.GetMode());
+        Assert.Equal(RuleMode.All, propertyValidator.GetRuleMode());
+        propertyValidator.UseRuleMode(RuleMode.FailFast);
+        Assert.Equal(RuleMode.FailFast, propertyValidator.GetRuleMode());
     }
 
     [Fact]
@@ -1542,7 +1542,7 @@ public class PropertyValidatorTests
     public void Clone_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ObjectModel>().RuleFor(u => u.Name).Required().MinLength(3)
-            .PreProcess(u => u.Trim()).AllowEmptyStrings().UseMode(CompositeMode.FailFast);
+            .PreProcess(u => u.Trim()).AllowEmptyStrings().UseRuleMode(RuleMode.FailFast);
 
         using var objectValidator = new ObjectValidator<ObjectModel>();
         var cloned = propertyValidator.Clone(objectValidator) as PropertyValidator<ObjectModel, string?>;
@@ -1550,7 +1550,7 @@ public class PropertyValidatorTests
         Assert.Equal(2, cloned.Validators.Count);
         Assert.NotNull(cloned._preProcessor);
         Assert.True(cloned._allowEmptyStrings);
-        Assert.Equal(CompositeMode.FailFast, cloned.Mode);
+        Assert.Equal(RuleMode.FailFast, cloned.RuleMode);
     }
 
     [Fact]

@@ -50,25 +50,25 @@ public class ConditionThenBuilderTests
 
         var builder3 =
             new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10).Then(u => u.Min(10).Max(100),
-                CompositeMode.All);
+                RuleMode.All);
 
         Assert.Single(builder3._conditionalRules);
         Assert.Single(builder3._conditionalRules.First().Validators);
         var addedValidator = builder3._conditionalRules.First().Validators[0] as CompositeValidator<int>;
         Assert.NotNull(addedValidator);
-        Assert.Equal(CompositeMode.All, addedValidator.Mode);
+        Assert.Equal(RuleMode.All, addedValidator.RuleMode);
 
         var builder4 =
             new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10).Then([
                     new MinValidator(10), new MaxValidator(100)
                 ],
-                CompositeMode.All);
+                RuleMode.All);
 
         Assert.Single(builder4._conditionalRules);
         Assert.Single(builder4._conditionalRules.First().Validators);
         var addedValidator2 = builder4._conditionalRules.First().Validators[0] as CompositeValidator<int>;
         Assert.NotNull(addedValidator2);
-        Assert.Equal(CompositeMode.All, addedValidator2.Mode);
+        Assert.Equal(RuleMode.All, addedValidator2.RuleMode);
     }
 
     [Fact]

@@ -76,14 +76,14 @@ public class ConditionBuilder<T>
     /// </summary>
     /// <remarks>当所有条件均不满足时使用。</remarks>
     /// <param name="configure">验证器配置委托</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <param name="ruleMode"><see cref="RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
     public ConditionBuilder<T> Otherwise(Action<FluentValidatorBuilder<T>> configure,
-        CompositeMode mode = CompositeMode.FailFast)
+        RuleMode ruleMode = RuleMode.FailFast)
     {
-        _defaultRules = [new CompositeValidator<T>(configure, mode)];
+        _defaultRules = [new CompositeValidator<T>(configure, ruleMode)];
 
         return this;
     }
@@ -93,13 +93,13 @@ public class ConditionBuilder<T>
     /// </summary>
     /// <remarks>当所有条件均不满足时使用。</remarks>
     /// <param name="validators">验证器列表</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <param name="ruleMode"><see cref="RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
-    public ConditionBuilder<T> Otherwise(ValidatorBase[] validators, CompositeMode mode = CompositeMode.FailFast)
+    public ConditionBuilder<T> Otherwise(ValidatorBase[] validators, RuleMode ruleMode = RuleMode.FailFast)
     {
-        _defaultRules = [new CompositeValidator<T>(validators, mode)];
+        _defaultRules = [new CompositeValidator<T>(validators, ruleMode)];
 
         return this;
     }
@@ -200,15 +200,15 @@ public sealed class ConditionThenBuilder<T>
     ///     配置满足条件时执行的验证规则
     /// </summary>
     /// <param name="configure">验证器配置委托</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <param name="ruleMode"><see cref="RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
     public ConditionBuilder<T> Then(Action<FluentValidatorBuilder<T>> configure,
-        CompositeMode mode = CompositeMode.FailFast)
+        RuleMode ruleMode = RuleMode.FailFast)
     {
         _conditionBuilder._conditionalRules.Add(new ConditionRule<T>(_condition,
-            [new CompositeValidator<T>(configure, mode)]));
+            [new CompositeValidator<T>(configure, ruleMode)]));
 
         return _conditionBuilder;
     }
@@ -217,14 +217,14 @@ public sealed class ConditionThenBuilder<T>
     ///     配置满足条件时执行的验证规则
     /// </summary>
     /// <param name="validators">验证器列表</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <param name="ruleMode"><see cref="RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
     /// <returns>
     ///     <see cref="ConditionBuilder{T}" />
     /// </returns>
-    public ConditionBuilder<T> Then(ValidatorBase[] validators, CompositeMode mode = CompositeMode.FailFast)
+    public ConditionBuilder<T> Then(ValidatorBase[] validators, RuleMode ruleMode = RuleMode.FailFast)
     {
         _conditionBuilder._conditionalRules.Add(new ConditionRule<T>(_condition,
-            [new CompositeValidator<T>(validators, mode)]));
+            [new CompositeValidator<T>(validators, ruleMode)]));
 
         return _conditionBuilder;
     }

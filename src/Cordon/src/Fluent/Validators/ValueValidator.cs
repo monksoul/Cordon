@@ -76,10 +76,10 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     internal Func<T, ValidationContext<T>, bool>? WhenCondition { get; private set; }
 
     /// <summary>
-    ///     <inheritdoc cref="CompositeMode" />
+    ///     <inheritdoc cref="Cordon.RuleMode" />
     /// </summary>
-    /// <remarks>默认值为：<see cref="CompositeMode.All" />。</remarks>
-    public CompositeMode Mode { get; set; } = CompositeMode.All;
+    /// <remarks>默认值为：<see cref="Cordon.RuleMode.All" />。</remarks>
+    public RuleMode RuleMode { get; set; } = RuleMode.All;
 
     /// <inheritdoc />
     string? IMemberPathRepairable.MemberPath
@@ -116,11 +116,11 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
         // 获取规则集匹配的验证器列表
         var validators = Validators.Where(u => RuleSetMatcher.Matches(u.RuleSets, resolvedRuleSets));
 
-        return Mode switch
+        return RuleMode switch
         {
-            CompositeMode.FailFast or CompositeMode.All => validators.All(u =>
+            RuleMode.FailFast or RuleMode.All => validators.All(u =>
                 u.IsValid(resolvedValue, validationContext)),
-            CompositeMode.Any => validators.Any(u => u.IsValid(resolvedValue, validationContext)),
+            RuleMode.Any => validators.Any(u => u.IsValid(resolvedValue, validationContext)),
             _ => throw new NotSupportedException()
         };
     }
@@ -158,14 +158,14 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
                 // 追加验证结果列表
                 validationResults.AddRange(results);
 
-                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
-                if (Mode is CompositeMode.FailFast)
+                // 检查验证规则的执行聚合模式是否是遇到首个验证失败即停止后续验证
+                if (RuleMode is RuleMode.FailFast)
                 {
                     break;
                 }
             }
-            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
-            else if (Mode is CompositeMode.Any)
+            // 检查验证规则的执行聚合模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (RuleMode is RuleMode.Any)
             {
                 // 清空验证结果列表
                 validationResults.Clear();
@@ -210,14 +210,14 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
                 // 缓存首个验证无效的验证器
                 firstFailedValidator ??= validator;
 
-                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
-                if (Mode is CompositeMode.FailFast or CompositeMode.All)
+                // 检查验证规则的执行聚合模式是否是遇到首个验证失败即停止后续验证
+                if (RuleMode is RuleMode.FailFast or RuleMode.All)
                 {
                     validator.Validate(resolvedValue, validationContext);
                 }
             }
-            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
-            else if (Mode is CompositeMode.Any)
+            // 检查验证规则的执行聚合模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (RuleMode is RuleMode.Any)
             {
                 return;
             }
@@ -469,17 +469,17 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     }
 
     /// <summary>
-    ///     设置验证模式
+    ///     设置验证规则的执行聚合模式
     /// </summary>
-    /// <param name="mode">
-    ///     <see cref="CompositeMode" />
+    /// <param name="ruleMode">
+    ///     <see cref="Cordon.RuleMode" />
     /// </param>
     /// <returns>
     ///     <see cref="ValueValidator{T}" />
     /// </returns>
-    public virtual ValueValidator<T> UseMode(CompositeMode mode)
+    public virtual ValueValidator<T> UseRuleMode(RuleMode ruleMode)
     {
-        Mode = mode;
+        RuleMode = ruleMode;
 
         return this;
     }

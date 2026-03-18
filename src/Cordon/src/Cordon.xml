@@ -1787,6 +1787,9 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
+        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1796,11 +1799,8 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
-        </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -1910,24 +1910,24 @@
                 <see cref="T:Cordon.ConditionThenBuilder`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ConditionBuilder`1.Otherwise(System.Action{Cordon.FluentValidatorBuilder{`0}},Cordon.CompositeMode)">
+        <member name="M:Cordon.ConditionBuilder`1.Otherwise(System.Action{Cordon.FluentValidatorBuilder{`0}},Cordon.RuleMode)">
             <summary>
                 配置默认验证规则
             </summary>
             <remarks>当所有条件均不满足时使用。</remarks>
             <param name="configure">验证器配置委托</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
             <returns>
                 <see cref="T:Cordon.ConditionBuilder`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ConditionBuilder`1.Otherwise(Cordon.ValidatorBase[],Cordon.CompositeMode)">
+        <member name="M:Cordon.ConditionBuilder`1.Otherwise(Cordon.ValidatorBase[],Cordon.RuleMode)">
             <summary>
                 配置默认验证规则
             </summary>
             <remarks>当所有条件均不满足时使用。</remarks>
             <param name="validators">验证器列表</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
             <returns>
                 <see cref="T:Cordon.ConditionBuilder`1" />
             </returns>
@@ -1990,22 +1990,22 @@
             </param>
             <param name="condition">条件委托</param>
         </member>
-        <member name="M:Cordon.ConditionThenBuilder`1.Then(System.Action{Cordon.FluentValidatorBuilder{`0}},Cordon.CompositeMode)">
+        <member name="M:Cordon.ConditionThenBuilder`1.Then(System.Action{Cordon.FluentValidatorBuilder{`0}},Cordon.RuleMode)">
             <summary>
                 配置满足条件时执行的验证规则
             </summary>
             <param name="configure">验证器配置委托</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
             <returns>
                 <see cref="T:Cordon.ConditionBuilder`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ConditionThenBuilder`1.Then(Cordon.ValidatorBase[],Cordon.CompositeMode)">
+        <member name="M:Cordon.ConditionThenBuilder`1.Then(Cordon.ValidatorBase[],Cordon.RuleMode)">
             <summary>
                 配置满足条件时执行的验证规则
             </summary>
             <param name="validators">验证器列表</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
             <returns>
                 <see cref="T:Cordon.ConditionBuilder`1" />
             </returns>
@@ -2193,22 +2193,22 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.Composite(Cordon.ValidatorBase[],Cordon.CompositeMode)">
+        <member name="M:Cordon.FluentValidatorBuilder`2.Composite(Cordon.ValidatorBase[],Cordon.RuleMode)">
             <summary>
                 添加组合验证器
             </summary>
             <param name="validators">验证器列表</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.Composite(System.Action{Cordon.FluentValidatorBuilder{`0}},Cordon.CompositeMode)">
+        <member name="M:Cordon.FluentValidatorBuilder`2.Composite(System.Action{Cordon.FluentValidatorBuilder{`0}},Cordon.RuleMode)">
             <summary>
                 添加组合验证器
             </summary>
             <param name="configure">验证器配置委托</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -3097,24 +3097,19 @@
             </returns>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
-        <member name="T:Cordon.CompositeMode">
+        <member name="T:Cordon.CascadeMode">
             <summary>
-                组合验证器模式
+                属性验证级联模式
             </summary>
         </member>
-        <member name="F:Cordon.CompositeMode.FailFast">
+        <member name="F:Cordon.CascadeMode.All">
             <summary>
-                遇到首个验证失败即停止后续验证
+                所有属性都会验证，收集全部错误信息
             </summary>
         </member>
-        <member name="F:Cordon.CompositeMode.All">
+        <member name="F:Cordon.CascadeMode.FailFast">
             <summary>
-                所有验证器都会执行，且全部必须通过
-            </summary>
-        </member>
-        <member name="F:Cordon.CompositeMode.Any">
-            <summary>
-                任一验证器验证成功，即视为整体验证通过
+                遇到第一个属性验证失败即停止验证后续属性
             </summary>
         </member>
         <member name="T:Cordon.Constants">
@@ -3138,6 +3133,26 @@
             <remarks>
                 用于使用 <![CDATA[ValidationContext.With<T>()]]> 时设置。
             </remarks>
+        </member>
+        <member name="T:Cordon.RuleMode">
+            <summary>
+                验证规则的执行聚合模式
+            </summary>
+        </member>
+        <member name="F:Cordon.RuleMode.All">
+            <summary>
+                所有验证器都会执行，且全部必须通过
+            </summary>
+        </member>
+        <member name="F:Cordon.RuleMode.FailFast">
+            <summary>
+                遇到首个验证失败即停止后续验证
+            </summary>
+        </member>
+        <member name="F:Cordon.RuleMode.Any">
+            <summary>
+                任一验证器验证成功，即视为整体验证通过
+            </summary>
         </member>
         <member name="T:Cordon.IValidationContext">
             <summary>
@@ -4288,11 +4303,17 @@
         <member name="P:Cordon.ObjectValidator`1.Options">
             <inheritdoc cref="T:Cordon.ValidatorOptions" />
         </member>
-        <member name="P:Cordon.ObjectValidator`1.Mode">
+        <member name="P:Cordon.ObjectValidator`1.RuleMode">
             <summary>
-                <inheritdoc cref="T:Cordon.CompositeMode" />
+                <inheritdoc cref="T:Cordon.RuleMode" />
             </summary>
-            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.All" />。</remarks>
+            <remarks>默认值为：<see cref="F:Cordon.RuleMode.All" />。</remarks>
+        </member>
+        <member name="P:Cordon.ObjectValidator`1.CascadeMode">
+            <summary>
+                <inheritdoc cref="P:Cordon.ObjectValidator`1.CascadeMode" />
+            </summary>
+            <remarks>默认值为：<see cref="F:Cordon.CascadeMode.All" /></remarks>
         </member>
         <member name="P:Cordon.ObjectValidator`1.WhenCondition">
             <summary>
@@ -4556,12 +4577,23 @@
                 <see cref="T:Cordon.ObjectValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ObjectValidator`1.UseMode(Cordon.CompositeMode)">
+        <member name="M:Cordon.ObjectValidator`1.UseRuleMode(Cordon.RuleMode)">
             <summary>
-                设置验证模式
+                设置属性验证规则的执行聚合模式
             </summary>
-            <param name="mode">
-                <see cref="T:Cordon.CompositeMode" />
+            <param name="ruleMode">
+                <see cref="T:Cordon.RuleMode" />
+            </param>
+            <returns>
+                <see cref="T:Cordon.ObjectValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.ObjectValidator`1.UseCascadeMode(Cordon.CascadeMode)">
+            <summary>
+                设置属性验证的级联模式
+            </summary>
+            <param name="cascadeMode">
+                <see cref="T:Cordon.CascadeMode" />
             </param>
             <returns>
                 <see cref="T:Cordon.ObjectValidator`1" />
@@ -4705,12 +4737,12 @@
                 <see cref="P:Cordon.ValidatorOptions.SuppressAttributeValidation" /> 配置项决定。
             </remarks>
         </member>
-        <member name="P:Cordon.PropertyValidator`3.Mode">
+        <member name="P:Cordon.PropertyValidator`3.RuleMode">
             <summary>
-                <inheritdoc cref="T:Cordon.CompositeMode" />
+                <inheritdoc cref="T:Cordon.RuleMode" />
             </summary>
             <remarks>
-                默认值为：<c>null</c>。当此值为 <c>null</c> 时，将由 <see cref="P:Cordon.ObjectValidator`1.Mode" /> 配置项决定。
+                默认值为：<c>null</c>。当此值为 <c>null</c> 时，将由 <see cref="P:Cordon.ObjectValidator`1.RuleMode" /> 配置项决定。
             </remarks>
         </member>
         <member name="P:Cordon.PropertyValidator`3.DisplayName">
@@ -4887,12 +4919,12 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.UseMode(Cordon.CompositeMode)">
+        <member name="M:Cordon.PropertyValidator`3.UseRuleMode(Cordon.RuleMode)">
             <summary>
-                设置验证模式
+                设置属性验证规则的执行聚合模式
             </summary>
             <param name="mode">
-                <see cref="T:Cordon.CompositeMode" />
+                <see cref="T:Cordon.RuleMode" />
             </param>
             <returns>
                 <typeparamref name="TSelf" />
@@ -4920,12 +4952,12 @@
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Cordon.PropertyValidator`3.GetMode">
+        <member name="M:Cordon.PropertyValidator`3.GetRuleMode">
             <summary>
-                获取组合验证器模式
+                获取属性验证规则的执行聚合模式
             </summary>
             <returns>
-                <see cref="T:Cordon.CompositeMode" />
+                <see cref="T:Cordon.RuleMode" />
             </returns>
         </member>
         <member name="M:Cordon.PropertyValidator`3.GetValue(`0)">
@@ -5271,6 +5303,17 @@
                 <see cref="T:Cordon.ObjectValidator`1" />
             </returns>
         </member>
+        <member name="M:Cordon.PropertyValidator`3.UseCascadeMode(Cordon.CascadeMode)">
+            <summary>
+                设置属性验证的级联模式
+            </summary>
+            <param name="cascadeMode">
+                <see cref="T:Cordon.CascadeMode" />
+            </param>
+            <returns>
+                <see cref="T:Cordon.ObjectValidator`1" />
+            </returns>
+        </member>
         <member name="M:Cordon.PropertyValidator`3.ToResults(System.Boolean)">
             <summary>
                 获取对象验证结果列表
@@ -5357,11 +5400,11 @@
             </summary>
             <remarks>当条件满足时才进行验证。</remarks>
         </member>
-        <member name="P:Cordon.ValueValidator`1.Mode">
+        <member name="P:Cordon.ValueValidator`1.RuleMode">
             <summary>
-                <inheritdoc cref="T:Cordon.CompositeMode" />
+                <inheritdoc cref="T:Cordon.RuleMode" />
             </summary>
-            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.All" />。</remarks>
+            <remarks>默认值为：<see cref="F:Cordon.RuleMode.All" />。</remarks>
         </member>
         <member name="P:Cordon.ValueValidator`1.Cordon#IMemberPathRepairable#MemberPath">
             <inheritdoc />
@@ -5488,12 +5531,12 @@
                 <see cref="T:Cordon.ValueValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.ValueValidator`1.UseMode(Cordon.CompositeMode)">
+        <member name="M:Cordon.ValueValidator`1.UseRuleMode(Cordon.RuleMode)">
             <summary>
-                设置验证模式
+                设置验证规则的执行聚合模式
             </summary>
-            <param name="mode">
-                <see cref="T:Cordon.CompositeMode" />
+            <param name="ruleMode">
+                <see cref="T:Cordon.RuleMode" />
             </param>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
@@ -6606,23 +6649,23 @@
                 <see cref="T:Cordon.CompareValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.Composite``1(Cordon.ValidatorBase[],Cordon.CompositeMode)">
+        <member name="M:Cordon.Validators.Composite``1(Cordon.ValidatorBase[],Cordon.RuleMode)">
             <summary>
                 创建组合验证器
             </summary>
             <param name="validators">验证器列表</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
                 <see cref="T:Cordon.CompositeValidator`1" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.Composite``1(System.Action{Cordon.FluentValidatorBuilder{``0}},Cordon.CompositeMode)">
+        <member name="M:Cordon.Validators.Composite``1(System.Action{Cordon.FluentValidatorBuilder{``0}},Cordon.RuleMode)">
             <summary>
                 创建组合验证器
             </summary>
             <param name="configure">验证器配置委托</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
             <typeparam name="T">对象类型</typeparam>
             <returns>
                 <see cref="T:Cordon.CompositeValidator`1" />
@@ -7774,8 +7817,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
+                            ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7797,7 +7840,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character greedily any number of times.<br/>
+                            ○ Match a whitespace character atomically any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -7822,7 +7865,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character greedily any number of times.<br/>
+                                    ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -7883,13 +7926,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7903,13 +7946,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7931,7 +7974,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a hexadecimal digit exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7956,10 +7999,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit greedily at least once.<br/>
+                                    ○ Match a Unicode digit atomically at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit greedily at least once.<br/>
+                                ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -8094,25 +8137,25 @@
                 <see cref="T:Cordon.ValidatorBase" /> 集合
             </summary>
         </member>
-        <member name="M:Cordon.CompositeValidator`1.#ctor(Cordon.ValidatorBase[],Cordon.CompositeMode)">
+        <member name="M:Cordon.CompositeValidator`1.#ctor(Cordon.ValidatorBase[],Cordon.RuleMode)">
             <summary>
                 <inheritdoc cref="T:Cordon.CompositeValidator`1" />
             </summary>
             <param name="validators">验证器列表</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
         </member>
-        <member name="M:Cordon.CompositeValidator`1.#ctor(System.Action{Cordon.FluentValidatorBuilder{`0}},Cordon.CompositeMode)">
+        <member name="M:Cordon.CompositeValidator`1.#ctor(System.Action{Cordon.FluentValidatorBuilder{`0}},Cordon.RuleMode)">
             <summary>
                 <inheritdoc cref="T:Cordon.CompositeValidator`1" />
             </summary>
             <param name="configure">验证器配置委托</param>
-            <param name="mode"><see cref="T:Cordon.CompositeMode" />，默认值为：<see cref="F:Cordon.CompositeMode.FailFast" /></param>
+            <param name="ruleMode"><see cref="T:Cordon.RuleMode" />，默认值为：<see cref="F:Cordon.RuleMode.FailFast" /></param>
         </member>
-        <member name="P:Cordon.CompositeValidator`1.Mode">
+        <member name="P:Cordon.CompositeValidator`1.RuleMode">
             <summary>
-                <inheritdoc cref="T:Cordon.CompositeMode" />
+                <inheritdoc cref="T:Cordon.RuleMode" />
             </summary>
-            <remarks>默认值为：<see cref="F:Cordon.CompositeMode.FailFast" />。</remarks>
+            <remarks>默认值为：<see cref="F:Cordon.RuleMode.FailFast" />。</remarks>
         </member>
         <member name="M:Cordon.CompositeValidator`1.Dispose">
             <inheritdoc />
@@ -8129,12 +8172,12 @@
         <member name="M:Cordon.CompositeValidator`1.Validate(`0,Cordon.ValidationContext{`0})">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.CompositeValidator`1.UseMode(Cordon.CompositeMode)">
+        <member name="M:Cordon.CompositeValidator`1.UseRuleMode(Cordon.RuleMode)">
             <summary>
-                设置验证模式
+                设置验证规则的执行聚合模式
             </summary>
-            <param name="mode">
-                <see cref="T:Cordon.CompositeMode" />
+            <param name="ruleMode">
+                <see cref="T:Cordon.RuleMode" />
             </param>
             <returns>
                 <see cref="T:Cordon.CompositeValidator`1" />
@@ -8431,12 +8474,12 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Loop greedily at least once.<br/>
                 ○ 1st capture group.<br/>
-                    ○ Match a character in the set [0-9A-Za-z].<br/>
+                    ○ Match an ASCII letter or digit.<br/>
                     ○ Optional (greedy).<br/>
-                        ○ Match a character in the set [-0-9A-Za-z] greedily at most 61 times.<br/>
-                        ○ Match a character in the set [0-9A-Za-z].<br/>
+                        ○ Match a character in the set [\-0-9A-Za-z] greedily at most 61 times.<br/>
+                        ○ Match an ASCII letter or digit.<br/>
                     ○ Match '.'.<br/>
-            ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
+            ○ Match an ASCII letter atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8489,9 +8532,9 @@
                     ○ 7th capture group.<br/>
                         ○ Loop greedily at least once.<br/>
                             ○ 8th capture group.<br/>
-                                ○ Match a character in the set [-0-9A-Za-z] atomically at least once.<br/>
+                                ○ Match a character in the set [\-0-9A-Za-z] atomically at least once.<br/>
                                 ○ Match '.'.<br/>
-                        ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
+                        ○ Match an ASCII letter atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9135,7 +9178,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
+            ○ Match a hexadecimal digit exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9149,8 +9192,8 @@
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
-                    ○ Match a character in the set [0-9A-Fa-f] exactly 16 times.<br/>
-                    ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
+                    ○ Match a hexadecimal digit exactly 16 times.<br/>
+                    ○ Match a hexadecimal digit exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9432,7 +9475,7 @@
             ○ Match if at the beginning of the string.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [A-Za-z].<br/>
+                ○ Match an ASCII letter.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
                 ○ Match a Unicode digit.<br/>
@@ -10081,12 +10124,12 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a character in the set [A-Za-z].<br/>
+            ○ Match an ASCII letter.<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [-_] exactly 2 times.<br/>
-            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match a character in the set [0-9A-Za-z].<br/>
+                ○ Match a character in the set [\-_] exactly 2 times.<br/>
+            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match an ASCII letter or digit.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -10683,6 +10726,12 @@
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>
             <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+       <returns>
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </returns>
         </member>

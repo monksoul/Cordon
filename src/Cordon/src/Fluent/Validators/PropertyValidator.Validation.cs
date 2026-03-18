@@ -410,6 +410,18 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
         _objectValidator.RuleSet(ruleSets, setAction);
 
     /// <summary>
+    ///     设置属性验证的级联模式
+    /// </summary>
+    /// <param name="cascadeMode">
+    ///     <see cref="Cordon.CascadeMode" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="ObjectValidator{T}" />
+    /// </returns>
+    public ObjectValidator<T> UseCascadeMode(CascadeMode cascadeMode) =>
+        _objectValidator.UseCascadeMode(cascadeMode);
+
+    /// <summary>
     ///     获取对象验证结果列表
     /// </summary>
     /// <param name="disposeAfterValidation">是否在验证完成后自动释放当前实例。默认值为：<c>true</c></param>

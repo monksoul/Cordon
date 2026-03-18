@@ -224,7 +224,7 @@ public class ValueValidatorValidationTests
         Assert.True(valueValidator.IsValid("百小僧"));
 
         var valueValidator2 =
-            new ValueValidator<object>().Composite(u => u.EmailAddress().UserName(), CompositeMode.Any);
+            new ValueValidator<object>().Composite(u => u.EmailAddress().UserName(), RuleMode.Any);
 
         Assert.Single(valueValidator2.Validators);
 

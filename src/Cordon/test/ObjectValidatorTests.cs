@@ -26,7 +26,8 @@ public class ObjectValidatorTests
         Assert.Null(validator.WhenCondition);
         Assert.Null(validator._memberPath);
         Assert.False(validator.IsNested);
-        Assert.Equal(CompositeMode.All, validator.Mode);
+        Assert.Equal(RuleMode.All, validator.RuleMode);
+        Assert.Equal(CascadeMode.All, validator.CascadeMode);
 
         using var validator2 = new ObjectValidator<ObjectModel>(new Dictionary<object, object?>());
         Assert.NotNull(validator2.Options);
@@ -254,6 +255,26 @@ public class ObjectValidatorTests
         Assert.Null(validator.GetValidationResults(new ObjectModel { Id = 1, Name = "Furion" }));
         Assert.Null(validator.GetValidationResults(new ObjectModel { Id = 1, Name = "Furion", Address = "广东省中山市" }));
         Assert.Null(validator.GetValidationResults(new ObjectModel { Id = 1, Name = "Furion", Address = "广东省" }));
+    }
+
+    [Fact]
+    public void GetValidationResults_WithCascadeMode_ReturnOK()
+    {
+        using var validator = new CascadeModelValidator();
+
+        var validationResults = validator.GetValidationResults(new CascadeModel());
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal(["The field Id must be greater than or equal to '1'."],
+            validationResults.Select(u => u.ErrorMessage));
+
+        validator.UseCascadeMode(CascadeMode.All);
+
+        var validationResults2 = validator.GetValidationResults(new CascadeModel());
+        Assert.NotNull(validationResults2);
+        Assert.Equal(2, validationResults2.Count);
+        Assert.Equal(["The field Id must be greater than or equal to '1'.", "The Name field is required."],
+            validationResults2.Select(u => u.ErrorMessage));
     }
 
     [Fact]
@@ -922,12 +943,21 @@ public class ObjectValidatorTests
     }
 
     [Fact]
-    public void UseMode_ReturnOK()
+    public void UseRuleMode_ReturnOK()
     {
         using var validator = new ObjectValidator<ObjectModel>();
-        Assert.Equal(CompositeMode.All, validator.Mode);
-        validator.UseMode(CompositeMode.FailFast);
-        Assert.Equal(CompositeMode.FailFast, validator.Mode);
+        Assert.Equal(RuleMode.All, validator.RuleMode);
+        validator.UseRuleMode(RuleMode.FailFast);
+        Assert.Equal(RuleMode.FailFast, validator.RuleMode);
+    }
+
+    [Fact]
+    public void UseCascadeMode_ReturnOK()
+    {
+        using var validator = new ObjectValidator<ObjectModel>();
+        Assert.Equal(CascadeMode.All, validator.CascadeMode);
+        validator.UseCascadeMode(CascadeMode.FailFast);
+        Assert.Equal(CascadeMode.FailFast, validator.CascadeMode);
     }
 
     [Fact]
@@ -1205,5 +1235,22 @@ public class ObjectValidatorTests
     public class Child
     {
         public string? Name { get; set; }
+    }
+
+    public class CascadeModel
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+    }
+
+    public class CascadeModelValidator : AbstractValidator<CascadeModel>
+    {
+        public CascadeModelValidator()
+        {
+            CascadeMode = CascadeMode.FailFast;
+
+            RuleFor(u => u.Id).NotNull().Min(1);
+            RuleFor(u => u.Name).Required().NotEmpty().MinLength(3);
+        }
     }
 }

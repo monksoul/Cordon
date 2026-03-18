@@ -60,7 +60,7 @@ public class ConditionBuilderTests
 
         var addValidator = conditionBuilder._defaultRules[0] as CompositeValidator<int>;
         Assert.NotNull(addValidator);
-        Assert.Equal(CompositeMode.FailFast, addValidator.Mode);
+        Assert.Equal(RuleMode.FailFast, addValidator.RuleMode);
 
         var conditionBuilder2 = new ConditionBuilder<int>();
         conditionBuilder2.When(u => u > 10).Then(b => b.Min(10)).Otherwise([new MinValidator(50)]);
@@ -69,7 +69,7 @@ public class ConditionBuilderTests
 
         var addValidator2 = conditionBuilder2._defaultRules[0] as CompositeValidator<int>;
         Assert.NotNull(addValidator2);
-        Assert.Equal(CompositeMode.FailFast, addValidator2.Mode);
+        Assert.Equal(RuleMode.FailFast, addValidator2.RuleMode);
     }
 
     [Fact]

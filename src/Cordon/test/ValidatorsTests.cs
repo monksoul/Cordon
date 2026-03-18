@@ -143,17 +143,17 @@ public class ValidatorsTests
     {
         var validator = Validators.Composite<string>(u => u.ChineseName().AllowedValues("百签", "百小僧"));
         Assert.Equal(2, validator._validators.Count);
-        Assert.Equal(CompositeMode.FailFast, validator.Mode);
+        Assert.Equal(RuleMode.FailFast, validator.RuleMode);
 
         var validator2 =
-            Validators.Composite<string>(u => u.ChineseName().AllowedValues("百签", "百小僧"), CompositeMode.Any);
+            Validators.Composite<string>(u => u.ChineseName().AllowedValues("百签", "百小僧"), RuleMode.Any);
         Assert.Equal(2, validator2._validators.Count);
-        Assert.Equal(CompositeMode.Any, validator2.Mode);
+        Assert.Equal(RuleMode.Any, validator2.RuleMode);
 
         var validator3 =
             Validators.Composite<string>([new ChineseNameValidator(), new AllowedValuesValidator("百签", "百小僧")]);
         Assert.Equal(2, validator3._validators.Count);
-        Assert.Equal(CompositeMode.FailFast, validator3.Mode);
+        Assert.Equal(RuleMode.FailFast, validator3.RuleMode);
     }
 
     [Fact]

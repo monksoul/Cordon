@@ -223,23 +223,23 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     添加组合验证器
     /// </summary>
     /// <param name="validators">验证器列表</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <param name="ruleMode"><see cref="RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf Composite(ValidatorBase[] validators, CompositeMode mode = CompositeMode.FailFast) =>
-        AddValidator(new CompositeValidator<T>(validators, mode));
+    public virtual TSelf Composite(ValidatorBase[] validators, RuleMode ruleMode = RuleMode.FailFast) =>
+        AddValidator(new CompositeValidator<T>(validators, ruleMode));
 
     /// <summary>
     ///     添加组合验证器
     /// </summary>
     /// <param name="configure">验证器配置委托</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <param name="ruleMode"><see cref="RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf Composite(Action<FluentValidatorBuilder<T>> configure,
-        CompositeMode mode = CompositeMode.FailFast) => AddValidator(new CompositeValidator<T>(configure, mode));
+        RuleMode ruleMode = RuleMode.FailFast) => AddValidator(new CompositeValidator<T>(configure, ruleMode));
 
     /// <summary>
     ///     添加条件验证器

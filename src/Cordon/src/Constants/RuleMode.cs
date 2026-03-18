@@ -5,19 +5,19 @@
 namespace Cordon;
 
 /// <summary>
-///     组合验证器模式
+///     验证规则的执行聚合模式
 /// </summary>
-public enum CompositeMode
+public enum RuleMode
 {
-    /// <summary>
-    ///     遇到首个验证失败即停止后续验证
-    /// </summary>
-    FailFast = 0,
-
     /// <summary>
     ///     所有验证器都会执行，且全部必须通过
     /// </summary>
-    All,
+    All = 0,
+
+    /// <summary>
+    ///     遇到首个验证失败即停止后续验证
+    /// </summary>
+    FailFast,
 
     /// <summary>
     ///     任一验证器验证成功，即视为整体验证通过

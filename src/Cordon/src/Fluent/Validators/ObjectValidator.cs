@@ -91,10 +91,16 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     internal ValidatorOptions Options { get; }
 
     /// <summary>
-    ///     <inheritdoc cref="CompositeMode" />
+    ///     <inheritdoc cref="Cordon.RuleMode" />
     /// </summary>
-    /// <remarks>默认值为：<see cref="CompositeMode.All" />。</remarks>
-    public CompositeMode Mode { get; set; } = CompositeMode.All;
+    /// <remarks>默认值为：<see cref="Cordon.RuleMode.All" />。</remarks>
+    public RuleMode RuleMode { get; set; } = RuleMode.All;
+
+    /// <summary>
+    ///     <inheritdoc cref="CascadeMode" />
+    /// </summary>
+    /// <remarks>默认值为：<see cref="Cordon.CascadeMode.All" /></remarks>
+    public CascadeMode CascadeMode { get; set; } = CascadeMode.All;
 
     /// <summary>
     ///     验证条件
@@ -161,6 +167,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
             return false;
         }
 
+        // All 本身短路，所以无需处理 CascadeMode 配置
         return Validators.All(u => u.IsValid(instance, resolvedRuleSets)) &&
                (_objectValidator is null || _objectValidator.IsValid(instance, resolvedRuleSets));
     }
@@ -193,9 +200,24 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
             validationResults.AddRange(_attributeValidator.GetValidationResults(instance, validationContext) ?? []);
         }
 
-        // 获取所有属性验证器验证结果列表
-        validationResults.AddRange(
-            Validators.SelectMany(u => u.GetValidationResults(instance, resolvedRuleSets) ?? []));
+        // 遍历验证器列表
+        foreach (var propertyValidator in Validators)
+        {
+            // 获取属性验证结果列表
+            if (propertyValidator.GetValidationResults(instance, resolvedRuleSets) is not { Count: > 0 } results)
+            {
+                continue;
+            }
+
+            // 追加验证结果列表
+            validationResults.AddRange(results);
+
+            // 检查验证规则的执行聚合模式是否是遇到首个验证失败即停止后续验证
+            if (CascadeMode is CascadeMode.FailFast)
+            {
+                break;
+            }
+        }
 
         // 检查是否设置了对象级别验证器
         if (_objectValidator is not null)
@@ -234,6 +256,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         // 遍历属性验证器列表
         foreach (var validator in Validators)
         {
+            // Validate 本身短路，所以无需处理 CascadeMode 配置
             validator.Validate(instance, resolvedRuleSets);
         }
 
@@ -735,17 +758,33 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
     public virtual ObjectValidator<T> CustomOnly() => UseAttributeValidation(false);
 
     /// <summary>
-    ///     设置验证模式
+    ///     设置属性验证规则的执行聚合模式
     /// </summary>
-    /// <param name="mode">
-    ///     <see cref="CompositeMode" />
+    /// <param name="ruleMode">
+    ///     <see cref="Cordon.RuleMode" />
     /// </param>
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
     /// </returns>
-    public virtual ObjectValidator<T> UseMode(CompositeMode mode)
+    public virtual ObjectValidator<T> UseRuleMode(RuleMode ruleMode)
     {
-        Mode = mode;
+        RuleMode = ruleMode;
+
+        return this;
+    }
+
+    /// <summary>
+    ///     设置属性验证的级联模式
+    /// </summary>
+    /// <param name="cascadeMode">
+    ///     <see cref="Cordon.CascadeMode" />
+    /// </param>
+    /// <returns>
+    ///     <see cref="ObjectValidator{T}" />
+    /// </returns>
+    public virtual ObjectValidator<T> UseCascadeMode(CascadeMode cascadeMode)
+    {
+        CascadeMode = cascadeMode;
 
         return this;
     }

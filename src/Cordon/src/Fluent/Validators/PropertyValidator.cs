@@ -86,12 +86,12 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     internal bool? SuppressAttributeValidation { get; set; }
 
     /// <summary>
-    ///     <inheritdoc cref="CompositeMode" />
+    ///     <inheritdoc cref="Cordon.RuleMode" />
     /// </summary>
     /// <remarks>
-    ///     默认值为：<c>null</c>。当此值为 <c>null</c> 时，将由 <see cref="ObjectValidator{T}.Mode" /> 配置项决定。
+    ///     默认值为：<c>null</c>。当此值为 <c>null</c> 时，将由 <see cref="ObjectValidator{T}.RuleMode" /> 配置项决定。
     /// </remarks>
-    internal CompositeMode? Mode { get; set; }
+    internal RuleMode? RuleMode { get; set; }
 
     /// <summary>
     ///     显示名称
@@ -153,12 +153,12 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         var validationContextForProperty = CreateValidationContext(propertyValue, ruleSets);
 
         // 对于 ValidatorProxy<T, TValidator>（对象级代理），传入整个对象；否则传入属性值
-        return GetMode() switch
+        return GetRuleMode() switch
         {
-            CompositeMode.FailFast or CompositeMode.All => Validators.All(u =>
+            Cordon.RuleMode.FailFast or Cordon.RuleMode.All => Validators.All(u =>
                 u.IsValid(u.IsTypedProxy ? instance : propertyValue,
                     u.IsTypedProxy ? validationContext : validationContextForProperty)),
-            CompositeMode.Any => Validators.Any(u => u.IsValid(u.IsTypedProxy ? instance : propertyValue,
+            Cordon.RuleMode.Any => Validators.Any(u => u.IsValid(u.IsTypedProxy ? instance : propertyValue,
                 u.IsTypedProxy ? validationContext : validationContextForProperty)),
             _ => throw new NotSupportedException()
         };
@@ -200,8 +200,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         // 初始化链式验证器验证结果列表
         var customValidationResults = new List<ValidationResult>();
 
-        // 获取组合验证器模式
-        var mode = GetMode();
+        // 获取属性验证规则的执行聚合模式
+        var ruleMode = GetRuleMode();
 
         // 遍历验证器列表
         foreach (var validator in Validators)
@@ -217,14 +217,14 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
                 // 追加验证结果列表
                 customValidationResults.AddRange(results);
 
-                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
-                if (mode is CompositeMode.FailFast)
+                // 检查验证规则的执行聚合模式是否是遇到首个验证失败即停止后续验证
+                if (ruleMode is Cordon.RuleMode.FailFast)
                 {
                     break;
                 }
             }
-            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
-            else if (mode is CompositeMode.Any)
+            // 检查验证规则的执行聚合模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (ruleMode is Cordon.RuleMode.Any)
             {
                 // 清空验证结果列表
                 customValidationResults.Clear();
@@ -274,8 +274,8 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
         object? firstFailedObject = null;
         IValidationContext? firstFailedValidationContext = null;
 
-        // 获取组合验证器模式
-        var mode = GetMode();
+        // 获取属性验证规则的执行聚合模式
+        var ruleMode = GetRuleMode();
 
         // 遍历验证器列表
         foreach (var validator in Validators)
@@ -296,14 +296,14 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
                     firstFailedValidationContext = currentValidationContext;
                 }
 
-                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
-                if (mode is CompositeMode.FailFast or CompositeMode.All)
+                // 检查验证规则的执行聚合模式是否是遇到首个验证失败即停止后续验证
+                if (ruleMode is Cordon.RuleMode.FailFast or Cordon.RuleMode.All)
                 {
                     validator.Validate(validatingObject, currentValidationContext);
                 }
             }
-            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
-            else if (mode is CompositeMode.Any)
+            // 检查验证规则的执行聚合模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (ruleMode is Cordon.RuleMode.Any)
             {
                 return;
             }
@@ -603,17 +603,17 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     }
 
     /// <summary>
-    ///     设置验证模式
+    ///     设置属性验证规则的执行聚合模式
     /// </summary>
     /// <param name="mode">
-    ///     <see cref="CompositeMode" />
+    ///     <see cref="Cordon.RuleMode" />
     /// </param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf UseMode(CompositeMode mode)
+    public virtual TSelf UseRuleMode(RuleMode mode)
     {
-        Mode = mode;
+        RuleMode = mode;
 
         return This;
     }
@@ -677,12 +677,12 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
     }
 
     /// <summary>
-    ///     获取组合验证器模式
+    ///     获取属性验证规则的执行聚合模式
     /// </summary>
     /// <returns>
-    ///     <see cref="CompositeMode" />
+    ///     <see cref="Cordon.RuleMode" />
     /// </returns>
-    internal CompositeMode GetMode() => Mode ?? _objectValidator.Mode;
+    internal RuleMode GetRuleMode() => RuleMode ?? _objectValidator.RuleMode;
 
     /// <summary>
     ///     获取属性值
@@ -787,7 +787,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf> : FluentVal
             DisplayName = DisplayName,
             MemberName = MemberName,
             WhenCondition = WhenCondition,
-            Mode = Mode
+            RuleMode = RuleMode
         };
 
         // 同步字段

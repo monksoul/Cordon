@@ -23,8 +23,8 @@ public class LengthValidatorTests
     public void IsValid_Invalid_Parameters()
     {
         var validator = new LengthValidator(5, 10);
-        var exception = Assert.Throws<InvalidCastException>(() => validator.IsValid(CompositeMode.All));
-        Assert.Equal("The field of type Cordon.CompositeMode must be a string, array or ICollection type.",
+        var exception = Assert.Throws<InvalidCastException>(() => validator.IsValid(RuleMode.All));
+        Assert.Equal("The field of type Cordon.RuleMode must be a string, array or ICollection type.",
             exception.Message);
     }
 

@@ -314,7 +314,7 @@ public class PropertyValidatorValidationTests
 
         var propertyValidator2 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .Composite(u => u.EmailAddress().UserName(), CompositeMode.Any);
+            .Composite(u => u.EmailAddress().UserName(), RuleMode.Any);
 
         Assert.Single(propertyValidator2.Validators);
 
@@ -2243,6 +2243,16 @@ public class PropertyValidatorValidationTests
         objectValidator5.RuleFor(u => u.Name)
             .RuleSet("login", () => objectValidator5.RuleFor(u => u.FirstName));
         Assert.Equal(2, objectValidator5.Validators.Count);
+    }
+
+    [Fact]
+    public void UseCascadeMode_ReturnOK()
+    {
+        using var objectValidator = new ObjectValidator<ObjectModel>()
+            .RuleFor(u => u.Name).UseCascadeMode(CascadeMode.All);
+        Assert.Equal(CascadeMode.All, objectValidator.CascadeMode);
+        objectValidator.UseCascadeMode(CascadeMode.FailFast);
+        Assert.Equal(CascadeMode.FailFast, objectValidator.CascadeMode);
     }
 
     [Fact]

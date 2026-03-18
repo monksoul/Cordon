@@ -181,25 +181,25 @@ public static class Validators
     ///     创建组合验证器
     /// </summary>
     /// <param name="validators">验证器列表</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <param name="ruleMode"><see cref="RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
     /// <typeparam name="T">对象类型</typeparam>
     /// <returns>
     ///     <see cref="CompositeValidator{T}" />
     /// </returns>
     public static CompositeValidator<T> Composite<T>(ValidatorBase[] validators,
-        CompositeMode mode = CompositeMode.FailFast) => new(validators, mode);
+        RuleMode ruleMode = RuleMode.FailFast) => new(validators, ruleMode);
 
     /// <summary>
     ///     创建组合验证器
     /// </summary>
     /// <param name="configure">验证器配置委托</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
+    /// <param name="ruleMode"><see cref="RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
     /// <typeparam name="T">对象类型</typeparam>
     /// <returns>
     ///     <see cref="CompositeValidator{T}" />
     /// </returns>
     public static CompositeValidator<T> Composite<T>(Action<FluentValidatorBuilder<T>> configure,
-        CompositeMode mode = CompositeMode.FailFast) => new(configure, mode);
+        RuleMode ruleMode = RuleMode.FailFast) => new(configure, ruleMode);
 
     /// <summary>
     ///     创建条件验证器

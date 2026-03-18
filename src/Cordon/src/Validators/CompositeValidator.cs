@@ -19,9 +19,9 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
     ///     <inheritdoc cref="CompositeValidator{T}" />
     /// </summary>
     /// <param name="validators">验证器列表</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
-    public CompositeValidator(ValidatorBase[] validators, CompositeMode mode = CompositeMode.FailFast)
-        : this(u => u.AddValidators(validators), mode)
+    /// <param name="ruleMode"><see cref="Cordon.RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
+    public CompositeValidator(ValidatorBase[] validators, RuleMode ruleMode = RuleMode.FailFast)
+        : this(u => u.AddValidators(validators), ruleMode)
     {
     }
 
@@ -29,23 +29,23 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
     ///     <inheritdoc cref="CompositeValidator{T}" />
     /// </summary>
     /// <param name="configure">验证器配置委托</param>
-    /// <param name="mode"><see cref="CompositeMode" />，默认值为：<see cref="CompositeMode.FailFast" /></param>
-    public CompositeValidator(Action<FluentValidatorBuilder<T>> configure, CompositeMode mode = CompositeMode.FailFast)
+    /// <param name="ruleMode"><see cref="Cordon.RuleMode" />，默认值为：<see cref="RuleMode.FailFast" /></param>
+    public CompositeValidator(Action<FluentValidatorBuilder<T>> configure, RuleMode ruleMode = RuleMode.FailFast)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configure);
 
         _validators = new FluentValidatorBuilder<T>().Build(configure);
-        Mode = mode;
+        RuleMode = ruleMode;
 
         ErrorMessageResourceAccessor = () => null!;
     }
 
     /// <summary>
-    ///     <inheritdoc cref="CompositeMode" />
+    ///     <inheritdoc cref="Cordon.RuleMode" />
     /// </summary>
-    /// <remarks>默认值为：<see cref="CompositeMode.FailFast" />。</remarks>
-    public CompositeMode Mode { get; set; }
+    /// <remarks>默认值为：<see cref="Cordon.RuleMode.FailFast" />。</remarks>
+    public RuleMode RuleMode { get; set; }
 
     /// <inheritdoc />
     public void Dispose()
@@ -60,10 +60,10 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
 
     /// <inheritdoc />
     public override bool IsValid(T? instance, ValidationContext<T> validationContext) =>
-        Mode switch
+        RuleMode switch
         {
-            CompositeMode.FailFast or CompositeMode.All => _validators.All(u => u.IsValid(instance, validationContext)),
-            CompositeMode.Any => _validators.Any(u => u.IsValid(instance, validationContext)),
+            RuleMode.FailFast or RuleMode.All => _validators.All(u => u.IsValid(instance, validationContext)),
+            RuleMode.Any => _validators.Any(u => u.IsValid(instance, validationContext)),
             _ => throw new NotSupportedException()
         };
 
@@ -82,14 +82,14 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
                 // 追加验证结果列表
                 validationResults.AddRange(results);
 
-                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
-                if (Mode is CompositeMode.FailFast)
+                // 检查验证规则的执行聚合模式是否是遇到首个验证失败即停止后续验证
+                if (RuleMode is RuleMode.FailFast)
                 {
                     break;
                 }
             }
-            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
-            else if (Mode is CompositeMode.Any)
+            // 检查验证规则的执行聚合模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (RuleMode is RuleMode.Any)
             {
                 // 清空验证结果列表
                 validationResults.Clear();
@@ -123,14 +123,14 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
                 // 缓存首个验证无效的验证器
                 firstFailedValidator ??= validator;
 
-                // 检查验证器模式是否是遇到首个验证失败即停止后续验证
-                if (Mode is CompositeMode.FailFast or CompositeMode.All)
+                // 检查验证规则的执行聚合模式是否是遇到首个验证失败即停止后续验证
+                if (RuleMode is RuleMode.FailFast or RuleMode.All)
                 {
                     ThrowValidationException(instance, validator, validationContext);
                 }
             }
-            // 检查验证器模式是否是任一验证器验证成功，即视为整体验证通过
-            else if (Mode is CompositeMode.Any)
+            // 检查验证规则的执行聚合模式是否是任一验证器验证成功，即视为整体验证通过
+            else if (RuleMode is RuleMode.Any)
             {
                 return;
             }
@@ -144,17 +144,17 @@ public class CompositeValidator<T> : ValidatorBase<T>, IValidatorInitializer, ID
     }
 
     /// <summary>
-    ///     设置验证模式
+    ///     设置验证规则的执行聚合模式
     /// </summary>
-    /// <param name="mode">
-    ///     <see cref="CompositeMode" />
+    /// <param name="ruleMode">
+    ///     <see cref="Cordon.RuleMode" />
     /// </param>
     /// <returns>
     ///     <see cref="CompositeValidator{T}" />
     /// </returns>
-    public CompositeValidator<T> UseMode(CompositeMode mode)
+    public CompositeValidator<T> UseRuleMode(RuleMode ruleMode)
     {
-        Mode = mode;
+        RuleMode = ruleMode;
 
         return this;
     }
