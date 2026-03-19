@@ -200,7 +200,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
             validationResults.AddRange(_attributeValidator.GetValidationResults(instance, validationContext) ?? []);
         }
 
-        // 遍历验证器列表
+        // 遍历属性验证器列表
         foreach (var propertyValidator in Validators)
         {
             // 获取属性验证结果列表
