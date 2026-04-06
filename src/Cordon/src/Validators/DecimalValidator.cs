@@ -5,7 +5,7 @@
 namespace Cordon;
 
 /// <summary>
-///     验证数值是否为有效的 <see cref="decimal" /> 类型验证器
+///     验证值是否为有效的 <see cref="decimal" /> 类型验证器
 /// </summary>
 /// <remarks>支持精度、标度和正负数配置。</remarks>
 public class DecimalValidator : ValidatorBase
@@ -95,24 +95,24 @@ public class DecimalValidator : ValidatorBase
         }
 
         // 检查小数位数（标度）
-        var scale = GetScale(decimalValue);
-        if (scale > Scale)
+        var actualScale = GetActualScale(decimalValue);
+        if (actualScale > Scale)
         {
             return false;
         }
 
         // 将数值转换为字符串
-        var valueString = decimalValue.ToString(CultureInfo.InvariantCulture);
-        var digitCount = valueString.Length;
+        var stringValue = decimalValue.ToString(CultureInfo.InvariantCulture);
+        var digitCount = stringValue.Length;
 
         // 检查字符串数值是否是负数
-        if (valueString.StartsWith('-'))
+        if (stringValue.StartsWith('-'))
         {
             digitCount--;
         }
 
         // 检查字符串数值是否包含小数点
-        if (valueString.Contains('.'))
+        if (stringValue.Contains('.'))
         {
             digitCount--;
         }
@@ -126,13 +126,13 @@ public class DecimalValidator : ValidatorBase
         string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, Precision, Scale);
 
     /// <summary>
-    ///     获取 <see cref="decimal" /> 值的小数位数（标度）
+    ///     获取 <see cref="decimal" /> 类型值的实际小数位数（标度）
     /// </summary>
     /// <param name="value">值</param>
     /// <returns>
     ///     <see cref="int" />
     /// </returns>
-    internal static int GetScale(decimal value)
+    internal static int GetActualScale(decimal value)
     {
         var bits = decimal.GetBits(value);
         return (bits[3] >> 16) & 0x7FF;

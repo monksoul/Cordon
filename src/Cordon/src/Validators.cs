@@ -268,7 +268,7 @@ public static class Validators
         DateTimeStyles style = DateTimeStyles.None) => new(formats) { Provider = provider, Style = style };
 
     /// <summary>
-    ///     创建验证数值是否为有效的 <see cref="decimal" /> 类型验证器
+    ///     创建验证值是否为有效的 <see cref="decimal" /> 类型验证器
     /// </summary>
     /// <param name="precision">总位数（精度），默认值为：<c>18</c></param>
     /// <param name="scale">小数位数（标度），默认值为：<c>2</c></param>

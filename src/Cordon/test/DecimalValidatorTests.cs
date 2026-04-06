@@ -358,6 +358,6 @@ public class DecimalValidatorTests
     [InlineData(2.2, 1)]
     [InlineData(2.23, 2)]
     [InlineData(2.234, 3)]
-    public void GetScale_ReturnOK(decimal value, int places) =>
-        Assert.Equal(places, DecimalValidator.GetScale(value));
+    public void GetActualScale_ReturnOK(decimal value, int places) =>
+        Assert.Equal(places, DecimalValidator.GetActualScale(value));
 }
