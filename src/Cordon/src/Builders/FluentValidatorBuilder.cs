@@ -309,15 +309,21 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         AddValidator(new DateTimeValidator(formats) { Provider = provider, Style = style });
 
     /// <summary>
-    ///     添加验证数值的小数位数验证器
+    ///     添加验证数值是否为有效的 <see cref="decimal" /> 类型验证器
     /// </summary>
-    /// <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
+    /// <param name="precision">总位数（精度），默认值为：<c>18</c></param>
+    /// <param name="scale">小数位数（标度），默认值为：<c>2</c></param>
+    /// <param name="allowNegative">是否允许负数，默认值为：<c>false</c></param>
     /// <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf DecimalPlaces(int maxDecimalPlaces, bool allowStringValues = false) =>
-        AddValidator(new DecimalPlacesValidator(maxDecimalPlaces) { AllowStringValues = allowStringValues });
+    public virtual TSelf Decimal(int precision = 18, int scale = 2, bool allowNegative = false,
+        bool allowStringValues = false) =>
+        AddValidator(new DecimalValidator(precision, scale)
+        {
+            AllowNegative = allowNegative, AllowStringValues = allowStringValues
+        });
 
     /// <summary>
     ///     添加不允许的值列表验证器

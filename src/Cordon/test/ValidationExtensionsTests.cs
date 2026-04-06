@@ -116,7 +116,7 @@ public class ValidationExtensionsTests
         Assert.Equal("The Name field is not a valid e-mail address.", exception5.Message);
 
         var services = new ServiceCollection();
-        services.AddValidationCore();
+        services.AddCordon();
         using var serviceProvider = services.BuildServiceProvider();
         var validationDataContext = serviceProvider.GetRequiredService<IValidationDataContext>();
         validationDataContext.SetValue(Constants.ValidationOptionsKey,

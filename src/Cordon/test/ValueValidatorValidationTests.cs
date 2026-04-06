@@ -392,31 +392,39 @@ public class ValueValidatorValidationTests
     [Fact]
     public void DecimalPlaces_ReturnOK()
     {
-        var valueValidator = new ValueValidator<object>().DecimalPlaces(1);
+        var valueValidator = new ValueValidator<object>().Decimal();
 
         Assert.Single(valueValidator.Validators);
 
-        var addedValidator = valueValidator._lastAddedValidator as DecimalPlacesValidator;
+        var addedValidator = valueValidator._lastAddedValidator as DecimalValidator;
         Assert.NotNull(addedValidator);
-        Assert.Equal(1, addedValidator.MaxDecimalPlaces);
+        Assert.Equal(18, addedValidator.Precision);
+        Assert.Equal(2, addedValidator.Scale);
+        Assert.False(addedValidator.AllowNegative);
         Assert.False(addedValidator.AllowStringValues);
 
-        Assert.False(valueValidator.IsValid(2.23));
+        Assert.True(valueValidator.IsValid(2.23));
+        Assert.False(valueValidator.IsValid(2.233));
         Assert.True(valueValidator.IsValid(2));
         Assert.False(valueValidator.IsValid("2.2"));
+        Assert.False(valueValidator.IsValid(-2));
 
-        var valueValidator2 = new ValueValidator<object>().DecimalPlaces(1, true);
+        var valueValidator2 = new ValueValidator<object>().Decimal(allowNegative: true, allowStringValues: true);
 
         Assert.Single(valueValidator2.Validators);
 
-        var addedValidator2 = valueValidator2._lastAddedValidator as DecimalPlacesValidator;
+        var addedValidator2 = valueValidator2._lastAddedValidator as DecimalValidator;
         Assert.NotNull(addedValidator2);
-        Assert.Equal(1, addedValidator2.MaxDecimalPlaces);
+        Assert.Equal(18, addedValidator2.Precision);
+        Assert.Equal(2, addedValidator2.Scale);
+        Assert.True(addedValidator2.AllowNegative);
         Assert.True(addedValidator2.AllowStringValues);
 
-        Assert.False(valueValidator2.IsValid(2.23));
+        Assert.True(valueValidator2.IsValid(2.23));
+        Assert.False(valueValidator2.IsValid(2.233));
         Assert.True(valueValidator2.IsValid(2));
         Assert.True(valueValidator2.IsValid("2.2"));
+        Assert.True(valueValidator2.IsValid(-2));
     }
 
     [Fact]

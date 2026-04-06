@@ -229,12 +229,16 @@ public class ValidatorsTests
     [Fact]
     public void DecimalPlaces_ReturnOK()
     {
-        var validator = Validators.DecimalPlaces(1);
-        Assert.Equal(1, validator.MaxDecimalPlaces);
+        var validator = Validators.Decimal();
+        Assert.Equal(18, validator.Precision);
+        Assert.Equal(2, validator.Scale);
+        Assert.False(validator.AllowNegative);
         Assert.False(validator.AllowStringValues);
 
-        var validator2 = Validators.DecimalPlaces(1, true);
-        Assert.Equal(1, validator2.MaxDecimalPlaces);
+        var validator2 = Validators.Decimal(allowNegative: true, allowStringValues: true);
+        Assert.Equal(18, validator2.Precision);
+        Assert.Equal(2, validator2.Scale);
+        Assert.True(validator2.AllowNegative);
         Assert.True(validator2.AllowStringValues);
     }
 

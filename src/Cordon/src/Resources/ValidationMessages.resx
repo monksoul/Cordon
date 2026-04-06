@@ -198,9 +198,9 @@
     <data name="ValidatorBase_ValidationError" xml:space="preserve">
     <value>The field {0} is invalid.</value>
   </data>
-    <data name="DecimalPlacesValidator_ValidationError" xml:space="preserve">
-    <value>The field {0} must not have more than '{1}' decimal places.</value>
-  </data>
+    <data name="DecimalValidator_ValidationError" xml:space="preserve">
+        <value>The field {0} must be a non-negative decimal within the DECIMAL({1},{2}) precision or scale limit.</value>
+    </data>
     <data name="DateOnlyValidator_ValidationError" xml:space="preserve">
         <value>The field {0} must be a valid date.</value>
     </data>
@@ -323,5 +323,8 @@
     </data>
     <data name="FileExtensionsValidator_ValidationError" xml:space="preserve">
         <value>The {0} field only accepts files with the following extensions: {1}.</value>
+    </data>
+    <data name="DecimalValidator_ValidationError_AllowNegative" xml:space="preserve">
+        <value>The field {0} must be a valid decimal within the DECIMAL({1},{2}) precision or scale limit.</value>
     </data>
 </root>

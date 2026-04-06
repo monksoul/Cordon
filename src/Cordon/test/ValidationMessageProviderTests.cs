@@ -90,7 +90,7 @@ public class ValidationMessageProviderTests
     public void UseChineseMessages_ReturnOK()
     {
         ValidationMessageProvider.UseChineseMessages();
-        Assert.Equal(67, ValidationMessageProvider._overrides.Count);
+        Assert.Equal(68, ValidationMessageProvider._overrides.Count);
 
         // 清除单元测试影响
         ValidationMessageProvider.ClearOverrides();

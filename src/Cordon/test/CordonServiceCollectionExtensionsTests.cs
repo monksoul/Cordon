@@ -4,26 +4,26 @@
 
 namespace Cordon.Tests;
 
-public class ValidationCoreServiceCollectionExtensionsTests
+public class CordonServiceCollectionExtensionsTests
 {
     [Fact]
-    public void AddValidationCore_Invalid_Parameters()
+    public void AddCordon_Invalid_Parameters()
     {
         var services = new ServiceCollection();
 
         Assert.Throws<ArgumentNullException>(() =>
         {
-            services.AddValidationCore((ValidationBuilder)null!);
+            services.AddCordon((ValidationBuilder)null!);
         });
     }
 
     [Fact]
-    public void AddValidationCore_ReturnOK()
+    public void AddCordon_ReturnOK()
     {
         var services = new ServiceCollection();
 
         var validationBuilder = new ValidationBuilder();
-        services.AddValidationCore(validationBuilder);
+        services.AddCordon(validationBuilder);
 
         Assert.Equal(2, services.Count);
         Assert.Contains(services, x => x.ServiceType == typeof(IValidationDataContext));
@@ -32,10 +32,10 @@ public class ValidationCoreServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddValidationCore_Action_Empty_Parameters()
+    public void AddCordon_Action_Empty_Parameters()
     {
         var services = new ServiceCollection();
-        services.AddValidationCore();
+        services.AddCordon();
 
         Assert.Equal(2, services.Count);
         Assert.Contains(services, x => x.ServiceType == typeof(IValidationDataContext));
@@ -44,10 +44,10 @@ public class ValidationCoreServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddValidationCore_Action_ReturnOK()
+    public void AddCordon_Action_ReturnOK()
     {
         var services = new ServiceCollection();
-        services.AddValidationCore(builder => builder.AddValidator(typeof(ObjectModelValidator1)));
+        services.AddCordon(builder => builder.AddValidator(typeof(ObjectModelValidator1)));
 
         Assert.Equal(5, services.Count);
         Assert.Contains(services, x => x.ServiceType == typeof(IObjectValidator<ObjectModel>));
@@ -56,12 +56,12 @@ public class ValidationCoreServiceCollectionExtensionsTests
     }
 
     [Fact]
-    public void AddValidationCore_Duplicate_ReturnOK()
+    public void AddCordon_Duplicate_ReturnOK()
     {
         var services = new ServiceCollection();
-        services.AddValidationCore(s => s.AddValidator(typeof(ObjectModelValidator1)));
-        services.AddValidationCore(s => s.AddValidator(typeof(ObjectModelValidator1)));
-        services.AddValidationCore(s => s.AddValidator(typeof(ObjectModelValidator1)));
+        services.AddCordon(s => s.AddValidator(typeof(ObjectModelValidator1)));
+        services.AddCordon(s => s.AddValidator(typeof(ObjectModelValidator1)));
+        services.AddCordon(s => s.AddValidator(typeof(ObjectModelValidator1)));
 
         Assert.Equal(5, services.Count);
         _ = services.BuildServiceProvider();

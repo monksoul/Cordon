@@ -263,36 +263,56 @@
                 <see cref="T:System.String" />
             </returns>
         </member>
-        <member name="T:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute">
+        <member name="T:System.ComponentModel.DataAnnotations.DecimalAttribute">
             <summary>
-                验证数值的小数位数验证特性
+                验证数值是否为有效的 <see cref="T:System.Decimal" /> 类型验证特性
             </summary>
         </member>
-        <member name="F:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute._validator">
-            <inheritdoc cref="T:Cordon.DecimalPlacesValidator" />
+        <member name="F:System.ComponentModel.DataAnnotations.DecimalAttribute._validator">
+            <inheritdoc cref="T:Cordon.DecimalValidator" />
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute.#ctor(System.Int32)">
+        <member name="M:System.ComponentModel.DataAnnotations.DecimalAttribute.#ctor(System.Int32,System.Int32)">
             <summary>
-                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute" />
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.DecimalAttribute" />
             </summary>
-            <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
+            <param name="precision">总位数（精度），默认值为：<c>18</c></param>
+            <param name="scale">小数位数（标度），默认值为：<c>2</c></param>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute.MaxDecimalPlaces">
+        <member name="P:System.ComponentModel.DataAnnotations.DecimalAttribute.Precision">
             <summary>
-                允许的最大有效小数位数
+                总位数（精度）
             </summary>
         </member>
-        <member name="P:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute.AllowStringValues">
+        <member name="P:System.ComponentModel.DataAnnotations.DecimalAttribute.Scale">
+            <summary>
+                小数位数（标度）
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.DecimalAttribute.AllowNegative">
+            <summary>
+                是否允许负数
+            </summary>
+            <remarks>默认值为：<c>false</c>。</remarks>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.DecimalAttribute.AllowStringValues">
             <summary>
                 是否允许字符串数值
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute.IsValid(System.Object)">
+        <member name="M:System.ComponentModel.DataAnnotations.DecimalAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.DecimalPlacesAttribute.FormatErrorMessage(System.String)">
+        <member name="M:System.ComponentModel.DataAnnotations.DecimalAttribute.FormatErrorMessage(System.String)">
             <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.DecimalAttribute.GetResourceKey">
+            <summary>
+                获取错误信息对应的资源键
+            </summary>
+            <returns>
+                <see cref="T:System.String" />
+            </returns>
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.DomainAttribute">
             <summary>
@@ -2272,11 +2292,13 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.DecimalPlaces(System.Int32,System.Boolean)">
+        <member name="M:Cordon.FluentValidatorBuilder`2.Decimal(System.Int32,System.Int32,System.Boolean,System.Boolean)">
             <summary>
-                添加验证数值的小数位数验证器
+                添加验证数值是否为有效的 <see cref="T:System.Decimal" /> 类型验证器
             </summary>
-            <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
+            <param name="precision">总位数（精度），默认值为：<c>18</c></param>
+            <param name="scale">小数位数（标度），默认值为：<c>2</c></param>
+            <param name="allowNegative">是否允许负数，默认值为：<c>false</c></param>
             <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
             <returns>
                 <typeparamref name="TSelf" />
@@ -6067,9 +6089,14 @@
               Looks up a localized string similar to The field {0} must be a valid datetime in the following format(s): {1}..
             </summary>
         </member>
-        <member name="P:Cordon.Resources.ValidationMessages.DecimalPlacesValidator_ValidationError">
+        <member name="P:Cordon.Resources.ValidationMessages.DecimalValidator_ValidationError">
             <summary>
-              Looks up a localized string similar to The field {0} must not have more than &apos;{1}&apos; decimal places..
+              Looks up a localized string similar to The field {0} must be a non-negative decimal within the DECIMAL({1},{2}) precision or scale limit..
+            </summary>
+        </member>
+        <member name="P:Cordon.Resources.ValidationMessages.DecimalValidator_ValidationError_AllowNegative">
+            <summary>
+              Looks up a localized string similar to The field {0} must be a valid decimal within the DECIMAL({1},{2}) precision or scale limit..
             </summary>
         </member>
         <member name="P:Cordon.Resources.ValidationMessages.DeniedValuesValidator_ValidationError">
@@ -6731,14 +6758,16 @@
                 <see cref="T:Cordon.DateTimeValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.DecimalPlaces(System.Int32,System.Boolean)">
+        <member name="M:Cordon.Validators.Decimal(System.Int32,System.Int32,System.Boolean,System.Boolean)">
             <summary>
-                创建验证数值的小数位数验证器
+                创建验证数值是否为有效的 <see cref="T:System.Decimal" /> 类型验证器
             </summary>
-            <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
+            <param name="precision">总位数（精度），默认值为：<c>18</c></param>
+            <param name="scale">小数位数（标度），默认值为：<c>2</c></param>
+            <param name="allowNegative">是否允许负数，默认值为：<c>false</c></param>
             <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
             <returns>
-                <see cref="T:Cordon.DecimalPlacesValidator" />
+                <see cref="T:Cordon.DecimalValidator" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.DeniedValues(System.Object[])">
@@ -8383,41 +8412,62 @@
                 <see cref="T:System.String" />
             </returns>
         </member>
-        <member name="T:Cordon.DecimalPlacesValidator">
+        <member name="T:Cordon.DecimalValidator">
             <summary>
-                验证数值的小数位数验证器
+                验证数值是否为有效的 <see cref="T:System.Decimal" /> 类型验证器
+            </summary>
+            <remarks>支持精度、标度和正负数配置。</remarks>
+        </member>
+        <member name="M:Cordon.DecimalValidator.#ctor(System.Int32,System.Int32)">
+            <summary>
+                <inheritdoc cref="T:Cordon.DecimalValidator" />
+            </summary>
+            <param name="precision">总位数（精度），默认值为：<c>18</c></param>
+            <param name="scale">小数位数（标度），默认值为：<c>2</c></param>
+        </member>
+        <member name="P:Cordon.DecimalValidator.Precision">
+            <summary>
+                总位数（精度）
             </summary>
         </member>
-        <member name="M:Cordon.DecimalPlacesValidator.#ctor(System.Int32)">
+        <member name="P:Cordon.DecimalValidator.Scale">
             <summary>
-                <inheritdoc cref="T:Cordon.DecimalPlacesValidator" />
-            </summary>
-            <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
-        </member>
-        <member name="P:Cordon.DecimalPlacesValidator.MaxDecimalPlaces">
-            <summary>
-                允许的最大有效小数位数
+                小数位数（标度）
             </summary>
         </member>
-        <member name="P:Cordon.DecimalPlacesValidator.AllowStringValues">
+        <member name="P:Cordon.DecimalValidator.AllowNegative">
+            <summary>
+                是否允许负数
+            </summary>
+            <remarks>默认值为：<c>false</c>。</remarks>
+        </member>
+        <member name="P:Cordon.DecimalValidator.AllowStringValues">
             <summary>
                 是否允许字符串数值
             </summary>
             <remarks>默认值为：<c>false</c>。</remarks>
         </member>
-        <member name="M:Cordon.DecimalPlacesValidator.IsValid(System.Object,Cordon.IValidationContext)">
+        <member name="M:Cordon.DecimalValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.DecimalPlacesValidator.FormatErrorMessage(System.String)">
+        <member name="M:Cordon.DecimalValidator.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.DecimalPlacesValidator.GetDecimalPlaces(System.Decimal)">
+        <member name="M:Cordon.DecimalValidator.GetScale(System.Decimal)">
             <summary>
-                获取 <see cref="T:System.Decimal" /> 值的实际有效小数位数
+                获取 <see cref="T:System.Decimal" /> 值的小数位数（标度）
             </summary>
             <param name="value">值</param>
             <returns>
                 <see cref="T:System.Int32" />
+            </returns>
+        </member>
+        <member name="M:Cordon.DecimalValidator.GetResourceKey">
+            <summary>
+                获取错误信息对应的资源键
+            </summary>
+            <returns>
+                <see cref="T:System.String" />
             </returns>
         </member>
         <member name="T:Cordon.DeniedValuesValidator">
@@ -8823,18 +8873,18 @@
                                     ○ 7th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 8th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [12].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 9th capture group.<br/>
@@ -8847,10 +8897,10 @@
                                     ○ 12th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ Match a sequence of expressions.<br/>
@@ -8864,13 +8914,13 @@
                                     ○ 15th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '2'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 16th capture group.<br/>
                                     ○ 17th capture group.<br/>
@@ -8883,13 +8933,13 @@
                                                 ○ 20th capture group.<br/>
                                                     ○ Match with 3 alternative expressions.<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match a character in the set [13579].<br/>
+                                                            ○ Match an empty string.<br/>
                                                             ○ Match a character in the set [26].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match a character in the set [2468].<br/>
+                                                            ○ Match an empty string.<br/>
                                                             ○ Match a character in the set [048].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match '0'.<br/>
+                                                            ○ Match an empty string.<br/>
                                                             ○ Match a character in the set [48].<br/>
                                             ○ 21st capture group.<br/>
                                                 ○ Match the string "2000".<br/>
@@ -8904,18 +8954,18 @@
                                     ○ 26th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 27th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [12].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 28th capture group.<br/>
@@ -8924,10 +8974,10 @@
                                     ○ 30th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ 31st capture group.<br/>
@@ -8937,25 +8987,25 @@
                                     ○ 33rd capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '2'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 34th capture group.<br/>
                                     ○ 35th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [13579].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [26].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [2468].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                     ○ Match the string "0229".<br/>
                         ○ Match a Unicode digit exactly 2 times.<br/>
@@ -9537,25 +9587,25 @@
             ○ Match '1'.<br/>
             ○ Match with 7 alternative expressions.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '3'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '4'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [579].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '5'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '6'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [6-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '7'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '8'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '9'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
             ○ Match a Unicode digit exactly 8 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -9585,31 +9635,31 @@
             ○ 1st capture group.<br/>
                 ○ Match with 9 alternative expressions.<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '0'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '1'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-356].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '2'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '3'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-6].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '4'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '5'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '6'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '7'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-5].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '8'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [013-6].<br/>
             ○ Match a Unicode digit exactly 4 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -10698,12 +10748,12 @@
         <member name="M:Cordon.ValidatorProxy`2.InitializeServiceProvider(System.Func{System.Type,System.Object})">
             <inheritdoc cref="M:Cordon.IValidatorInitializer.InitializeServiceProvider(System.Func{System.Type,System.Object})" />
         </member>
-        <member name="T:Microsoft.Extensions.DependencyInjection.ValidationCoreServiceCollectionExtensions">
+        <member name="T:Microsoft.Extensions.DependencyInjection.CordonServiceCollectionExtensions">
             <summary>
                 数据验证模块 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" /> 扩展类
             </summary>
         </member>
-        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationCoreServiceCollectionExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Cordon.ValidationBuilder})">
+        <member name="M:Microsoft.Extensions.DependencyInjection.CordonServiceCollectionExtensions.AddCordon(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Cordon.ValidationBuilder})">
             <summary>
                 添加数据验证服务
             </summary>
@@ -10715,23 +10765,13 @@
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </returns>
         </member>
-        <member name="M:Microsoft.Extensions.DependencyInjection.ValidationCoreServiceCollectionExtensions.AddValidationCore(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
+        <member name="M:Microsoft.Extensions.DependencyInjection.CordonServiceCollectionExtensions.AddCordon(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
             <summary>
                 添加数据验证服务
             </summary>
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

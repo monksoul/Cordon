@@ -7,7 +7,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// <summary>
 ///     数据验证模块 <see cref="IMvcBuilder" /> 扩展类
 /// </summary>
-public static class ValidationCoreMvcBuilderExtensions
+public static class CordonMvcBuilderExtensions
 {
     /// <summary>
     ///     添加数据验证服务
@@ -19,14 +19,14 @@ public static class ValidationCoreMvcBuilderExtensions
     /// <returns>
     ///     <see cref="IMvcBuilder" />
     /// </returns>
-    public static IMvcBuilder AddValidationCore(this IMvcBuilder mvcBuilder,
+    public static IMvcBuilder AddCordon(this IMvcBuilder mvcBuilder,
         Action<ValidationBuilder>? configure = null)
     {
         // 注册本地化服务
         mvcBuilder.Services.AddLocalization();
 
         // 注册数据验证服务
-        mvcBuilder.Services.AddValidationCore(configure);
+        mvcBuilder.Services.AddCordon(configure);
 
         // 添加验证选项模型验证器提供器
         mvcBuilder.AddMvcOptions(options =>

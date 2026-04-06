@@ -177,11 +177,20 @@ namespace Cordon.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The field {0} must not have more than &apos;{1}&apos; decimal places..
+        ///   Looks up a localized string similar to The field {0} must be a non-negative decimal within the DECIMAL({1},{2}) precision or scale limit..
         /// </summary>
-        internal static string DecimalPlacesValidator_ValidationError {
+        internal static string DecimalValidator_ValidationError {
             get {
-                return ResourceManager.GetString("DecimalPlacesValidator_ValidationError", resourceCulture);
+                return ResourceManager.GetString("DecimalValidator_ValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The field {0} must be a valid decimal within the DECIMAL({1},{2}) precision or scale limit..
+        /// </summary>
+        internal static string DecimalValidator_ValidationError_AllowNegative {
+            get {
+                return ResourceManager.GetString("DecimalValidator_ValidationError_AllowNegative", resourceCulture);
             }
         }
         

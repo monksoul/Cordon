@@ -77,7 +77,11 @@ public static class ValidationMessageProvider
             { "TelephoneValidator_ValidationError", "字段 {0} 不是有效的电话号码。" },
             { "UserNameValidator_ValidationError", "字段 {0} 不是有效的用户名。" },
             { "ValidatorBase_ValidationError", "字段 {0} 无效。" },
-            { "DecimalPlacesValidator_ValidationError", "字段 {0} 的小数位数不能超过“{1}”位。" },
+            { "DecimalValidator_ValidationError", "字段 {0} 的值必须为非负数，且不能超过 DECIMAL({1},{2}) 的精度或标度限制。" },
+            {
+                "DecimalValidator_ValidationError_AllowNegative",
+                "字段 {0} 的值必须是有效的小数，且不能超过 DECIMAL({1},{2}) 的精度或标度限制。"
+            },
             { "DateOnlyValidator_ValidationError", "字段 {0} 必须是有效的日期。" },
             { "TimeOnlyValidator_ValidationError", "字段 {0} 必须是有效的时间。" },
             { "MD5StringValidator_ValidationError", "字段 {0} 不是有效的 MD5 字符串。" },

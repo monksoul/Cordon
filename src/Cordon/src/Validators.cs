@@ -268,15 +268,18 @@ public static class Validators
         DateTimeStyles style = DateTimeStyles.None) => new(formats) { Provider = provider, Style = style };
 
     /// <summary>
-    ///     创建验证数值的小数位数验证器
+    ///     创建验证数值是否为有效的 <see cref="decimal" /> 类型验证器
     /// </summary>
-    /// <param name="maxDecimalPlaces">允许的最大有效小数位数</param>
+    /// <param name="precision">总位数（精度），默认值为：<c>18</c></param>
+    /// <param name="scale">小数位数（标度），默认值为：<c>2</c></param>
+    /// <param name="allowNegative">是否允许负数，默认值为：<c>false</c></param>
     /// <param name="allowStringValues">是否允许字符串数值，默认值为：<c>false</c></param>
     /// <returns>
-    ///     <see cref="DecimalPlacesValidator" />
+    ///     <see cref="DecimalValidator" />
     /// </returns>
-    public static DecimalPlacesValidator DecimalPlaces(int maxDecimalPlaces, bool allowStringValues = false) =>
-        new(maxDecimalPlaces) { AllowStringValues = allowStringValues };
+    public static DecimalValidator Decimal(int precision = 18, int scale = 2, bool allowNegative = false,
+        bool allowStringValues = false) =>
+        new(precision, scale) { AllowNegative = allowNegative, AllowStringValues = allowStringValues };
 
     /// <summary>
     ///     创建不允许的值列表验证器

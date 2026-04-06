@@ -4,13 +4,13 @@
 
 namespace Cordon.AspNetCore.Tests;
 
-public class ValidationCoreMvcBuilderExtensionsTests
+public class CordonMvcBuilderExtensionsTests
 {
     [Fact]
-    public void AddValidationCore_ReturnOK()
+    public void AddCordon_ReturnOK()
     {
         var builder = WebApplication.CreateBuilder();
-        builder.Services.AddControllers().AddValidationCore();
+        builder.Services.AddControllers().AddCordon();
 
         Assert.Contains(builder.Services, u => u.ServiceType == typeof(IValidationDataContext));
         Assert.Contains(builder.Services, u => u.ServiceType == typeof(IStringLocalizer<>));
@@ -32,10 +32,10 @@ public class ValidationCoreMvcBuilderExtensionsTests
     }
 
     [Fact]
-    public void AddValidationCore_Duplicate_ReturnOK()
+    public void AddCordon_Duplicate_ReturnOK()
     {
         var builder = WebApplication.CreateBuilder();
-        builder.Services.AddControllers().AddValidationCore().AddValidationCore();
+        builder.Services.AddControllers().AddCordon().AddCordon();
 
         Assert.Contains(builder.Services, u => u.ServiceType == typeof(IValidationDataContext));
         Assert.Contains(builder.Services, u => u.ServiceType == typeof(IStringLocalizer<>));

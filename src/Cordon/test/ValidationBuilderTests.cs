@@ -156,7 +156,7 @@ public class ValidationBuilderTests
     {
         var builder = new ValidationBuilder();
         builder.UseChineseValidationMessages();
-        Assert.Equal(67, ValidationMessageProvider._overrides.Count);
+        Assert.Equal(68, ValidationMessageProvider._overrides.Count);
 
         // 清除单元测试影响
         ValidationMessageProvider.ClearOverrides();

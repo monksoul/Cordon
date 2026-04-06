@@ -560,33 +560,41 @@ public class PropertyValidatorValidationTests
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .DecimalPlaces(1);
+            .Decimal();
 
         Assert.Single(propertyValidator.Validators);
 
-        var addedValidator = propertyValidator._lastAddedValidator as DecimalPlacesValidator;
+        var addedValidator = propertyValidator._lastAddedValidator as DecimalValidator;
         Assert.NotNull(addedValidator);
-        Assert.Equal(1, addedValidator.MaxDecimalPlaces);
+        Assert.Equal(18, addedValidator.Precision);
+        Assert.Equal(2, addedValidator.Scale);
+        Assert.False(addedValidator.AllowNegative);
         Assert.False(addedValidator.AllowStringValues);
 
-        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = 2.23 }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = 2.23 }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = 2.233 }));
         Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = 2 }));
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "2.2" }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = -2 }));
 
         var propertyValidator2 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .DecimalPlaces(1, true);
+            .Decimal(allowNegative: true, allowStringValues: true);
 
         Assert.Single(propertyValidator2.Validators);
 
-        var addedValidator2 = propertyValidator2._lastAddedValidator as DecimalPlacesValidator;
+        var addedValidator2 = propertyValidator2._lastAddedValidator as DecimalValidator;
         Assert.NotNull(addedValidator2);
-        Assert.Equal(1, addedValidator2.MaxDecimalPlaces);
+        Assert.Equal(18, addedValidator2.Precision);
+        Assert.Equal(2, addedValidator2.Scale);
+        Assert.True(addedValidator2.AllowNegative);
         Assert.True(addedValidator2.AllowStringValues);
 
-        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = 2.23 }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = 2.23 }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = 2.233 }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = 2 }));
         Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "2.2" }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = -2 }));
     }
 
     [Fact]
