@@ -8,7 +8,7 @@ namespace System.ComponentModel.DataAnnotations;
 ///     最小值验证特性
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public class MinAttribute : ComparisonAttribute
+public class MinAttribute : ValidationBaseAttribute
 {
     /// <inheritdoc cref="MinValidator" />
     internal readonly MinValidator _validator;
@@ -36,9 +36,22 @@ public class MinAttribute : ComparisonAttribute
     /// </summary>
     /// <param name="minimum">允许的最小字段值</param>
     public MinAttribute(IComparable minimum)
-        : base(minimum, nameof(ValidationMessages.MinValidator_ValidationError)) =>
+    {
+        CompareValue = minimum;
         _validator = new MinValidator(minimum);
 
+        UseResourceKey(() => nameof(ValidationMessages.MinValidator_ValidationError));
+    }
+
+    /// <summary>
+    ///     比较的值
+    /// </summary>
+    public IComparable CompareValue { get; }
+
     /// <inheritdoc />
-    protected override bool IsValid(IComparable value) => _validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
+
+    /// <inheritdoc />
+    public override string FormatErrorMessage(string name) =>
+        string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, CompareValue);
 }

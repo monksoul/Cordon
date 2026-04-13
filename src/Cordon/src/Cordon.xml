@@ -114,45 +114,6 @@
         <member name="M:System.ComponentModel.DataAnnotations.ColorAttribute.IsValid(System.Object)">
             <inheritdoc />
         </member>
-        <member name="T:System.ComponentModel.DataAnnotations.ComparisonAttribute">
-            <summary>
-                比较验证特性抽象基类
-            </summary>
-        </member>
-        <member name="M:System.ComponentModel.DataAnnotations.ComparisonAttribute.#ctor(System.IComparable,System.String)">
-            <summary>
-                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ComparisonAttribute" />
-            </summary>
-            <param name="compareValue">比较的值</param>
-            <param name="resourceKey">资源属性名</param>
-        </member>
-        <member name="M:System.ComponentModel.DataAnnotations.ComparisonAttribute.#ctor(System.IComparable,System.Func{System.String})">
-            <summary>
-                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.ComparisonAttribute" />
-            </summary>
-            <param name="compareValue">比较的值</param>
-            <param name="errorMessageResourceAccessor">错误信息资源访问器</param>
-        </member>
-        <member name="P:System.ComponentModel.DataAnnotations.ComparisonAttribute.CompareValue">
-            <summary>
-                比较的值
-            </summary>
-        </member>
-        <member name="M:System.ComponentModel.DataAnnotations.ComparisonAttribute.IsValid(System.IComparable)">
-            <summary>
-                检查对象是否合法
-            </summary>
-            <param name="value">对象</param>
-            <returns>
-                <see cref="T:System.Boolean" />
-            </returns>
-        </member>
-        <member name="M:System.ComponentModel.DataAnnotations.ComparisonAttribute.IsValid(System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:System.ComponentModel.DataAnnotations.ComparisonAttribute.FormatErrorMessage(System.String)">
-            <inheritdoc />
-        </member>
         <member name="T:System.ComponentModel.DataAnnotations.DateOnlyAttribute">
             <summary>
                 <see cref="T:System.DateOnly" /> 日期验证特性
@@ -521,7 +482,15 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.GreaterThanAttribute.IsValid(System.IComparable)">
+        <member name="P:System.ComponentModel.DataAnnotations.GreaterThanAttribute.CompareValue">
+            <summary>
+                比较的值
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.GreaterThanAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.GreaterThanAttribute.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.GreaterThanOrEqualToAttribute">
@@ -550,7 +519,15 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.GreaterThanOrEqualToAttribute.IsValid(System.IComparable)">
+        <member name="P:System.ComponentModel.DataAnnotations.GreaterThanOrEqualToAttribute.CompareValue">
+            <summary>
+                比较的值
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.GreaterThanOrEqualToAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.GreaterThanOrEqualToAttribute.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.HaveLengthAttribute">
@@ -687,7 +664,15 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.LessThanAttribute.IsValid(System.IComparable)">
+        <member name="P:System.ComponentModel.DataAnnotations.LessThanAttribute.CompareValue">
+            <summary>
+                比较的值
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.LessThanAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.LessThanAttribute.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.LessThanOrEqualToAttribute">
@@ -716,7 +701,15 @@
             </summary>
             <param name="compareValue">比较的值</param>
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.LessThanOrEqualToAttribute.IsValid(System.IComparable)">
+        <member name="P:System.ComponentModel.DataAnnotations.LessThanOrEqualToAttribute.CompareValue">
+            <summary>
+                比较的值
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.LessThanOrEqualToAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.LessThanOrEqualToAttribute.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.MaxAttribute">
@@ -745,7 +738,15 @@
             </summary>
             <param name="maximum">允许的最大字段值</param>
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.MaxAttribute.IsValid(System.IComparable)">
+        <member name="P:System.ComponentModel.DataAnnotations.MaxAttribute.CompareValue">
+            <summary>
+                比较的值
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.MaxAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.MaxAttribute.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.MD5StringAttribute">
@@ -797,7 +798,15 @@
             </summary>
             <param name="minimum">允许的最小字段值</param>
         </member>
-        <member name="M:System.ComponentModel.DataAnnotations.MinAttribute.IsValid(System.IComparable)">
+        <member name="P:System.ComponentModel.DataAnnotations.MinAttribute.CompareValue">
+            <summary>
+                比较的值
+            </summary>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.MinAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.MinAttribute.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.NotBlankAttribute">
@@ -888,30 +897,6 @@
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.NullAttribute.IsValid(System.Object)">
             <inheritdoc />
-        </member>
-        <member name="T:System.ComponentModel.DataAnnotations.NumericComparisonAttribute">
-            <summary>
-                <see cref="T:System.Decimal" /> 类型比较验证特性抽象基类
-            </summary>
-        </member>
-        <member name="M:System.ComponentModel.DataAnnotations.NumericComparisonAttribute.#ctor(System.IComparable,System.String)">
-            <inheritdoc />
-        </member>
-        <member name="M:System.ComponentModel.DataAnnotations.NumericComparisonAttribute.#ctor(System.IComparable,System.Func{System.String})">
-            <inheritdoc />
-        </member>
-        <member name="M:System.ComponentModel.DataAnnotations.NumericComparisonAttribute.IsValid(System.IComparable)">
-            <inheritdoc />
-        </member>
-        <member name="M:System.ComponentModel.DataAnnotations.NumericComparisonAttribute.IsValid(System.Decimal,System.Decimal)">
-            <summary>
-                检查对象是否合法
-            </summary>
-            <param name="value">对象</param>
-            <param name="compareValue">比较的值</param>
-            <returns>
-                <see cref="T:System.Boolean" />
-            </returns>
         </member>
         <member name="T:System.ComponentModel.DataAnnotations.PasswordAttribute">
             <summary>
@@ -8127,6 +8112,12 @@
                 比较的值
             </summary>
         </member>
+        <member name="P:Cordon.ComparisonValidator.Conversion">
+            <summary>
+                执行验证的值的转换委托
+            </summary>
+            <remarks>用于将执行验证的值转换为 <see cref="P:Cordon.ComparisonValidator.CompareValue" /> 同等类型。</remarks>
+        </member>
         <member name="M:Cordon.ComparisonValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
             <summary>
                 检查对象是否合法
@@ -8145,14 +8136,19 @@
         <member name="M:Cordon.ComparisonValidator.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.ComparisonValidator.IsTypeMatchedToCompareValue(System.IComparable)">
+        <member name="M:Cordon.ComparisonValidator.SetupConversion">
             <summary>
-                检查对象和比较的值是否为同一类型
+                初始化执行验证的值的转换委托
             </summary>
-            <remarks>用于确保比较逻辑的类型一致性。</remarks>
-            <param name="value">对象</param>
+        </member>
+        <member name="M:Cordon.ComparisonValidator.CreateDefaultConversion(System.Type)">
+            <summary>
+                为指定类型创建默认的类型转换委托
+            </summary>
+            <remarks>此方法可能触发反射，在 AOT 或裁剪（trimming）环境下需确保类型元数据保留。</remarks>
+            <param name="operandType">数据字段值的类型</param>
             <returns>
-                <see cref="T:System.Boolean" />
+                <see cref="T:System.Func`2" />
             </returns>
         </member>
         <member name="T:Cordon.CompositeValidator`1">
@@ -9460,30 +9456,6 @@
         <member name="M:Cordon.NullValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
         </member>
-        <member name="T:Cordon.NumericComparisonValidator">
-            <summary>
-                <see cref="T:System.Decimal" /> 类型比较验证器抽象基类
-            </summary>
-        </member>
-        <member name="M:Cordon.NumericComparisonValidator.#ctor(System.IComparable,System.String)">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.NumericComparisonValidator.#ctor(System.IComparable,System.Func{System.String})">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.NumericComparisonValidator.IsValid(System.IComparable,Cordon.IValidationContext)">
-            <inheritdoc />
-        </member>
-        <member name="M:Cordon.NumericComparisonValidator.IsValid(System.Decimal,System.Decimal)">
-            <summary>
-                检查对象是否合法
-            </summary>
-            <param name="value">对象</param>
-            <param name="compareValue">比较的值</param>
-            <returns>
-                <see cref="T:System.Boolean" />
-            </returns>
-        </member>
         <member name="T:Cordon.PasswordValidator">
             <summary>
                 密码验证器
@@ -9741,9 +9713,9 @@
         </member>
         <member name="P:Cordon.RangeValidator.Conversion">
             <summary>
-                内部缓存的值转换委托
+                执行验证的值的转换委托
             </summary>
-            <remarks>用于将任意输入对象转换为目标类型（<see cref="P:Cordon.RangeValidator.OperandType" />）。</remarks>
+            <remarks>用于将执行验证的值转换为 <see cref="P:Cordon.RangeValidator.OperandType" /> 同等类型。</remarks>
         </member>
         <member name="M:Cordon.RangeValidator.IsValid(System.Object,Cordon.IValidationContext)">
             <inheritdoc />
@@ -9751,13 +9723,11 @@
         <member name="M:Cordon.RangeValidator.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
-        <member name="M:Cordon.RangeValidator.GetResourceKey">
+        <member name="M:Cordon.RangeValidator.SetupConversion">
             <summary>
-                获取错误信息对应的资源键
+                初始化执行验证的值的转换委托
             </summary>
-            <returns>
-                <see cref="T:System.String" />
-            </returns>
+            <exception cref="T:System.InvalidOperationException"></exception>
         </member>
         <member name="M:Cordon.RangeValidator.Initialize(System.IComparable,System.IComparable,System.Func{System.Object,System.Object})">
             <summary>
@@ -9766,13 +9736,7 @@
             <remarks>验证边界有效性，并创建值转换委托。</remarks>
             <param name="minimum">已解析的最小字段值</param>
             <param name="maximum">已解析的最大字段值</param>
-            <param name="conversion">将输入值转换为目标类型的委托</param>
-            <exception cref="T:System.InvalidOperationException"></exception>
-        </member>
-        <member name="M:Cordon.RangeValidator.SetupConversion">
-            <summary>
-                初始化转换逻辑
-            </summary>
+            <param name="conversion">执行验证的值的转换委托</param>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
         <member name="M:Cordon.RangeValidator.GetOperandTypeConverter">
@@ -9782,6 +9746,14 @@
             <remarks>此方法可能触发反射，在 AOT 或裁剪（trimming）环境下需确保类型元数据保留。</remarks>
             <returns>
                 <see cref="T:System.ComponentModel.TypeConverter" />
+            </returns>
+        </member>
+        <member name="M:Cordon.RangeValidator.GetResourceKey">
+            <summary>
+                获取错误信息对应的资源键
+            </summary>
+            <returns>
+                <see cref="T:System.String" />
             </returns>
         </member>
         <member name="T:Cordon.RegularExpressionValidator">
@@ -10772,6 +10744,22 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+       <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

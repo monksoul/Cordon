@@ -8,7 +8,7 @@ namespace System.ComponentModel.DataAnnotations;
 ///     大于验证特性
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public class GreaterThanAttribute : ComparisonAttribute
+public class GreaterThanAttribute : ValidationBaseAttribute
 {
     /// <inheritdoc cref="GreaterThanValidator" />
     internal readonly GreaterThanValidator _validator;
@@ -36,9 +36,22 @@ public class GreaterThanAttribute : ComparisonAttribute
     /// </summary>
     /// <param name="compareValue">比较的值</param>
     public GreaterThanAttribute(IComparable compareValue)
-        : base(compareValue, nameof(ValidationMessages.GreaterThanValidator_ValidationError)) =>
+    {
+        CompareValue = compareValue;
         _validator = new GreaterThanValidator(compareValue);
 
+        UseResourceKey(() => nameof(ValidationMessages.GreaterThanValidator_ValidationError));
+    }
+
+    /// <summary>
+    ///     比较的值
+    /// </summary>
+    public IComparable CompareValue { get; }
+
     /// <inheritdoc />
-    protected override bool IsValid(IComparable value) => _validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
+
+    /// <inheritdoc />
+    public override string FormatErrorMessage(string name) =>
+        string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, CompareValue);
 }

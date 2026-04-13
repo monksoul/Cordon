@@ -288,16 +288,16 @@ public class RangeValidatorTests
     public void SetupConversion_Invalid_Parameters()
     {
         var validator = new RangeValidator(null!, null!, null!);
-        var exception = Assert.Throws<InvalidOperationException>(() => validator.SetupConversion());
+        var exception = Assert.Throws<InvalidOperationException>(validator.SetupConversion);
         Assert.Equal("The minimum and maximum values must be set.", exception.Message);
 
         var validator2 = new RangeValidator(null!, "10", "20");
-        var exception2 = Assert.Throws<InvalidOperationException>(() => validator2.SetupConversion());
+        var exception2 = Assert.Throws<InvalidOperationException>(validator2.SetupConversion);
         Assert.Equal("The OperandType must be set when strings are used for minimum and maximum values.",
             exception2.Message);
 
         var validator3 = new RangeValidator(typeof(NoComparableClass), "10", "20");
-        var exception3 = Assert.Throws<InvalidOperationException>(() => validator3.SetupConversion());
+        var exception3 = Assert.Throws<InvalidOperationException>(validator3.SetupConversion);
         Assert.Equal("The type Cordon.Tests.RangeValidatorTests+NoComparableClass must implement System.IComparable.",
             exception3.Message);
     }

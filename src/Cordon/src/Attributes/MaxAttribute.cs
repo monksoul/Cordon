@@ -8,7 +8,7 @@ namespace System.ComponentModel.DataAnnotations;
 ///     最大值验证特性
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public class MaxAttribute : ComparisonAttribute
+public class MaxAttribute : ValidationBaseAttribute
 {
     /// <inheritdoc cref="MaxValidator" />
     internal readonly MaxValidator _validator;
@@ -36,9 +36,22 @@ public class MaxAttribute : ComparisonAttribute
     /// </summary>
     /// <param name="maximum">允许的最大字段值</param>
     public MaxAttribute(IComparable maximum)
-        : base(maximum, nameof(ValidationMessages.MaxValidator_ValidationError)) =>
+    {
+        CompareValue = maximum;
         _validator = new MaxValidator(maximum);
 
+        UseResourceKey(() => nameof(ValidationMessages.MaxValidator_ValidationError));
+    }
+
+    /// <summary>
+    ///     比较的值
+    /// </summary>
+    public IComparable CompareValue { get; }
+
     /// <inheritdoc />
-    protected override bool IsValid(IComparable value) => _validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
+
+    /// <inheritdoc />
+    public override string FormatErrorMessage(string name) =>
+        string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, CompareValue);
 }

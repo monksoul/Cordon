@@ -27,6 +27,11 @@ public class LessThanOrEqualToAttributeTests
         Assert.Equal(10, attribute.CompareValue);
         Assert.Null(attribute.ErrorMessage);
         Assert.NotNull(attribute._validator);
+
+        var attribute2 = new LessThanOrEqualToAttribute((IComparable)10);
+        Assert.Equal(10, attribute2.CompareValue);
+        Assert.Null(attribute2.ErrorMessage);
+        Assert.NotNull(attribute2._validator);
     }
 
     [Fact]

@@ -45,6 +45,12 @@ public abstract class ComparisonValidator : ValidatorBase
     public IComparable CompareValue { get; }
 
     /// <summary>
+    ///     执行验证的值的转换委托
+    /// </summary>
+    /// <remarks>用于将执行验证的值转换为 <see cref="CompareValue" /> 同等类型。</remarks>
+    internal Func<object, object>? Conversion { get; private set; }
+
+    /// <summary>
     ///     检查对象是否合法
     /// </summary>
     /// <param name="value">对象</param>
@@ -57,25 +63,100 @@ public abstract class ComparisonValidator : ValidatorBase
     protected abstract bool IsValid(IComparable value, IValidationContext? validationContext);
 
     /// <inheritdoc />
-    public sealed override bool IsValid(object? value, IValidationContext? validationContext) =>
-        value switch
+    public sealed override bool IsValid(object? value, IValidationContext? validationContext)
+    {
+        // 初始化执行验证的值的转换委托
+        SetupConversion();
+
+        // 可检查
+        if (value is null or string { Length: 0 })
         {
-            null => true,
-            IComparable val => IsValid(val, validationContext),
-            _ => false
-        };
+            return true;
+        }
+
+        // 将执行验证的值转换为 CompareValue 同等类型
+        object? convertedValue;
+        try
+        {
+            convertedValue = Conversion!(value);
+        }
+        catch (FormatException)
+        {
+            return false;
+        }
+        catch (InvalidCastException)
+        {
+            return false;
+        }
+        catch (NotSupportedException)
+        {
+            return false;
+        }
+        catch (OverflowException)
+        {
+            return false;
+        }
+
+        return convertedValue is IComparable comparable && IsValid(comparable, validationContext);
+    }
 
     /// <inheritdoc />
-    public override string FormatErrorMessage(string name) =>
-        string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, CompareValue);
+    public override string FormatErrorMessage(string name)
+    {
+        // 初始化执行验证的值的转换委托
+        SetupConversion();
+
+        return string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, CompareValue);
+    }
 
     /// <summary>
-    ///     检查对象和比较的值是否为同一类型
+    ///     初始化执行验证的值的转换委托
     /// </summary>
-    /// <remarks>用于确保比较逻辑的类型一致性。</remarks>
-    /// <param name="value">对象</param>
+    internal void SetupConversion()
+    {
+        // 空检查
+        if (Conversion is not null)
+        {
+            return;
+        }
+
+        // 获取数据字段值的类型
+        var operandType = CompareValue.GetType();
+
+        // 检查是否是 int 类型
+        if (operandType == typeof(int))
+        {
+            Conversion = u => Convert.ToInt32(u, CultureInfo.InvariantCulture);
+        }
+        // 检查是否是 double 类型
+        else if (operandType == typeof(double))
+        {
+            Conversion = u => Convert.ToDouble(u, CultureInfo.InvariantCulture);
+        }
+        // 其他类型创建默认的类型转换委托
+        else
+        {
+            Conversion = CreateDefaultConversion(operandType);
+        }
+    }
+
+    /// <summary>
+    ///     为指定类型创建默认的类型转换委托
+    /// </summary>
+    /// <remarks>此方法可能触发反射，在 AOT 或裁剪（trimming）环境下需确保类型元数据保留。</remarks>
+    /// <param name="operandType">数据字段值的类型</param>
     /// <returns>
-    ///     <see cref="bool" />
+    ///     <see cref="Func{T,TResult}" />
     /// </returns>
-    protected bool IsTypeMatchedToCompareValue(IComparable value) => value.GetType() == CompareValue.GetType();
+    [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode",
+        Justification = "The ctor that allows this code to be called is marked with RequiresUnreferencedCode.")]
+    protected virtual Func<object, object> CreateDefaultConversion(Type operandType)
+    {
+        // 若要支持更多类型，可使用: value => Convert.ChangeType(value, operandType, CultureInfo.InvariantCulture);
+
+        // 获取目标类型的 TypeConverter（主要用于字符串解析，对于数值类型间的转换可能失败）
+        var typeConverter = TypeDescriptor.GetConverter(operandType);
+
+        return value => value.GetType() == operandType ? value : typeConverter.ConvertFrom(value)!;
+    }
 }

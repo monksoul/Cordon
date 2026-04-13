@@ -8,7 +8,7 @@ namespace System.ComponentModel.DataAnnotations;
 ///     小于等于验证特性
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public class LessThanOrEqualToAttribute : ComparisonAttribute
+public class LessThanOrEqualToAttribute : ValidationBaseAttribute
 {
     /// <inheritdoc cref="LessThanOrEqualToValidator" />
     internal readonly LessThanOrEqualToValidator _validator;
@@ -36,9 +36,22 @@ public class LessThanOrEqualToAttribute : ComparisonAttribute
     /// </summary>
     /// <param name="compareValue">比较的值</param>
     public LessThanOrEqualToAttribute(IComparable compareValue)
-        : base(compareValue, nameof(ValidationMessages.LessThanOrEqualToValidator_ValidationError)) =>
+    {
+        CompareValue = compareValue;
         _validator = new LessThanOrEqualToValidator(compareValue);
 
+        UseResourceKey(() => nameof(ValidationMessages.LessThanOrEqualToValidator_ValidationError));
+    }
+
+    /// <summary>
+    ///     比较的值
+    /// </summary>
+    public IComparable CompareValue { get; }
+
     /// <inheritdoc />
-    protected override bool IsValid(IComparable value) => _validator.IsValid(value);
+    public override bool IsValid(object? value) => _validator.IsValid(value);
+
+    /// <inheritdoc />
+    public override string FormatErrorMessage(string name) =>
+        string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name, CompareValue);
 }
