@@ -261,11 +261,7 @@ public class ObjectValidator<T> : ValidatorBase<T>, IObjectValidator<T>, IMember
         }
 
         // 检查是否设置了对象级别验证器
-        // ReSharper disable once UseNullPropagation
-        if (_objectValidator is not null)
-        {
-            _objectValidator.Validate(instance, resolvedRuleSets);
-        }
+        _objectValidator?.Validate(instance, resolvedRuleSets);
     }
 
     /// <inheritdoc />
