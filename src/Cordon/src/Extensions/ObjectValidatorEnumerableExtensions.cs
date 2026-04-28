@@ -14,7 +14,7 @@ public static class ObjectValidatorEnumerableExtensions
     /// </summary>
     /// <param name="validators"><see cref="IObjectValidator{T}" /> 集合</param>
     /// <param name="instance">对象</param>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
@@ -32,7 +32,7 @@ public static class ObjectValidatorEnumerableExtensions
     /// </summary>
     /// <param name="validators"><see cref="IObjectValidator{T}" /> 集合</param>
     /// <param name="instance">对象</param>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <returns>
     ///     <see cref="List{T}" />
     /// </returns>
@@ -51,7 +51,7 @@ public static class ObjectValidatorEnumerableExtensions
     /// <remarks>验证失败时抛出 <see cref="ValidationException" /> 异常。</remarks>
     /// <param name="validators"><see cref="IObjectValidator{T}" /> 集合</param>
     /// <param name="instance">对象</param>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <exception cref="ValidationException"></exception>
     public static void Validate<T>(this IEnumerable<IObjectValidator<T>> validators, T? instance,
         string?[]? ruleSets = null)

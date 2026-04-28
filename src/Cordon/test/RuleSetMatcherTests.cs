@@ -12,6 +12,8 @@ public class RuleSetMatcherTests
         Assert.True(RuleSetMatcher.Matches(null, null));
         Assert.True(RuleSetMatcher.Matches(null, ["*"]));
         Assert.False(RuleSetMatcher.Matches(null, ["login"]));
+        Assert.False(RuleSetMatcher.Matches(null, [""]));
+        Assert.False(RuleSetMatcher.Matches(null, [string.Empty]));
 
         Assert.False(RuleSetMatcher.Matches(["login", "register"], null));
         Assert.True(RuleSetMatcher.Matches(["login", "register"], ["*"]));

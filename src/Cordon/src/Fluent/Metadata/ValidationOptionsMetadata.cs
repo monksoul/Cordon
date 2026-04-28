@@ -13,7 +13,7 @@ public sealed class ValidationOptionsMetadata
     /// <summary>
     ///     <inheritdoc cref="ValidationOptionsMetadata" />
     /// </summary>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     internal ValidationOptionsMetadata(string?[]? ruleSets) => RuleSets = ruleSets;
 
     /// <summary>

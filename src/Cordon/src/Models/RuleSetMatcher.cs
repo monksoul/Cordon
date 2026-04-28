@@ -24,6 +24,7 @@ internal static class RuleSetMatcher
         var input = (activeRuleSets ?? []).Select(NormalizeRuleSet).ToArray();
 
         // 当前实例未定义规则集时
+        // 注意：匹配默认规则集请使用 null，空字符串无效
         if (current is { Length: 0 })
         {
             return input is { Length: 0 } || input.Contains("*") || input.Contains(null);

@@ -104,7 +104,7 @@ public sealed class ValidationService : IValidationService
     ///     创建 <see cref="ValidationContext{T}" /> 实例
     /// </summary>
     /// <param name="instance">对象</param>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <returns>
     ///     <see cref="ValidationContext{T}" />
     /// </returns>

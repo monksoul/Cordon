@@ -1214,6 +1214,48 @@ public class ObjectValidatorTests
         Assert.NotNull(validationContext2._serviceProvider);
     }
 
+    [Fact]
+    public void CustomValidator_WithRuleSet_GetValidationResults_ReturnOK()
+    {
+        using var validator = new RuleSetModelValidator();
+
+        var validationResults = validator.GetValidationResults(new RuleSetModel());
+        Assert.True(validationResults.HasErrors());
+        Assert.Equal(2, validationResults.Count);
+        Assert.Equal((string?[])["Id1 不能为空", "Id2 不能为空"], validationResults.FlattenErrors());
+
+        var validationResults2 = validator.GetValidationResults(new RuleSetModel(), [null]);
+        Assert.True(validationResults2.HasErrors());
+        Assert.Equal(2, validationResults2.Count);
+        Assert.Equal((string?[])["Id1 不能为空", "Id2 不能为空"], validationResults2.FlattenErrors());
+
+        var validationResults3 = validator.GetValidationResults(new RuleSetModel(), ["*"]);
+        Assert.True(validationResults3.HasErrors());
+        Assert.Equal(6, validationResults3.Count);
+        Assert.Equal((string?[])["Id1 不能为空", "Id2 不能为空", "Id3 不能为空", "Id4 不能为空", "Id5 不能为空", "Id6 不能为空"],
+            validationResults3.FlattenErrors());
+
+        var validationResults4 = validator.GetValidationResults(new RuleSetModel(), ["id3-id4"]);
+        Assert.True(validationResults4.HasErrors());
+        Assert.Equal(2, validationResults4.Count);
+        Assert.Equal((string?[])["Id3 不能为空", "Id4 不能为空"], validationResults4.FlattenErrors());
+
+        var validationResults5 = validator.GetValidationResults(new RuleSetModel(), ["id3-id4", "id5-id6"]);
+        Assert.True(validationResults5.HasErrors());
+        Assert.Equal(4, validationResults5.Count);
+        Assert.Equal((string?[])["Id3 不能为空", "Id4 不能为空", "Id5 不能为空", "Id6 不能为空"], validationResults5.FlattenErrors());
+
+        var validationResults6 = validator.GetValidationResults(new RuleSetModel(), [string.Empty, "id3-id4"]);
+        Assert.True(validationResults6.HasErrors());
+        Assert.Equal(2, validationResults6.Count);
+        Assert.Equal((string?[])["Id3 不能为空", "Id4 不能为空"], validationResults6.FlattenErrors());
+
+        var validationResults7 = validator.GetValidationResults(new RuleSetModel(), [null, "id3-id4"]);
+        Assert.True(validationResults7.HasErrors());
+        Assert.Equal(4, validationResults7.Count);
+        Assert.Equal((string?[])["Id1 不能为空", "Id2 不能为空", "Id3 不能为空", "Id4 不能为空"], validationResults7.FlattenErrors());
+    }
+
     public class ObjectModel
     {
         [Range(1, int.MaxValue)] public int Id { get; set; }
@@ -1251,6 +1293,37 @@ public class ObjectValidatorTests
 
             RuleFor(u => u.Id).NotNull().Min(1);
             RuleFor(u => u.Name).Required().NotEmpty().MinLength(3);
+        }
+    }
+
+    public class RuleSetModel
+    {
+        public string? Id1 { get; set; }
+        public string? Id2 { get; set; }
+        public string? Id3 { get; set; }
+        public string? Id4 { get; set; }
+        public string? Id5 { get; set; }
+        public string? Id6 { get; set; }
+    }
+
+    public class RuleSetModelValidator : AbstractValidator<RuleSetModel>
+    {
+        public RuleSetModelValidator()
+        {
+            RuleFor(u => u.Id1).Required().WithMessage("Id1 不能为空");
+            RuleFor(u => u.Id2).Required().WithMessage("Id2 不能为空");
+
+            RuleSet("id3-id4", () =>
+            {
+                RuleFor(u => u.Id3).Required().WithMessage("Id3 不能为空");
+                RuleFor(u => u.Id4).Required().WithMessage("Id4 不能为空");
+            });
+
+            RuleSet("id5-id6", () =>
+            {
+                RuleFor(u => u.Id5).Required().WithMessage("Id5 不能为空");
+                RuleFor(u => u.Id6).Required().WithMessage("Id6 不能为空");
+            });
         }
     }
 }

@@ -379,7 +379,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <summary>
     ///     在指定规则集上下文中为指定属性配置验证规则
     /// </summary>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <param name="setAction">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />
@@ -401,7 +401,7 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <summary>
     ///     在指定规则集上下文中为指定属性配置验证规则
     /// </summary>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <param name="setAction">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ObjectValidator{T}" />

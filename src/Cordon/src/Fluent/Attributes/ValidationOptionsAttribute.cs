@@ -9,7 +9,7 @@ namespace Cordon;
 /// </summary>
 /// <remarks>
 ///     要在项目中启用 <see cref="ValidationOptionsAttribute" /> 支持，需在配置服务时调用：
-///     <c>services.AddControllers().AddValidationOptions()</c>。
+///     <c>services.AddControllers().AddCordon()</c>。
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
 public sealed class ValidationOptionsAttribute : Attribute
@@ -17,7 +17,7 @@ public sealed class ValidationOptionsAttribute : Attribute
     /// <summary>
     ///     <inheritdoc cref="ValidationOptionsAttribute" />
     /// </summary>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     public ValidationOptionsAttribute(string?[]? ruleSets = null) => RuleSets = ruleSets;
 
     /// <summary>

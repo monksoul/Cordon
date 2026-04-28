@@ -319,7 +319,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <summary>
     ///     在指定规则集上下文中配置验证规则
     /// </summary>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <param name="setAction">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ValueValidator{T}" />
@@ -346,7 +346,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <summary>
     ///     在指定规则集上下文中配置验证规则
     /// </summary>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <param name="setAction">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ValueValidator{T}" />
@@ -657,7 +657,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <summary>
     ///     解析验证时使用的规则集
     /// </summary>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <returns><see cref="string" />列表</returns>
     internal string?[]? ResolveValidationRuleSets(string?[]? ruleSets) =>
         // 优先使用显式传入的规则集，否则从验证数据上下文中解析
@@ -686,7 +686,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     ///     创建 <see cref="ValidationContext{T}" /> 实例
     /// </summary>
     /// <param name="value">对象</param>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <returns>
     ///     <see cref="ValidationContext{T}" />
     /// </returns>

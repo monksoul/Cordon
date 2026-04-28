@@ -10,6 +10,24 @@ namespace Cordon;
 public static class ValidationExtensions
 {
     /// <summary>
+    ///     判断对象验证结果列表是否包含错误项（空列表或<c>null</c>）
+    /// </summary>
+    /// <param name="validationResults"><see cref="ValidationResult" /> 列表</param>
+    /// <returns>
+    ///     <see cref="bool" />
+    /// </returns>
+    public static bool HasErrors([NotNullWhen(true)] this List<ValidationResult>? validationResults) =>
+        validationResults is { Count: > 0 };
+
+    /// <summary>
+    ///     将对象验证结果列表中的错误消息提取并扁平化为字符串数组
+    /// </summary>
+    /// <param name="validationResults"><see cref="ValidationResult" /> 列表</param>
+    /// <returns><see cref="string" />[]</returns>
+    public static string?[] FlattenErrors(this List<ValidationResult>? validationResults) =>
+        validationResults?.Select(u => u.ErrorMessage).ToArray() ?? [];
+
+    /// <summary>
     ///     若 <see cref="ValidationResult" /> 列表为空则返回 <c>null</c>，否则返回列表本身
     /// </summary>
     /// <param name="validationResults"><see cref="ValidationResult" /> 列表</param>
@@ -35,7 +53,7 @@ public static class ValidationExtensions
     /// <param name="validationContext">
     ///     <see cref="ValidationContext" />
     /// </param>
-    /// <param name="ruleSets">规则集</param>
+    /// <param name="ruleSets">规则集。未设置规则集时，默认值为 <c>null</c>（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <returns>
     ///     <see cref="ValidationContext" />
     /// </returns>

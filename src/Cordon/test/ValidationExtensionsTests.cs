@@ -7,6 +7,33 @@ namespace Cordon.Tests;
 public class ValidationExtensionsTests
 {
     [Fact]
+    public void HasErrors_ReturnOK()
+    {
+        List<ValidationResult>? validationResults = null;
+        Assert.False(validationResults.HasErrors());
+
+        var validationResults2 = new List<ValidationResult>();
+        Assert.False(validationResults2.HasErrors());
+
+        validationResults2.Add(new ValidationResult("验证失败"));
+        Assert.True(validationResults2.HasErrors());
+    }
+
+    [Fact]
+    public void FlattenErrors_ReturnOK()
+    {
+        List<ValidationResult>? validationResults = null;
+        Assert.Equal(Array.Empty<string?>(), validationResults.FlattenErrors());
+
+        var validationResults2 = new List<ValidationResult>();
+        Assert.Equal(Array.Empty<string?>(), validationResults2.FlattenErrors());
+
+        validationResults2.Add(new ValidationResult("验证失败"));
+        validationResults2.Add(new ValidationResult("验证失败2"));
+        Assert.Equal((string?[])["验证失败", "验证失败2"], validationResults2.FlattenErrors());
+    }
+
+    [Fact]
     public void ToResults_ReturnOK()
     {
         var validationResults = new List<ValidationResult>();
