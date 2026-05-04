@@ -17,6 +17,10 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0"/>
     </ItemGroup>
 
+    <ItemGroup Condition=" '$(TargetFramework)' == 'net11.0' ">
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="11.0.0-preview.3.26207.106"/>
+    </ItemGroup>
+
     <ItemGroup>
         <EmbeddedResource Update="Resources\ValidationMessages.resx">
             <Generator>ResXFileCodeGenerator</Generator>
