@@ -114,7 +114,7 @@ public class ConditionBuilder<T>
     /// </returns>
     public ConditionBuilder<T> OtherwiseMessage(string? errorMessage)
     {
-        _defaultRules = [new FailureValidator().WithMessage(errorMessage)];
+        _defaultRules = [new NeverValidator().WithMessage(errorMessage)];
 
         return this;
     }
@@ -133,7 +133,7 @@ public class ConditionBuilder<T>
             DynamicallyAccessedMemberTypes.NonPublicProperties)]
         Type resourceType, string resourceName)
     {
-        _defaultRules = [new FailureValidator().WithMessage(resourceType, resourceName)];
+        _defaultRules = [new NeverValidator().WithMessage(resourceType, resourceName)];
 
         return this;
     }
@@ -240,7 +240,7 @@ public sealed class ConditionThenBuilder<T>
     public ConditionBuilder<T> ThenMessage(string? errorMessage)
     {
         _conditionBuilder._conditionalRules.Add(new ConditionRule<T>(_condition,
-            [new FailureValidator().WithMessage(errorMessage)]));
+            [new NeverValidator().WithMessage(errorMessage)]));
 
         return _conditionBuilder;
     }
@@ -260,7 +260,7 @@ public sealed class ConditionThenBuilder<T>
         Type resourceType, string resourceName)
     {
         _conditionBuilder._conditionalRules.Add(new ConditionRule<T>(_condition,
-            [new FailureValidator().WithMessage(resourceType, resourceName)]));
+            [new NeverValidator().WithMessage(resourceType, resourceName)]));
 
         return _conditionBuilder;
     }

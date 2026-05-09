@@ -272,13 +272,13 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
-    public void Failure_ReturnOK()
+    public void Never_ReturnOK()
     {
-        var valueValidator = new ValueValidator<string>().Failure();
+        var valueValidator = new ValueValidator<string>().Never();
 
         Assert.Single(valueValidator.Validators);
 
-        var addedValidator = valueValidator._lastAddedValidator as FailureValidator;
+        var addedValidator = valueValidator._lastAddedValidator as NeverValidator;
         Assert.NotNull(addedValidator);
 
         Assert.False(valueValidator.IsValid("蒙奇·D·路飞"));
@@ -858,6 +858,10 @@ public class ValueValidatorValidationTests
         Assert.Throws<ArgumentNullException>(() => new ValueValidator<int>().Must((Func<int, bool>)null!));
         Assert.Throws<ArgumentNullException>(() =>
             new ValueValidator<int>().Must((Func<int, ValidationContext<int>, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() => new ValueValidator<int>().Must((Func<int, Task<bool>>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<int>().Must((Func<int, ValidationContext<int>, Task<bool>>)null!));
     }
 
     [Fact]
@@ -874,6 +878,31 @@ public class ValueValidatorValidationTests
         Assert.False(valueValidator.IsValid(9));
 
         var valueValidator2 = new ValueValidator<int>().Must((_, ctx) => ctx.Instance > 10);
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator2 = valueValidator2._lastAddedValidator as MustValidator<int>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.True(valueValidator2.IsValid(11));
+        Assert.False(valueValidator2.IsValid(9));
+    }
+
+    [Fact]
+    public void Must_WithTask_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<int>().Must(async u => await Task.FromResult(u > 10));
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as MustValidator<int>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(valueValidator.IsValid(11));
+        Assert.False(valueValidator.IsValid(9));
+
+        var valueValidator2 =
+            new ValueValidator<int>().Must(async (_, ctx) => await Task.FromResult(ctx.Instance > 10));
 
         Assert.Single(valueValidator2.Validators);
 

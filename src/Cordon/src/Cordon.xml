@@ -1792,9 +1792,6 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
-        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1804,8 +1801,11 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -2361,9 +2361,9 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.Failure">
+        <member name="M:Cordon.FluentValidatorBuilder`2.Never">
             <summary>
-                添加固定失败验证器
+                添加永不通过验证器
             </summary>
             <returns>
                 <typeparamref name="TSelf" />
@@ -2532,6 +2532,24 @@
             </returns>
         </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.Must(System.Func{`0,Cordon.ValidationContext{`0},System.Boolean})">
+            <summary>
+                添加自定义条件成立时委托验证器
+            </summary>
+            <param name="condition">条件委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.Must(System.Func{`0,System.Threading.Tasks.Task{System.Boolean}})">
+            <summary>
+                添加自定义条件成立时委托验证器
+            </summary>
+            <param name="condition">条件委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.Must(System.Func{`0,Cordon.ValidationContext{`0},System.Threading.Tasks.Task{System.Boolean}})">
             <summary>
                 添加自定义条件成立时委托验证器
             </summary>
@@ -3505,6 +3523,34 @@
             <returns>
                 <see cref="T:System.Action`2" />
             </returns>
+        </member>
+        <member name="T:Cordon.Core.Utilities.AsyncUtility">
+            <summary>
+                异步实用方法
+            </summary>
+            <remarks>
+                <see href="https://github.com/aspnet/AspNetIdentity/blob/main/src/Microsoft.AspNet.Identity.Core/AsyncHelper.cs">参考代码</see>
+            </remarks>
+        </member>
+        <member name="M:Cordon.Core.Utilities.AsyncUtility.RunSync``1(System.Func{System.Threading.Tasks.Task{``0}})">
+            <summary>
+                运行带有返回值的异步方法
+            </summary>
+            <param name="func">
+                <see cref="T:System.Func`1" />
+            </param>
+            <typeparam name="TResult">返回值类型</typeparam>
+            <returns>
+                <typeparamref name="TResult" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Core.Utilities.AsyncUtility.RunSync(System.Func{System.Threading.Tasks.Task})">
+            <summary>
+                运行无返回值的异步方法
+            </summary>
+            <param name="func">
+                <see cref="T:System.Func`1" />
+            </param>
         </member>
         <member name="T:Cordon.ValidatorException">
             <summary>
@@ -5167,6 +5213,15 @@
             </returns>
         </member>
         <member name="M:Cordon.PropertyValidator`3.Must(System.Func{`1,Cordon.ValidationContext{`0},System.Boolean})">
+            <summary>
+                添加自定义条件成立时委托验证器
+            </summary>
+            <param name="condition">条件委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.PropertyValidator`3.Must(System.Func{`1,Cordon.ValidationContext{`0},System.Threading.Tasks.Task{System.Boolean}})">
             <summary>
                 添加自定义条件成立时委托验证器
             </summary>
@@ -6843,12 +6898,12 @@
                 <see cref="T:Cordon.EqualToValidator" />
             </returns>
         </member>
-        <member name="M:Cordon.Validators.Failure">
+        <member name="M:Cordon.Validators.Never">
             <summary>
-                创建固定失败验证器
+                创建永不通过验证器
             </summary>
             <returns>
-                <see cref="T:Cordon.FailureValidator" />
+                <see cref="T:Cordon.NeverValidator" />
             </returns>
         </member>
         <member name="M:Cordon.Validators.FileExtensions">
@@ -7015,6 +7070,26 @@
             </returns>
         </member>
         <member name="M:Cordon.Validators.Must``1(System.Func{``0,Cordon.ValidationContext{``0},System.Boolean})">
+            <summary>
+                创建自定义条件成立时委托验证器
+            </summary>
+            <param name="condition">条件委托</param>
+            <typeparam name="T">对象类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.MustValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.Must``1(System.Func{``0,System.Threading.Tasks.Task{System.Boolean}})">
+            <summary>
+                创建自定义条件成立时委托验证器
+            </summary>
+            <param name="condition">条件委托</param>
+            <typeparam name="T">对象类型</typeparam>
+            <returns>
+                <see cref="T:Cordon.MustValidator`1" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.Must``1(System.Func{``0,Cordon.ValidationContext{``0},System.Threading.Tasks.Task{System.Boolean}})">
             <summary>
                 创建自定义条件成立时委托验证器
             </summary>
@@ -7721,7 +7796,7 @@
         <member name="M:Cordon.BankCardValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^[1-9]\d{11,18}$</code><br/>
+            <code>^[1-9]\\d{11,18}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -7760,7 +7835,7 @@
         <member name="M:Cordon.ChineseNameValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:[\u4e00-\u9fa5·]{2,16})$</code><br/>
+            <code>^(?:[\\u4e00-\\u9fa5·]{2,16})$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -7785,7 +7860,7 @@
         <member name="M:Cordon.ChineseValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:[\u3400-\u4DB5\u4E00-\u9FEA\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879][\uDC00-\uDFFF]|\uD869[\uDC00-\uDED6\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF34\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0])+$</code><br/>
+            <code>^(?:[\\u3400-\\u4DB5\\u4E00-\\u9FEA\\uFA0E\\uFA0F\\uFA11\\uFA13\\uFA14\\uFA1F\\uFA21\\uFA23\\uFA24\\uFA27-\\uFA29]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872\\uD874-\\uD879][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1\\uDEB0-\\uDFFF]|\\uD87A[\\uDC00-\\uDFE0])+$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -7836,7 +7911,7 @@
         <member name="M:Cordon.ColorValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:#(?:(?:[0-9a-fA-F]{3}){1,2}|[0-9a-fA-F]{8})|rgba?\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*(?:,\s*[0-9.]+\s*)?)?\)|hsla?\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*(?:,\s*[0-9.]+\s*)?)?\)|hwb\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|lch\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|oklch\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|lab\((?:\s*[-+]?\d+\%?\s*,){2}\s*[-+]?\d+\%?\s*\)|oklab\((?:\s*[-+]?\d+\%?\s*,){2}\s*[-+]?\d+\%?\s*\))$</code><br/>
+            <code>^(?:#(?:(?:[0-9a-fA-F]{3}){1,2}|[0-9a-fA-F]{8})|rgba?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hsla?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hwb\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|oklch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\)|oklab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\))$</code><br/>
             Options:<br/>
             <code>RegexOptions.IgnoreCase</code><br/>
             Explanation:<br/>
@@ -7847,8 +7922,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a hexadecimal digit exactly 3 times.<br/>
-                        ○ Match a hexadecimal digit exactly 8 times.<br/>
+                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -7870,7 +7945,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character atomically any number of times.<br/>
+                            ○ Match a whitespace character greedily any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -7895,7 +7970,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character atomically any number of times.<br/>
+                                    ○ Match a whitespace character greedily any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -7956,13 +8031,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7976,13 +8051,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -7994,7 +8069,7 @@
         <member name="M:Cordon.ColorValidator.StandardRegex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:#(?:[0-9a-fA-F]{3}){1,2}|rgba?\((?:\s*(?:\d+%?)\s*,){2}\s*(?:\d+%?)\s*(?:,\s*(?:\d+(?:\.\d+)?|\.\d+))?\))$</code><br/>
+            <code>^(?:#(?:[0-9a-fA-F]{3}){1,2}|rgba?\\((?:\\s*(?:\\d+%?)\\s*,){2}\\s*(?:\\d+%?)\\s*(?:,\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+))?\\))$</code><br/>
             Options:<br/>
             <code>RegexOptions.IgnoreCase</code><br/>
             Explanation:<br/>
@@ -8004,7 +8079,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -8029,10 +8104,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit atomically at least once.<br/>
+                                    ○ Match a Unicode digit greedily at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit atomically at least once.<br/>
+                                ○ Match a Unicode digit greedily at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -8530,18 +8605,18 @@
         <member name="M:Cordon.DomainValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$</code><br/>
+            <code>^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
             ○ Loop greedily at least once.<br/>
                 ○ 1st capture group.<br/>
-                    ○ Match an ASCII letter or digit.<br/>
+                    ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Optional (greedy).<br/>
-                        ○ Match a character in the set [\-0-9A-Za-z] greedily at most 61 times.<br/>
-                        ○ Match an ASCII letter or digit.<br/>
+                        ○ Match a character in the set [-0-9A-Za-z] greedily at most 61 times.<br/>
+                        ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Match '.'.<br/>
-            ○ Match an ASCII letter atomically at least twice.<br/>
+            ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8562,7 +8637,7 @@
         <member name="M:Cordon.EmailAddressValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(([^&lt;&gt;()\$$\].,;:\s@"]+(\.[^&lt;&gt;()\$$\].,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$</code><br/>
+            <code>^(([^&lt;&gt;()\\$$\\].,;:\\s@"]+(\\.[^&lt;&gt;()\\$$\\].,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8594,9 +8669,9 @@
                     ○ 7th capture group.<br/>
                         ○ Loop greedily at least once.<br/>
                             ○ 8th capture group.<br/>
-                                ○ Match a character in the set [\-0-9A-Za-z] atomically at least once.<br/>
+                                ○ Match a character in the set [-0-9A-Za-z] atomically at least once.<br/>
                                 ○ Match '.'.<br/>
-                        ○ Match an ASCII letter atomically at least twice.<br/>
+                        ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -8730,15 +8805,6 @@
         <member name="M:Cordon.EqualToValidator.FormatErrorMessage(System.String)">
             <inheritdoc />
         </member>
-        <member name="T:Cordon.FailureValidator">
-            <summary>
-                固定失败验证器
-            </summary>
-            <remarks>仅用于输出指定错误信息。</remarks>
-        </member>
-        <member name="M:Cordon.FailureValidator.IsValid(System.Object,Cordon.IValidationContext)">
-            <inheritdoc />
-        </member>
         <member name="T:Cordon.FileExtensionsValidator">
             <summary>
                 文件扩展名验证器
@@ -8865,7 +8931,7 @@
         <member name="M:Cordon.IDCardValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^\d{6}((((((19|20)\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|(((19|20)\d{2})(0[13578]|1[02])31)|((19|20)\d{2})02(0[1-9]|1\d|2[0-8])|((((19|20)([13579][26]|[2468][048]|0[48]))|(2000))0229))\d{3})|((((\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|((\d{2})(0[13578]|1[02])31)|((\d{2})02(0[1-9]|1\d|2[0-8]))|(([13579][26]|[2468][048]|0[048])0229))\d{2}))(\d|X|x)$</code><br/>
+            <code>^\\d{6}((((((19|20)\\d{2})(0[13-9]|1[012])(0[1-9]|[12]\\d|30))|(((19|20)\\d{2})(0[13578]|1[02])31)|((19|20)\\d{2})02(0[1-9]|1\\d|2[0-8])|((((19|20)([13579][26]|[2468][048]|0[48]))|(2000))0229))\\d{3})|((((\\d{2})(0[13-9]|1[012])(0[1-9]|[12]\\d|30))|((\\d{2})(0[13578]|1[02])31)|((\\d{2})02(0[1-9]|1\\d|2[0-8]))|(([13579][26]|[2468][048]|0[048])0229))\\d{2}))(\\d|X|x)$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8885,18 +8951,18 @@
                                     ○ 7th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 8th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [12].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 9th capture group.<br/>
@@ -8909,10 +8975,10 @@
                                     ○ 12th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ Match a sequence of expressions.<br/>
@@ -8926,13 +8992,13 @@
                                     ○ 15th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '2'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 16th capture group.<br/>
                                     ○ 17th capture group.<br/>
@@ -8945,13 +9011,13 @@
                                                 ○ 20th capture group.<br/>
                                                     ○ Match with 3 alternative expressions.<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match a character in the set [13579].<br/>
+                                                            ○ Match an empty string.<br/>
                                                             ○ Match a character in the set [26].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match a character in the set [2468].<br/>
+                                                            ○ Match an empty string.<br/>
                                                             ○ Match a character in the set [048].<br/>
                                                         ○ Match a sequence of expressions.<br/>
-                                                            ○ Match '0'.<br/>
+                                                            ○ Match an empty string.<br/>
                                                             ○ Match a character in the set [48].<br/>
                                             ○ 21st capture group.<br/>
                                                 ○ Match the string "2000".<br/>
@@ -8966,18 +9032,18 @@
                                     ○ 26th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-2].<br/>
                                     ○ 27th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [12].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match the string "30".<br/>
                                 ○ 28th capture group.<br/>
@@ -8986,10 +9052,10 @@
                                     ○ 30th capture group.<br/>
                                         ○ Match with 2 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [13578].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [02].<br/>
                                     ○ Match the string "31".<br/>
                                 ○ 31st capture group.<br/>
@@ -8999,25 +9065,25 @@
                                     ○ 33rd capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [1-9].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '1'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a Unicode digit.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '2'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [0-8].<br/>
                                 ○ 34th capture group.<br/>
                                     ○ 35th capture group.<br/>
                                         ○ Match with 3 alternative expressions.<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [13579].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [26].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match a character in the set [2468].<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                             ○ Match a sequence of expressions.<br/>
-                                                ○ Match '0'.<br/>
+                                                ○ Match an empty string.<br/>
                                                 ○ Match a character in the set [048].<br/>
                                     ○ Match the string "0229".<br/>
                         ○ Match a Unicode digit exactly 2 times.<br/>
@@ -9067,7 +9133,7 @@
         <member name="M:Cordon.IpAddressValidator.StrictIPv4Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:\d{1,3}\.){3}\d{1,3}$</code><br/>
+            <code>^(?:\\d{1,3}\\.){3}\\d{1,3}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9240,7 +9306,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a hexadecimal digit exactly 32 times.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9254,8 +9320,8 @@
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
-                    ○ Match a hexadecimal digit exactly 16 times.<br/>
-                    ○ Match a hexadecimal digit exactly 32 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 16 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9360,6 +9426,18 @@
             </summary>
             <param name="condition">条件委托</param>
         </member>
+        <member name="M:Cordon.MustValidator`1.#ctor(System.Func{`0,System.Threading.Tasks.Task{System.Boolean}})">
+            <summary>
+                <inheritdoc cref="T:Cordon.MustValidator`1" />
+            </summary>
+            <param name="condition">条件委托</param>
+        </member>
+        <member name="M:Cordon.MustValidator`1.#ctor(System.Func{`0,Cordon.ValidationContext{`0},System.Threading.Tasks.Task{System.Boolean}})">
+            <summary>
+                <inheritdoc cref="T:Cordon.MustValidator`1" />
+            </summary>
+            <param name="condition">条件委托</param>
+        </member>
         <member name="P:Cordon.MustValidator`1.Condition">
             <summary>
                 条件委托
@@ -9385,6 +9463,15 @@
             <returns>
                 <see cref="T:System.ComponentModel.DataAnnotations.ValidationResult" />
             </returns>
+        </member>
+        <member name="T:Cordon.NeverValidator">
+            <summary>
+                永不通过验证器
+            </summary>
+            <remarks>仅用于输出指定错误信息。</remarks>
+        </member>
+        <member name="M:Cordon.NeverValidator.IsValid(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
         </member>
         <member name="T:Cordon.NotBlankValidator">
             <summary>
@@ -9507,13 +9594,13 @@
         <member name="M:Cordon.PasswordValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>\A(?=.*[a-zA-Z])(?=.*\d).{8,64}\z</code><br/>
+            <code>\\A(?=.*[a-zA-Z])(?=.*\\d).{8,64}\\z</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match an ASCII letter.<br/>
+                ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
                 ○ Match a Unicode digit.<br/>
@@ -9525,7 +9612,7 @@
         <member name="M:Cordon.PasswordValidator.StrongRegex">
             <remarks>
             Pattern:<br/>
-            <code>\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&amp;*]).{12,64}\z</code><br/>
+            <code>\\A(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&amp;*]).{12,64}\\z</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9563,7 +9650,7 @@
         <member name="M:Cordon.PhoneNumberValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:(?:\+|00)86)?1(?:3\d|4[579]|5[0-35-9]|6[6-8]|7[0-8]|8\d|9[0-35-9])\d{8}$</code><br/>
+            <code>^(?:(?:\\+|00)86)?1(?:3\\d|4[579]|5[0-35-9]|6[6-8]|7[0-8]|8\\d|9[0-35-9])\\d{8}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9575,25 +9662,25 @@
             ○ Match '1'.<br/>
             ○ Match with 7 alternative expressions.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '3'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '4'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [579].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '5'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '6'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [6-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '7'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-8].<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '8'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a Unicode digit.<br/>
                 ○ Match a sequence of expressions.<br/>
-                    ○ Match '9'.<br/>
+                    ○ Match an empty string.<br/>
                     ○ Match a character in the set [0-35-9].<br/>
             ○ Match a Unicode digit exactly 8 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -9616,38 +9703,38 @@
         <member name="M:Cordon.PostalCodeValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(0[1-7]|1[0-356]|2[0-7]|3[0-6]|4[0-7]|5[1-7]|6[1-7]|7[0-5]|8[013-6])\d{4}$</code><br/>
+            <code>^(0[1-7]|1[0-356]|2[0-7]|3[0-6]|4[0-7]|5[1-7]|6[1-7]|7[0-5]|8[013-6])\\d{4}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 9 alternative expressions.<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '0'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '1'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-356].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '2'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '3'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-6].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '4'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '5'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '6'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [1-7].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '7'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [0-5].<br/>
                     ○ Match a sequence of expressions.<br/>
-                        ○ Match '8'.<br/>
+                        ○ Match an empty string.<br/>
                         ○ Match a character in the set [013-6].<br/>
             ○ Match a Unicode digit exactly 4 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
@@ -10024,7 +10111,7 @@
         <member name="M:Cordon.TelephoneValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:(?:\d{3}-)?\d{8}|(?:\d{4}-)?\d{7,8})(?:-\d+)?$</code><br/>
+            <code>^(?:(?:\\d{3}-)?\\d{8}|(?:\\d{4}-)?\\d{7,8})(?:-\\d+)?$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10158,16 +10245,16 @@
         <member name="M:Cordon.UserNameValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^[a-zA-Z](?!.*[_-]{2})[\w-]{2,14}[a-zA-Z0-9]$</code><br/>
+            <code>^[a-zA-Z](?!.*[_-]{2})[\\w-]{2,14}[a-zA-Z0-9]$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match an ASCII letter.<br/>
+            ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [\-_] exactly 2 times.<br/>
-            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match an ASCII letter or digit.<br/>
+                ○ Match a character in the set [-_] exactly 2 times.<br/>
+            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match a character in the set [0-9A-Za-z].<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -10754,22 +10841,6 @@
             </returns>
         </member>
         <member name="M:Microsoft.Extensions.DependencyInjection.CordonServiceCollectionExtensions.AddCordon(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
-            <summary>
-                添加数据验证服务
-            </summary>
-            <param name="services">
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>
-ection.CordonServiceCollectionExtensions.AddCordon(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
             <summary>
                 添加数据验证服务
             </summary>

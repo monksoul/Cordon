@@ -379,15 +379,15 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
-    public void Failure_ReturnOK()
+    public void Never_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Data1)
-            .Failure();
+            .Never();
 
         Assert.Single(propertyValidator.Validators);
 
-        var addedValidator = propertyValidator._lastAddedValidator as FailureValidator;
+        var addedValidator = propertyValidator._lastAddedValidator as NeverValidator;
         Assert.NotNull(addedValidator);
 
         Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "蒙奇·D·路飞" }));
@@ -1171,7 +1171,15 @@ public class PropertyValidatorValidationTests
 
         Assert.Throws<ArgumentNullException>(() =>
             new ObjectValidator<ValidationModel>().RuleFor(u => u.Number1)
-                .Must(null!));
+                .Must((Func<int, ValidationContext<int>, bool>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.Number1)
+                .Must((Func<int, Task<bool>>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ObjectValidator<ValidationModel>().RuleFor(u => u.Number1)
+                .Must((Func<int, ValidationContext<int>, Task<bool>>)null!));
     }
 
     [Fact]
@@ -1205,6 +1213,48 @@ public class PropertyValidatorValidationTests
         var propertyValidator3 = new ObjectValidator<ValidationModel>()
             .RuleFor(u => u.Number1)
             .Must((_, ctx) => ctx.Instance > 10);
+
+        Assert.Single(propertyValidator3.Validators);
+
+        var addedValidator3 =
+            propertyValidator3._lastAddedValidator as MustValidator<int>;
+        Assert.NotNull(addedValidator3);
+
+        Assert.True(propertyValidator3.IsValid(new ValidationModel { Number1 = 11 }));
+        Assert.False(propertyValidator3.IsValid(new ValidationModel { Number1 = 9 }));
+    }
+
+    [Fact]
+    public void Must_WithTask_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Number1)
+            .Must(async u => await Task.FromResult(u > 10));
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as MustValidator<int>;
+        Assert.NotNull(addedValidator);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Number1 = 11 }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Number1 = 9 }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Number1)
+            .Must(async (_, ctx) => await Task.FromResult(ctx.Instance.Number1 > 10));
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator2 =
+            propertyValidator2._lastAddedValidator as ValidatorProxy<ValidationModel, MustValidator<int>>;
+        Assert.NotNull(addedValidator2);
+
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Number1 = 11 }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Number1 = 9 }));
+
+        var propertyValidator3 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Number1)
+            .Must(async (_, ctx) => await Task.FromResult(ctx.Instance > 10));
 
         Assert.Single(propertyValidator3.Validators);
 

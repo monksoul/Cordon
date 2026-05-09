@@ -97,6 +97,30 @@ public class MustValidator<T> : ValidatorBase<T>
     }
 
     /// <summary>
+    ///     <inheritdoc cref="MustValidator{T}" />
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    public MustValidator(Func<T, Task<bool>> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        Condition = (instance, _) => AsyncUtility.RunSync(() => condition(instance));
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="MustValidator{T}" />
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    public MustValidator(Func<T, ValidationContext<T>, Task<bool>> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        Condition = (instance, context) => AsyncUtility.RunSync(() => condition(instance, context));
+    }
+
+    /// <summary>
     ///     条件委托
     /// </summary>
     public Func<T, ValidationContext<T>, bool> Condition { get; }

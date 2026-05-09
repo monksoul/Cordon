@@ -78,13 +78,13 @@ public class ConditionBuilderTests
         var conditionBuilder = new ConditionBuilder<int>();
         conditionBuilder.When(u => u > 10).ThenMessage("错误信息").OtherwiseMessage("默认错误信息");
         Assert.NotNull(conditionBuilder._defaultRules);
-        Assert.Equal(typeof(FailureValidator), conditionBuilder._defaultRules[0].GetType());
+        Assert.Equal(typeof(NeverValidator), conditionBuilder._defaultRules[0].GetType());
 
         var conditionBuilder2 = new ConditionBuilder<int>();
         conditionBuilder2.When(u => u > 10).ThenMessage("错误信息")
             .OtherwiseMessage(typeof(TestValidationMessages), "TestValidator_ValidationError");
         Assert.NotNull(conditionBuilder2._defaultRules);
-        Assert.Equal(typeof(FailureValidator), conditionBuilder2._defaultRules[0].GetType());
+        Assert.Equal(typeof(NeverValidator), conditionBuilder2._defaultRules[0].GetType());
     }
 
     [Fact]

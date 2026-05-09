@@ -358,12 +358,12 @@ public static class Validators
     public static EqualToValidator EqualTo(object? compareValue) => new(compareValue);
 
     /// <summary>
-    ///     创建固定失败验证器
+    ///     创建永不通过验证器
     /// </summary>
     /// <returns>
-    ///     <see cref="FailureValidator" />
+    ///     <see cref="NeverValidator" />
     /// </returns>
-    public static FailureValidator Failure() => new();
+    public static NeverValidator Never() => new();
 
     /// <summary>
     ///     创建文件扩展名验证器
@@ -540,6 +540,26 @@ public static class Validators
     ///     <see cref="MustValidator{T}" />
     /// </returns>
     public static MustValidator<T> Must<T>(Func<T, ValidationContext<T>, bool> condition) => new(condition);
+
+    /// <summary>
+    ///     创建自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="MustValidator{T}" />
+    /// </returns>
+    public static MustValidator<T> Must<T>(Func<T, Task<bool>> condition) => new(condition);
+
+    /// <summary>
+    ///     创建自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="MustValidator{T}" />
+    /// </returns>
+    public static MustValidator<T> Must<T>(Func<T, ValidationContext<T>, Task<bool>> condition) => new(condition);
 
     /// <summary>
     ///     创建自定义条件成立时委托验证器

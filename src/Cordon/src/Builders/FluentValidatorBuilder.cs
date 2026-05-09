@@ -402,12 +402,12 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf EqualTo(object? compareValue) => AddValidator(new EqualToValidator(compareValue));
 
     /// <summary>
-    ///     添加固定失败验证器
+    ///     添加永不通过验证器
     /// </summary>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    public virtual TSelf Failure() => AddValidator(new FailureValidator());
+    public virtual TSelf Never() => AddValidator(new NeverValidator());
 
     /// <summary>
     ///     添加文件扩展名验证器
@@ -587,6 +587,25 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     ///     <typeparamref name="TSelf" />
     /// </returns>
     public virtual TSelf Must(Func<T, ValidationContext<T>, bool> condition) =>
+        AddValidator(new MustValidator<T>(condition));
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Must(Func<T, Task<bool>> condition) => AddValidator(new MustValidator<T>(condition));
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Must(Func<T, ValidationContext<T>, Task<bool>> condition) =>
         AddValidator(new MustValidator<T>(condition));
 
     /// <summary>

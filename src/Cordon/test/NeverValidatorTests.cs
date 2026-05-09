@@ -4,12 +4,12 @@
 
 namespace Cordon.Tests;
 
-public class FailureValidatorTests
+public class NeverValidatorTests
 {
     [Fact]
     public void New_ReturnOK()
     {
-        var validator = new FailureValidator();
+        var validator = new NeverValidator();
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} is invalid.", validator._errorMessageResourceAccessor());
     }
@@ -21,14 +21,14 @@ public class FailureValidatorTests
     [InlineData(false, false)]
     public void IsValid_ReturnOK(object? value, bool result)
     {
-        var validator = new FailureValidator();
+        var validator = new NeverValidator();
         Assert.Equal(result, validator.IsValid(value));
     }
 
     [Fact]
     public void GetValidationResults_ReturnOK()
     {
-        var validator = new FailureValidator();
+        var validator = new NeverValidator();
 
         var validationResults = validator.GetValidationResults(9, "data");
         Assert.NotNull(validationResults);
@@ -45,7 +45,7 @@ public class FailureValidatorTests
     [Fact]
     public void Validate_ReturnOK()
     {
-        var validator = new FailureValidator();
+        var validator = new NeverValidator();
 
         var exception = Assert.Throws<ValidationException>(() => validator.Validate(9, "data"));
         Assert.Equal("The field data is invalid.", exception.Message);

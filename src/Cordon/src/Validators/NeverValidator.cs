@@ -5,10 +5,10 @@
 namespace Cordon;
 
 /// <summary>
-///     固定失败验证器
+///     永不通过验证器
 /// </summary>
 /// <remarks>仅用于输出指定错误信息。</remarks>
-public sealed class FailureValidator : ValidatorBase
+public sealed class NeverValidator : ValidatorBase
 {
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext) => false;

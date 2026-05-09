@@ -168,9 +168,9 @@ public class ValidatorsTests
     }
 
     [Fact]
-    public void Failure_ReturnOK()
+    public void Never_ReturnOK()
     {
-        var validator = Validators.Failure();
+        var validator = Validators.Never();
         Assert.NotNull(validator);
     }
 
@@ -428,6 +428,16 @@ public class ValidatorsTests
         Assert.NotNull(validator.Condition);
 
         var validator2 = Validators.Must<int>((u, _) => u > 10);
+        Assert.NotNull(validator2.Condition);
+    }
+
+    [Fact]
+    public void Must_WithTask_ReturnOK()
+    {
+        var validator = Validators.Must<int>(async u => await Task.FromResult(u > 10));
+        Assert.NotNull(validator.Condition);
+
+        var validator2 = Validators.Must<int>(async (u, _) => await Task.FromResult(u > 10));
         Assert.NotNull(validator2.Condition);
     }
 

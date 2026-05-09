@@ -16,6 +16,16 @@ public class MustValidatorTests
 
         var validator2 = new MustValidator<int>((u, _) => u > 10);
         Assert.NotNull(validator2.Condition);
+
+        var validator3 = new MustValidator<int>(async u => await Task.FromResult(u > 10));
+        Assert.NotNull(validator3.Condition);
+        Assert.False(validator3.Condition(10, new ValidationContext<int>(10)));
+        Assert.True(validator3.Condition(11, new ValidationContext<int>(11)));
+
+        var validator4 = new MustValidator<int>(async (u, _) => await Task.FromResult(u > 10));
+        Assert.NotNull(validator4.Condition);
+        Assert.False(validator4.Condition(10, new ValidationContext<int>(10)));
+        Assert.True(validator4.Condition(11, new ValidationContext<int>(11)));
     }
 
     [Theory]

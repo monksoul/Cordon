@@ -79,7 +79,7 @@ public class ConditionThenBuilderTests
                 .When(u => u < 10).ThenMessage("错误信息2");
 
         Assert.Equal(2, builder._conditionalRules.Count);
-        Assert.Equal(typeof(FailureValidator), builder._conditionalRules.First().Validators[0].GetType());
+        Assert.Equal(typeof(NeverValidator), builder._conditionalRules.First().Validators[0].GetType());
 
         var builder2 =
             new ConditionThenBuilder<int>(new ConditionBuilder<int>(), (u, _) => u > 10)
@@ -87,6 +87,6 @@ public class ConditionThenBuilderTests
                 .When(u => u < 10).ThenMessage(typeof(TestValidationMessages), "TestValidator_ValidationError2");
 
         Assert.Equal(2, builder._conditionalRules.Count);
-        Assert.Equal(typeof(FailureValidator), builder2._conditionalRules.First().Validators[0].GetType());
+        Assert.Equal(typeof(NeverValidator), builder2._conditionalRules.First().Validators[0].GetType());
     }
 }

@@ -207,6 +207,22 @@ public abstract partial class PropertyValidator<T, TProperty, TSelf>
     /// <summary>
     ///     添加自定义条件成立时委托验证器
     /// </summary>
+    /// <param name="condition">条件委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Must(Func<TProperty, ValidationContext<T>, Task<bool>> condition)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(condition);
+
+        return ValidatorProxy<MustValidator<TProperty>>(context =>
+            [new Func<TProperty, Task<bool>>(u => condition(u, context))]);
+    }
+
+    /// <summary>
+    ///     添加自定义条件成立时委托验证器
+    /// </summary>
     /// <remarks>仅当被验证的值不为 <c>null</c> 时才执行验证逻辑。</remarks>
     /// <param name="condition">条件委托</param>
     /// <returns>

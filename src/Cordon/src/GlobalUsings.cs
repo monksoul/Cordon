@@ -4,6 +4,7 @@
 
 global using Cordon;
 global using Cordon.Core.Extensions;
+global using Cordon.Core.Utilities;
 global using Cordon.Resources;
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.DependencyInjection.Extensions;
