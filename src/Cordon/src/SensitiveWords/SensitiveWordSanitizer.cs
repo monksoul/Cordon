@@ -139,6 +139,9 @@ public sealed class SensitiveWordSanitizer
         var root = new TrieNode();
         root.Fail = root;
 
+        // 初始化并复用 StringBuilder 实例
+        var coreBuilder = new StringBuilder();
+
         // 构建 Trie 树
         foreach (var originalWord in words)
         {
@@ -148,10 +151,11 @@ public sealed class SensitiveWordSanitizer
                 continue;
             }
 
-            // 移除分隔符生成纯净匹配键，同时计算核心长度
-            var coreBuilder = new StringBuilder(originalWord.Length);
+            // 清空 StringBuilder
+            coreBuilder.Clear();
             var coreLength = 0;
 
+            // 移除分隔符生成纯净匹配键，同时计算核心长度
             foreach (var ch in originalWord.Where(ch => !IgnoredSeparators.Contains(ch)))
             {
                 coreBuilder.Append(ch);
@@ -159,7 +163,7 @@ public sealed class SensitiveWordSanitizer
             }
 
             var normalizedKey = coreBuilder.ToString();
-            if (string.IsNullOrWhiteSpace(normalizedKey))
+            if (string.IsNullOrEmpty(normalizedKey))
             {
                 continue;
             }
