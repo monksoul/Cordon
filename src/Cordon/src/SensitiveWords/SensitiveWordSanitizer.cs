@@ -17,14 +17,7 @@ public sealed class SensitiveWordSanitizer
     /// <summary>
     ///     以下字符在匹配时一律视为"隐形分隔符"（_/-/空格/全角空格/制表符）
     /// </summary>
-    internal static readonly HashSet<char> IgnoredSeparators = new()
-    {
-        '_',
-        '-',
-        ' ',
-        '\t',
-        '　'
-    };
+    internal static readonly SearchValues<char> IgnoredSeparators = SearchValues.Create(['_', '-', ' ', '\t', '　']);
 
     /// <summary>
     ///     是否忽略大小写
@@ -155,16 +148,31 @@ public sealed class SensitiveWordSanitizer
                 continue;
             }
 
-            // 移除分隔符生成纯净匹配键，但保留原始词用于返回结果
-            var normalizedKey = string.Concat(originalWord.Where(c => !IgnoredSeparators.Contains(c)));
+            // 移除分隔符生成纯净匹配键，同时计算核心长度
+            var coreBuilder = new StringBuilder(originalWord.Length);
+            var coreLength = 0;
+
+            foreach (var ch in originalWord.Where(ch => !IgnoredSeparators.Contains(ch)))
+            {
+                coreBuilder.Append(ch);
+                coreLength++;
+            }
+
+            var normalizedKey = coreBuilder.ToString();
             if (string.IsNullOrWhiteSpace(normalizedKey))
             {
                 continue;
             }
 
+            // 大小写归一化
+            if (ignoreCase)
+            {
+                normalizedKey = normalizedKey.ToLowerInvariant();
+            }
+
             // 初始化根节点
             var node = root;
-            foreach (var c in normalizedKey.Select(ch => ignoreCase ? char.ToLowerInvariant(ch) : ch))
+            foreach (var c in normalizedKey)
             {
                 if (!node.Children.TryGetValue(c, out var next))
                 {
@@ -176,10 +184,10 @@ public sealed class SensitiveWordSanitizer
             }
 
             node.IsEnd = true;
-            // 保留原始词（含分隔符）
-            if (!node.MatchedWords.Contains(originalWord))
+            // 保留原始词及其核心长度（含分隔符）
+            if (node.MatchedWords.All(m => m.Word != originalWord))
             {
-                node.MatchedWords.Add(originalWord);
+                node.MatchedWords.Add((originalWord, coreLength));
             }
         }
 
@@ -203,7 +211,8 @@ public sealed class SensitiveWordSanitizer
                 currentNode.IsEnd = true;
 
                 // 合并 fail 链上的匹配词
-                foreach (var w in currentNode.Fail.MatchedWords.Where(w => !currentNode.MatchedWords.Contains(w)))
+                foreach (var w in currentNode.Fail.MatchedWords.Where(w =>
+                             currentNode.MatchedWords.All(m => m.Word != w.Word)))
                 {
                     currentNode.MatchedWords.Add(w);
                 }
@@ -224,7 +233,7 @@ public sealed class SensitiveWordSanitizer
                 // 提前合并 fail 节点的匹配词
                 if (child.Fail.IsEnd)
                 {
-                    foreach (var w in child.Fail.MatchedWords.Where(w => !child.MatchedWords.Contains(w)))
+                    foreach (var w in child.Fail.MatchedWords.Where(w => child.MatchedWords.All(m => m.Word != w.Word)))
                     {
                         child.MatchedWords.Add(w);
                     }
@@ -291,11 +300,8 @@ public sealed class SensitiveWordSanitizer
                     // 收集匹配结果
                     if (node is { IsEnd: true, MatchedWords.Count: > 0 })
                     {
-                        // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
-                        foreach (var word in node.MatchedWords)
+                        foreach (var (word, coreLength) in node.MatchedWords)
                         {
-                            // 计算原始词去除分隔符后的实际长度（用于虚拟索引偏移）
-                            var coreLength = word.Count(w => !IgnoredSeparators.Contains(w));
                             var startVirtual = virtualIndex - coreLength + 1;
 
                             if (startVirtual >= 0 && startVirtual < realIndexMap.Length)

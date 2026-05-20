@@ -25,7 +25,7 @@ internal sealed class TrieNode
     internal Dictionary<char, TrieNode> Children { get; set; } = new(64);
 
     /// <summary>
-    ///     在此节点结束的所有敏感词（含 <see cref="Fail" /> 链继承的词）
+    ///     在此节点结束的所有敏感词及其核心长度
     /// </summary>
-    internal List<string> MatchedWords { get; set; } = new(2);
+    internal List<(string Word, int CoreLength)> MatchedWords { get; set; } = new(2);
 }
