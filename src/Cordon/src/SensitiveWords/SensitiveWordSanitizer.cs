@@ -5,9 +5,10 @@
 namespace Cordon;
 
 /// <summary>
-///     高性能敏感词清理器（基于 Aho‑Corasick 自动机）
+///     敏感词清理器（基于 Aho‑Corasick 自动机）
 /// </summary>
 /// <remarks>
+///     <para>参考文献：https://zhuanlan.zhihu.com/p/368184958</para>
 ///     <para>分隔符：支持 <c>|</c>、<c>,</c>、<c>\t</c>、<c>;</c> 任意混用，连续分隔符自动跳过。同时兼容一行一个词。</para>
 ///     <para>注释：以 <c>#</c> 开头的整行将被忽略；行内 <c>#</c> 之后的内容将被截断忽略。</para>
 /// </remarks>
@@ -46,11 +47,79 @@ public sealed class SensitiveWordSanitizer
     }
 
     /// <summary>
-    ///     从内存词表构建清理器
+    ///     从 <see cref="Stream" /> 加载词库并构建敏感词清理器
+    /// </summary>
+    /// <param name="stream">输入流</param>
+    /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+    /// <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+    /// <returns>
+    ///     <see cref="SensitiveWordSanitizer" />
+    /// </returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="ArgumentException"></exception>
+    public static SensitiveWordSanitizer CreateFromStream(Stream stream, bool ignoreCase = true,
+        bool ignoreSymbol = true)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(stream);
+
+        // 检查流是否可读
+        if (!stream.CanRead)
+        {
+            // ReSharper disable once LocalizableElement
+            throw new ArgumentException("Stream must be readable.", nameof(stream));
+        }
+
+        // 初始化 HashSet 实例
+        var words = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        // 初始化 StreamReader 实例
+        using var streamReader = new StreamReader(stream, Encoding.UTF8, leaveOpen: true, bufferSize: 81920);
+
+        // 循环读取流的每一行
+        while (streamReader.ReadLine() is { } line)
+        {
+            ParseLine(line, words);
+        }
+
+        return Build(words, ignoreCase, ignoreSymbol);
+    }
+
+    /// <summary>
+    ///     从文件路径加载词库并构建敏感词清理器
+    /// </summary>
+    /// <param name="filePath">文件路径</param>
+    /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+    /// <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+    /// <returns>
+    ///     <see cref="SensitiveWordSanitizer" />
+    /// </returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="FileNotFoundException"></exception>
+    public static SensitiveWordSanitizer CreateFromPath(string filePath, bool ignoreCase = true,
+        bool ignoreSymbol = true)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+
+        // 检查文件是否存在
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException("Sensitive word file not found.", filePath);
+        }
+
+        // 打开并读取文件流
+        using var stream = File.OpenRead(filePath);
+
+        return CreateFromStream(stream, ignoreCase, ignoreSymbol);
+    }
+
+    /// <summary>
+    ///     从内存词表构建敏感词清理器
     /// </summary>
     /// <param name="words">敏感词集合</param>
-    /// <param name="ignoreCase">是否忽略大小写（默认 <c>true</c>）</param>
-    /// <param name="ignoreSymbol">是否跳过标点/空格/符号进行匹配（默认 <c>true</c>）</param>
+    /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+    /// <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
@@ -61,17 +130,20 @@ public sealed class SensitiveWordSanitizer
         // 空检查
         ArgumentNullException.ThrowIfNull(words);
 
+        // 初始化 TrieNode 实例
         var root = new TrieNode();
         root.Fail = root;
 
-        // 构建 Trie 树：插入所有词
+        // 构建 Trie 树
         foreach (var word in words)
         {
+            // 空检查
             if (string.IsNullOrWhiteSpace(word))
             {
                 continue;
             }
 
+            // 初始化根节点
             var node = root;
             foreach (var c in word.Select(ch => ignoreCase ? char.ToLowerInvariant(ch) : ch))
             {
@@ -88,10 +160,10 @@ public sealed class SensitiveWordSanitizer
             node.MatchedWords.Add(word);
         }
 
-        // BFS 构建 Fail 指针
+        // 构建 Fail 指针
         var queue = new Queue<TrieNode>(256);
 
-        // 初始化：根的直接子节点 fail 指向 root
+        // 根的直接子节点 fail 指向 root
         foreach (var child in root.Children.Values)
         {
             child.Fail = root;
@@ -106,6 +178,7 @@ public sealed class SensitiveWordSanitizer
             if (currentNode.Fail?.IsEnd == true)
             {
                 currentNode.IsEnd = true;
+
                 // 合并 fail 链上的匹配词
                 foreach (var w in currentNode.Fail.MatchedWords.Where(w => !currentNode.MatchedWords.Contains(w)))
                 {
@@ -139,68 +212,6 @@ public sealed class SensitiveWordSanitizer
         }
 
         return new SensitiveWordSanitizer(root, ignoreCase, ignoreSymbol);
-    }
-
-    /// <summary>
-    ///     从文件路径加载词库并构建清理器
-    /// </summary>
-    /// <param name="filePath">词库文件路径（支持紧凑分隔符格式）</param>
-    /// <param name="ignoreCase">是否忽略大小写</param>
-    /// <param name="ignoreSymbol">是否跳过符号匹配</param>
-    /// <returns>
-    ///     <see cref="SensitiveWordSanitizer" />
-    /// </returns>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="FileNotFoundException"></exception>
-    public static SensitiveWordSanitizer CreateFromPath(string filePath, bool ignoreCase = true,
-        bool ignoreSymbol = true)
-    {
-        // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
-
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException("Sensitive word file not found.", filePath);
-        }
-
-        using var stream = File.OpenRead(filePath);
-        return CreateFromStream(stream, ignoreCase, ignoreSymbol);
-    }
-
-    /// <summary>
-    ///     从 <see cref="Stream" /> 加载词库并构建清理器
-    /// </summary>
-    /// <param name="stream">输入流</param>
-    /// <param name="ignoreCase">是否忽略大小写</param>
-    /// <param name="ignoreSymbol">是否跳过符号匹配</param>
-    /// <returns>
-    ///     <see cref="SensitiveWordSanitizer" />
-    /// </returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    /// <exception cref="ArgumentException"></exception>
-    public static SensitiveWordSanitizer CreateFromStream(Stream stream, bool ignoreCase = true,
-        bool ignoreSymbol = true)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(stream);
-
-        if (!stream.CanRead)
-        {
-            // ReSharper disable once LocalizableElement
-            throw new ArgumentException("Stream must be readable.", nameof(stream));
-        }
-
-        var words = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        // 使用 UTF8 编码，自动检测 BOM
-        using var reader = new StreamReader(stream, Encoding.UTF8, leaveOpen: true, bufferSize: 81920);
-
-        while (reader.ReadLine() is { } line)
-        {
-            ParseLine(line, words);
-        }
-
-        return Build(words, ignoreCase, ignoreSymbol);
     }
 
     /// <summary>
@@ -379,7 +390,10 @@ public sealed class SensitiveWordSanitizer
     /// <summary>
     ///     解析单行词库
     /// </summary>
-    /// <remarks>格式示例：<c>敏感词 | badword, 违规词 # 注释内容</c></remarks>
+    /// <remarks>
+    ///     <para>分隔符：支持 <c>|</c>、<c>,</c>、<c>\t</c>、<c>;</c> 任意混用，连续分隔符自动跳过。同时兼容一行一个词。</para>
+    ///     <para>注释：以 <c>#</c> 开头的整行将被忽略；行内 <c>#</c> 之后的内容将被截断忽略。</para>
+    /// </remarks>
     /// <param name="line">词库中的一行原始文本</param>
     /// <param name="words">用于收集解析结果的 <see cref="HashSet{T}" /> 集合</param>
     internal static void ParseLine(string line, HashSet<string> words)
@@ -390,13 +404,16 @@ public sealed class SensitiveWordSanitizer
             return;
         }
 
+        // 移除前后空格
         var trimmed = line.Trim();
+
+        // 处理 # 字符开头的注释
         if (trimmed.Length == 0 || trimmed[0] == '#')
         {
             return;
         }
 
-        // 截断行内注释
+        // 处理行内注释
         var commentIdx = trimmed.IndexOf('#');
         if (commentIdx > 0)
         {
@@ -409,8 +426,9 @@ public sealed class SensitiveWordSanitizer
             return;
         }
 
-        // 分隔符：| , \t ;
+        // 处理 | , \t ; 分隔符
         var span = trimmed.AsSpan();
+
         var start = 0;
         for (var i = 0; i < span.Length; i++)
         {
@@ -442,7 +460,10 @@ public sealed class SensitiveWordSanitizer
     /// <param name="words">目标词集</param>
     internal static void AddWord(ReadOnlySpan<char> span, HashSet<string> words)
     {
+        // 移除前后空格
         var word = span.Trim().ToString();
+
+        // 检查非空白字符串
         if (word.Length > 0)
         {
             words.Add(word);
