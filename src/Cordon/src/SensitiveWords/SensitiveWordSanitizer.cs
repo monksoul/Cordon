@@ -9,6 +9,7 @@ namespace Cordon;
 /// </summary>
 /// <remarks>
 ///     <para>参考文献：https://zhuanlan.zhihu.com/p/368184958</para>
+///     <para>词库下载：https://github.com/konsheng/Sensitive-lexicon</para>
 ///     <para>分隔符：支持 <c>|</c>、<c>,</c>、<c>\t</c>、<c>;</c> 任意混用，连续分隔符自动跳过。同时兼容一行一个词。</para>
 ///     <para>注释：以 <c>#</c> 开头的整行将被忽略；行内 <c>#</c> 之后的内容将被截断忽略。</para>
 /// </remarks>
@@ -114,9 +115,9 @@ public sealed class SensitiveWordSanitizer
         }
 
         // 打开并读取文件流
-        using var stream = File.OpenRead(filePath);
+        using var fileStream = File.OpenRead(filePath);
 
-        return CreateFromStream(stream, ignoreCase, ignoreSymbol);
+        return CreateFromStream(fileStream, ignoreCase, ignoreSymbol);
     }
 
     /// <summary>
@@ -423,7 +424,6 @@ public sealed class SensitiveWordSanitizer
 
             // 追加未匹配部分
             stringBuilder.Append(text, lastEnd, m.StartIndex - lastEnd);
-
             // 替换敏感词
             stringBuilder.Append(replaceChar, m.EndIndex - m.StartIndex);
 
@@ -474,10 +474,10 @@ public sealed class SensitiveWordSanitizer
             return;
         }
 
-        // 处理 | , \t ; 分隔符
         var span = trimmed.AsSpan();
-
         var start = 0;
+
+        // 处理 | , \t ; 分隔符
         for (var i = 0; i < span.Length; i++)
         {
             var c = span[i];
@@ -487,6 +487,7 @@ public sealed class SensitiveWordSanitizer
             {
                 if (i > start)
                 {
+                    // 将单词片段添加到词集
                     AddWord(span.Slice(start, i - start), words);
                 }
 
@@ -497,6 +498,7 @@ public sealed class SensitiveWordSanitizer
         // 处理最后一个词
         if (start < span.Length)
         {
+            // 将单词片段添加到词集
             AddWord(span[start..], words);
         }
     }
@@ -523,7 +525,7 @@ public sealed class SensitiveWordSanitizer
     /// </summary>
     /// <remarks>
     ///     <para>此方法仅受 <see cref="_ignoreSymbol" /> 参数控制，用于跳过标点/符号/空白</para>
-    ///     <para>分隔符（_/-/空格/全角空格/制表符）的跳过由 <see cref="IgnoredSeparators" /> 独立控制，始终生效</para>
+    ///     <para>分隔符（_/-/空格/全角空格/制表符）的跳过由 <see cref="IgnoredSeparators" /> 独立控制</para>
     /// </remarks>
     /// <param name="c">待检测字符</param>
     /// <returns>
