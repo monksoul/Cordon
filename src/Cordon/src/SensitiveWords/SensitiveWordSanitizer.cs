@@ -15,6 +15,18 @@ namespace Cordon;
 public sealed class SensitiveWordSanitizer
 {
     /// <summary>
+    ///     以下字符在匹配时一律视为"隐形分隔符"（_/-/空格/全角空格/制表符）
+    /// </summary>
+    internal static readonly HashSet<char> IgnoredSeparators = new()
+    {
+        '_',
+        '-',
+        ' ',
+        '\t',
+        '　'
+    };
+
+    /// <summary>
     ///     是否忽略大小写
     /// </summary>
     internal readonly bool _ignoreCase;
@@ -135,17 +147,24 @@ public sealed class SensitiveWordSanitizer
         root.Fail = root;
 
         // 构建 Trie 树
-        foreach (var word in words)
+        foreach (var originalWord in words)
         {
             // 空检查
-            if (string.IsNullOrWhiteSpace(word))
+            if (string.IsNullOrWhiteSpace(originalWord))
+            {
+                continue;
+            }
+
+            // 移除分隔符生成纯净匹配键，但保留原始词用于返回结果
+            var normalizedKey = string.Concat(originalWord.Where(c => !IgnoredSeparators.Contains(c)));
+            if (string.IsNullOrWhiteSpace(normalizedKey))
             {
                 continue;
             }
 
             // 初始化根节点
             var node = root;
-            foreach (var c in word.Select(ch => ignoreCase ? char.ToLowerInvariant(ch) : ch))
+            foreach (var c in normalizedKey.Select(ch => ignoreCase ? char.ToLowerInvariant(ch) : ch))
             {
                 if (!node.Children.TryGetValue(c, out var next))
                 {
@@ -157,7 +176,11 @@ public sealed class SensitiveWordSanitizer
             }
 
             node.IsEnd = true;
-            node.MatchedWords.Add(word);
+            // 保留原始词（含分隔符）
+            if (!node.MatchedWords.Contains(originalWord))
+            {
+                node.MatchedWords.Add(originalWord);
+            }
         }
 
         // 构建 Fail 指针
@@ -222,7 +245,7 @@ public sealed class SensitiveWordSanitizer
     public MatchResult[] FindMatches(string text)
     {
         // 空检查
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrWhiteSpace(text))
         {
             return [];
         }
@@ -239,7 +262,13 @@ public sealed class SensitiveWordSanitizer
             {
                 var c = text[i];
 
-                // 符号过滤：跳过但不增加虚拟索引
+                // 始终跳过分隔符（_/-/空格/全角空格/制表符等），使输入流与 Trie 结构对齐
+                if (IgnoredSeparators.Contains(c))
+                {
+                    continue;
+                }
+
+                // 符号过滤：跳过但不增加虚拟索引（仅当 _ignoreSymbol 启用时）
                 if (_ignoreSymbol && ShouldSkip(c))
                 {
                     continue;
@@ -265,7 +294,10 @@ public sealed class SensitiveWordSanitizer
                         // ReSharper disable once ForeachCanBeConvertedToQueryUsingAnotherGetEnumerator
                         foreach (var word in node.MatchedWords)
                         {
-                            var startVirtual = virtualIndex - word.Length + 1;
+                            // 计算原始词去除分隔符后的实际长度（用于虚拟索引偏移）
+                            var coreLength = word.Count(w => !IgnoredSeparators.Contains(w));
+                            var startVirtual = virtualIndex - coreLength + 1;
+
                             if (startVirtual >= 0 && startVirtual < realIndexMap.Length)
                             {
                                 matches.Add(new MatchResult(word, realIndexMap[startVirtual],
@@ -296,7 +328,7 @@ public sealed class SensitiveWordSanitizer
     public bool Contains(string text)
     {
         // 空检查
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrWhiteSpace(text))
         {
             return false;
         }
@@ -306,6 +338,12 @@ public sealed class SensitiveWordSanitizer
         // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
         foreach (var c in text)
         {
+            // 始终跳过分隔符
+            if (IgnoredSeparators.Contains(c))
+            {
+                continue;
+            }
+
             if (_ignoreSymbol && ShouldSkip(c))
             {
                 continue;
@@ -344,7 +382,7 @@ public sealed class SensitiveWordSanitizer
     public string Replace(string text, char replaceChar = '*')
     {
         // 空检查
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrWhiteSpace(text))
         {
             return text;
         }
@@ -473,6 +511,10 @@ public sealed class SensitiveWordSanitizer
     /// <summary>
     ///     判断字符是否应被跳过
     /// </summary>
+    /// <remarks>
+    ///     <para>此方法仅受 <see cref="_ignoreSymbol" /> 参数控制，用于跳过标点/符号/空白</para>
+    ///     <para>分隔符（_/-/空格/全角空格/制表符）的跳过由 <see cref="IgnoredSeparators" /> 独立控制，始终生效</para>
+    /// </remarks>
     /// <param name="c">待检测字符</param>
     /// <returns>
     ///     <see cref="bool" />
