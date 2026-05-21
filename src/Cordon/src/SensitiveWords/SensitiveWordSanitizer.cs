@@ -256,7 +256,7 @@ public sealed class SensitiveWordSanitizer
     /// </summary>
     /// <param name="text">待检测文本</param>
     /// <returns><see cref="MatchResult" />[]</returns>
-    public MatchResult[] FindMatches(string text)
+    public MatchResult[] FindMatches(string? text)
     {
         // 空检查
         if (string.IsNullOrWhiteSpace(text))
@@ -264,14 +264,18 @@ public sealed class SensitiveWordSanitizer
             return [];
         }
 
+        // 初始化匹配结果集合
         var matches = new List<MatchResult>(32);
+
         var node = _root;
         var virtualIndex = 0;
 
         // 记录 虚拟索引 -> 真实索引 的映射
         var realIndexMap = ArrayPool<int>.Shared.Rent(text.Length);
+
         try
         {
+            // 遍历文本每一个字符
             for (var i = 0; i < text.Length; i++)
             {
                 var c = text[i];
@@ -336,7 +340,7 @@ public sealed class SensitiveWordSanitizer
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    public bool Contains(string text)
+    public bool Contains(string? text)
     {
         // 空检查
         if (string.IsNullOrWhiteSpace(text))
