@@ -161,7 +161,7 @@ public static class SensitiveWordSanitizerFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
         // 获取完整的文件路径
-        var fullPath = Path.GetFullPath(filePath);
+        var fullPath = Path.GetFullPath(File.ResolveLinkTarget(filePath, true)!.FullName);
 
         return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
             ? fullPath.ToLowerInvariant()
