@@ -16,9 +16,12 @@ namespace Cordon;
 public sealed class SensitiveWordSanitizer
 {
     /// <summary>
-    ///     以下字符在匹配时一律视为"隐形分隔符"（_/-/空格/全角空格/制表符）
+    ///     以下字符在匹配时一律视为"隐形分隔符"
+    ///     包含：_ / - / 空格 / 全角空格 / 制表符 / 回车 / 换行
     /// </summary>
-    internal static readonly SearchValues<char> IgnoredSeparators = SearchValues.Create(['_', '-', ' ', '\t', '　']);
+    /// <remarks>匹配时始终跳过的以下隐形分隔符（例如 <c>敏_感_词</c> 等同于 <c>敏感词</c>）。</remarks>
+    internal static readonly SearchValues<char> IgnoredSeparators =
+        SearchValues.Create(['_', '-', ' ', '\t', '　', '\r', '\n']);
 
     /// <summary>
     ///     是否忽略大小写
@@ -169,7 +172,7 @@ public sealed class SensitiveWordSanitizer
                 continue;
             }
 
-            // 大小写归一化
+            // 处理大小写
             if (ignoreCase)
             {
                 normalizedKey = normalizedKey.ToLowerInvariant();
@@ -280,7 +283,7 @@ public sealed class SensitiveWordSanitizer
             {
                 var c = text[i];
 
-                // 始终跳过分隔符（_/-/空格/全角空格/制表符等），使输入流与 Trie 结构对齐
+                // 始终跳过分隔符（_/-/空格/全角空格/制表符/回车/换行），使输入流与 Trie 结构对齐
                 if (IgnoredSeparators.Contains(c))
                 {
                     continue;
@@ -313,7 +316,8 @@ public sealed class SensitiveWordSanitizer
                         {
                             var startVirtual = virtualIndex - coreLength + 1;
 
-                            if (startVirtual >= 0 && startVirtual < realIndexMap.Length)
+                            // 边界检查
+                            if (startVirtual >= 0)
                             {
                                 matches.Add(new MatchResult(word, realIndexMap[startVirtual],
                                     realIndexMap[virtualIndex] + 1));
@@ -359,6 +363,7 @@ public sealed class SensitiveWordSanitizer
                 continue;
             }
 
+            // 符号过滤（仅当 _ignoreSymbol 启用时）
             if (_ignoreSymbol && ShouldSkip(c))
             {
                 continue;
@@ -390,7 +395,7 @@ public sealed class SensitiveWordSanitizer
     /// </summary>
     /// <remarks>保留原文本符号与空格结构。</remarks>
     /// <param name="text">原始文本</param>
-    /// <param name="replaceChar">替换字符（默认 <c>'*'</c>）</param>
+    /// <param name="replaceChar">替换字符，默认值为：<c>*</c>）</param>
     /// <returns>
     ///     <see cref="string" />
     /// </returns>
@@ -402,12 +407,16 @@ public sealed class SensitiveWordSanitizer
             return text;
         }
 
+        // 检查文本并返回所有命中词及精确位置
         var matches = FindMatches(text);
+
+        // 空检查
         if (matches.Length == 0)
         {
             return text;
         }
 
+        // 初始化 StringBuilder 实例
         var stringBuilder = new StringBuilder(text.Length);
         var lastEnd = 0;
 
@@ -418,6 +427,7 @@ public sealed class SensitiveWordSanitizer
             return cmp != 0 ? cmp : b.EndIndex.CompareTo(a.EndIndex);
         });
 
+        // 遍历所有匹配结果
         foreach (var m in matches)
         {
             // 跳过被前面匹配覆盖的重叠部分
@@ -436,6 +446,7 @@ public sealed class SensitiveWordSanitizer
 
         // 追加剩余部分
         stringBuilder.Append(text, lastEnd, text.Length - lastEnd);
+
         return stringBuilder.ToString();
     }
 
@@ -529,7 +540,7 @@ public sealed class SensitiveWordSanitizer
     /// </summary>
     /// <remarks>
     ///     <para>此方法仅受 <see cref="_ignoreSymbol" /> 参数控制，用于跳过标点/符号/空白</para>
-    ///     <para>分隔符（_/-/空格/全角空格/制表符）的跳过由 <see cref="IgnoredSeparators" /> 独立控制</para>
+    ///     <para>分隔符（_/-/空格/全角空格/制表符/回车/换行）的跳过由 <see cref="IgnoredSeparators" /> 独立控制，始终生效</para>
     /// </remarks>
     /// <param name="c">待检测字符</param>
     /// <returns>
