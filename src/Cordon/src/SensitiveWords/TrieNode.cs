@@ -10,7 +10,7 @@ namespace Cordon;
 internal sealed class TrieNode
 {
     /// <summary>
-    ///     <see cref="Fail" /> 指针：匹配失败时跳转的目标节点
+    ///     <see cref="TrieNode" />
     /// </summary>
     internal TrieNode? Fail { get; set; }
 
@@ -20,7 +20,7 @@ internal sealed class TrieNode
     internal bool IsEnd { get; set; }
 
     /// <summary>
-    ///     子节点映射：字符 -> <see cref="TrieNode" />
+    ///     子节点映射字典
     /// </summary>
     internal Dictionary<char, TrieNode> Children { get; set; } = new(64);
 

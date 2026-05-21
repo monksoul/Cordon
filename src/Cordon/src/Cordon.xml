@@ -6456,18 +6456,19 @@
                 敏感词清理器（基于 Aho‑Corasick 自动机）
             </summary>
             <remarks>
-                <para>参考文献：https://zhuanlan.zhihu.com/p/368184958</para>
-                <para>词库下载：https://github.com/konsheng/Sensitive-lexicon</para>
                 <para>分隔符：支持 <c>|</c>、<c>,</c>、<c>\t</c>、<c>;</c> 任意混用，连续分隔符自动跳过。同时兼容一行一个词。</para>
                 <para>注释：以 <c>#</c> 开头的整行将被忽略；行内 <c>#</c> 之后的内容将被截断忽略。</para>
+                <para>词库下载：https://github.com/konsheng/Sensitive-lexicon</para>
             </remarks>
         </member>
         <member name="F:Cordon.SensitiveWordSanitizer.IgnoredSeparators">
             <summary>
                 以下字符在匹配时一律视为"隐形分隔符"
-                包含：_ / - / 空格 / 全角空格 / 制表符 / 回车 / 换行
             </summary>
-            <remarks>匹配时始终跳过的以下隐形分隔符（例如 <c>敏_感_词</c> 等同于 <c>敏感词</c>）。</remarks>
+            <remarks>
+                <para>包含：_ / - / 空格 / 全角空格 / 制表符 / 回车 / 换行</para>
+                <para>匹配时始终跳过的"隐形分隔符"（例如 <c>敏_感_词</c> 视同于 <c>敏感词</c>）</para>
+            </remarks>
         </member>
         <member name="F:Cordon.SensitiveWordSanitizer._ignoreCase">
             <summary>
@@ -6591,102 +6592,117 @@
         </member>
         <member name="T:Cordon.SensitiveWordSanitizerFactory">
             <summary>
-                敏感词清理器工厂（单例管理 + 热刷新）
+                敏感词清理器工厂
             </summary>
-            <remarks>
-                <para>支持多命名实例，每个实例独立缓存。</para>
-                <para>线程安全，适用于词库动态更新的场景。</para>
-                <para>文件路径作为键时会自动规范化（绝对路径、统一分隔符、Windows 下不区分大小写）。</para>
-            </remarks>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.NormalizeFilePath(System.String)">
+        <member name="F:Cordon.SensitiveWordSanitizerFactory._instances">
             <summary>
-                规范化文件路径作为缓存键
+                敏感词清理器缓存字典
             </summary>
-            <param name="filePath">原始文件路径</param>
-            <returns>规范化的绝对路径（Windows 下转为小写，Linux 保持原样）</returns>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreate(System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreate(System.String,System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean)">
             <summary>
-                获取或创建默认实例（使用内存词表）
+                获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
+            <param name="name">实例名称</param>
             <param name="words">敏感词集合</param>
-            <param name="ignoreCase">是否忽略大小写</param>
-            <param name="ignoreSymbol">是否跳过符号匹配</param>
+            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <returns>
+                <see cref="T:Cordon.SensitiveWordSanitizer" />
+            </returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromPath(System.String,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromPath(System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
-                获取或创建默认实例（使用词库文件）
+                获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <remarks>
-                内部会对文件路径进行规范化，确保指向同一文件的不同路径写法复用同一实例。
-            </remarks>
-            <param name="filePath">词库文件路径</param>
-            <param name="ignoreCase">是否忽略大小写</param>
-            <param name="ignoreSymbol">是否跳过符号匹配</param>
+            <param name="name">实例名称</param>
+            <param name="filePath">文件路径</param>
+            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <returns>
+                <see cref="T:Cordon.SensitiveWordSanitizer" />
+            </returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.ArgumentException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromStream(System.IO.Stream,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromStream(System.String,System.IO.Stream,System.Boolean,System.Boolean)">
             <summary>
-                获取或创建默认实例（使用词库流）
+                获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <remarks>
-                流无法唯一标识，默认使用 null 键。如需多流实例，请调用 <see cref="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreate(System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean)" /> 并传入自定义键。
-            </remarks>
-            <param name="stream">包含词库的流</param>
-            <param name="ignoreCase">是否忽略大小写</param>
-            <param name="ignoreSymbol">是否跳过符号匹配</param>
+            <param name="name">实例名称</param>
+            <param name="stream">输入流</param>
+            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <returns>
+                <see cref="T:Cordon.SensitiveWordSanitizer" />
+            </returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreate(System.String,System.Func{Cordon.SensitiveWordSanitizer})">
             <summary>
-                获取或创建指定名称的实例（完全自定义工厂）
+                获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例（核心方法）
             </summary>
-            <param name="name">实例名称（null 或空字符串表示默认实例）</param>
+            <param name="name">实例名称</param>
             <param name="factory">构建敏感词清理器的工厂委托</param>
+            <returns>
+                <see cref="T:Cordon.SensitiveWordSanitizer" />
+            </returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.Refresh(System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.Refresh(System.String,System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean)">
             <summary>
-                刷新默认实例（内存词表）
+                刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <param name="words">新的敏感词集合</param>
-            <param name="ignoreCase">是否忽略大小写</param>
-            <param name="ignoreSymbol">是否跳过符号匹配</param>
+            <param name="name">实例名称</param>
+            <param name="words">敏感词集合</param>
+            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromPath(System.String,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromPath(System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
-                刷新默认实例（词库文件）
+                刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <remarks>
-                内部会对文件路径进行规范化，确保刷新与获取时使用相同的键。
-            </remarks>
-            <param name="filePath">新的词库文件路径</param>
-            <param name="ignoreCase">是否忽略大小写</param>
-            <param name="ignoreSymbol">是否跳过符号匹配</param>
+            <param name="name">实例名称</param>
+            <param name="filePath">文件路径</param>
+            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.ArgumentException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromStream(System.IO.Stream,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromStream(System.String,System.IO.Stream,System.Boolean,System.Boolean)">
             <summary>
-                刷新默认实例（词库流）
+                刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <param name="stream">包含新词库的流</param>
-            <param name="ignoreCase">是否忽略大小写</param>
-            <param name="ignoreSymbol">是否跳过符号匹配</param>
+            <param name="name">实例名称</param>
+            <param name="stream">输入流</param>
+            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.Refresh(System.String,System.Func{Cordon.SensitiveWordSanitizer})">
             <summary>
-                刷新指定名称的实例（完全自定义工厂）
+                刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例（核心方法）
             </summary>
-            <param name="name">实例名称（null 或空字符串表示默认实例）</param>
-            <param name="factory">构建新敏感词清理器的工厂委托</param>
+            <param name="name">实例名称</param>
+            <param name="factory">构建敏感词清理器的工厂委托</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.TryRemove(System.String)">
             <summary>
-                移除指定名称的实例（释放资源）
+                移除指定名称的 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <param name="name">实例名称（null 或空字符串表示默认实例）</param>
-            <returns>是否成功移除</returns>
+            <param name="name">实例名称</param>
+            <returns>
+                <see cref="T:System.Boolean" />
+            </returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.Clear">
             <summary>
-                清除所有缓存的实例
+                清除所有缓存的 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
         </member>
         <member name="T:Cordon.TrieNode">
@@ -6696,7 +6712,7 @@
         </member>
         <member name="P:Cordon.TrieNode.Fail">
             <summary>
-                <see cref="P:Cordon.TrieNode.Fail" /> 指针：匹配失败时跳转的目标节点
+                <see cref="T:Cordon.TrieNode" />
             </summary>
         </member>
         <member name="P:Cordon.TrieNode.IsEnd">
@@ -6706,7 +6722,7 @@
         </member>
         <member name="P:Cordon.TrieNode.Children">
             <summary>
-                子节点映射：字符 -> <see cref="T:Cordon.TrieNode" />
+                子节点映射字典
             </summary>
         </member>
         <member name="P:Cordon.TrieNode.MatchedWords">

@@ -8,18 +8,19 @@ namespace Cordon;
 ///     敏感词清理器（基于 Aho‑Corasick 自动机）
 /// </summary>
 /// <remarks>
-///     <para>参考文献：https://zhuanlan.zhihu.com/p/368184958</para>
-///     <para>词库下载：https://github.com/konsheng/Sensitive-lexicon</para>
 ///     <para>分隔符：支持 <c>|</c>、<c>,</c>、<c>\t</c>、<c>;</c> 任意混用，连续分隔符自动跳过。同时兼容一行一个词。</para>
 ///     <para>注释：以 <c>#</c> 开头的整行将被忽略；行内 <c>#</c> 之后的内容将被截断忽略。</para>
+///     <para>词库下载：https://github.com/konsheng/Sensitive-lexicon</para>
 /// </remarks>
 public sealed class SensitiveWordSanitizer
 {
     /// <summary>
     ///     以下字符在匹配时一律视为"隐形分隔符"
-    ///     包含：_ / - / 空格 / 全角空格 / 制表符 / 回车 / 换行
     /// </summary>
-    /// <remarks>匹配时始终跳过的以下隐形分隔符（例如 <c>敏_感_词</c> 等同于 <c>敏感词</c>）。</remarks>
+    /// <remarks>
+    ///     <para>包含：_ / - / 空格 / 全角空格 / 制表符 / 回车 / 换行</para>
+    ///     <para>匹配时始终跳过的"隐形分隔符"（例如 <c>敏_感_词</c> 视同于 <c>敏感词</c>）</para>
+    /// </remarks>
     internal static readonly SearchValues<char> IgnoredSeparators =
         SearchValues.Create(['_', '-', ' ', '\t', '　', '\r', '\n']);
 
