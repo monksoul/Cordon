@@ -166,8 +166,10 @@ public static class SensitiveWordSanitizerFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(factory);
 
-        // 创建新的惰性实例替换旧值
-        var newLazy = new Lazy<SensitiveWordSanitizer>(factory, LazyThreadSafetyMode.ExecutionAndPublication);
+        // 提前执行工厂，确保新实例构建成功后才替换缓存
+        var instance = factory();
+        var newLazy = new Lazy<SensitiveWordSanitizer>(() => instance, LazyThreadSafetyMode.ExecutionAndPublication);
+
         _instances.AddOrUpdate(name, newLazy, (_, _) => newLazy);
     }
 
