@@ -6707,7 +6707,6 @@
             <param name="factory">构建敏感词清理器的工厂委托</param>
             <exception cref="T:System.ArgumentNullException"></exception>
             <exception cref="T:System.ArgumentException"></exception>
-            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.TryRemove(System.String)">
             <summary>

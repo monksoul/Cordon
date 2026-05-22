@@ -12,7 +12,8 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     敏感词清理器缓存字典
     /// </summary>
-    internal static readonly ConcurrentDictionary<string, Lazy<SensitiveWordSanitizer>> _instances = new();
+    internal static readonly ConcurrentDictionary<string, Lazy<SensitiveWordSanitizer>> _instances =
+        new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
@@ -175,7 +176,6 @@ public static class SensitiveWordSanitizerFactory
     /// <param name="factory">构建敏感词清理器的工厂委托</param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="ArgumentNullException"></exception>
     public static void Refresh(string name, Func<SensitiveWordSanitizer> factory)
     {
         // 空检查
