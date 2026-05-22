@@ -16,10 +16,14 @@ namespace Cordon;
 public class SensitiveWordValidator : ValidatorBase
 {
     /// <summary>
+    ///     最近一次验证命中的匹配结果详情
+    /// </summary>
+    internal string[]? _lastMatchDetails;
+
+    /// <summary>
     ///     <inheritdoc cref="SensitiveWordValidator" />
     /// </summary>
-    public SensitiveWordValidator() =>
-        UseResourceKey(() => nameof(ValidationMessages.SensitiveWordValidator_ValidationError));
+    public SensitiveWordValidator() => UseResourceKey(GetResourceKey);
 
     /// <summary>
     ///     <inheritdoc cref="SensitiveWordValidator" />
@@ -77,9 +81,18 @@ public class SensitiveWordValidator : ValidatorBase
     /// </remarks>
     public string? FilePath { get; set; }
 
+    /// <summary>
+    ///     是否在错误信息中显示命中的敏感词详情
+    /// </summary>
+    /// <remarks>默认值为：<c>false</c>。</remarks>
+    public bool ShowMatchedWords { get; set; }
+
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext)
     {
+        // 重置所有命中词及精确位置字符串
+        _lastMatchDetails = null;
+
         // 检查值是否为字符串类型，且字符串不是由空白字符组成
         if (value is not string text || string.IsNullOrWhiteSpace(text))
         {
@@ -89,7 +102,38 @@ public class SensitiveWordValidator : ValidatorBase
         // 获取敏感词清理器实例
         var sanitizer = GetSanitizer();
 
-        return !sanitizer.Contains(text);
+        // 检查是否在错误信息中显示命中的敏感词详情
+        if (!ShowMatchedWords)
+        {
+            return !sanitizer.Contains(text);
+        }
+
+        // 检查文本并返回所有命中词及精确位置
+        var matches = sanitizer.FindMatches(text);
+
+        // 空检查
+        if (matches.Length == 0)
+        {
+            return true;
+        }
+
+        // 存储所有命中词及精确位置字符串
+        _lastMatchDetails = matches.Select(m => m.ToString()).ToArray();
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override string? FormatErrorMessage(string name)
+    {
+        // 检查是否在错误信息中显示命中的敏感词详情
+        if (ShowMatchedWords && _lastMatchDetails is { Length: > 0 })
+        {
+            return string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name,
+                string.Join(", ", _lastMatchDetails));
+        }
+
+        return base.FormatErrorMessage(name);
     }
 
     /// <summary>
@@ -123,4 +167,15 @@ public class SensitiveWordValidator : ValidatorBase
         throw new InvalidOperationException(
             $"No dictionary source is configured for the {nameof(SensitiveWordValidator)}. Please set the '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(FilePath)}' property, or provide a Stream or Sanitizer via the constructor.");
     }
+
+    /// <summary>
+    ///     获取错误信息对应的资源键
+    /// </summary>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    internal string GetResourceKey() =>
+        ShowMatchedWords
+            ? nameof(ValidationMessages.SensitiveWordValidator_ValidationError_ShowMatchedWords)
+            : nameof(ValidationMessages.SensitiveWordValidator_ValidationError);
 }

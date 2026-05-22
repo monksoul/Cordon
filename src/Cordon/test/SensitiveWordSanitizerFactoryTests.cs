@@ -227,7 +227,7 @@ public class SensitiveWordSanitizerFactoryTests
     public void RefreshFromStream_Default_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        using var stream = new FileStream(filePath, FileMode.Open);
+        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
 
         SensitiveWordSanitizerFactory.RefreshFromStream("stream", stream);
         var sensitiveWordSanitizer = SensitiveWordSanitizerFactory._instances["stream"];
