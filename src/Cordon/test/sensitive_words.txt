@@ -13,3 +13,6 @@ test_bad_word	illegal_term
 low_high
 hello_world
 abc_def
+
+# 包含符号测试
+TMD!

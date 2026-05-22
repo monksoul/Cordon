@@ -13,10 +13,12 @@ public class TrieNodeTests
         node.Fail = node;
         node.Children.Add('敏', new TrieNode { IsEnd = true });
         node.MatchedWords.Add(("敏感词", 3));
+        node.MatchedWordSet.Add("敏感词");
 
         Assert.NotNull(node.Fail);
         Assert.True(node.IsEnd);
         Assert.Single(node.Children);
         Assert.Single(node.MatchedWords);
+        Assert.Single(node.MatchedWordSet);
     }
 }

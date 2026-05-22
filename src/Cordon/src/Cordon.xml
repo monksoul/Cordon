@@ -6461,6 +6461,12 @@
                 <para>词库下载：https://github.com/konsheng/Sensitive-lexicon</para>
             </remarks>
         </member>
+        <member name="F:Cordon.SensitiveWordSanitizer.SkipMap">
+            <summary>
+                预计算的符号跳过映射表
+            </summary>
+            <remarks>65536 个 bool 仅占 64KB，换取极致扫描性能。</remarks>
+        </member>
         <member name="F:Cordon.SensitiveWordSanitizer.IgnoredSeparators">
             <summary>
                 以下字符在匹配时一律视为"隐形分隔符"
@@ -6590,6 +6596,12 @@
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
+        <member name="M:Cordon.SensitiveWordSanitizer.InitSkipMap">
+            <summary>
+                初始化符号跳过映射表
+            </summary>
+            <returns><see cref="T:System.Boolean" />[]</returns>
+        </member>
         <member name="T:Cordon.SensitiveWordSanitizerFactory">
             <summary>
                 敏感词清理器工厂
@@ -6611,6 +6623,7 @@
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
+            <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromPath(System.String,System.String,System.Boolean,System.Boolean)">
@@ -6624,8 +6637,8 @@
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
-            <exception cref="T:System.ArgumentNullException"></exception>
             <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromStream(System.String,System.IO.Stream,System.Boolean,System.Boolean)">
             <summary>
@@ -6638,6 +6651,7 @@
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
+            <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreate(System.String,System.Func{Cordon.SensitiveWordSanitizer})">
@@ -6649,6 +6663,7 @@
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
+            <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.Refresh(System.String,System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean)">
@@ -6659,6 +6674,7 @@
             <param name="words">敏感词集合</param>
             <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
             <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromPath(System.String,System.String,System.Boolean,System.Boolean)">
@@ -6669,8 +6685,8 @@
             <param name="filePath">文件路径</param>
             <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
             <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
-            <exception cref="T:System.ArgumentNullException"></exception>
             <exception cref="T:System.ArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromStream(System.String,System.IO.Stream,System.Boolean,System.Boolean)">
             <summary>
@@ -6680,6 +6696,7 @@
             <param name="stream">输入流</param>
             <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
             <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.Refresh(System.String,System.Func{Cordon.SensitiveWordSanitizer})">
@@ -6688,6 +6705,8 @@
             </summary>
             <param name="name">实例名称</param>
             <param name="factory">构建敏感词清理器的工厂委托</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.TryRemove(System.String)">
@@ -6698,7 +6717,7 @@
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
-            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.ArgumentException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.Clear">
             <summary>
@@ -6728,6 +6747,11 @@
         <member name="P:Cordon.TrieNode.MatchedWords">
             <summary>
                 在此节点结束的所有敏感词及其核心长度
+            </summary>
+        </member>
+        <member name="P:Cordon.TrieNode.MatchedWordSet">
+            <summary>
+                辅助去重集合
             </summary>
         </member>
         <member name="T:Cordon.IValidationService">

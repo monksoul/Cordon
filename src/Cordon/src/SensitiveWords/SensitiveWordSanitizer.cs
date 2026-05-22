@@ -15,6 +15,12 @@ namespace Cordon;
 public sealed class SensitiveWordSanitizer
 {
     /// <summary>
+    ///     预计算的符号跳过映射表
+    /// </summary>
+    /// <remarks>65536 个 bool 仅占 64KB，换取极致扫描性能。</remarks>
+    internal static readonly bool[] SkipMap = InitSkipMap();
+
+    /// <summary>
     ///     以下字符在匹配时一律视为"隐形分隔符"
     /// </summary>
     /// <remarks>
@@ -161,8 +167,21 @@ public sealed class SensitiveWordSanitizer
             var coreLength = 0;
 
             // 移除分隔符生成纯净匹配键，同时计算核心长度
-            foreach (var ch in originalWord.Where(ch => !IgnoredSeparators.Contains(ch)))
+            // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+            foreach (var ch in originalWord)
             {
+                // 始终跳过分隔符
+                if (IgnoredSeparators.Contains(ch))
+                {
+                    continue;
+                }
+
+                // 符号过滤（仅当 _ignoreSymbol 启用时）
+                if (ignoreSymbol && ShouldSkip(ch))
+                {
+                    continue;
+                }
+
                 coreBuilder.Append(ch);
                 coreLength++;
             }
@@ -194,7 +213,7 @@ public sealed class SensitiveWordSanitizer
 
             node.IsEnd = true;
             // 保留原始词及其核心长度（含分隔符）
-            if (node.MatchedWords.All(m => m.Word != originalWord))
+            if (node.MatchedWordSet.Add(originalWord))
             {
                 node.MatchedWords.Add((originalWord, coreLength));
             }
@@ -215,15 +234,18 @@ public sealed class SensitiveWordSanitizer
             var currentNode = queue.Dequeue();
 
             // 继承 fail 节点的匹配状态
-            if (currentNode.Fail?.IsEnd == true)
+            if (currentNode.Fail is { IsEnd: true })
             {
                 currentNode.IsEnd = true;
 
                 // 合并 fail 链上的匹配词
-                foreach (var w in currentNode.Fail.MatchedWords.Where(w =>
-                             currentNode.MatchedWords.All(m => m.Word != w.Word)))
+                // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+                foreach (var w in currentNode.Fail.MatchedWords)
                 {
-                    currentNode.MatchedWords.Add(w);
+                    if (currentNode.MatchedWordSet.Add(w.Word))
+                    {
+                        currentNode.MatchedWords.Add(w);
+                    }
                 }
             }
 
@@ -238,15 +260,6 @@ public sealed class SensitiveWordSanitizer
 
                 // 设置子节点的 fail 指针
                 child.Fail = failNode.Children.GetValueOrDefault(c, root);
-
-                // 提前合并 fail 节点的匹配词
-                if (child.Fail.IsEnd)
-                {
-                    foreach (var w in child.Fail.MatchedWords.Where(w => child.MatchedWords.All(m => m.Word != w.Word)))
-                    {
-                        child.MatchedWords.Add(w);
-                    }
-                }
 
                 queue.Enqueue(child);
             }
@@ -301,14 +314,20 @@ public sealed class SensitiveWordSanitizer
                 var matchChar = _ignoreCase ? char.ToLowerInvariant(c) : c;
 
                 // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
-                while (node != _root && !node.Children.ContainsKey(matchChar))
+                TrieNode? next;
+                while (!node.Children.TryGetValue(matchChar, out next))
                 {
+                    if (node == _root)
+                    {
+                        break;
+                    }
+
                     node = node.Fail ?? _root;
                 }
 
-                if (node.Children.TryGetValue(matchChar, out var child))
+                if (next != null)
                 {
-                    node = child;
+                    node = next;
 
                     // 收集匹配结果
                     if (node is { IsEnd: true, MatchedWords.Count: > 0 })
@@ -372,15 +391,22 @@ public sealed class SensitiveWordSanitizer
 
             var matchChar = _ignoreCase ? char.ToLowerInvariant(c) : c;
 
-            while (node != _root && !node.Children.ContainsKey(matchChar))
+            // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
+            TrieNode? next;
+            while (!node.Children.TryGetValue(matchChar, out next))
             {
+                if (node == _root)
+                {
+                    break;
+                }
+
                 node = node.Fail ?? _root;
             }
 
             // ReSharper disable once InvertIf
-            if (node.Children.TryGetValue(matchChar, out var child))
+            if (next != null)
             {
-                node = child;
+                node = next;
                 if (node.IsEnd)
                 {
                     return true;
@@ -547,5 +573,21 @@ public sealed class SensitiveWordSanitizer
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
-    internal static bool ShouldSkip(char c) => char.IsWhiteSpace(c) || char.IsPunctuation(c) || char.IsSymbol(c);
+    internal static bool ShouldSkip(char c) => SkipMap[c];
+
+    /// <summary>
+    ///     初始化符号跳过映射表
+    /// </summary>
+    /// <returns><see cref="bool" />[]</returns>
+    internal static bool[] InitSkipMap()
+    {
+        var map = new bool[65536];
+        for (var i = 0; i < 65536; i++)
+        {
+            var c = (char)i;
+            map[i] = char.IsWhiteSpace(c) || char.IsPunctuation(c) || char.IsSymbol(c);
+        }
+
+        return map;
+    }
 }

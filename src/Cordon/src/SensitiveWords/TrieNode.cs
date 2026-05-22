@@ -28,4 +28,9 @@ internal sealed class TrieNode
     ///     在此节点结束的所有敏感词及其核心长度
     /// </summary>
     internal List<(string Word, int CoreLength)> MatchedWords { get; set; } = new(2);
+
+    /// <summary>
+    ///     辅助去重集合
+    /// </summary>
+    internal HashSet<string> MatchedWordSet { get; set; } = new(2);
 }
