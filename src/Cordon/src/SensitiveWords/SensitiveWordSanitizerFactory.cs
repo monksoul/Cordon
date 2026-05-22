@@ -16,6 +16,29 @@ public static class SensitiveWordSanitizerFactory
         new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
+    ///     获取已缓存的 <see cref="SensitiveWordSanitizer" /> 实例
+    /// </summary>
+    /// <param name="name">实例名称</param>
+    /// <returns>
+    ///     <see cref="SensitiveWordSanitizer" />
+    /// </returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static SensitiveWordSanitizer Get(string name)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+        if (_instances.TryGetValue(name, out var lazy))
+        {
+            return lazy.Value;
+        }
+
+        throw new InvalidOperationException(
+            $"The sensitive word dictionary '{name}' has not been registered. Please register it using `SensitiveWordSanitizerFactory.GetOrCreate` at application startup.");
+    }
+
+    /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
     /// <param name="name">实例名称</param>

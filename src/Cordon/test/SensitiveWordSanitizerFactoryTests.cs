@@ -15,6 +15,34 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
+    public void Get_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.Get(null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.Get(string.Empty));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.Get(" "));
+
+        var exception = Assert.Throws<InvalidOperationException>(() => SensitiveWordSanitizerFactory.Get("not-found"));
+        Assert.Equal(
+            "The sensitive word dictionary 'not-found' has not been registered. Please register it using `SensitiveWordSanitizerFactory.GetOrCreate` at application startup.",
+            exception.Message);
+    }
+
+    [Fact]
+    public void Get_ReturnOK()
+    {
+        List<string> words = ["敏感词", "违规表述", "涉政", "暴恐"];
+
+        var sensitiveWordSanitizer = SensitiveWordSanitizerFactory.GetOrCreate("default", words);
+        var sensitiveWordSanitizer2 = SensitiveWordSanitizerFactory.Get("default");
+        var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get("default");
+        Assert.Same(sensitiveWordSanitizer, sensitiveWordSanitizer2);
+        Assert.Same(sensitiveWordSanitizer, sensitiveWordSanitizer3);
+
+        SensitiveWordSanitizerFactory.TryRemove("default");
+        Assert.Empty(SensitiveWordSanitizerFactory._instances);
+    }
+
+    [Fact]
     public void GetOrCreate_Default_Invalid_Parameters()
     {
         Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.GetOrCreate(null!, null!));

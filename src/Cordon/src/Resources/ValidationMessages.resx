@@ -327,4 +327,7 @@
     <data name="DecimalValidator_ValidationError_AllowNegative" xml:space="preserve">
         <value>The field {0} must be a valid decimal within the DECIMAL({1},{2}) precision or scale limit.</value>
     </data>
+    <data name="SensitiveWordValidator_ValidationError" xml:space="preserve">
+        <value>The field {0} contains sensitive or prohibited words.</value>
+    </data>
 </root>
