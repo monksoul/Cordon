@@ -97,18 +97,19 @@ public static class SensitiveWordSanitizerFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(factory);
 
-        var lazy = _instances.GetOrAdd(name,
+        // 获取或添加惰性实例
+        var lazyInstance = _instances.GetOrAdd(name,
             _ => new Lazy<SensitiveWordSanitizer>(factory, LazyThreadSafetyMode.ExecutionAndPublication));
 
         try
         {
-            return lazy.Value;
+            return lazyInstance.Value;
         }
         catch
         {
             // 处理 Lazy<T> 会缓存异常问题
-            ((ICollection<KeyValuePair<string, Lazy<SensitiveWordSanitizer>>>)_instances)
-                .Remove(new KeyValuePair<string, Lazy<SensitiveWordSanitizer>>(name, lazy));
+            ((ICollection<KeyValuePair<string, Lazy<SensitiveWordSanitizer>>>)_instances).Remove(
+                new KeyValuePair<string, Lazy<SensitiveWordSanitizer>>(name, lazyInstance));
 
             throw;
         }
