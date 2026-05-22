@@ -48,7 +48,8 @@ public class SensitiveWordValidator : ValidatorBase
     /// <param name="dictionaryName">
     ///     字典名称，默认值为：<c>null</c>。若提供，则利用 <see cref="SensitiveWordSanitizerFactory" /> 进行缓存；否则直接读取流构建实例。
     /// </param>
-    public SensitiveWordValidator(Stream stream, string? dictionaryName = null) : this()
+    public SensitiveWordValidator(Stream stream, string? dictionaryName = null)
+        : this()
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(stream);
@@ -78,6 +79,7 @@ public class SensitiveWordValidator : ValidatorBase
     /// </summary>
     /// <remarks>
     ///     当 <see cref="Sanitizer" /> 和 <see cref="DictionaryName" /> 均为空时，使用此路径加载词库。
+    ///     支持后续通过 <see cref="SensitiveWordSanitizerFactory.Refresh(string)" /> 进行刷新（热更新）。
     /// </remarks>
     public string? FilePath { get; set; }
 
@@ -126,7 +128,7 @@ public class SensitiveWordValidator : ValidatorBase
     /// <inheritdoc />
     public override string? FormatErrorMessage(string name)
     {
-        // 检查是否在错误信息中显示命中的敏感词详情
+        // 检查是否在错误信息中显示命中的敏感词详情（若 ShowMatchedWords 为 true，明确要求用户传入 {1}，否则将抛异常）
         if (ShowMatchedWords && _lastMatchDetails is { Length: > 0 })
         {
             return string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name,

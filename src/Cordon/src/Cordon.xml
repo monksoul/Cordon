@@ -10370,6 +10370,7 @@
             </summary>
             <remarks>
                 当 <see cref="P:Cordon.SensitiveWordValidator.Sanitizer" /> 和 <see cref="P:Cordon.SensitiveWordValidator.DictionaryName" /> 均为空时，使用此路径加载词库。
+                支持后续通过 <see cref="M:Cordon.SensitiveWordSanitizerFactory.Refresh(System.String)" /> 进行刷新（热更新）。
             </remarks>
         </member>
         <member name="P:Cordon.SensitiveWordValidator.ShowMatchedWords">
