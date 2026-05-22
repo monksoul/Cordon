@@ -86,6 +86,13 @@ public sealed class SensitiveWordSanitizer
             throw new ArgumentException("Stream must be readable.", nameof(stream));
         }
 
+        // 检查流是否支持查找
+        if (stream.CanSeek)
+        {
+            // 重置到起始位置
+            stream.Position = 0;
+        }
+
         // 初始化 HashSet 实例
         var words = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -589,5 +596,36 @@ public sealed class SensitiveWordSanitizer
         }
 
         return map;
+    }
+
+    /// <summary>
+    ///     Aho‑Corasick 自动机的字典树节点
+    /// </summary>
+    internal sealed class TrieNode
+    {
+        /// <summary>
+        ///     <see cref="TrieNode" />
+        /// </summary>
+        internal TrieNode? Fail { get; set; }
+
+        /// <summary>
+        ///     是否为某个敏感词的结尾
+        /// </summary>
+        internal bool IsEnd { get; set; }
+
+        /// <summary>
+        ///     子节点映射字典
+        /// </summary>
+        internal Dictionary<char, TrieNode> Children { get; set; } = new(64);
+
+        /// <summary>
+        ///     在此节点结束的所有敏感词及其核心长度
+        /// </summary>
+        internal List<(string Word, int CoreLength)> MatchedWords { get; set; } = new(2);
+
+        /// <summary>
+        ///     辅助去重集合
+        /// </summary>
+        internal HashSet<string> MatchedWordSet { get; set; } = new(2);
     }
 }

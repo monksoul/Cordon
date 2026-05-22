@@ -12,7 +12,7 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     敏感词清理器缓存字典
     /// </summary>
-    internal static readonly ConcurrentDictionary<string, Lazy<SensitiveWordSanitizer>> _instances =
+    internal static readonly ConcurrentDictionary<string, SanitizerEntry> _instances =
         new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
@@ -29,9 +29,10 @@ public static class SensitiveWordSanitizerFactory
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
-        if (_instances.TryGetValue(name, out var lazy))
+        // 尝试获取敏感词清理器缓存条目
+        if (_instances.TryGetValue(name, out var entry))
         {
-            return lazy.Value;
+            return entry.LazyInstance.Value;
         }
 
         throw new InvalidOperationException(
@@ -120,22 +121,50 @@ public static class SensitiveWordSanitizerFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(factory);
 
-        // 获取或添加惰性实例
-        var lazyInstance = _instances.GetOrAdd(name,
-            _ => new Lazy<SensitiveWordSanitizer>(factory, LazyThreadSafetyMode.ExecutionAndPublication));
+        // 获取或添加敏感词清理器缓存条目
+        var entry = _instances.GetOrAdd(name,
+            _ => new SanitizerEntry(factory,
+                new Lazy<SensitiveWordSanitizer>(factory, LazyThreadSafetyMode.ExecutionAndPublication)));
 
         try
         {
-            return lazyInstance.Value;
+            return entry.LazyInstance.Value;
         }
         catch
         {
             // 处理 Lazy<T> 会缓存异常问题
-            ((ICollection<KeyValuePair<string, Lazy<SensitiveWordSanitizer>>>)_instances).Remove(
-                new KeyValuePair<string, Lazy<SensitiveWordSanitizer>>(name, lazyInstance));
+            ((ICollection<KeyValuePair<string, SanitizerEntry>>)_instances).Remove(
+                new KeyValuePair<string, SanitizerEntry>(name, entry));
 
             throw;
         }
+    }
+
+    /// <summary>
+    ///     使用原始配置重新刷新 <see cref="SensitiveWordSanitizer" /> 实例（热更新）
+    /// </summary>
+    /// <remarks>注意：若实例最初是通过 <see cref="GetOrCreateFromStream" /> 注册的，传入的流必须支持 <c>CanSeek</c>（如 FileStream），否则刷新时将读取到空数据。</remarks>
+    /// <param name="name">实例名称</param>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static void Refresh(string name)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+        // 尝试获取敏感词清理器缓存条目
+        if (!_instances.TryGetValue(name, out var oldEntry))
+        {
+            throw new InvalidOperationException(
+                $"The sensitive word dictionary '{name}' has not been registered. Cannot refresh an unregistered dictionary.");
+        }
+
+        // 提前执行原始 Factory，确保新实例构建成功后才替换缓存
+        var instance = oldEntry.Factory();
+        var newLazy = new Lazy<SensitiveWordSanitizer>(() => instance, LazyThreadSafetyMode.PublicationOnly);
+        var newEntry = new SanitizerEntry(oldEntry.Factory, newLazy);
+
+        _instances.AddOrUpdate(name, newEntry, (_, _) => newEntry);
     }
 
     /// <summary>
@@ -209,8 +238,9 @@ public static class SensitiveWordSanitizerFactory
         // 提前执行工厂，确保新实例构建成功后才替换缓存
         var instance = factory();
         var newLazy = new Lazy<SensitiveWordSanitizer>(() => instance, LazyThreadSafetyMode.PublicationOnly);
+        var newEntry = new SanitizerEntry(factory, newLazy);
 
-        _instances.AddOrUpdate(name, newLazy, (_, _) => newLazy);
+        _instances.AddOrUpdate(name, newEntry, (_, _) => newEntry);
     }
 
     /// <summary>
@@ -223,7 +253,6 @@ public static class SensitiveWordSanitizerFactory
     /// <exception cref="ArgumentException"></exception>
     public static bool TryRemove(string name)
     {
-        // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
         return _instances.TryRemove(name, out _);
@@ -233,4 +262,31 @@ public static class SensitiveWordSanitizerFactory
     ///     清除所有缓存的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
     public static void Clear() => _instances.Clear();
+
+    /// <summary>
+    ///     敏感词清理器缓存条目
+    /// </summary>
+    internal sealed class SanitizerEntry
+    {
+        /// <summary>
+        ///     <inheritdoc cref="SanitizerEntry" />
+        /// </summary>
+        /// <param name="factory">原始的构建委托</param>
+        /// <param name="lazyInstance">线程安全的延迟初始化实例</param>
+        internal SanitizerEntry(Func<SensitiveWordSanitizer> factory, Lazy<SensitiveWordSanitizer> lazyInstance)
+        {
+            Factory = factory;
+            LazyInstance = lazyInstance;
+        }
+
+        /// <summary>
+        ///     原始的构建委托
+        /// </summary>
+        internal Func<SensitiveWordSanitizer> Factory { get; }
+
+        /// <summary>
+        ///     线程安全的延迟初始化实例
+        /// </summary>
+        internal Lazy<SensitiveWordSanitizer> LazyInstance { get; }
+    }
 }

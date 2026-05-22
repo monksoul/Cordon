@@ -119,7 +119,7 @@ public class SensitiveWordSanitizerFactoryTests
     public void GetOrCreateFromStream_Default_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        using var stream = new FileStream(filePath, FileMode.Open);
+        using var stream = File.OpenRead(filePath);
 
         var sensitiveWordSanitizer = SensitiveWordSanitizerFactory.GetOrCreateFromStream("stream", stream);
         Assert.NotNull(sensitiveWordSanitizer);
@@ -170,6 +170,56 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
+    public void Refresh_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.Refresh(null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.Refresh(string.Empty));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.Refresh(" "));
+
+        var exception =
+            Assert.Throws<InvalidOperationException>(() => SensitiveWordSanitizerFactory.Refresh("not-found"));
+        Assert.Equal(
+            "The sensitive word dictionary 'not-found' has not been registered. Cannot refresh an unregistered dictionary.",
+            exception.Message);
+    }
+
+    [Fact]
+    public void Refresh_ReturnOK()
+    {
+        var tempFilePath = Path.Combine(Path.GetTempPath(), $"sensitive_words_{Guid.NewGuid()}.txt");
+        const string dictName = "refresh_file_test";
+
+        try
+        {
+            File.WriteAllText(tempFilePath, "敏感词\n");
+            var sanitizer = SensitiveWordSanitizerFactory.GetOrCreateFromPath(dictName, tempFilePath);
+            Assert.Single(SensitiveWordSanitizerFactory._instances);
+            Assert.True(sanitizer.Contains("敏感词"));
+            Assert.False(sanitizer.Contains("TMD"));
+            Assert.True(sanitizer.Contains("这里包含敏感词吗，TMD!"));
+
+            File.AppendAllText(tempFilePath, "TMD\n");
+            SensitiveWordSanitizerFactory.Refresh(dictName);
+            Assert.Single(SensitiveWordSanitizerFactory._instances);
+            var refreshedSanitizer = SensitiveWordSanitizerFactory.Get(dictName);
+            Assert.True(refreshedSanitizer.Contains("敏感词"));
+            Assert.True(refreshedSanitizer.Contains("TMD"));
+            Assert.True(refreshedSanitizer.Contains("这里包含敏感词吗，TMD!"));
+
+            Assert.NotSame(sanitizer, refreshedSanitizer);
+            Assert.Single(SensitiveWordSanitizerFactory._instances);
+        }
+        finally
+        {
+            SensitiveWordSanitizerFactory.TryRemove(dictName);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
+        }
+    }
+
+    [Fact]
     public void Refresh_Default_ReturnOK()
     {
         List<string> words = ["敏感词", "违规表述", "涉政", "暴恐"];
@@ -179,7 +229,7 @@ public class SensitiveWordSanitizerFactoryTests
         Assert.NotNull(sensitiveWordSanitizer);
         Assert.Single(SensitiveWordSanitizerFactory._instances);
 
-        Assert.True(sensitiveWordSanitizer.Value.Contains("这里包含敏感词吗"));
+        Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
 
         SensitiveWordSanitizerFactory.TryRemove("default");
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
@@ -206,7 +256,7 @@ public class SensitiveWordSanitizerFactoryTests
         Assert.NotNull(sensitiveWordSanitizer);
         Assert.Single(SensitiveWordSanitizerFactory._instances);
 
-        Assert.True(sensitiveWordSanitizer.Value.Contains("这里包含敏感词吗"));
+        Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
 
         SensitiveWordSanitizerFactory.TryRemove("file");
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
@@ -227,14 +277,14 @@ public class SensitiveWordSanitizerFactoryTests
     public void RefreshFromStream_Default_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        using var stream = File.OpenRead(filePath);
 
         SensitiveWordSanitizerFactory.RefreshFromStream("stream", stream);
         var sensitiveWordSanitizer = SensitiveWordSanitizerFactory._instances["stream"];
         Assert.NotNull(sensitiveWordSanitizer);
         Assert.Single(SensitiveWordSanitizerFactory._instances);
 
-        Assert.True(sensitiveWordSanitizer.Value.Contains("这里包含敏感词吗"));
+        Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
 
         SensitiveWordSanitizerFactory.TryRemove("stream");
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
@@ -263,7 +313,7 @@ public class SensitiveWordSanitizerFactoryTests
         Assert.NotNull(sensitiveWordSanitizer);
         Assert.Single(SensitiveWordSanitizerFactory._instances);
 
-        Assert.True(sensitiveWordSanitizer.Value.Contains("这里包含敏感词吗"));
+        Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
 
         SensitiveWordSanitizerFactory.TryRemove("factory");
         Assert.Empty(SensitiveWordSanitizerFactory._instances);

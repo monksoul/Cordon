@@ -491,4 +491,20 @@ public class SensitiveWordSanitizerTests
         Assert.NotNull(skipMap);
         Assert.Equal(65536, skipMap.Length);
     }
+
+    [Fact]
+    public void TrieNode_New_ReturnOK()
+    {
+        var node = new SensitiveWordSanitizer.TrieNode { IsEnd = true };
+        node.Fail = node;
+        node.Children.Add('敏', new SensitiveWordSanitizer.TrieNode { IsEnd = true });
+        node.MatchedWords.Add(("敏感词", 3));
+        node.MatchedWordSet.Add("敏感词");
+
+        Assert.NotNull(node.Fail);
+        Assert.True(node.IsEnd);
+        Assert.Single(node.Children);
+        Assert.Single(node.MatchedWords);
+        Assert.Single(node.MatchedWordSet);
+    }
 }
