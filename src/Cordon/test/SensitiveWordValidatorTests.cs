@@ -21,7 +21,7 @@ public class SensitiveWordValidatorTests
         Assert.Null(validator.DictionaryName);
         Assert.Null(validator.FilePath);
         Assert.False(validator.ShowMatchedWords);
-        Assert.Null(validator._lastMatchDetails);
+        Assert.Null(SensitiveWordValidator._lastMatchDetails.Value);
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} contains sensitive or prohibited words.",
             validator._errorMessageResourceAccessor());
@@ -67,136 +67,91 @@ public class SensitiveWordValidatorTests
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
         var normalizedPath = Path.GetFullPath(filePath);
         var validator = new SensitiveWordValidator { FilePath = filePath };
+
         Assert.Equal(result, validator.IsValid(value));
         SensitiveWordSanitizerFactory.TryRemove(normalizedPath); // null 或空白字符串时，GetSanitizer() 还未调用
     }
-    //
-    // [Theory]
-    // [InlineData(null, true)]
-    // [InlineData(0, false)]
-    // [InlineData(10, false)]
-    // [InlineData(17, false)]
-    // [InlineData(18, true)]
-    // [InlineData(30, true)]
-    // [InlineData(100, true)]
-    // [InlineData(120, true)]
-    // [InlineData(121, false)]
-    // public void IsValid_WithShowMatchedWords_ReturnOK(object? value, bool result)
-    // {
-    //     var validator = new SensitiveWordValidator { ShowMatchedWords = true };
-    //     Assert.Equal(result, validator.IsValid(value));
-    // }
-    //
-    // [Theory]
-    // [InlineData(null, true)]
-    // [InlineData("0", true)]
-    // [InlineData("30", true)]
-    // [InlineData("100", true)]
-    // [InlineData("120", true)]
-    // [InlineData("121", false)]
-    // [InlineData("30.00", false)]
-    // [InlineData("-1", false)]
-    // public void IsValid_WithAllowStringValues_ReturnOK(object? value, bool result)
-    // {
-    //     var validator = new SensitiveWordValidator { AllowStringValues = true };
-    //     Assert.Equal(result, validator.IsValid(value));
-    // }
-    //
-    // [Fact]
-    // public void GetValidationResults_ReturnOK()
-    // {
-    //     var validator = new SensitiveWordValidator();
-    //     Assert.Null(validator.GetValidationResults(30, "data"));
-    //
-    //     var validationResults = validator.GetValidationResults(121, "data");
-    //     Assert.NotNull(validationResults);
-    //     Assert.Single(validationResults);
-    //     Assert.Equal("The field data contains sensitive or prohibited words.", validationResults.First().ErrorMessage);
-    //
-    //     validator.ErrorMessage = "数据无效";
-    //     var validationResults2 = validator.GetValidationResults(121, "data");
-    //     Assert.NotNull(validationResults2);
-    //     Assert.Single(validationResults2);
-    //     Assert.Equal("数据无效", validationResults2.First().ErrorMessage);
-    // }
-    //
-    // [Fact]
-    // public void GetValidationResults_WithShowMatchedWords_ReturnOK()
-    // {
-    //     var validator = new SensitiveWordValidator { ShowMatchedWords = true };
-    //     Assert.Null(validator.GetValidationResults(30, "data"));
-    //
-    //     var validationResults = validator.GetValidationResults(16, "data");
-    //     Assert.NotNull(validationResults);
-    //     Assert.Single(validationResults);
-    //     Assert.Equal("The field data contains sensitive or prohibited words: {1}.", validationResults.First().ErrorMessage);
-    //
-    //     validator.ErrorMessage = "数据无效";
-    //     var validationResults2 = validator.GetValidationResults(16, "data");
-    //     Assert.NotNull(validationResults2);
-    //     Assert.Single(validationResults2);
-    //     Assert.Equal("数据无效", validationResults2.First().ErrorMessage);
-    // }
-    //
-    // [Fact]
-    // public void GetValidationResults_WithAllowStringValues_ReturnOK()
-    // {
-    //     var validator = new SensitiveWordValidator { AllowStringValues = true };
-    //     Assert.Null(validator.GetValidationResults("30", "data"));
-    //
-    //     var validationResults = validator.GetValidationResults("121", "data");
-    //     Assert.NotNull(validationResults);
-    //     Assert.Single(validationResults);
-    //     Assert.Equal("The field data contains sensitive or prohibited words.", validationResults.First().ErrorMessage);
-    //
-    //     validator.ErrorMessage = "数据无效";
-    //     var validationResults2 = validator.GetValidationResults("121", "data");
-    //     Assert.NotNull(validationResults2);
-    //     Assert.Single(validationResults2);
-    //     Assert.Equal("数据无效", validationResults2.First().ErrorMessage);
-    // }
-    //
-    // [Fact]
-    // public void Validate_ReturnOK()
-    // {
-    //     var validator = new SensitiveWordValidator();
-    //     validator.Validate(30, "data");
-    //
-    //     var exception = Assert.Throws<ValidationException>(() => validator.Validate(121, "data"));
-    //     Assert.Equal("The field data contains sensitive or prohibited words.", exception.Message);
-    //
-    //     validator.ErrorMessage = "数据无效";
-    //     var exception2 = Assert.Throws<ValidationException>(() => validator.Validate(121, "data"));
-    //     Assert.Equal("数据无效", exception2.Message);
-    // }
-    //
-    // [Fact]
-    // public void Validate_WithShowMatchedWords_ReturnOK()
-    // {
-    //     var validator = new SensitiveWordValidator { ShowMatchedWords = true };
-    //     validator.Validate(30, "data");
-    //
-    //     var exception = Assert.Throws<ValidationException>(() => validator.Validate(16, "data"));
-    //     Assert.Equal("The field data contains sensitive or prohibited words: {1}.", exception.Message);
-    //
-    //     validator.ErrorMessage = "数据无效";
-    //     var exception2 = Assert.Throws<ValidationException>(() => validator.Validate(16, "data"));
-    //     Assert.Equal("数据无效", exception2.Message);
-    // }
-    //
-    // [Fact]
-    // public void Validate_WithAllowStringValues_ReturnOK()
-    // {
-    //     var validator = new SensitiveWordValidator { AllowStringValues = true };
-    //     validator.Validate("30", "data");
-    //
-    //     var exception = Assert.Throws<ValidationException>(() => validator.Validate("121", "data"));
-    //     Assert.Equal("The field data contains sensitive or prohibited words.", exception.Message);
-    //
-    //     validator.ErrorMessage = "数据无效";
-    //     var exception2 = Assert.Throws<ValidationException>(() => validator.Validate("121", "data"));
-    //     Assert.Equal("数据无效", exception2.Message);
-    // }
+
+    [Fact]
+    public void GetValidationResults_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var normalizedPath = Path.GetFullPath(filePath);
+        var validator = new SensitiveWordValidator { FilePath = filePath };
+
+        Assert.Null(validator.GetValidationResults(null, "data"));
+
+        var validationResults = validator.GetValidationResults("这里包含敏感词吗", "data");
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal("The field data contains sensitive or prohibited words.", validationResults.First().ErrorMessage);
+
+        validator.ErrorMessage = "数据无效";
+        var validationResults2 = validator.GetValidationResults("这里包含敏感词吗", "data");
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal("数据无效", validationResults2.First().ErrorMessage);
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+    }
+
+    [Fact]
+    public void GetValidationResults_WithShowMatchedWords_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var normalizedPath = Path.GetFullPath(filePath);
+        var validator = new SensitiveWordValidator { FilePath = filePath, ShowMatchedWords = true };
+
+        Assert.Null(validator.GetValidationResults(null, "data"));
+
+        var validationResults = validator.GetValidationResults("这里包含敏感词吗", "data");
+        Assert.NotNull(validationResults);
+        Assert.Single(validationResults);
+        Assert.Equal("The field data contains sensitive or prohibited words: [敏感词] @ 4..7.",
+            validationResults.First().ErrorMessage);
+
+        validator.ErrorMessage = "数据无效";
+        var validationResults2 = validator.GetValidationResults("这里包含敏感词吗", "data");
+        Assert.NotNull(validationResults2);
+        Assert.Single(validationResults2);
+        Assert.Equal("数据无效 Matched: [敏感词] @ 4..7", validationResults2.First().ErrorMessage);
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+    }
+
+    [Fact]
+    public void Validate_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var normalizedPath = Path.GetFullPath(filePath);
+        var validator = new SensitiveWordValidator { FilePath = filePath };
+
+        validator.Validate(null, "data");
+
+        var exception = Assert.Throws<ValidationException>(() => validator.Validate("这里包含敏感词吗", "data"));
+        Assert.Equal("The field data contains sensitive or prohibited words.", exception.Message);
+
+        validator.ErrorMessage = "数据无效";
+        var exception2 = Assert.Throws<ValidationException>(() => validator.Validate("这里包含敏感词吗", "data"));
+        Assert.Equal("数据无效", exception2.Message);
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+    }
+
+    [Fact]
+    public void Validate_WithShowMatchedWords_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var normalizedPath = Path.GetFullPath(filePath);
+        var validator = new SensitiveWordValidator { FilePath = filePath, ShowMatchedWords = true };
+
+        validator.Validate(null, "data");
+
+        var exception = Assert.Throws<ValidationException>(() => validator.Validate("这里包含敏感词吗", "data"));
+        Assert.Equal("The field data contains sensitive or prohibited words: [敏感词] @ 4..7.", exception.Message);
+
+        validator.ErrorMessage = "数据无效";
+        var exception2 = Assert.Throws<ValidationException>(() => validator.Validate("这里包含敏感词吗", "data"));
+        Assert.Equal("数据无效 Matched: [敏感词] @ 4..7", exception2.Message);
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+    }
 
     [Fact]
     public void GetSanitizer_Invalid_Parameters()
@@ -206,6 +161,13 @@ public class SensitiveWordValidatorTests
         Assert.Equal(
             "No dictionary source is configured for the SensitiveWordValidator. Please set the 'Sanitizer', 'DictionaryName', or 'FilePath' property, or provide a Stream or Sanitizer via the constructor.",
             exception.Message);
+
+        validator.DictionaryName = "file-key";
+        validator.FilePath = "mock-file.txt";
+        var exception2 = Assert.Throws<InvalidOperationException>(validator.GetSanitizer);
+        Assert.Equal(
+            "Multiple dictionary sources are configured for the SensitiveWordValidator. Please set only one of 'Sanitizer', 'DictionaryName', or 'FilePath'.",
+            exception2.Message);
     }
 
     [Fact]
@@ -245,13 +207,11 @@ public class SensitiveWordValidatorTests
         Assert.Equal("The field data contains sensitive or prohibited words: .",
             validator2.FormatErrorMessage("data"));
 
-        var validator3 = new SensitiveWordValidator
-        {
-            ShowMatchedWords = true, _lastMatchDetails = ["[敏感词] @ 5..10", "[TMD!] @ 5..8"]
-        };
+        var validator3 = new SensitiveWordValidator { ShowMatchedWords = true };
+        SensitiveWordValidator._lastMatchDetails.Value = ["[敏感词] @ 5..10", "[TMD!] @ 5..8"];
         Assert.Equal("The field data contains sensitive or prohibited words: [敏感词] @ 5..10, [TMD!] @ 5..8.",
             validator3.FormatErrorMessage("data"));
-        validator3._lastMatchDetails = null;
+        SensitiveWordValidator._lastMatchDetails.Value = null;
     }
 
     [Fact]

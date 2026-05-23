@@ -16,7 +16,7 @@ public class SensitiveWordValidator : ValidatorBase
     /// <summary>
     ///     最近一次验证命中的匹配结果详情
     /// </summary>
-    internal string[]? _lastMatchDetails;
+    internal static readonly AsyncLocal<string[]?> _lastMatchDetails = new();
 
     /// <summary>
     ///     <inheritdoc cref="SensitiveWordValidator" />
@@ -92,7 +92,7 @@ public class SensitiveWordValidator : ValidatorBase
     public override bool IsValid(object? value, IValidationContext? validationContext)
     {
         // 重置所有命中词及精确位置字符串
-        _lastMatchDetails = null;
+        _lastMatchDetails.Value = null;
 
         // 检查值是否为字符串类型，且字符串不是由空白字符组成
         if (value is not string text || string.IsNullOrWhiteSpace(text))
@@ -119,7 +119,7 @@ public class SensitiveWordValidator : ValidatorBase
         }
 
         // 存储所有命中词及精确位置字符串
-        _lastMatchDetails = matches.Select(u => u.ToString()).ToArray();
+        _lastMatchDetails.Value = matches.Select(u => u.ToString()).ToArray();
 
         return false;
     }
@@ -142,7 +142,7 @@ public class SensitiveWordValidator : ValidatorBase
         }
 
         // 将验证命中的匹配结果详情组合成字符串
-        var wordsString = string.Join(", ", _lastMatchDetails ?? []);
+        var wordsString = string.Join(", ", _lastMatchDetails.Value ?? []);
 
         // 检查错误信息字符串是否包含 {1} 占位符
         if (template.Contains("{1}"))
