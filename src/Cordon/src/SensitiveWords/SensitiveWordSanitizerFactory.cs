@@ -64,6 +64,30 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
+    /// <remarks>以规范化的文件路径作为缓存的键。</remarks>
+    /// <param name="filePath">文件路径</param>
+    /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+    /// <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+    /// <returns>
+    ///     <see cref="SensitiveWordSanitizer" />
+    /// </returns>
+    /// <exception cref="ArgumentException"></exception>
+    public static SensitiveWordSanitizer GetOrCreateFromPath(string filePath, bool ignoreCase = true,
+        bool ignoreSymbol = true)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+
+        // 规范化文件路径
+        var normalizedPath = Path.GetFullPath(filePath);
+
+        return GetOrCreate(normalizedPath,
+            () => SensitiveWordSanitizer.CreateFromPath(normalizedPath, ignoreCase, ignoreSymbol));
+    }
+
+    /// <summary>
+    ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
+    /// </summary>
     /// <param name="name">实例名称</param>
     /// <param name="filePath">文件路径</param>
     /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
@@ -80,7 +104,10 @@ public static class SensitiveWordSanitizerFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        return GetOrCreate(name, () => SensitiveWordSanitizer.CreateFromPath(filePath, ignoreCase, ignoreSymbol));
+        // 规范化文件路径
+        var normalizedPath = Path.GetFullPath(filePath);
+
+        return GetOrCreate(name, () => SensitiveWordSanitizer.CreateFromPath(normalizedPath, ignoreCase, ignoreSymbol));
     }
 
     /// <summary>
@@ -189,6 +216,25 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     刷新 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
+    /// <remarks>以规范化的文件路径作为缓存的键。</remarks>
+    /// <param name="filePath">文件路径</param>
+    /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+    /// <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+    /// <exception cref="ArgumentException"></exception>
+    public static void RefreshFromPath(string filePath, bool ignoreCase = true, bool ignoreSymbol = true)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+
+        // 规范化文件路径
+        var normalizedPath = Path.GetFullPath(filePath);
+
+        Refresh(normalizedPath, () => SensitiveWordSanitizer.CreateFromPath(normalizedPath, ignoreCase, ignoreSymbol));
+    }
+
+    /// <summary>
+    ///     刷新 <see cref="SensitiveWordSanitizer" /> 实例
+    /// </summary>
     /// <param name="name">实例名称</param>
     /// <param name="filePath">文件路径</param>
     /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
@@ -201,7 +247,10 @@ public static class SensitiveWordSanitizerFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        Refresh(name, () => SensitiveWordSanitizer.CreateFromPath(filePath, ignoreCase, ignoreSymbol));
+        // 规范化文件路径
+        var normalizedPath = Path.GetFullPath(filePath);
+
+        Refresh(name, () => SensitiveWordSanitizer.CreateFromPath(normalizedPath, ignoreCase, ignoreSymbol));
     }
 
     /// <summary>
@@ -246,6 +295,7 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     移除指定名称的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
+    /// <remarks>注意：若使用文件路径作为缓存的键，那么请使用 <c>Path.GetFullPath(filePath)</c> 来标准化文件路径。</remarks>
     /// <param name="name">实例名称</param>
     /// <returns>
     ///     <see cref="bool" />

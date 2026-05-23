@@ -331,6 +331,6 @@
         <value>The field {0} contains sensitive or prohibited words.</value>
     </data>
     <data name="SensitiveWordValidator_ValidationError_ShowMatchedWords" xml:space="preserve">
-        <value>he field {0} contains sensitive or prohibited words: {1}.</value>
+        <value>The field {0} contains sensitive or prohibited words: {1}.</value>
     </data>
 </root>

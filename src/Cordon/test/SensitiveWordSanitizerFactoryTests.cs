@@ -38,7 +38,7 @@ public class SensitiveWordSanitizerFactoryTests
         Assert.Same(sensitiveWordSanitizer, sensitiveWordSanitizer2);
         Assert.Same(sensitiveWordSanitizer, sensitiveWordSanitizer3);
 
-        SensitiveWordSanitizerFactory.TryRemove("default");
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("default"));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -70,7 +70,7 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(sensitiveWordSanitizer.Contains("这里包含敏感词吗"));
 
-        SensitiveWordSanitizerFactory.TryRemove("default");
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("default"));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -100,7 +100,37 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(sensitiveWordSanitizer.Contains("这里包含敏感词吗"));
 
-        SensitiveWordSanitizerFactory.TryRemove("file");
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("file"));
+        Assert.Empty(SensitiveWordSanitizerFactory._instances);
+    }
+
+    [Fact]
+    public void GetOrCreateFromPath_FilePathKey_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(string.Empty));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(" "));
+        Assert.Throws<FileNotFoundException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath("not-found.txt"));
+    }
+
+    [Fact]
+    public void GetOrCreateFromPath_FilePathKey_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var normalizedPath = Path.GetFullPath(filePath);
+
+        var sensitiveWordSanitizer = SensitiveWordSanitizerFactory.GetOrCreateFromPath(filePath);
+        Assert.NotNull(sensitiveWordSanitizer);
+        Assert.Single(SensitiveWordSanitizerFactory._instances);
+        Assert.Equal(normalizedPath, SensitiveWordSanitizerFactory._instances.Keys.FirstOrDefault());
+
+        var sensitiveWordSanitizer2 = SensitiveWordSanitizerFactory.GetOrCreateFromPath(filePath);
+        Assert.Single(SensitiveWordSanitizerFactory._instances);
+        Assert.Same(sensitiveWordSanitizer, sensitiveWordSanitizer2);
+
+        Assert.True(sensitiveWordSanitizer.Contains("这里包含敏感词吗"));
+
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -131,7 +161,7 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(sensitiveWordSanitizer.Contains("这里包含敏感词吗"));
 
-        SensitiveWordSanitizerFactory.TryRemove("stream");
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("stream"));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -165,7 +195,7 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(sensitiveWordSanitizer.Contains("这里包含敏感词吗"));
 
-        SensitiveWordSanitizerFactory.TryRemove("factory");
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("factory"));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -211,7 +241,7 @@ public class SensitiveWordSanitizerFactoryTests
         }
         finally
         {
-            SensitiveWordSanitizerFactory.TryRemove(dictName);
+            Assert.True(SensitiveWordSanitizerFactory.TryRemove(dictName));
             if (File.Exists(tempFilePath))
             {
                 File.Delete(tempFilePath);
@@ -231,7 +261,7 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
 
-        SensitiveWordSanitizerFactory.TryRemove("default");
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("default"));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -258,7 +288,34 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
 
-        SensitiveWordSanitizerFactory.TryRemove("file");
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("file"));
+        Assert.Empty(SensitiveWordSanitizerFactory._instances);
+    }
+
+    [Fact]
+    public void RefreshFromPath_FilePathKey_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(string.Empty));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(" "));
+        Assert.Throws<FileNotFoundException>(() =>
+            SensitiveWordSanitizerFactory.RefreshFromPath("not-found.txt"));
+    }
+
+    [Fact]
+    public void RefreshFromPath_FilePathKey_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var normalizedPath = Path.GetFullPath(filePath);
+
+        SensitiveWordSanitizerFactory.RefreshFromPath(filePath);
+        var sensitiveWordSanitizer = SensitiveWordSanitizerFactory._instances[normalizedPath];
+        Assert.NotNull(sensitiveWordSanitizer);
+        Assert.Single(SensitiveWordSanitizerFactory._instances);
+
+        Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
+
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -286,7 +343,7 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
 
-        SensitiveWordSanitizerFactory.TryRemove("stream");
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("stream"));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -315,7 +372,7 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
 
-        SensitiveWordSanitizerFactory.TryRemove("factory");
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("factory"));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 

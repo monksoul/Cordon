@@ -9,9 +9,7 @@ namespace Cordon;
 /// </summary>
 /// <remarks>
 ///     <para>支持多种词库加载方式：直接注入实例、引用工厂缓存名称、指定文件路径或输入流。</para>
-///     <para>
-///         优先级：<see cref="Sanitizer" /> > <see cref="DictionaryName" /> > <see cref="FilePath" />。
-///     </para>
+///     <para>优先级：<see cref="Sanitizer" /> > <see cref="DictionaryName" /> > <see cref="FilePath" />。</para>
 /// </remarks>
 public class SensitiveWordValidator : ValidatorBase
 {
@@ -46,7 +44,8 @@ public class SensitiveWordValidator : ValidatorBase
     /// </summary>
     /// <param name="stream">输入流</param>
     /// <param name="dictionaryName">
-    ///     字典名称，默认值为：<c>null</c>。若提供，则利用 <see cref="SensitiveWordSanitizerFactory" /> 进行缓存；否则直接读取流构建实例。
+    ///     字典名称，默认值为：<c>null</c>。若提供，则利用 <see cref="SensitiveWordSanitizerFactory" />
+    ///     进行创建并缓存；否则直接读取流构建实例。
     /// </param>
     public SensitiveWordValidator(Stream stream, string? dictionaryName = null)
         : this()
@@ -54,7 +53,7 @@ public class SensitiveWordValidator : ValidatorBase
         // 空检查
         ArgumentNullException.ThrowIfNull(stream);
 
-        DictionaryName = dictionaryName;
+        // 注意：dictionaryName 仅作为工厂缓存的键传入，不再赋值给公开的 DictionaryName 属性
         Sanitizer = !string.IsNullOrWhiteSpace(dictionaryName)
             ? SensitiveWordSanitizerFactory.GetOrCreateFromStream(dictionaryName, stream)
             : SensitiveWordSanitizer.CreateFromStream(stream);
@@ -120,7 +119,7 @@ public class SensitiveWordValidator : ValidatorBase
         }
 
         // 存储所有命中词及精确位置字符串
-        _lastMatchDetails = matches.Select(m => m.ToString()).ToArray();
+        _lastMatchDetails = matches.Select(u => u.ToString()).ToArray();
 
         return false;
     }
@@ -128,14 +127,30 @@ public class SensitiveWordValidator : ValidatorBase
     /// <inheritdoc />
     public override string? FormatErrorMessage(string name)
     {
-        // 检查是否在错误信息中显示命中的敏感词详情（若 ShowMatchedWords 为 true，明确要求用户传入 {1}，否则将抛异常）
-        if (ShowMatchedWords && _lastMatchDetails is { Length: > 0 })
+        var template = ErrorMessageString;
+
+        // 空检查
+        if (string.IsNullOrWhiteSpace(template))
         {
-            return string.Format(CultureInfo.CurrentCulture, ErrorMessageString, name,
-                string.Join(", ", _lastMatchDetails));
+            return null;
         }
 
-        return base.FormatErrorMessage(name);
+        // 检查是否在错误信息中显示命中的敏感词详情
+        if (!ShowMatchedWords)
+        {
+            return string.Format(CultureInfo.CurrentCulture, template, name);
+        }
+
+        // 将验证命中的匹配结果详情组合成字符串
+        var wordsString = string.Join(", ", _lastMatchDetails ?? []);
+
+        // 检查错误信息字符串是否包含 {1} 占位符
+        if (template.Contains("{1}"))
+        {
+            return string.Format(CultureInfo.CurrentCulture, template, name, wordsString);
+        }
+
+        return string.Format(CultureInfo.CurrentCulture, template, name) + $" Matched: {wordsString}";
     }
 
     /// <summary>
@@ -147,27 +162,40 @@ public class SensitiveWordValidator : ValidatorBase
     /// <exception cref="InvalidOperationException"></exception>
     internal SensitiveWordSanitizer GetSanitizer()
     {
-        // 空检查
-        if (Sanitizer is not null)
+        var sanitizerSet = Sanitizer is not null;
+        var dictionaryNameSet = !string.IsNullOrWhiteSpace(DictionaryName);
+        var filePathSet = !string.IsNullOrWhiteSpace(FilePath);
+
+        // 以下组合是非法的，会抛出 InvalidOperationException：
+        // 1) 没有任何数据源被配置
+        if (!sanitizerSet && !dictionaryNameSet && !filePathSet)
         {
-            return Sanitizer;
+            throw new InvalidOperationException(
+                $"No dictionary source is configured for the {nameof(SensitiveWordValidator)}. Please set the '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(FilePath)}' property, or provide a Stream or Sanitizer via the constructor.");
         }
 
-        // 从工厂缓存中获取
-        if (!string.IsNullOrWhiteSpace(DictionaryName))
+        // 2) 同时配置了多个数据源（任意两个同时为 true 即为非法）
+        if ((sanitizerSet && dictionaryNameSet) || (sanitizerSet && filePathSet) || (dictionaryNameSet && filePathSet))
         {
-            return SensitiveWordSanitizerFactory.Get(DictionaryName);
+            throw new InvalidOperationException(
+                $"Multiple dictionary sources are configured for the {nameof(SensitiveWordValidator)}. Please set only one of '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(FilePath)}'.");
         }
 
-        // 通过文件路径加载
-        // ReSharper disable once InvertIf
-        if (!string.IsNullOrWhiteSpace(FilePath))
+        // 如果设置了 Sanitizer，则直接返回
+        if (sanitizerSet)
         {
-            return SensitiveWordSanitizerFactory.GetOrCreateFromPath(FilePath, FilePath);
+            return Sanitizer!;
         }
 
-        throw new InvalidOperationException(
-            $"No dictionary source is configured for the {nameof(SensitiveWordValidator)}. Please set the '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(FilePath)}' property, or provide a Stream or Sanitizer via the constructor.");
+        // 如果设置了 DictionaryName，则从工厂缓存中获取
+        // ReSharper disable once ConvertIfStatementToReturnStatement
+        if (dictionaryNameSet)
+        {
+            return SensitiveWordSanitizerFactory.Get(DictionaryName!);
+        }
+
+        // 否则通过文件路径加载（工厂内部会自动规范化路径并作为键缓存）
+        return SensitiveWordSanitizerFactory.GetOrCreateFromPath(FilePath!);
     }
 
     /// <summary>

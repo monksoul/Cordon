@@ -6362,7 +6362,7 @@
         </member>
         <member name="P:Cordon.Resources.ValidationMessages.SensitiveWordValidator_ValidationError_ShowMatchedWords">
             <summary>
-              Looks up a localized string similar to he field {0} contains sensitive or prohibited words: {1}..
+              Looks up a localized string similar to The field {0} contains sensitive or prohibited words: {1}..
             </summary>
         </member>
         <member name="P:Cordon.Resources.ValidationMessages.SingleValidator_ValidationError">
@@ -6677,6 +6677,19 @@
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromPath(System.String,System.Boolean,System.Boolean)">
+            <summary>
+                获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
+            </summary>
+            <remarks>以规范化的文件路径作为缓存的键。</remarks>
+            <param name="filePath">文件路径</param>
+            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <returns>
+                <see cref="T:Cordon.SensitiveWordSanitizer" />
+            </returns>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromPath(System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
                 获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
@@ -6737,6 +6750,16 @@
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromPath(System.String,System.Boolean,System.Boolean)">
+            <summary>
+                刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
+            </summary>
+            <remarks>以规范化的文件路径作为缓存的键。</remarks>
+            <param name="filePath">文件路径</param>
+            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
+            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
         <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromPath(System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
                 刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
@@ -6772,6 +6795,7 @@
             <summary>
                 移除指定名称的 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
+            <remarks>注意：若使用文件路径作为缓存的键，那么请使用 <c>Path.GetFullPath(filePath)</c> 来标准化文件路径。</remarks>
             <param name="name">实例名称</param>
             <returns>
                 <see cref="T:System.Boolean" />
@@ -10317,9 +10341,7 @@
             </summary>
             <remarks>
                 <para>支持多种词库加载方式：直接注入实例、引用工厂缓存名称、指定文件路径或输入流。</para>
-                <para>
-                    优先级：<see cref="P:Cordon.SensitiveWordValidator.Sanitizer" /> > <see cref="P:Cordon.SensitiveWordValidator.DictionaryName" /> > <see cref="P:Cordon.SensitiveWordValidator.FilePath" />。
-                </para>
+                <para>优先级：<see cref="P:Cordon.SensitiveWordValidator.Sanitizer" /> > <see cref="P:Cordon.SensitiveWordValidator.DictionaryName" /> > <see cref="P:Cordon.SensitiveWordValidator.FilePath" />。</para>
             </remarks>
         </member>
         <member name="F:Cordon.SensitiveWordValidator._lastMatchDetails">
@@ -10347,7 +10369,8 @@
             </summary>
             <param name="stream">输入流</param>
             <param name="dictionaryName">
-                字典名称，默认值为：<c>null</c>。若提供，则利用 <see cref="T:Cordon.SensitiveWordSanitizerFactory" /> 进行缓存；否则直接读取流构建实例。
+                字典名称，默认值为：<c>null</c>。若提供，则利用 <see cref="T:Cordon.SensitiveWordSanitizerFactory" />
+                进行创建并缓存；否则直接读取流构建实例。
             </param>
         </member>
         <member name="P:Cordon.SensitiveWordValidator.Sanitizer">

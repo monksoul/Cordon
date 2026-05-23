@@ -564,7 +564,7 @@ namespace Cordon.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to he field {0} contains sensitive or prohibited words: {1}..
+        ///   Looks up a localized string similar to The field {0} contains sensitive or prohibited words: {1}..
         /// </summary>
         internal static string SensitiveWordValidator_ValidationError_ShowMatchedWords {
             get {
