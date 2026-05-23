@@ -2805,6 +2805,47 @@
                 <typeparamref name="TSelf" />
             </returns>
         </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.SensitiveWord(System.Action{Cordon.SensitiveWordValidator})">
+            <summary>
+                添加敏感词验证器
+            </summary>
+            <param name="configure">自定义配置委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.SensitiveWord(System.String,System.Action{Cordon.SensitiveWordValidator})">
+            <summary>
+                添加敏感词验证器
+            </summary>
+            <param name="filePath">文件路径</param>
+            <param name="configure">自定义配置委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.SensitiveWord(Cordon.SensitiveWordSanitizer,System.Action{Cordon.SensitiveWordValidator})">
+            <summary>
+                添加敏感词验证器
+            </summary>
+            <param name="sanitizer">敏感词清理器实例</param>
+            <param name="configure">自定义配置委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.SensitiveWord(System.IO.Stream,System.String,System.Action{Cordon.SensitiveWordValidator})">
+            <summary>
+                添加敏感词验证器
+            </summary>
+            <param name="stream">输入流</param>
+            <param name="dictionaryName">字典名称，默认值为：<c>null</c></param>
+            <param name="configure">自定义配置委托</param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
         <member name="M:Cordon.FluentValidatorBuilder`2.Single">
             <summary>
                 添加单项验证器
@@ -7786,6 +7827,47 @@
                 <see cref="T:Cordon.RequiredValidator" />
             </returns>
         </member>
+        <member name="M:Cordon.Validators.SensitiveWord(System.Action{Cordon.SensitiveWordValidator})">
+            <summary>
+                创建敏感词验证器
+            </summary>
+            <param name="configure">自定义配置委托</param>
+            <returns>
+                <see cref="T:Cordon.SensitiveWordValidator" />
+            </returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Cordon.Validators.SensitiveWord(System.String,System.Action{Cordon.SensitiveWordValidator})">
+            <summary>
+                创建敏感词验证器
+            </summary>
+            <param name="filePath">文件路径</param>
+            <param name="configure">自定义配置委托</param>
+            <returns>
+                <see cref="T:Cordon.SensitiveWordValidator" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.SensitiveWord(Cordon.SensitiveWordSanitizer,System.Action{Cordon.SensitiveWordValidator})">
+            <summary>
+                创建敏感词验证器
+            </summary>
+            <param name="sanitizer">敏感词清理器实例</param>
+            <param name="configure">自定义配置委托</param>
+            <returns>
+                <see cref="T:Cordon.SensitiveWordValidator" />
+            </returns>
+        </member>
+        <member name="M:Cordon.Validators.SensitiveWord(System.IO.Stream,System.String,System.Action{Cordon.SensitiveWordValidator})">
+            <summary>
+                创建敏感词验证器
+            </summary>
+            <param name="stream">输入流</param>
+            <param name="dictionaryName">字典名称，默认值为：<c>null</c></param>
+            <param name="configure">自定义配置委托</param>
+            <returns>
+                <see cref="T:Cordon.SensitiveWordValidator" />
+            </returns>
+        </member>
         <member name="M:Cordon.Validators.Single">
             <summary>
                 创建单项验证器
@@ -10353,6 +10435,13 @@
             <summary>
                 <inheritdoc cref="T:Cordon.SensitiveWordValidator" />
             </summary>
+        </member>
+        <member name="M:Cordon.SensitiveWordValidator.#ctor(System.String)">
+            <summary>
+                <inheritdoc cref="T:Cordon.SensitiveWordValidator" />
+            </summary>
+            <param name="filePath">文件路径</param>
+            <exception cref="T:System.ArgumentException"></exception>
         </member>
         <member name="M:Cordon.SensitiveWordValidator.#ctor(Cordon.SensitiveWordSanitizer)">
             <summary>

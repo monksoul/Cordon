@@ -929,6 +929,58 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
         AddValidator(new RequiredValidator { AllowEmptyStrings = allowEmptyStrings });
 
     /// <summary>
+    ///     添加敏感词验证器
+    /// </summary>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    public virtual TSelf SensitiveWord(Action<SensitiveWordValidator> configure)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        return AddValidator(new SensitiveWordValidator(), configure);
+    }
+
+    /// <summary>
+    ///     添加敏感词验证器
+    /// </summary>
+    /// <param name="filePath">文件路径</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf SensitiveWord(string filePath, Action<SensitiveWordValidator>? configure = null) =>
+        AddValidator(new SensitiveWordValidator(filePath), configure);
+
+    /// <summary>
+    ///     添加敏感词验证器
+    /// </summary>
+    /// <param name="sanitizer">敏感词清理器实例</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf SensitiveWord(SensitiveWordSanitizer sanitizer,
+        Action<SensitiveWordValidator>? configure = null) =>
+        AddValidator(new SensitiveWordValidator(sanitizer), configure);
+
+    /// <summary>
+    ///     添加敏感词验证器
+    /// </summary>
+    /// <param name="stream">输入流</param>
+    /// <param name="dictionaryName">字典名称，默认值为：<c>null</c></param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf SensitiveWord(Stream stream, string? dictionaryName = null,
+        Action<SensitiveWordValidator>? configure = null) =>
+        AddValidator(new SensitiveWordValidator(stream, dictionaryName), configure);
+
+    /// <summary>
     ///     添加单项验证器
     /// </summary>
     /// <returns>

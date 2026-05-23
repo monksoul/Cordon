@@ -32,9 +32,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="sensitive_words.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+        <None Update="sensitive_words.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

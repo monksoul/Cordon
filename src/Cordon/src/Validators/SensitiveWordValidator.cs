@@ -26,6 +26,20 @@ public class SensitiveWordValidator : ValidatorBase
     /// <summary>
     ///     <inheritdoc cref="SensitiveWordValidator" />
     /// </summary>
+    /// <param name="filePath">文件路径</param>
+    /// <exception cref="ArgumentException"></exception>
+    public SensitiveWordValidator(string filePath)
+        : this()
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+
+        FilePath = filePath;
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="SensitiveWordValidator" />
+    /// </summary>
     /// <param name="sanitizer">
     ///     <see cref="SensitiveWordSanitizer" />
     /// </param>

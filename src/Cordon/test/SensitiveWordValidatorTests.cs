@@ -4,13 +4,17 @@
 
 namespace Cordon.Tests;
 
+[Collection("SensitiveWordValidatorTests")]
 public class SensitiveWordValidatorTests
 {
     [Fact]
     public void New_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => new SensitiveWordValidator(null!));
+        Assert.Throws<ArgumentNullException>(() => new SensitiveWordValidator((SensitiveWordSanitizer)null!));
         Assert.Throws<ArgumentNullException>(() => new SensitiveWordValidator((Stream)null!));
+        Assert.Throws<ArgumentNullException>(() => new SensitiveWordValidator((string)null!));
+        Assert.Throws<ArgumentException>(() => new SensitiveWordValidator(string.Empty));
+        Assert.Throws<ArgumentException>(() => new SensitiveWordValidator(" "));
     }
 
     [Fact]
@@ -55,6 +59,13 @@ public class SensitiveWordValidatorTests
         Assert.Single(SensitiveWordSanitizerFactory._instances);
         Assert.Same(validator5.Sanitizer, SensitiveWordSanitizerFactory.Get("validator_test"));
         SensitiveWordSanitizerFactory.TryRemove("validator_test");
+
+        var validator6 = new SensitiveWordValidator(filePath);
+        Assert.NotNull(validator6.FilePath);
+        Assert.Equal(filePath, validator6.FilePath);
+        Assert.NotNull(validator6._errorMessageResourceAccessor);
+        Assert.Equal("The field {0} contains sensitive or prohibited words.",
+            validator6._errorMessageResourceAccessor());
     }
 
     [Theory]
