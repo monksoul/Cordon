@@ -1842,9 +1842,6 @@
         <member name="M:System.Text.RegularExpressions.Generated.Utilities.StackPush(System.Int32[]@,System.Int32@,System.Int32,System.Int32,System.Int32)">
             <summary>Pushes 3 values onto the backtracking stack.</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiDigitsAndDot">
-            <summary>Supports searching for characters in or not in ".0123456789".</summary>
-        </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
         </member>
@@ -1854,8 +1851,11 @@
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
             <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_20FF03FEFFFF07FEFFFF07">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_40FF030000000000000000">
+            <summary>Supports searching for characters in or not in ".0123456789".</summary>
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
             <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
@@ -6552,6 +6552,29 @@
         <member name="M:Cordon.MatchResult.ToString">
             <inheritdoc />
         </member>
+        <member name="T:Cordon.SensitiveWordOptions">
+            <summary>
+                敏感词清理器配置选项
+            </summary>
+        </member>
+        <member name="F:Cordon.SensitiveWordOptions.Default">
+            <summary>
+                默认选项
+            </summary>
+            <remarks>忽略大小写、忽略符号。</remarks>
+        </member>
+        <member name="P:Cordon.SensitiveWordOptions.IgnoreCase">
+            <summary>
+                是否忽略大小写
+            </summary>
+            <remarks>默认值为：<c>true</c>。</remarks>
+        </member>
+        <member name="P:Cordon.SensitiveWordOptions.IgnoreSymbol">
+            <summary>
+                是否跳过标点/空格/符号进行匹配
+            </summary>
+            <remarks>默认值为：<c>true</c>。</remarks>
+        </member>
         <member name="T:Cordon.SensitiveWordSanitizer">
             <summary>
                 敏感词清理器（基于 Aho‑Corasick 自动机）
@@ -6577,63 +6600,54 @@
                 <para>匹配时始终跳过的"隐形分隔符"（例如 <c>敏_感_词</c> 视同于 <c>敏感词</c>）</para>
             </remarks>
         </member>
-        <member name="F:Cordon.SensitiveWordSanitizer._ignoreCase">
-            <summary>
-                是否忽略大小写
-            </summary>
-        </member>
-        <member name="F:Cordon.SensitiveWordSanitizer._ignoreSymbol">
-            <summary>
-                是否跳过标点/空格/符号进行匹配
-            </summary>
+        <member name="F:Cordon.SensitiveWordSanitizer._options">
+            <inheritdoc cref="T:Cordon.SensitiveWordOptions" />
         </member>
         <member name="F:Cordon.SensitiveWordSanitizer._root">
             <summary>
                 根节点
             </summary>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizer.#ctor(Cordon.SensitiveWordSanitizer.TrieNode,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizer.#ctor(Cordon.SensitiveWordSanitizer.TrieNode,Cordon.SensitiveWordOptions)">
             <summary>
                 <inheritdoc cref="T:Cordon.SensitiveWordSanitizer" />
             </summary>
             <param name="root">根节点</param>
-            <param name="ignoreCase">是否忽略大小写</param>
-            <param name="ignoreSymbol">是否跳过标点/空格/符号进行匹配</param>
+            <param name="options">
+                <see cref="T:Cordon.SensitiveWordOptions" />
+            </param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizer.CreateFromStream(System.IO.Stream,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizer.CreateFromStream(System.IO.Stream,Cordon.SensitiveWordOptions)">
             <summary>
                 从 <see cref="T:System.IO.Stream" /> 加载词库并构建敏感词清理器
             </summary>
             <param name="stream">输入流</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
             <exception cref="T:System.ArgumentNullException"></exception>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizer.CreateFromPath(System.String,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizer.CreateFromPath(System.String,Cordon.SensitiveWordOptions)">
             <summary>
                 从文件路径加载词库并构建敏感词清理器
             </summary>
             <param name="filePath">文件路径</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.IO.FileNotFoundException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizer.Build(System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizer.Build(System.Collections.Generic.IEnumerable{System.String},Cordon.SensitiveWordOptions)">
             <summary>
                 从内存词表构建敏感词清理器
             </summary>
             <param name="words">敏感词集合</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
@@ -6689,7 +6703,7 @@
                 判断字符是否应被跳过
             </summary>
             <remarks>
-                <para>此方法仅受 <see cref="F:Cordon.SensitiveWordSanitizer._ignoreSymbol" /> 参数控制，用于跳过标点/符号/空白</para>
+                <para>此方法仅受 <see cref="P:Cordon.SensitiveWordOptions.IgnoreSymbol" /> 参数控制，用于跳过标点/符号/空白</para>
                 <para>分隔符（_/-/空格/全角空格/制表符/回车/换行）的跳过由 <see cref="F:Cordon.SensitiveWordSanitizer.IgnoredSeparators" /> 独立控制，始终生效</para>
             </remarks>
             <param name="c">待检测字符</param>
@@ -6754,55 +6768,51 @@
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreate(System.String,System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreate(System.String,System.Collections.Generic.IEnumerable{System.String},Cordon.SensitiveWordOptions)">
             <summary>
                 获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
             <param name="name">实例名称</param>
             <param name="words">敏感词集合</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromPath(System.String,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromPath(System.String,Cordon.SensitiveWordOptions)">
             <summary>
                 获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
             <remarks>以规范化的文件路径作为缓存的键。</remarks>
             <param name="filePath">文件路径</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromPath(System.String,System.String,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromPath(System.String,System.String,Cordon.SensitiveWordOptions)">
             <summary>
                 获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
             <param name="name">实例名称</param>
             <param name="filePath">文件路径</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromStream(System.String,System.IO.Stream,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromStream(System.String,System.IO.Stream,Cordon.SensitiveWordOptions)">
             <summary>
                 获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
             <param name="name">实例名称</param>
             <param name="stream">输入流</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
@@ -6825,51 +6835,47 @@
             <summary>
                 使用原始配置重新刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例（热更新）
             </summary>
-            <remarks>注意：若实例最初是通过 <see cref="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromStream(System.String,System.IO.Stream,System.Boolean,System.Boolean)" /> 注册的，传入的流必须支持 <c>CanSeek</c>（如 FileStream），否则刷新时将读取到空数据。</remarks>
+            <remarks>注意：若实例最初是通过 <see cref="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreateFromStream(System.String,System.IO.Stream,Cordon.SensitiveWordOptions)" /> 注册的，传入的流必须支持 <c>CanSeek</c>（如 FileStream），否则刷新时将读取到空数据。</remarks>
             <param name="name">实例名称</param>
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.InvalidOperationException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.Refresh(System.String,System.Collections.Generic.IEnumerable{System.String},System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.Refresh(System.String,System.Collections.Generic.IEnumerable{System.String},Cordon.SensitiveWordOptions)">
             <summary>
                 刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
             <param name="name">实例名称</param>
             <param name="words">敏感词集合</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromPath(System.String,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromPath(System.String,Cordon.SensitiveWordOptions)">
             <summary>
                 刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
             <remarks>以规范化的文件路径作为缓存的键。</remarks>
             <param name="filePath">文件路径</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <exception cref="T:System.ArgumentException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromPath(System.String,System.String,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromPath(System.String,System.String,Cordon.SensitiveWordOptions)">
             <summary>
                 刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
             <param name="name">实例名称</param>
             <param name="filePath">文件路径</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromStream(System.String,System.IO.Stream,System.Boolean,System.Boolean)">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.RefreshFromStream(System.String,System.IO.Stream,Cordon.SensitiveWordOptions)">
             <summary>
                 刷新 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
             <param name="name">实例名称</param>
             <param name="stream">输入流</param>
-            <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-            <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+            <param name="options"><see cref="T:Cordon.SensitiveWordOptions" />，默认值为：<see cref="F:Cordon.SensitiveWordOptions.Default" /></param>
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
@@ -8347,7 +8353,7 @@
         <member name="M:Cordon.BankCardValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^[1-9]\d{11,18}$</code><br/>
+            <code>^[1-9]\\d{11,18}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8386,7 +8392,7 @@
         <member name="M:Cordon.ChineseNameValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:[\u4e00-\u9fa5·]{2,16})$</code><br/>
+            <code>^(?:[\\u4e00-\\u9fa5·]{2,16})$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8411,7 +8417,7 @@
         <member name="M:Cordon.ChineseValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:[\u3400-\u4DB5\u4E00-\u9FEA\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879][\uDC00-\uDFFF]|\uD869[\uDC00-\uDED6\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF34\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0])+$</code><br/>
+            <code>^(?:[\\u3400-\\u4DB5\\u4E00-\\u9FEA\\uFA0E\\uFA0F\\uFA11\\uFA13\\uFA14\\uFA1F\\uFA21\\uFA23\\uFA24\\uFA27-\\uFA29]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872\\uD874-\\uD879][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1\\uDEB0-\\uDFFF]|\\uD87A[\\uDC00-\\uDFE0])+$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8462,7 +8468,7 @@
         <member name="M:Cordon.ColorValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:#(?:(?:[0-9a-fA-F]{3}){1,2}|[0-9a-fA-F]{8})|rgba?\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*(?:,\s*[0-9.]+\s*)?)?\)|hsla?\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*(?:,\s*[0-9.]+\s*)?)?\)|hwb\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|lch\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|oklch\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|lab\((?:\s*[-+]?\d+\%?\s*,){2}\s*[-+]?\d+\%?\s*\)|oklab\((?:\s*[-+]?\d+\%?\s*,){2}\s*[-+]?\d+\%?\s*\))$</code><br/>
+            <code>^(?:#(?:(?:[0-9a-fA-F]{3}){1,2}|[0-9a-fA-F]{8})|rgba?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hsla?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hwb\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|oklch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\)|oklab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\))$</code><br/>
             Options:<br/>
             <code>RegexOptions.IgnoreCase</code><br/>
             Explanation:<br/>
@@ -8473,8 +8479,8 @@
                     ○ Match '#'.<br/>
                     ○ Match with 2 alternative expressions.<br/>
                         ○ Loop greedily at least 1 and at most 2 times.<br/>
-                            ○ Match a hexadecimal digit exactly 3 times.<br/>
-                        ○ Match a hexadecimal digit exactly 8 times.<br/>
+                            ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 8 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -8496,7 +8502,7 @@
                             ○ Match ','.<br/>
                             ○ Match a whitespace character atomically any number of times.<br/>
                             ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                            ○ Match a whitespace character atomically any number of times.<br/>
+                            ○ Match a whitespace character greedily any number of times.<br/>
                     ○ Match ')'.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Hh].<br/>
@@ -8521,7 +8527,7 @@
                                     ○ Match ','.<br/>
                                     ○ Match a whitespace character atomically any number of times.<br/>
                                     ○ Match a character in the set [.0-9] greedily at least once.<br/>
-                                    ○ Match a whitespace character atomically any number of times.<br/>
+                                    ○ Match a whitespace character greedily any number of times.<br/>
                             ○ Match ')'.<br/>
                         ○ Match a sequence of expressions.<br/>
                             ○ Match a character in the set [Ww].<br/>
@@ -8582,13 +8588,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -8602,13 +8608,13 @@
                     ○ Match '('.<br/>
                     ○ Loop exactly 2 times.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
-                        ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                        ○ Match a character in the set [+-] atomically, optionally.<br/>
                         ○ Match a Unicode digit atomically at least once.<br/>
                         ○ Match '%' atomically, optionally.<br/>
                         ○ Match a whitespace character atomically any number of times.<br/>
                         ○ Match ','.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
-                    ○ Match a character in the set [+\-] atomically, optionally.<br/>
+                    ○ Match a character in the set [+-] atomically, optionally.<br/>
                     ○ Match a Unicode digit atomically at least once.<br/>
                     ○ Match '%' atomically, optionally.<br/>
                     ○ Match a whitespace character atomically any number of times.<br/>
@@ -8620,7 +8626,7 @@
         <member name="M:Cordon.ColorValidator.StandardRegex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:#(?:[0-9a-fA-F]{3}){1,2}|rgba?\((?:\s*(?:\d+%?)\s*,){2}\s*(?:\d+%?)\s*(?:,\s*(?:\d+(?:\.\d+)?|\.\d+))?\))$</code><br/>
+            <code>^(?:#(?:[0-9a-fA-F]{3}){1,2}|rgba?\\((?:\\s*(?:\\d+%?)\\s*,){2}\\s*(?:\\d+%?)\\s*(?:,\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+))?\\))$</code><br/>
             Options:<br/>
             <code>RegexOptions.IgnoreCase</code><br/>
             Explanation:<br/>
@@ -8630,7 +8636,7 @@
                 ○ Match a sequence of expressions.<br/>
                     ○ Match '#'.<br/>
                     ○ Loop greedily at least 1 and at most 2 times.<br/>
-                        ○ Match a hexadecimal digit exactly 3 times.<br/>
+                        ○ Match a character in the set [0-9A-Fa-f] exactly 3 times.<br/>
                 ○ Match a sequence of expressions.<br/>
                     ○ Match a character in the set [Rr].<br/>
                     ○ Match a character in the set [Gg].<br/>
@@ -8655,10 +8661,10 @@
                                 ○ Match a Unicode digit greedily at least once.<br/>
                                 ○ Optional (greedy).<br/>
                                     ○ Match '.'.<br/>
-                                    ○ Match a Unicode digit atomically at least once.<br/>
+                                    ○ Match a Unicode digit greedily at least once.<br/>
                             ○ Match a sequence of expressions.<br/>
                                 ○ Match '.'.<br/>
-                                ○ Match a Unicode digit atomically at least once.<br/>
+                                ○ Match a Unicode digit greedily at least once.<br/>
                     ○ Match ')'.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
@@ -9156,18 +9162,18 @@
         <member name="M:Cordon.DomainValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$</code><br/>
+            <code>^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
             ○ Loop greedily at least once.<br/>
                 ○ 1st capture group.<br/>
-                    ○ Match an ASCII letter or digit.<br/>
+                    ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Optional (greedy).<br/>
-                        ○ Match a character in the set [\-0-9A-Za-z] greedily at most 61 times.<br/>
-                        ○ Match an ASCII letter or digit.<br/>
+                        ○ Match a character in the set [-0-9A-Za-z] greedily at most 61 times.<br/>
+                        ○ Match a character in the set [0-9A-Za-z].<br/>
                     ○ Match '.'.<br/>
-            ○ Match an ASCII letter atomically at least twice.<br/>
+            ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9188,7 +9194,7 @@
         <member name="M:Cordon.EmailAddressValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(([^&lt;&gt;()\$$\].,;:\s@"]+(\.[^&lt;&gt;()\$$\].,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$</code><br/>
+            <code>^(([^&lt;&gt;()\\$$\\].,;:\\s@"]+(\\.[^&lt;&gt;()\\$$\\].,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9220,9 +9226,9 @@
                     ○ 7th capture group.<br/>
                         ○ Loop greedily at least once.<br/>
                             ○ 8th capture group.<br/>
-                                ○ Match a character in the set [\-0-9A-Za-z] atomically at least once.<br/>
+                                ○ Match a character in the set [-0-9A-Za-z] atomically at least once.<br/>
                                 ○ Match '.'.<br/>
-                        ○ Match an ASCII letter atomically at least twice.<br/>
+                        ○ Match a character in the set [A-Za-z] atomically at least twice.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9482,7 +9488,7 @@
         <member name="M:Cordon.IDCardValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^\d{6}((((((19|20)\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|(((19|20)\d{2})(0[13578]|1[02])31)|((19|20)\d{2})02(0[1-9]|1\d|2[0-8])|((((19|20)([13579][26]|[2468][048]|0[48]))|(2000))0229))\d{3})|((((\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|((\d{2})(0[13578]|1[02])31)|((\d{2})02(0[1-9]|1\d|2[0-8]))|(([13579][26]|[2468][048]|0[048])0229))\d{2}))(\d|X|x)$</code><br/>
+            <code>^\\d{6}((((((19|20)\\d{2})(0[13-9]|1[012])(0[1-9]|[12]\\d|30))|(((19|20)\\d{2})(0[13578]|1[02])31)|((19|20)\\d{2})02(0[1-9]|1\\d|2[0-8])|((((19|20)([13579][26]|[2468][048]|0[48]))|(2000))0229))\\d{3})|((((\\d{2})(0[13-9]|1[012])(0[1-9]|[12]\\d|30))|((\\d{2})(0[13578]|1[02])31)|((\\d{2})02(0[1-9]|1\\d|2[0-8]))|(([13579][26]|[2468][048]|0[048])0229))\\d{2}))(\\d|X|x)$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9684,7 +9690,7 @@
         <member name="M:Cordon.IpAddressValidator.StrictIPv4Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:\d{1,3}\.){3}\d{1,3}$</code><br/>
+            <code>^(?:\\d{1,3}\\.){3}\\d{1,3}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9857,7 +9863,7 @@
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match a hexadecimal digit exactly 32 times.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -9871,8 +9877,8 @@
             ○ Match if at the beginning of the string.<br/>
             ○ 1st capture group.<br/>
                 ○ Match with 2 alternative expressions.<br/>
-                    ○ Match a hexadecimal digit exactly 16 times.<br/>
-                    ○ Match a hexadecimal digit exactly 32 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 16 times.<br/>
+                    ○ Match a character in the set [0-9A-Fa-f] exactly 32 times.<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -10145,13 +10151,13 @@
         <member name="M:Cordon.PasswordValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>\A(?=.*[a-zA-Z])(?=.*\d).{8,64}\z</code><br/>
+            <code>\\A(?=.*[a-zA-Z])(?=.*\\d).{8,64}\\z</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match an ASCII letter.<br/>
+                ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
                 ○ Match a Unicode digit.<br/>
@@ -10163,7 +10169,7 @@
         <member name="M:Cordon.PasswordValidator.StrongRegex">
             <remarks>
             Pattern:<br/>
-            <code>\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&amp;*]).{12,64}\z</code><br/>
+            <code>\\A(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&amp;*]).{12,64}\\z</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10201,7 +10207,7 @@
         <member name="M:Cordon.PhoneNumberValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:(?:\+|00)86)?1(?:3\d|4[579]|5[0-35-9]|6[6-8]|7[0-8]|8\d|9[0-35-9])\d{8}$</code><br/>
+            <code>^(?:(?:\\+|00)86)?1(?:3\\d|4[579]|5[0-35-9]|6[6-8]|7[0-8]|8\\d|9[0-35-9])\\d{8}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10254,7 +10260,7 @@
         <member name="M:Cordon.PostalCodeValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(0[1-7]|1[0-356]|2[0-7]|3[0-6]|4[0-7]|5[1-7]|6[1-7]|7[0-5]|8[013-6])\d{4}$</code><br/>
+            <code>^(0[1-7]|1[0-356]|2[0-7]|3[0-6]|4[0-7]|5[1-7]|6[1-7]|7[0-5]|8[013-6])\\d{4}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10761,7 +10767,7 @@
         <member name="M:Cordon.TelephoneValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:(?:\d{3}-)?\d{8}|(?:\d{4}-)?\d{7,8})(?:-\d+)?$</code><br/>
+            <code>^(?:(?:\\d{3}-)?\\d{8}|(?:\\d{4}-)?\\d{7,8})(?:-\\d+)?$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10895,16 +10901,16 @@
         <member name="M:Cordon.UserNameValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^[a-zA-Z](?!.*[_-]{2})[\w-]{2,14}[a-zA-Z0-9]$</code><br/>
+            <code>^[a-zA-Z](?!.*[_-]{2})[\\w-]{2,14}[a-zA-Z0-9]$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
-            ○ Match an ASCII letter.<br/>
+            ○ Match a character in the set [A-Za-z].<br/>
             ○ Zero-width negative lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [\-_] exactly 2 times.<br/>
-            ○ Match a character in the set [\-\w] greedily at least 2 and at most 14 times.<br/>
-            ○ Match an ASCII letter or digit.<br/>
+                ○ Match a character in the set [-_] exactly 2 times.<br/>
+            ○ Match a character in the set [-\w] greedily at least 2 and at most 14 times.<br/>
+            ○ Match a character in the set [0-9A-Za-z].<br/>
             ○ Match if at the end of the string or if before an ending newline.<br/>
             </code>
             </remarks>
@@ -11497,6 +11503,16 @@
             <param name="services">
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+     </param>
             <param name="validationBuilder">
                 <see cref="T:Cordon.ValidationBuilder" />
             </param>

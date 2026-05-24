@@ -46,15 +46,18 @@ public class SensitiveWordSanitizerTests
         var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath);
         Assert.NotNull(sensitiveWordSanitizer);
 
-        Assert.True(sensitiveWordSanitizer._ignoreCase);
-        Assert.True(sensitiveWordSanitizer._ignoreSymbol);
+        Assert.NotNull(sensitiveWordSanitizer._options);
+        Assert.True(sensitiveWordSanitizer._options.IgnoreCase);
+        Assert.True(sensitiveWordSanitizer._options.IgnoreSymbol);
         Assert.NotNull(sensitiveWordSanitizer._root);
         Assert.Equal('加', sensitiveWordSanitizer._root.Children.FirstOrDefault().Key);
         Assert.Equal(15, sensitiveWordSanitizer._root.Children.Count);
 
-        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.CreateFromPath(filePath, false, false);
-        Assert.False(sensitiveWordSanitizer2._ignoreCase);
-        Assert.False(sensitiveWordSanitizer2._ignoreSymbol);
+        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.CreateFromPath(filePath,
+            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
+        Assert.NotNull(sensitiveWordSanitizer2._options);
+        Assert.False(sensitiveWordSanitizer2._options.IgnoreCase);
+        Assert.False(sensitiveWordSanitizer2._options.IgnoreSymbol);
     }
 
     [Fact]
@@ -79,15 +82,16 @@ public class SensitiveWordSanitizerTests
         var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromStream(stream);
         Assert.NotNull(sensitiveWordSanitizer);
 
-        Assert.True(sensitiveWordSanitizer._ignoreCase);
-        Assert.True(sensitiveWordSanitizer._ignoreSymbol);
+        Assert.True(sensitiveWordSanitizer._options.IgnoreCase);
+        Assert.True(sensitiveWordSanitizer._options.IgnoreSymbol);
         Assert.NotNull(sensitiveWordSanitizer._root);
         Assert.Equal('加', sensitiveWordSanitizer._root.Children.FirstOrDefault().Key);
         Assert.Equal(15, sensitiveWordSanitizer._root.Children.Count);
 
-        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.CreateFromStream(stream, false, false);
-        Assert.False(sensitiveWordSanitizer2._ignoreCase);
-        Assert.False(sensitiveWordSanitizer2._ignoreSymbol);
+        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.CreateFromStream(stream,
+            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
+        Assert.False(sensitiveWordSanitizer2._options.IgnoreCase);
+        Assert.False(sensitiveWordSanitizer2._options.IgnoreSymbol);
     }
 
     [Fact]
@@ -100,14 +104,15 @@ public class SensitiveWordSanitizerTests
         List<string> words = ["敏感词", "违规表述", "涉政", "暴恐"];
         var sensitiveWordSanitizer = SensitiveWordSanitizer.Build(words);
 
-        Assert.True(sensitiveWordSanitizer._ignoreCase);
-        Assert.True(sensitiveWordSanitizer._ignoreSymbol);
+        Assert.True(sensitiveWordSanitizer._options.IgnoreCase);
+        Assert.True(sensitiveWordSanitizer._options.IgnoreSymbol);
         Assert.NotNull(sensitiveWordSanitizer._root);
         Assert.Equal('敏', sensitiveWordSanitizer._root.Children.FirstOrDefault().Key);
 
-        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.Build(words, false, false);
-        Assert.False(sensitiveWordSanitizer2._ignoreCase);
-        Assert.False(sensitiveWordSanitizer2._ignoreSymbol);
+        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.Build(words,
+            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
+        Assert.False(sensitiveWordSanitizer2._options.IgnoreCase);
+        Assert.False(sensitiveWordSanitizer2._options.IgnoreSymbol);
     }
 
     [Fact]
@@ -294,7 +299,8 @@ public class SensitiveWordSanitizerTests
     public void FindMatches_SetIgnoreCaseFalse_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath, false);
+        var sensitiveWordSanitizer =
+            SensitiveWordSanitizer.CreateFromPath(filePath, new SensitiveWordOptions { IgnoreCase = false });
 
         var matchResults1 = sensitiveWordSanitizer.FindMatches("这里呢，是否包含敏__感__词呢？");
         Assert.Single(matchResults1);
@@ -332,7 +338,8 @@ public class SensitiveWordSanitizerTests
     public void FindMatches_SetIgnoreCaseFalse_And_SetIgnoreSymbolFalse_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath, false, false);
+        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
+            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
 
         var matchResults1 = sensitiveWordSanitizer.FindMatches("这里呢，是否包含敏__感__词呢？");
         Assert.Single(matchResults1);
@@ -401,7 +408,8 @@ public class SensitiveWordSanitizerTests
     public void Contains_SetIgnoreCaseFalse_ReturnOK(string? text, bool result)
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath, false);
+        var sensitiveWordSanitizer =
+            SensitiveWordSanitizer.CreateFromPath(filePath, new SensitiveWordOptions { IgnoreCase = false });
 
         Assert.Equal(result, sensitiveWordSanitizer.Contains(text));
     }
@@ -423,7 +431,8 @@ public class SensitiveWordSanitizerTests
     public void Contains_SetIgnoreCaseFalse_And_SetIgnoreSymbolFalse_ReturnOK(string? text, bool result)
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath, false, false);
+        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
+            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
 
         Assert.Equal(result, sensitiveWordSanitizer.Contains(text));
     }
@@ -444,7 +453,8 @@ public class SensitiveWordSanitizerTests
     public void Replace_SetIgnoreCaseFalse_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath, false);
+        var sensitiveWordSanitizer =
+            SensitiveWordSanitizer.CreateFromPath(filePath, new SensitiveWordOptions { IgnoreCase = false });
 
         var newText1 = sensitiveWordSanitizer.Replace("这里呢，是否包含敏__感__词呢？");
         Assert.Equal("这里呢，是否包含*******呢？", newText1);
@@ -466,7 +476,8 @@ public class SensitiveWordSanitizerTests
     public void Replace_SetIgnoreCaseFalse_And_SetIgnoreSymbolFalse_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath, false, false);
+        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
+            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
 
         var newText1 = sensitiveWordSanitizer.Replace("这里呢，是否包含敏__感__词呢？");
         Assert.Equal("这里呢，是否包含*******呢？", newText1);

@@ -30,15 +30,8 @@ public sealed class SensitiveWordSanitizer
     internal static readonly SearchValues<char> IgnoredSeparators =
         SearchValues.Create(['_', '-', ' ', '\t', '　', '\r', '\n']);
 
-    /// <summary>
-    ///     是否忽略大小写
-    /// </summary>
-    internal readonly bool _ignoreCase;
-
-    /// <summary>
-    ///     是否跳过标点/空格/符号进行匹配
-    /// </summary>
-    internal readonly bool _ignoreSymbol;
+    /// <inheritdoc cref="SensitiveWordOptions" />
+    internal readonly SensitiveWordOptions _options;
 
     /// <summary>
     ///     根节点
@@ -49,35 +42,35 @@ public sealed class SensitiveWordSanitizer
     ///     <inheritdoc cref="SensitiveWordSanitizer" />
     /// </summary>
     /// <param name="root">根节点</param>
-    /// <param name="ignoreCase">是否忽略大小写</param>
-    /// <param name="ignoreSymbol">是否跳过标点/空格/符号进行匹配</param>
+    /// <param name="options">
+    ///     <see cref="SensitiveWordOptions" />
+    /// </param>
     /// <exception cref="ArgumentNullException"></exception>
-    private SensitiveWordSanitizer(TrieNode root, bool ignoreCase, bool ignoreSymbol)
+    private SensitiveWordSanitizer(TrieNode root, SensitiveWordOptions options)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(root);
+        ArgumentNullException.ThrowIfNull(options);
 
         _root = root;
-        _ignoreCase = ignoreCase;
-        _ignoreSymbol = ignoreSymbol;
+        _options = options;
     }
 
     /// <summary>
     ///     从 <see cref="Stream" /> 加载词库并构建敏感词清理器
     /// </summary>
     /// <param name="stream">输入流</param>
-    /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-    /// <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+    /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    public static SensitiveWordSanitizer CreateFromStream(Stream stream, bool ignoreCase = true,
-        bool ignoreSymbol = true)
+    public static SensitiveWordSanitizer CreateFromStream(Stream stream, SensitiveWordOptions? options = null)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(stream);
+        options ??= SensitiveWordOptions.Default;
 
         // 检查流是否可读
         if (!stream.CanRead)
@@ -105,25 +98,24 @@ public sealed class SensitiveWordSanitizer
             ParseLine(line, words);
         }
 
-        return Build(words, ignoreCase, ignoreSymbol);
+        return Build(words, options);
     }
 
     /// <summary>
     ///     从文件路径加载词库并构建敏感词清理器
     /// </summary>
     /// <param name="filePath">文件路径</param>
-    /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-    /// <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+    /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="FileNotFoundException"></exception>
-    public static SensitiveWordSanitizer CreateFromPath(string filePath, bool ignoreCase = true,
-        bool ignoreSymbol = true)
+    public static SensitiveWordSanitizer CreateFromPath(string filePath, SensitiveWordOptions? options = null)
     {
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+        options ??= SensitiveWordOptions.Default;
 
         // 检查文件是否存在
         if (!File.Exists(filePath))
@@ -134,24 +126,23 @@ public sealed class SensitiveWordSanitizer
         // 打开并读取文件流
         using var fileStream = File.OpenRead(filePath);
 
-        return CreateFromStream(fileStream, ignoreCase, ignoreSymbol);
+        return CreateFromStream(fileStream, options);
     }
 
     /// <summary>
     ///     从内存词表构建敏感词清理器
     /// </summary>
     /// <param name="words">敏感词集合</param>
-    /// <param name="ignoreCase">是否忽略大小写，默认值为：<c>true</c></param>
-    /// <param name="ignoreSymbol">是否跳过符号匹配，默认值为：<c>true</c></param>
+    /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static SensitiveWordSanitizer Build(IEnumerable<string> words, bool ignoreCase = true,
-        bool ignoreSymbol = true)
+    public static SensitiveWordSanitizer Build(IEnumerable<string> words, SensitiveWordOptions? options = null)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(words);
+        options ??= SensitiveWordOptions.Default;
 
         // 初始化 TrieNode 实例
         var root = new TrieNode();
@@ -183,8 +174,8 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
-                // 符号过滤（仅当 _ignoreSymbol 启用时）
-                if (ignoreSymbol && ShouldSkip(ch))
+                // 符号过滤（仅当选项启用时）
+                if (options.IgnoreSymbol && ShouldSkip(ch))
                 {
                     continue;
                 }
@@ -200,7 +191,7 @@ public sealed class SensitiveWordSanitizer
             }
 
             // 处理大小写
-            if (ignoreCase)
+            if (options.IgnoreCase)
             {
                 normalizedKey = normalizedKey.ToLowerInvariant();
             }
@@ -272,7 +263,7 @@ public sealed class SensitiveWordSanitizer
             }
         }
 
-        return new SensitiveWordSanitizer(root, ignoreCase, ignoreSymbol);
+        return new SensitiveWordSanitizer(root, options);
     }
 
     /// <summary>
@@ -310,15 +301,15 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
-                // 符号过滤：跳过但不增加虚拟索引（仅当 _ignoreSymbol 启用时）
-                if (_ignoreSymbol && ShouldSkip(c))
+                // 符号过滤：跳过但不增加虚拟索引（仅当选项启用时）
+                if (_options.IgnoreSymbol && ShouldSkip(c))
                 {
                     continue;
                 }
 
                 // 记录映射关系
                 realIndexMap[virtualIndex] = i;
-                var matchChar = _ignoreCase ? char.ToLowerInvariant(c) : c;
+                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(c) : c;
 
                 // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
                 TrieNode? next;
@@ -390,13 +381,13 @@ public sealed class SensitiveWordSanitizer
                 continue;
             }
 
-            // 符号过滤（仅当 _ignoreSymbol 启用时）
-            if (_ignoreSymbol && ShouldSkip(c))
+            // 符号过滤（仅当选项启用时）
+            if (_options.IgnoreSymbol && ShouldSkip(c))
             {
                 continue;
             }
 
-            var matchChar = _ignoreCase ? char.ToLowerInvariant(c) : c;
+            var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(c) : c;
 
             // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
             TrieNode? next;
@@ -573,7 +564,7 @@ public sealed class SensitiveWordSanitizer
     ///     判断字符是否应被跳过
     /// </summary>
     /// <remarks>
-    ///     <para>此方法仅受 <see cref="_ignoreSymbol" /> 参数控制，用于跳过标点/符号/空白</para>
+    ///     <para>此方法仅受 <see cref="SensitiveWordOptions.IgnoreSymbol" /> 参数控制，用于跳过标点/符号/空白</para>
     ///     <para>分隔符（_/-/空格/全角空格/制表符/回车/换行）的跳过由 <see cref="IgnoredSeparators" /> 独立控制，始终生效</para>
     /// </remarks>
     /// <param name="c">待检测字符</param>
