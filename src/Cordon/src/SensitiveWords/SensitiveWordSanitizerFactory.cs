@@ -78,11 +78,11 @@ public static class SensitiveWordSanitizerFactory
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        // 规范化文件路径
-        var normalizedPath = Path.GetFullPath(filePath);
+        // 解析（规范化）文件路径
+        var resolvedPath = ResolveFilePath(filePath);
 
-        return GetOrCreate(normalizedPath,
-            () => SensitiveWordSanitizer.CreateFromPath(normalizedPath, ignoreCase, ignoreSymbol));
+        return GetOrCreate(resolvedPath,
+            () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, ignoreCase, ignoreSymbol));
     }
 
     /// <summary>
@@ -104,10 +104,10 @@ public static class SensitiveWordSanitizerFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        // 规范化文件路径
-        var normalizedPath = Path.GetFullPath(filePath);
+        // 解析（规范化）文件路径
+        var resolvedPath = ResolveFilePath(filePath);
 
-        return GetOrCreate(name, () => SensitiveWordSanitizer.CreateFromPath(normalizedPath, ignoreCase, ignoreSymbol));
+        return GetOrCreate(name, () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, ignoreCase, ignoreSymbol));
     }
 
     /// <summary>
@@ -226,10 +226,10 @@ public static class SensitiveWordSanitizerFactory
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        // 规范化文件路径
-        var normalizedPath = Path.GetFullPath(filePath);
+        // 解析（规范化）文件路径
+        var resolvedPath = ResolveFilePath(filePath);
 
-        Refresh(normalizedPath, () => SensitiveWordSanitizer.CreateFromPath(normalizedPath, ignoreCase, ignoreSymbol));
+        Refresh(resolvedPath, () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, ignoreCase, ignoreSymbol));
     }
 
     /// <summary>
@@ -247,10 +247,10 @@ public static class SensitiveWordSanitizerFactory
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        // 规范化文件路径
-        var normalizedPath = Path.GetFullPath(filePath);
+        // 解析（规范化）文件路径
+        var resolvedPath = ResolveFilePath(filePath);
 
-        Refresh(name, () => SensitiveWordSanitizer.CreateFromPath(normalizedPath, ignoreCase, ignoreSymbol));
+        Refresh(name, () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, ignoreCase, ignoreSymbol));
     }
 
     /// <summary>
@@ -312,6 +312,27 @@ public static class SensitiveWordSanitizerFactory
     ///     清除所有缓存的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
     public static void Clear() => _instances.Clear();
+
+    /// <summary>
+    ///     解析文件路径
+    /// </summary>
+    /// <remarks>如果已是绝对路径，直接返回。如果是相对路径，基于 <see cref="AppContext.BaseDirectory" /> 解析。</remarks>
+    /// <param name="filePath">文件路径</param>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    internal static string ResolveFilePath(string filePath)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+
+        // 处理绝对和相对路径问题
+        var basePath = Path.IsPathRooted(filePath)
+            ? filePath
+            : Path.Combine(AppContext.BaseDirectory, filePath);
+
+        return Path.GetFullPath(basePath);
+    }
 
     /// <summary>
     ///     敏感词清理器缓存条目

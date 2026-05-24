@@ -411,4 +411,23 @@ public class SensitiveWordSanitizerFactoryTests
         SensitiveWordSanitizerFactory.Clear();
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
+
+    [Fact]
+    public void ResolveFilePath_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(string.Empty));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(" "));
+    }
+
+    [Fact]
+    public void ResolveFilePath_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var normalizedPath = Path.GetFullPath(filePath);
+
+        Assert.Equal(normalizedPath, SensitiveWordSanitizerFactory.ResolveFilePath("sensitive_words.txt"));
+        Assert.Equal(normalizedPath, SensitiveWordSanitizerFactory.ResolveFilePath(filePath));
+        Assert.Equal(normalizedPath, SensitiveWordSanitizerFactory.ResolveFilePath(normalizedPath));
+    }
 }

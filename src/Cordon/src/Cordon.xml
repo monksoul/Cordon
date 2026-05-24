@@ -6898,6 +6898,16 @@
                 清除所有缓存的 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
         </member>
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.ResolveFilePath(System.String)">
+            <summary>
+                解析文件路径
+            </summary>
+            <remarks>如果已是绝对路径，直接返回。如果是相对路径，基于 <see cref="P:System.AppContext.BaseDirectory" /> 解析。</remarks>
+            <param name="filePath">文件路径</param>
+            <returns>
+                <see cref="T:System.String" />
+            </returns>
+        </member>
         <member name="T:Cordon.SensitiveWordSanitizerFactory.SanitizerEntry">
             <summary>
                 敏感词清理器缓存条目
@@ -8337,7 +8347,7 @@
         <member name="M:Cordon.BankCardValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^[1-9]\\d{11,18}$</code><br/>
+            <code>^[1-9]\d{11,18}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8376,7 +8386,7 @@
         <member name="M:Cordon.ChineseNameValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:[\\u4e00-\\u9fa5·]{2,16})$</code><br/>
+            <code>^(?:[\u4e00-\u9fa5·]{2,16})$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8401,7 +8411,7 @@
         <member name="M:Cordon.ChineseValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:[\\u3400-\\u4DB5\\u4E00-\\u9FEA\\uFA0E\\uFA0F\\uFA11\\uFA13\\uFA14\\uFA1F\\uFA21\\uFA23\\uFA24\\uFA27-\\uFA29]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872\\uD874-\\uD879][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1\\uDEB0-\\uDFFF]|\\uD87A[\\uDC00-\\uDFE0])+$</code><br/>
+            <code>^(?:[\u3400-\u4DB5\u4E00-\u9FEA\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879][\uDC00-\uDFFF]|\uD869[\uDC00-\uDED6\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF34\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0])+$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8452,7 +8462,7 @@
         <member name="M:Cordon.ColorValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:#(?:(?:[0-9a-fA-F]{3}){1,2}|[0-9a-fA-F]{8})|rgba?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hsla?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hwb\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|oklch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\)|oklab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\))$</code><br/>
+            <code>^(?:#(?:(?:[0-9a-fA-F]{3}){1,2}|[0-9a-fA-F]{8})|rgba?\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*(?:,\s*[0-9.]+\s*)?)?\)|hsla?\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*(?:,\s*[0-9.]+\s*)?)?\)|hwb\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|lch\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|oklch\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|lab\((?:\s*[-+]?\d+\%?\s*,){2}\s*[-+]?\d+\%?\s*\)|oklab\((?:\s*[-+]?\d+\%?\s*,){2}\s*[-+]?\d+\%?\s*\))$</code><br/>
             Options:<br/>
             <code>RegexOptions.IgnoreCase</code><br/>
             Explanation:<br/>
@@ -8610,7 +8620,7 @@
         <member name="M:Cordon.ColorValidator.StandardRegex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:#(?:[0-9a-fA-F]{3}){1,2}|rgba?\\((?:\\s*(?:\\d+%?)\\s*,){2}\\s*(?:\\d+%?)\\s*(?:,\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+))?\\))$</code><br/>
+            <code>^(?:#(?:[0-9a-fA-F]{3}){1,2}|rgba?\((?:\s*(?:\d+%?)\s*,){2}\s*(?:\d+%?)\s*(?:,\s*(?:\d+(?:\.\d+)?|\.\d+))?\))$</code><br/>
             Options:<br/>
             <code>RegexOptions.IgnoreCase</code><br/>
             Explanation:<br/>
@@ -9146,7 +9156,7 @@
         <member name="M:Cordon.DomainValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$</code><br/>
+            <code>^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9178,7 +9188,7 @@
         <member name="M:Cordon.EmailAddressValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(([^&lt;&gt;()\\$$\\].,;:\\s@"]+(\\.[^&lt;&gt;()\\$$\\].,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$</code><br/>
+            <code>^(([^&lt;&gt;()\$$\].,;:\s@"]+(\.[^&lt;&gt;()\$$\].,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9472,7 +9482,7 @@
         <member name="M:Cordon.IDCardValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^\\d{6}((((((19|20)\\d{2})(0[13-9]|1[012])(0[1-9]|[12]\\d|30))|(((19|20)\\d{2})(0[13578]|1[02])31)|((19|20)\\d{2})02(0[1-9]|1\\d|2[0-8])|((((19|20)([13579][26]|[2468][048]|0[48]))|(2000))0229))\\d{3})|((((\\d{2})(0[13-9]|1[012])(0[1-9]|[12]\\d|30))|((\\d{2})(0[13578]|1[02])31)|((\\d{2})02(0[1-9]|1\\d|2[0-8]))|(([13579][26]|[2468][048]|0[048])0229))\\d{2}))(\\d|X|x)$</code><br/>
+            <code>^\d{6}((((((19|20)\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|(((19|20)\d{2})(0[13578]|1[02])31)|((19|20)\d{2})02(0[1-9]|1\d|2[0-8])|((((19|20)([13579][26]|[2468][048]|0[48]))|(2000))0229))\d{3})|((((\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|((\d{2})(0[13578]|1[02])31)|((\d{2})02(0[1-9]|1\d|2[0-8]))|(([13579][26]|[2468][048]|0[048])0229))\d{2}))(\d|X|x)$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9674,7 +9684,7 @@
         <member name="M:Cordon.IpAddressValidator.StrictIPv4Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:\\d{1,3}\\.){3}\\d{1,3}$</code><br/>
+            <code>^(?:\d{1,3}\.){3}\d{1,3}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10135,7 +10145,7 @@
         <member name="M:Cordon.PasswordValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>\\A(?=.*[a-zA-Z])(?=.*\\d).{8,64}\\z</code><br/>
+            <code>\A(?=.*[a-zA-Z])(?=.*\d).{8,64}\z</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10153,7 +10163,7 @@
         <member name="M:Cordon.PasswordValidator.StrongRegex">
             <remarks>
             Pattern:<br/>
-            <code>\\A(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&amp;*]).{12,64}\\z</code><br/>
+            <code>\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&amp;*]).{12,64}\z</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10191,7 +10201,7 @@
         <member name="M:Cordon.PhoneNumberValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:(?:\\+|00)86)?1(?:3\\d|4[579]|5[0-35-9]|6[6-8]|7[0-8]|8\\d|9[0-35-9])\\d{8}$</code><br/>
+            <code>^(?:(?:\+|00)86)?1(?:3\d|4[579]|5[0-35-9]|6[6-8]|7[0-8]|8\d|9[0-35-9])\d{8}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10244,7 +10254,7 @@
         <member name="M:Cordon.PostalCodeValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(0[1-7]|1[0-356]|2[0-7]|3[0-6]|4[0-7]|5[1-7]|6[1-7]|7[0-5]|8[013-6])\\d{4}$</code><br/>
+            <code>^(0[1-7]|1[0-356]|2[0-7]|3[0-6]|4[0-7]|5[1-7]|6[1-7]|7[0-5]|8[013-6])\d{4}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10751,7 +10761,7 @@
         <member name="M:Cordon.TelephoneValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:(?:\\d{3}-)?\\d{8}|(?:\\d{4}-)?\\d{7,8})(?:-\\d+)?$</code><br/>
+            <code>^(?:(?:\d{3}-)?\d{8}|(?:\d{4}-)?\d{7,8})(?:-\d+)?$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10885,7 +10895,7 @@
         <member name="M:Cordon.UserNameValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^[a-zA-Z](?!.*[_-]{2})[\\w-]{2,14}[a-zA-Z0-9]$</code><br/>
+            <code>^[a-zA-Z](?!.*[_-]{2})[\w-]{2,14}[a-zA-Z0-9]$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
