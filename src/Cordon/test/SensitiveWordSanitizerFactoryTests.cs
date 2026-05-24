@@ -77,10 +77,11 @@ public class SensitiveWordSanitizerFactoryTests
     [Fact]
     public void GetOrCreateFromPath_Default_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(null!, null!));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(string.Empty, null!));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(" ", null!));
-        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath("file", null!));
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(string.Empty));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(" "));
+        Assert.Throws<ArgumentNullException>(() =>
+            SensitiveWordSanitizerFactory.GetOrCreateFromPath("file", (string)null!));
         Assert.Throws<FileNotFoundException>(() =>
             SensitiveWordSanitizerFactory.GetOrCreateFromPath("file", "not-found.txt"));
     }
@@ -268,10 +269,11 @@ public class SensitiveWordSanitizerFactoryTests
     [Fact]
     public void RefreshFromPath_Default_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(null!, null!));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(string.Empty, null!));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(" ", null!));
-        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.RefreshFromPath("file", null!));
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(string.Empty));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(" "));
+        Assert.Throws<ArgumentNullException>(() =>
+            SensitiveWordSanitizerFactory.RefreshFromPath("file", (string)null!));
         Assert.Throws<FileNotFoundException>(() =>
             SensitiveWordSanitizerFactory.RefreshFromPath("file", "not-found.txt"));
     }

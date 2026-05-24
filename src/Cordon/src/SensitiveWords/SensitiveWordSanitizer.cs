@@ -481,10 +481,11 @@ public sealed class SensitiveWordSanitizer
     /// <remarks>
     ///     <para>分隔符：支持 <c>|</c>、<c>,</c>、<c>\t</c>、<c>;</c> 任意混用，连续分隔符自动跳过。同时兼容一行一个词。</para>
     ///     <para>注释：以 <c>#</c> 开头的整行将被忽略；行内 <c>#</c> 之后的内容将被截断忽略。</para>
+    ///     <para>公开此方法，方便后续用户解析并获取敏感词词库列表。</para>
     /// </remarks>
     /// <param name="line">词库中的一行原始文本</param>
     /// <param name="words">用于收集解析结果的 <see cref="HashSet{T}" /> 集合</param>
-    internal static void ParseLine(string line, HashSet<string> words)
+    public static void ParseLine(string line, HashSet<string> words)
     {
         // 空检查
         if (string.IsNullOrWhiteSpace(line))
