@@ -9,7 +9,8 @@ namespace Cordon;
 /// </summary>
 /// <remarks>
 ///     <para>支持多种词库加载方式：直接注入实例、引用工厂缓存名称、指定文件路径或输入流。</para>
-///     <para>优先级：<see cref="Sanitizer" /> > <see cref="DictionaryName" /> > <see cref="FilePath" />。</para>
+///     <para>注意：<see cref="Sanitizer" />、<see cref="DictionaryName" />、<see cref="FilePath" /> 三者互斥，只能设置其中一个。</para>
+///     <para>若需注入 <see cref="SensitiveWordSanitizer" /> 实例，请通过 <see cref="SensitiveWordSanitizerFactory" /> 注册或手动构建。</para>
 /// </remarks>
 public class SensitiveWordValidator : ValidatorBase
 {
@@ -76,14 +77,15 @@ public class SensitiveWordValidator : ValidatorBase
     /// <summary>
     ///     敏感词清理器实例
     /// </summary>
-    /// <remarks>优先级最高。</remarks>
+    /// <remarks>与 <see cref="DictionaryName" />、<see cref="FilePath" /> 互斥，只能设置其中一个。</remarks>
     public SensitiveWordSanitizer? Sanitizer { get; set; }
 
     /// <summary>
     ///     敏感词字典名称
     /// </summary>
     /// <remarks>
-    ///     对应 <see cref="SensitiveWordSanitizerFactory" /> 中缓存的实例名称。当 <see cref="Sanitizer" /> 为空时，尝试通过此名称从工厂获取实例。
+    ///     对应 <see cref="SensitiveWordSanitizerFactory" /> 中缓存的实例名称。与 <see cref="Sanitizer" />、<see cref="FilePath" />
+    ///     互斥，只能设置其中一个。
     /// </remarks>
     public string? DictionaryName { get; set; }
 
@@ -91,8 +93,8 @@ public class SensitiveWordValidator : ValidatorBase
     ///     敏感词文件路径
     /// </summary>
     /// <remarks>
-    ///     当 <see cref="Sanitizer" /> 和 <see cref="DictionaryName" /> 均为空时，使用此路径加载词库。
-    ///     支持后续通过 <see cref="SensitiveWordSanitizerFactory.Refresh(string)" /> 进行刷新（热更新）。
+    ///     与 <see cref="Sanitizer" />、<see cref="DictionaryName" /> 互斥，只能设置其中一个。支持后续通过
+    ///     <see cref="SensitiveWordSanitizerFactory.Refresh(string)" /> 进行刷新（热更新）。
     /// </remarks>
     public string? FilePath { get; set; }
 
