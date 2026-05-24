@@ -963,38 +963,19 @@ public static class Validators
     /// <summary>
     ///     创建敏感词验证器
     /// </summary>
+    /// <remarks>
+    ///     若未配置 <paramref name="configure" />，那么用户需在应用启动时通过 <c>SensitiveWordSanitizerFactory.GetOrCreateFromPath</c> 等方式预注册
+    ///     <see cref="SensitiveWordOptions.DefaultDictionaryName" /> 名称的实例。
+    /// </remarks>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordValidator" />
     /// </returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static SensitiveWordValidator SensitiveWord(Action<SensitiveWordValidator> configure)
+    public static SensitiveWordValidator SensitiveWord(Action<SensitiveWordValidator>? configure = null)
     {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
-
         // 初始化 SensitiveWordValidator 实例
         var validator = new SensitiveWordValidator();
-
-        // 调用自定义配置委托
-        configure.Invoke(validator);
-
-        return validator;
-    }
-
-    /// <summary>
-    ///     创建敏感词验证器
-    /// </summary>
-    /// <param name="filePath">文件路径</param>
-    /// <param name="configure">自定义配置委托</param>
-    /// <returns>
-    ///     <see cref="SensitiveWordValidator" />
-    /// </returns>
-    public static SensitiveWordValidator SensitiveWord(string filePath,
-        Action<SensitiveWordValidator>? configure = null)
-    {
-        // 初始化 SensitiveWordValidator 实例
-        var validator = new SensitiveWordValidator(filePath);
 
         // 调用自定义配置委托
         configure?.Invoke(validator);

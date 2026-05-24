@@ -1039,11 +1039,20 @@
             <summary>
                 敏感词字典名称
             </summary>
-            <remarks>对应
-                <see cref="T:Cordon.SensitiveWordSanitizerFactory"/>
-                中缓存的实例名称。与
-                <see cref="P:System.ComponentModel.DataAnnotations.SensitiveWordAttribute.FilePath"/>
-                互斥，只能设置其中一个。
+            <remarks>
+                <para>用于从
+                    <see cref="M:Cordon.SensitiveWordSanitizerFactory.Get(System.String)"/>
+                    中获取
+                    <see cref="T:Cordon.SensitiveWordSanitizer"/>
+                    实例。
+                </para>
+                <para>
+                    对应
+                    <see cref="T:Cordon.SensitiveWordSanitizerFactory"/>
+                    中缓存的实例名称。与<see cref="!:Sanitizer"/>、
+                    <see cref="P:System.ComponentModel.DataAnnotations.SensitiveWordAttribute.FilePath"/>
+                    互斥，只能设置其中一个。
+                </para>
             </remarks>
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.SensitiveWordAttribute.FilePath">
@@ -3311,17 +3320,13 @@
             <summary>
                 添加敏感词验证器
             </summary>
-            <param name="configure">自定义配置委托</param>
-            <returns>
-                <typeparamref name="TSelf"/>
-            </returns>
-            <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
-        <member name="M:Cordon.FluentValidatorBuilder`2.SensitiveWord(System.String,System.Action{Cordon.SensitiveWordValidator})">
-            <summary>
-                添加敏感词验证器
-            </summary>
-            <param name="filePath">文件路径</param>
+            <remarks>
+                若未配置<paramref name="configure"/>，那么用户需在应用启动时通过 <c>
+                SensitiveWordSanitizerFactory.GetOrCreateFromPath
+            </c> 等方式预注册
+                <see cref="F:Cordon.SensitiveWordOptions.DefaultDictionaryName"/>
+                名称的实例。
+            </remarks>
             <param name="configure">自定义配置委托</param>
             <returns>
                 <typeparamref name="TSelf"/>
@@ -7270,6 +7275,22 @@
                 敏感词清理器配置选项
             </summary>
         </member>
+        <member name="F:Cordon.SensitiveWordOptions.DefaultDictionaryName">
+            <summary>
+                默认敏感词字典名称
+            </summary>
+            <remarks>
+                <para>
+                    当
+                    <see cref="P:Cordon.SensitiveWordValidator.DictionaryName"/>
+                    和
+                    <see cref="P:Cordon.SensitiveWordValidator.FilePath"/>
+                    均未配置时，将使用此名称从工厂获取实例。
+                </para>
+                <para>用户需在应用启动时通过 <c>SensitiveWordSanitizerFactory.GetOrCreateFromPath</c> 等方式预注册该名称的实例。
+                </para>
+            </remarks>
+        </member>
         <member name="F:Cordon.SensitiveWordOptions.Default">
             <summary>
                 默认选项
@@ -8771,21 +8792,18 @@
             <summary>
                 创建敏感词验证器
             </summary>
+            <remarks>
+                若未配置<paramref name="configure"/>，那么用户需在应用启动时通过 <c>
+                SensitiveWordSanitizerFactory.GetOrCreateFromPath
+            </c> 等方式预注册
+                <see cref="F:Cordon.SensitiveWordOptions.DefaultDictionaryName"/>
+                名称的实例。
+            </remarks>
             <param name="configure">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordValidator"/>
             </returns>
             <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
-        <member name="M:Cordon.Validators.SensitiveWord(System.String,System.Action{Cordon.SensitiveWordValidator})">
-            <summary>
-                创建敏感词验证器
-            </summary>
-            <param name="filePath">文件路径</param>
-            <param name="configure">自定义配置委托</param>
-            <returns>
-                <see cref="T:Cordon.SensitiveWordValidator"/>
-            </returns>
         </member>
         <member name="M:Cordon.Validators.SensitiveWord(Cordon.SensitiveWordSanitizer,System.Action{Cordon.SensitiveWordValidator})">
             <summary>
@@ -12076,13 +12094,6 @@
                 <inheritdoc cref="T:Cordon.SensitiveWordValidator"/>
             </summary>
         </member>
-        <member name="M:Cordon.SensitiveWordValidator.#ctor(System.String)">
-            <summary>
-                <inheritdoc cref="T:Cordon.SensitiveWordValidator"/>
-            </summary>
-            <param name="filePath">文件路径</param>
-            <exception cref="T:System.ArgumentException"></exception>
-        </member>
         <member name="M:Cordon.SensitiveWordValidator.#ctor(Cordon.SensitiveWordSanitizer)">
             <summary>
                 <inheritdoc cref="T:Cordon.SensitiveWordValidator"/>
@@ -12117,11 +12128,19 @@
                 敏感词字典名称
             </summary>
             <remarks>
-                对应
-                <see cref="T:Cordon.SensitiveWordSanitizerFactory"/>
-                中缓存的实例名称。与<see cref="P:Cordon.SensitiveWordValidator.Sanitizer"/>、
-                <see cref="P:Cordon.SensitiveWordValidator.FilePath"/>
-                互斥，只能设置其中一个。
+                <para>用于从
+                    <see cref="M:Cordon.SensitiveWordSanitizerFactory.Get(System.String)"/>
+                    中获取
+                    <see cref="T:Cordon.SensitiveWordSanitizer"/>
+                    实例。
+                </para>
+                <para>
+                    对应
+                    <see cref="T:Cordon.SensitiveWordSanitizerFactory"/>
+                    中缓存的实例名称。与<see cref="P:Cordon.SensitiveWordValidator.Sanitizer"/>、
+                    <see cref="P:Cordon.SensitiveWordValidator.FilePath"/>
+                    互斥，只能设置其中一个。
+                </para>
             </remarks>
         </member>
         <member name="P:Cordon.SensitiveWordValidator.FilePath">

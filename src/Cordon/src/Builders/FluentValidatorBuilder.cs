@@ -931,29 +931,16 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加敏感词验证器
     /// </summary>
+    /// <remarks>
+    ///     若未配置 <paramref name="configure" />，那么用户需在应用启动时通过 <c>SensitiveWordSanitizerFactory.GetOrCreateFromPath</c> 等方式预注册
+    ///     <see cref="SensitiveWordOptions.DefaultDictionaryName" /> 名称的实例。
+    /// </remarks>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
     /// </returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    public virtual TSelf SensitiveWord(Action<SensitiveWordValidator> configure)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
-
-        return AddValidator(new SensitiveWordValidator(), configure);
-    }
-
-    /// <summary>
-    ///     添加敏感词验证器
-    /// </summary>
-    /// <param name="filePath">文件路径</param>
-    /// <param name="configure">自定义配置委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf SensitiveWord(string filePath, Action<SensitiveWordValidator>? configure = null) =>
-        AddValidator(new SensitiveWordValidator(filePath), configure);
+    public virtual TSelf SensitiveWord(Action<SensitiveWordValidator>? configure = null) =>
+        AddValidator(new SensitiveWordValidator(), configure);
 
     /// <summary>
     ///     添加敏感词验证器

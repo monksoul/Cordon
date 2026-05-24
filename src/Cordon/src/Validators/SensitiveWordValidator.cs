@@ -27,20 +27,6 @@ public class SensitiveWordValidator : ValidatorBase
     /// <summary>
     ///     <inheritdoc cref="SensitiveWordValidator" />
     /// </summary>
-    /// <param name="filePath">文件路径</param>
-    /// <exception cref="ArgumentException"></exception>
-    public SensitiveWordValidator(string filePath)
-        : this()
-    {
-        // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
-
-        FilePath = filePath;
-    }
-
-    /// <summary>
-    ///     <inheritdoc cref="SensitiveWordValidator" />
-    /// </summary>
     /// <param name="sanitizer">
     ///     <see cref="SensitiveWordSanitizer" />
     /// </param>
@@ -84,8 +70,11 @@ public class SensitiveWordValidator : ValidatorBase
     ///     敏感词字典名称
     /// </summary>
     /// <remarks>
-    ///     对应 <see cref="SensitiveWordSanitizerFactory" /> 中缓存的实例名称。与 <see cref="Sanitizer" />、<see cref="FilePath" />
-    ///     互斥，只能设置其中一个。
+    ///     <para>用于从 <see cref="SensitiveWordSanitizerFactory.Get(string)" /> 中获取 <see cref="SensitiveWordSanitizer" /> 实例。</para>
+    ///     <para>
+    ///         对应 <see cref="SensitiveWordSanitizerFactory" /> 中缓存的实例名称。与 <see cref="Sanitizer" />、<see cref="FilePath" />
+    ///         互斥，只能设置其中一个。
+    ///     </para>
     /// </remarks>
     public string? DictionaryName { get; set; }
 
@@ -183,11 +172,18 @@ public class SensitiveWordValidator : ValidatorBase
         var filePathSet = !string.IsNullOrWhiteSpace(FilePath);
 
         // 以下组合是非法的，会抛出 InvalidOperationException：
-        // 1) 没有任何数据源被配置
+        // 1) 没有任何数据源被配置，使用默认的 SensitiveWordOptions.DefaultDictionaryName 回退
         if (!sanitizerSet && !dictionaryNameSet && !filePathSet)
         {
-            throw new InvalidOperationException(
-                $"No dictionary source is configured for the {nameof(SensitiveWordValidator)}. Please set the '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(FilePath)}' property, or provide a Stream or Sanitizer via the constructor.");
+            try
+            {
+                return SensitiveWordSanitizerFactory.Get(SensitiveWordOptions.DefaultDictionaryName);
+            }
+            catch (InvalidOperationException)
+            {
+                throw new InvalidOperationException(
+                    $"No dictionary source is configured for the {nameof(SensitiveWordValidator)}, and the default dictionary '{SensitiveWordOptions.DefaultDictionaryName}' has not been registered. Please either set the '{nameof(DictionaryName)}' or '{nameof(FilePath)}' property, or register the default dictionary via `SensitiveWordSanitizerFactory.GetOrCreateFromPath` at application startup.");
+            }
         }
 
         // 2) 同时配置了多个数据源（任意两个同时为 true 即为非法）

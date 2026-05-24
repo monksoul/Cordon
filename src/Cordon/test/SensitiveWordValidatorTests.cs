@@ -10,11 +10,8 @@ public class SensitiveWordValidatorTests
     [Fact]
     public void New_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => new SensitiveWordValidator((SensitiveWordSanitizer)null!));
+        Assert.Throws<ArgumentNullException>(() => new SensitiveWordValidator(null!));
         Assert.Throws<ArgumentNullException>(() => new SensitiveWordValidator((Stream)null!));
-        Assert.Throws<ArgumentNullException>(() => new SensitiveWordValidator((string)null!));
-        Assert.Throws<ArgumentException>(() => new SensitiveWordValidator(string.Empty));
-        Assert.Throws<ArgumentException>(() => new SensitiveWordValidator(" "));
     }
 
     [Fact]
@@ -59,13 +56,6 @@ public class SensitiveWordValidatorTests
         Assert.Single(SensitiveWordSanitizerFactory._instances);
         Assert.Same(validator5.Sanitizer, SensitiveWordSanitizerFactory.Get("validator_test"));
         SensitiveWordSanitizerFactory.TryRemove("validator_test");
-
-        var validator6 = new SensitiveWordValidator(filePath);
-        Assert.NotNull(validator6.FilePath);
-        Assert.Equal(filePath, validator6.FilePath);
-        Assert.NotNull(validator6._errorMessageResourceAccessor);
-        Assert.Equal("The field {0} contains sensitive or prohibited words.",
-            validator6._errorMessageResourceAccessor());
     }
 
     [Theory]
@@ -170,7 +160,7 @@ public class SensitiveWordValidatorTests
         var validator = new SensitiveWordValidator();
         var exception = Assert.Throws<InvalidOperationException>(validator.GetSanitizer);
         Assert.Equal(
-            "No dictionary source is configured for the SensitiveWordValidator. Please set the 'Sanitizer', 'DictionaryName', or 'FilePath' property, or provide a Stream or Sanitizer via the constructor.",
+            "No dictionary source is configured for the SensitiveWordValidator, and the default dictionary 'SensitiveWords:Default' has not been registered. Please either set the 'DictionaryName' or 'FilePath' property, or register the default dictionary via `SensitiveWordSanitizerFactory.GetOrCreateFromPath` at application startup.",
             exception.Message);
 
         validator.DictionaryName = "file-key";
@@ -206,6 +196,13 @@ public class SensitiveWordValidatorTests
         var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get(normalizedPath);
         Assert.Same(sensitiveWordSanitizer3, sanitizer3);
         Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+
+        var validator4 = new SensitiveWordValidator();
+        var sensitiveWordSanitizer4 =
+            SensitiveWordSanitizerFactory.GetOrCreateFromPath(SensitiveWordOptions.DefaultDictionaryName, filePath);
+        var sanitizer4 = validator4.GetSanitizer();
+        Assert.Same(sensitiveWordSanitizer4, sanitizer4);
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
     }
 
     [Fact]

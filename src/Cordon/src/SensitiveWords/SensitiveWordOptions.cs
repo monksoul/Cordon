@@ -10,6 +10,18 @@ namespace Cordon;
 public sealed record SensitiveWordOptions
 {
     /// <summary>
+    ///     默认敏感词字典名称
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         当 <see cref="SensitiveWordValidator.DictionaryName" /> 和 <see cref="SensitiveWordValidator.FilePath" />
+    ///         均未配置时，将使用此名称从工厂获取实例。
+    ///     </para>
+    ///     <para>用户需在应用启动时通过 <c>SensitiveWordSanitizerFactory.GetOrCreateFromPath</c> 等方式预注册该名称的实例。</para>
+    /// </remarks>
+    public const string DefaultDictionaryName = "SensitiveWords:Default";
+
+    /// <summary>
     ///     默认选项
     /// </summary>
     /// <remarks>忽略大小写、忽略符号。</remarks>

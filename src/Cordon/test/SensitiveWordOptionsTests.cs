@@ -16,5 +16,6 @@ public class SensitiveWordOptionsTests
         var defaultOptions = SensitiveWordOptions.Default;
         Assert.NotNull(defaultOptions);
         Assert.Same(defaultOptions, SensitiveWordOptions.Default);
+        Assert.Equal("SensitiveWords:Default", SensitiveWordOptions.DefaultDictionaryName);
     }
 }
