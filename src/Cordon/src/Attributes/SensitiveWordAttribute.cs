@@ -79,6 +79,35 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
     /// <inheritdoc />
     public override bool IsValid(object? value) => _validator.IsValid(value);
 
+    /// <inheritdoc />
+    public override string FormatErrorMessage(string name)
+    {
+        var template = ErrorMessageString;
+
+        // 空检查
+        if (string.IsNullOrWhiteSpace(template))
+        {
+            return base.FormatErrorMessage(name);
+        }
+
+        // 检查是否在错误信息中显示命中的敏感词详情
+        if (!ShowMatchedWords)
+        {
+            return string.Format(CultureInfo.CurrentCulture, template, name);
+        }
+
+        // 将验证命中的匹配结果详情组合成字符串
+        var wordsString = string.Join(", ", SensitiveWordValidator._lastMatchDetails.Value ?? []);
+
+        // 检查错误信息字符串是否包含 {1} 占位符
+        if (template.Contains("{1}"))
+        {
+            return string.Format(CultureInfo.CurrentCulture, template, name, wordsString);
+        }
+
+        return string.Format(CultureInfo.CurrentCulture, template, name) + $" Matched: {wordsString}";
+    }
+
     /// <summary>
     ///     获取错误信息对应的资源键
     /// </summary>

@@ -94,6 +94,16 @@ public class DecimalAttributeTests
             validationResults4[0].ErrorMessage);
         Assert.Equal("The field Data2 must be a valid decimal within the DECIMAL(18,2) precision or scale limit.",
             validationResults4[1].ErrorMessage);
+
+        var model5 = new TestModel { Data = 10.123, Data2 = "10.123", Data3 = "10.123" };
+        var validationResults5 = new List<ValidationResult>();
+        Assert.False(Validator.TryValidateObject(model5, new ValidationContext(model5), validationResults5, true));
+        Assert.Equal(3, validationResults5.Count);
+        Assert.Equal("The field Data must be a non-negative decimal within the DECIMAL(18,2) precision or scale limit.",
+            validationResults5[0].ErrorMessage);
+        Assert.Equal("The field Data2 must be a valid decimal within the DECIMAL(18,2) precision or scale limit.",
+            validationResults5[1].ErrorMessage);
+        Assert.Equal("数据无效", validationResults5[2].ErrorMessage);
     }
 
     [Fact]
@@ -152,5 +162,7 @@ public class DecimalAttributeTests
 
         [Decimal(AllowNegative = true, AllowStringValues = true)]
         public string? Data2 { get; set; }
+
+        [Decimal(ErrorMessage = "数据无效")] public string? Data3 { get; set; }
     }
 }
