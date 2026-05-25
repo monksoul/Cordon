@@ -34,7 +34,9 @@ public class SensitiveWordAttributeTests
         Assert.False(attribute._validator.ShowMatchedWords);
 
         var attribute2 = new SensitiveWordAttribute
-            { DictionaryName = "attribute", FilePath = "sensitive_words.txt", ShowMatchedWords = true };
+        {
+            DictionaryName = "attribute", FilePath = "sensitive_words.txt", ShowMatchedWords = true
+        };
         Assert.Equal("attribute", attribute2.DictionaryName);
         Assert.Equal("sensitive_words.txt", attribute2.FilePath);
         Assert.True(attribute2.ShowMatchedWords);
