@@ -54,14 +54,14 @@ public class ValidatorProxyOfTTests
         Assert.NotNull(proxyValidator);
 
         Assert.Single(validator._validatorCache);
-        Assert.Equal(RuntimeHelpers.GetHashCode(instance), validator._validatorCache.Keys.First());
+        Assert.Equal(instance, validator._validatorCache.Keys.First());
 
         var proxyValidator2 = validator.GetValidator(instance, new ValidationContext<ValidatorProxyClass>(instance));
         Assert.NotNull(proxyValidator2);
 
         Assert.Same(proxyValidator, proxyValidator2);
         Assert.Single(validator._validatorCache);
-        Assert.Equal(RuntimeHelpers.GetHashCode(instance), validator._validatorCache.Keys.First());
+        Assert.Equal(instance, validator._validatorCache.Keys.First());
     }
 
     [Fact]
@@ -108,8 +108,6 @@ public class ValidatorProxyOfTTests
         {
             v.ErrorMessage = "数据无效";
         });
-
-        Assert.Empty(validator._validatorCache);
     }
 
 
@@ -231,7 +229,6 @@ public class ValidatorProxyOfTTests
         validator.OnPropertyChanged(validator, new ValidationPropertyChangedEventArgs("ErrorMessage", "数据无效"));
         Assert.Equal("ErrorMessage", validator._propertyChanges.Keys.First());
         Assert.Equal("数据无效", validator._propertyChanges.Values.First());
-        Assert.Empty(validator._validatorCache);
     }
 
     [Fact]

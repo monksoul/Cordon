@@ -119,6 +119,28 @@ public class SensitiveWordValidatorTests
     }
 
     [Fact]
+    public void GetValidationResults_WithShowMatchedWords_MultipleInstances_ReturnOK()
+    {
+        SensitiveWordSanitizerFactory.GetOrCreateFromPath(SensitiveWordOptions.DefaultDictionaryName,
+            "sensitive_words.txt");
+        var validator1 = new SensitiveWordValidator { ShowMatchedWords = true };
+        var validator2 = new SensitiveWordValidator { ShowMatchedWords = true };
+
+        var validationResults1 = validator1.GetValidationResults("这里包含敏感词", "data");
+        var validationResults2 = validator2.GetValidationResults("你大爷的，TMD!", "data");
+
+        Assert.NotNull(validationResults1);
+        Assert.Equal("The field data contains sensitive or prohibited words: [敏感词] @ 4..7.",
+            validationResults1.First().ErrorMessage);
+
+        Assert.NotNull(validationResults2);
+        Assert.Equal("The field data contains sensitive or prohibited words: [你-大-爷] @ 0..3, [TMD!] @ 5..8.",
+            validationResults2.First().ErrorMessage);
+
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
+    }
+
+    [Fact]
     public void Validate_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
