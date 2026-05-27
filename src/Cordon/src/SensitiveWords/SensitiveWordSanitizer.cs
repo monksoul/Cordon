@@ -356,6 +356,94 @@ public sealed class SensitiveWordSanitizer
     }
 
     /// <summary>
+    ///     检查文本并返回首个命中词及精确位置
+    /// </summary>
+    /// <param name="text">待检测文本</param>
+    /// <returns>
+    ///     <see cref="MatchResult" />
+    /// </returns>
+    public MatchResult? FindFirst(string? text)
+    {
+        // 空检查
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return null;
+        }
+
+        var node = _root;
+        var virtualIndex = 0;
+
+        // 记录 虚拟索引 -> 真实索引 的映射
+        var realIndexMap = ArrayPool<int>.Shared.Rent(text.Length);
+
+        try
+        {
+            // 遍历文本每一个字符
+            for (var i = 0; i < text.Length; i++)
+            {
+                var c = text[i];
+
+                // 始终跳过分隔符（_/-/空格/全角空格/制表符/回车/换行），使输入流与 Trie 结构对齐
+                if (IgnoredSeparators.Contains(c))
+                {
+                    continue;
+                }
+
+                // 符号过滤：跳过但不增加虚拟索引（仅当选项启用时）
+                if (_options.IgnoreSymbol && ShouldSkip(c))
+                {
+                    continue;
+                }
+
+                // 记录映射关系
+                realIndexMap[virtualIndex] = i;
+                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(c) : c;
+
+                // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
+                TrieNode? next;
+                while (!node.Children.TryGetValue(matchChar, out next))
+                {
+                    if (node == _root)
+                    {
+                        break;
+                    }
+
+                    node = node.Fail ?? _root;
+                }
+
+                if (next != null)
+                {
+                    node = next;
+
+                    // 收集匹配结果
+                    if (node is { IsEnd: true, MatchedWords.Count: > 0 })
+                    {
+                        foreach (var (word, coreLength) in node.MatchedWords)
+                        {
+                            var startVirtual = virtualIndex - coreLength + 1;
+
+                            // 边界检查
+                            if (startVirtual >= 0)
+                            {
+                                return new MatchResult(word, realIndexMap[startVirtual],
+                                    realIndexMap[virtualIndex] + 1);
+                            }
+                        }
+                    }
+                }
+
+                virtualIndex++;
+            }
+
+            return null;
+        }
+        finally
+        {
+            ArrayPool<int>.Shared.Return(realIndexMap);
+        }
+    }
+
+    /// <summary>
     ///     快速检查是否包含敏感词
     /// </summary>
     /// <param name="text">待检测文本</param>

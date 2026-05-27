@@ -369,6 +369,130 @@ public class SensitiveWordSanitizerTests
         Assert.Empty(matchResults7);
     }
 
+    [Fact]
+    public void FindFirst_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath);
+
+        Assert.Null(sensitiveWordSanitizer.FindFirst(null));
+        Assert.Null(sensitiveWordSanitizer.FindFirst(string.Empty));
+
+        var matchResult = sensitiveWordSanitizer.FindFirst(userText);
+        Assert.NotNull(matchResult);
+        Assert.Equal("加微信", matchResult.Value.Word);
+        Assert.Equal("[加微信] @ 5..8", matchResult.Value.ToString());
+
+        var matchResult2 = sensitiveWordSanitizer.FindFirst("这里呢，是否包含敏__感__词呢？");
+        Assert.NotNull(matchResult2);
+        Assert.Equal("敏感词", matchResult2.Value.Word);
+        Assert.Equal("[敏感词] @ 8..15", matchResult2.Value.ToString());
+
+        var matchResult3 = sensitiveWordSanitizer.FindFirst("这里面包含敏\r感\n词吗？");
+        Assert.NotNull(matchResult3);
+        Assert.Equal("敏感词", matchResult3.Value.Word);
+        Assert.Equal("[敏感词] @ 5..10", matchResult3.Value.ToString());
+
+        var matchResult4 = sensitiveWordSanitizer.FindFirst("这里面包含敏\t感\n词吗？");
+        Assert.NotNull(matchResult4);
+        Assert.Equal("敏感词", matchResult4.Value.Word);
+        Assert.Equal("[敏感词] @ 5..10", matchResult4.Value.ToString());
+
+        var matchResult5 = sensitiveWordSanitizer.FindFirst("Low High");
+        Assert.NotNull(matchResult5);
+        Assert.Equal("low_high", matchResult5.Value.Word);
+        Assert.Equal("[low_high] @ 0..8", matchResult5.Value.ToString());
+
+        var matchResult6 = sensitiveWordSanitizer.FindFirst("这里面包含敏*感*词吗？");
+        Assert.NotNull(matchResult6);
+        Assert.Equal("敏感词", matchResult6.Value.Word);
+        Assert.Equal("[敏感词] @ 5..10", matchResult6.Value.ToString());
+
+        var matchResult7 = sensitiveWordSanitizer.FindFirst("这里面包含TMD吗？");
+        Assert.NotNull(matchResult7);
+        Assert.Equal("TMD!", matchResult7.Value.Word);
+        Assert.Equal("[TMD!] @ 5..8", matchResult7.Value.ToString());
+
+        var matchResult8 = sensitiveWordSanitizer.FindFirst("这里面包含tmd吗？");
+        Assert.NotNull(matchResult8);
+        Assert.Equal("TMD!", matchResult8.Value.Word);
+        Assert.Equal("[TMD!] @ 5..8", matchResult8.Value.ToString());
+    }
+
+    [Fact]
+    public void FindFirst_SetIgnoreCaseFalse_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var sensitiveWordSanitizer =
+            SensitiveWordSanitizer.CreateFromPath(filePath, new SensitiveWordOptions { IgnoreCase = false });
+
+        var matchResult1 = sensitiveWordSanitizer.FindFirst("这里呢，是否包含敏__感__词呢？");
+        Assert.NotNull(matchResult1);
+        Assert.Equal("敏感词", matchResult1.Value.Word);
+        Assert.Equal("[敏感词] @ 8..15", matchResult1.Value.ToString());
+
+        var matchResult2 = sensitiveWordSanitizer.FindFirst("这里面包含敏\r感\n词吗？");
+        Assert.NotNull(matchResult2);
+        Assert.Equal("敏感词", matchResult2.Value.Word);
+        Assert.Equal("[敏感词] @ 5..10", matchResult2.Value.ToString());
+
+        var matchResult3 = sensitiveWordSanitizer.FindFirst("这里面包含敏\t感\n词吗？");
+        Assert.NotNull(matchResult3);
+        Assert.Equal("敏感词", matchResult3.Value.Word);
+        Assert.Equal("[敏感词] @ 5..10", matchResult3.Value.ToString());
+
+        var matchResult4 = sensitiveWordSanitizer.FindFirst("Low High");
+        Assert.Null(matchResult4);
+
+        var matchResult5 = sensitiveWordSanitizer.FindFirst("这里面包含敏*感*词吗？");
+        Assert.NotNull(matchResult5);
+        Assert.Equal("敏感词", matchResult5.Value.Word);
+        Assert.Equal("[敏感词] @ 5..10", matchResult5.Value.ToString());
+
+        var matchResult6 = sensitiveWordSanitizer.FindFirst("这里面包含TMD吗？");
+        Assert.NotNull(matchResult6);
+        Assert.Equal("TMD!", matchResult6.Value.Word);
+        Assert.Equal("[TMD!] @ 5..8", matchResult6.Value.ToString());
+
+        var matchResults7 = sensitiveWordSanitizer.FindFirst("这里面包含tmd吗？");
+        Assert.Null(matchResults7);
+    }
+
+    [Fact]
+    public void FindFirst_SetIgnoreCaseFalse_And_SetIgnoreSymbolFalse_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
+            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
+
+        var matchResult1 = sensitiveWordSanitizer.FindFirst("这里呢，是否包含敏__感__词呢？");
+        Assert.NotNull(matchResult1);
+        Assert.Equal("敏感词", matchResult1.Value.Word);
+        Assert.Equal("[敏感词] @ 8..15", matchResult1.Value.ToString());
+
+        var matchResult2 = sensitiveWordSanitizer.FindFirst("这里面包含敏\r感\n词吗？");
+        Assert.NotNull(matchResult2);
+        Assert.Equal("敏感词", matchResult2.Value.Word);
+        Assert.Equal("[敏感词] @ 5..10", matchResult2.Value.ToString());
+
+        var matchResult3 = sensitiveWordSanitizer.FindFirst("这里面包含敏\t感\n词吗？");
+        Assert.NotNull(matchResult3);
+        Assert.Equal("敏感词", matchResult3.Value.Word);
+        Assert.Equal("[敏感词] @ 5..10", matchResult3.Value.ToString());
+
+        var matchResult4 = sensitiveWordSanitizer.FindFirst("Low High");
+        Assert.Null(matchResult4);
+
+        var matchResult5 = sensitiveWordSanitizer.FindFirst("这里面包含敏*感*词吗？");
+        Assert.Null(matchResult5);
+
+        var matchResult6 = sensitiveWordSanitizer.FindFirst("这里面包含TMD吗？");
+        Assert.Null(matchResult6);
+
+        var matchResult7 = sensitiveWordSanitizer.FindFirst("这里面包含tmd吗？");
+        Assert.Null(matchResult7);
+    }
+
     [Theory]
     [InlineData(null, false)]
     [InlineData("", false)]
