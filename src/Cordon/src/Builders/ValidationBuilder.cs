@@ -7,7 +7,7 @@ namespace Cordon;
 /// <summary>
 ///     数据验证构建器
 /// </summary>
-public sealed class ValidationBuilder
+public sealed partial class ValidationBuilder
 {
     /// <summary>
     ///     <see cref="AbstractValidator{T}" /> 泛型定义

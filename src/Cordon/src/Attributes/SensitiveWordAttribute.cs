@@ -25,7 +25,7 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
     /// </summary>
     /// <remarks>
     ///     <para>用于从 <see cref="SensitiveWordSanitizerFactory.Get(string)" /> 中获取 <see cref="SensitiveWordSanitizer" /> 实例。</para>
-    ///     <para>对应 <see cref="SensitiveWordSanitizerFactory" /> 中缓存的实例名称。与 <see cref="FilePath" /> 互斥，只能设置其中一个。</para>
+    ///     <para>对应 <see cref="SensitiveWordSanitizerFactory" /> 中缓存的字典名称。与 <see cref="FilePath" /> 互斥，只能设置其中一个。</para>
     /// </remarks>
     public string? DictionaryName { get; set; }
 

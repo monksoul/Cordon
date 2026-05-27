@@ -18,31 +18,31 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     获取已缓存的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="InvalidOperationException"></exception>
-    public static SensitiveWordSanitizer Get(string name)
+    public static SensitiveWordSanitizer Get(string dictionaryName)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
 
         // 尝试获取敏感词清理器缓存条目
-        if (_instances.TryGetValue(name, out var entry))
+        if (_instances.TryGetValue(dictionaryName, out var entry))
         {
             return entry.LazyInstance.Value;
         }
 
         throw new InvalidOperationException(
-            $"The sensitive word dictionary '{name}' has not been registered. Please register it using `SensitiveWordSanitizerFactory.GetOrCreate` at application startup.");
+            $"The sensitive word dictionary '{dictionaryName}' has not been registered. Please register it using `SensitiveWordSanitizerFactory.GetOrCreate` at application startup.");
     }
 
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <param name="words">敏感词集合</param>
     /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <returns>
@@ -50,14 +50,14 @@ public static class SensitiveWordSanitizerFactory
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    public static SensitiveWordSanitizer GetOrCreate(string name, IEnumerable<string> words,
+    public static SensitiveWordSanitizer GetOrCreate(string dictionaryName, IEnumerable<string> words,
         SensitiveWordOptions? options = null)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
         ArgumentNullException.ThrowIfNull(words);
 
-        return GetOrCreate(name, () => SensitiveWordSanitizer.Build(words, options));
+        return GetOrCreate(dictionaryName, () => SensitiveWordSanitizer.Build(words, options));
     }
 
     /// <summary>
@@ -85,7 +85,7 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <param name="filePath">文件路径</param>
     /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <returns>
@@ -93,23 +93,23 @@ public static class SensitiveWordSanitizerFactory
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    public static SensitiveWordSanitizer GetOrCreateFromPath(string name, string filePath,
+    public static SensitiveWordSanitizer GetOrCreateFromPath(string dictionaryName, string filePath,
         SensitiveWordOptions? options = null)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
         // 解析（规范化）文件路径
         var resolvedPath = ResolveFilePath(filePath);
 
-        return GetOrCreate(name, () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, options));
+        return GetOrCreate(dictionaryName, () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, options));
     }
 
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <param name="stream">输入流</param>
     /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <returns>
@@ -117,34 +117,34 @@ public static class SensitiveWordSanitizerFactory
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    public static SensitiveWordSanitizer GetOrCreateFromStream(string name, Stream stream,
+    public static SensitiveWordSanitizer GetOrCreateFromStream(string dictionaryName, Stream stream,
         SensitiveWordOptions? options = null)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
         ArgumentNullException.ThrowIfNull(stream);
 
-        return GetOrCreate(name, () => SensitiveWordSanitizer.CreateFromStream(stream, options));
+        return GetOrCreate(dictionaryName, () => SensitiveWordSanitizer.CreateFromStream(stream, options));
     }
 
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例（核心方法）
     /// </summary>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <param name="factory">构建敏感词清理器的工厂委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    public static SensitiveWordSanitizer GetOrCreate(string name, Func<SensitiveWordSanitizer> factory)
+    public static SensitiveWordSanitizer GetOrCreate(string dictionaryName, Func<SensitiveWordSanitizer> factory)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
         ArgumentNullException.ThrowIfNull(factory);
 
         // 获取或添加敏感词清理器缓存条目
-        var entry = _instances.GetOrAdd(name,
+        var entry = _instances.GetOrAdd(dictionaryName,
             _ => new SanitizerEntry(factory,
                 new Lazy<SensitiveWordSanitizer>(factory, LazyThreadSafetyMode.ExecutionAndPublication)));
 
@@ -156,7 +156,7 @@ public static class SensitiveWordSanitizerFactory
         {
             // 处理 Lazy<T> 会缓存异常问题
             ((ICollection<KeyValuePair<string, SanitizerEntry>>)_instances).Remove(
-                new KeyValuePair<string, SanitizerEntry>(name, entry));
+                new KeyValuePair<string, SanitizerEntry>(dictionaryName, entry));
 
             throw;
         }
@@ -166,19 +166,19 @@ public static class SensitiveWordSanitizerFactory
     ///     使用原始配置重新刷新 <see cref="SensitiveWordSanitizer" /> 实例（热更新）
     /// </summary>
     /// <remarks>注意：若实例最初是通过 <see cref="GetOrCreateFromStream" /> 注册的，传入的流必须支持 <c>CanSeek</c>（如 FileStream），否则刷新时将读取到空数据。</remarks>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="InvalidOperationException"></exception>
-    public static void Refresh(string name)
+    public static void Refresh(string dictionaryName)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
 
         // 尝试获取敏感词清理器缓存条目
-        if (!_instances.TryGetValue(name, out var oldEntry))
+        if (!_instances.TryGetValue(dictionaryName, out var oldEntry))
         {
             throw new InvalidOperationException(
-                $"The sensitive word dictionary '{name}' has not been registered. Cannot refresh an unregistered dictionary.");
+                $"The sensitive word dictionary '{dictionaryName}' has not been registered. Cannot refresh an unregistered dictionary.");
         }
 
         // 提前执行原始 Factory，确保新实例构建成功后才替换缓存
@@ -186,24 +186,24 @@ public static class SensitiveWordSanitizerFactory
         var newLazy = new Lazy<SensitiveWordSanitizer>(() => instance, LazyThreadSafetyMode.PublicationOnly);
         var newEntry = new SanitizerEntry(oldEntry.Factory, newLazy);
 
-        _instances.AddOrUpdate(name, newEntry, (_, _) => newEntry);
+        _instances.AddOrUpdate(dictionaryName, newEntry, (_, _) => newEntry);
     }
 
     /// <summary>
     ///     刷新 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <param name="words">敏感词集合</param>
     /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    public static void Refresh(string name, IEnumerable<string> words, SensitiveWordOptions? options = null)
+    public static void Refresh(string dictionaryName, IEnumerable<string> words, SensitiveWordOptions? options = null)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
         ArgumentNullException.ThrowIfNull(words);
 
-        Refresh(name, () => SensitiveWordSanitizer.Build(words, options));
+        Refresh(dictionaryName, () => SensitiveWordSanitizer.Build(words, options));
     }
 
     /// <summary>
@@ -227,51 +227,51 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     刷新 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <param name="filePath">文件路径</param>
     /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    public static void RefreshFromPath(string name, string filePath, SensitiveWordOptions? options = null)
+    public static void RefreshFromPath(string dictionaryName, string filePath, SensitiveWordOptions? options = null)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
         // 解析（规范化）文件路径
         var resolvedPath = ResolveFilePath(filePath);
 
-        Refresh(name, () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, options));
+        Refresh(dictionaryName, () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, options));
     }
 
     /// <summary>
     ///     刷新 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <param name="stream">输入流</param>
     /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    public static void RefreshFromStream(string name, Stream stream, SensitiveWordOptions? options = null)
+    public static void RefreshFromStream(string dictionaryName, Stream stream, SensitiveWordOptions? options = null)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
         ArgumentNullException.ThrowIfNull(stream);
 
-        Refresh(name, () => SensitiveWordSanitizer.CreateFromStream(stream, options));
+        Refresh(dictionaryName, () => SensitiveWordSanitizer.CreateFromStream(stream, options));
     }
 
     /// <summary>
     ///     刷新 <see cref="SensitiveWordSanitizer" /> 实例（核心方法）
     /// </summary>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <param name="factory">构建敏感词清理器的工厂委托</param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    public static void Refresh(string name, Func<SensitiveWordSanitizer> factory)
+    public static void Refresh(string dictionaryName, Func<SensitiveWordSanitizer> factory)
     {
         // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
         ArgumentNullException.ThrowIfNull(factory);
 
         // 提前执行工厂，确保新实例构建成功后才替换缓存
@@ -279,23 +279,23 @@ public static class SensitiveWordSanitizerFactory
         var newLazy = new Lazy<SensitiveWordSanitizer>(() => instance, LazyThreadSafetyMode.PublicationOnly);
         var newEntry = new SanitizerEntry(factory, newLazy);
 
-        _instances.AddOrUpdate(name, newEntry, (_, _) => newEntry);
+        _instances.AddOrUpdate(dictionaryName, newEntry, (_, _) => newEntry);
     }
 
     /// <summary>
     ///     移除指定名称的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
     /// <remarks>注意：若使用文件路径作为缓存的键，那么请使用 <c>Path.GetFullPath(filePath)</c> 来标准化文件路径。</remarks>
-    /// <param name="name">实例名称</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
-    public static bool TryRemove(string name)
+    public static bool TryRemove(string dictionaryName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
 
-        return _instances.TryRemove(name, out _);
+        return _instances.TryRemove(dictionaryName, out _);
     }
 
     /// <summary>
