@@ -4,6 +4,7 @@
 
 namespace Cordon.Tests;
 
+[Collection("SensitiveWordAttributeTests")]
 public class SensitiveWordAttributeTests
 {
     [Fact]

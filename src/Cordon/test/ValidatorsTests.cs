@@ -752,6 +752,50 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void SensitiveWord_ReturnOK()
+    {
+        var validator = Validators.SensitiveWord();
+        Assert.Null(validator.Sanitizer);
+        Assert.Null(validator.DictionaryName);
+        Assert.Null(validator.FilePath);
+        Assert.False(validator.ShowMatchedWords);
+
+        var validator2 = Validators.SensitiveWord(u => u.DictionaryName = "Furion");
+        Assert.Null(validator2.Sanitizer);
+        Assert.Equal("Furion", validator2.DictionaryName);
+        Assert.Null(validator2.FilePath);
+        Assert.False(validator2.ShowMatchedWords);
+
+        var validator3 = Validators.SensitiveWord(SensitiveWordSanitizer.Build(["敏感词"]));
+        Assert.NotNull(validator3.Sanitizer);
+        Assert.Null(validator3.DictionaryName);
+        Assert.Null(validator3.FilePath);
+        Assert.False(validator3.ShowMatchedWords);
+
+        var validator4 =
+            Validators.SensitiveWord(SensitiveWordSanitizer.Build(["敏感词"]), u => u.ShowMatchedWords = true);
+        Assert.NotNull(validator4.Sanitizer);
+        Assert.Null(validator4.DictionaryName);
+        Assert.Null(validator4.FilePath);
+        Assert.True(validator4.ShowMatchedWords);
+
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        using var stream = File.OpenRead(filePath);
+        var validator5 = Validators.SensitiveWord(stream);
+        Assert.NotNull(validator5.Sanitizer);
+        Assert.Null(validator5.DictionaryName);
+        Assert.Null(validator5.FilePath);
+        Assert.False(validator5.ShowMatchedWords);
+
+        var validator6 = Validators.SensitiveWord(stream, "validator_test", u => u.ShowMatchedWords = true);
+        Assert.NotNull(validator6.Sanitizer);
+        Assert.Null(validator6.DictionaryName);
+        Assert.Null(validator6.FilePath);
+        Assert.True(validator6.ShowMatchedWords);
+        SensitiveWordSanitizerFactory.TryRemove("validator_test");
+    }
+
+    [Fact]
     public void Single_ReturnOK()
     {
         var validator = Validators.Single();
