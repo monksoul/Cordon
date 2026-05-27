@@ -22,7 +22,6 @@ public class SensitiveWordValidatorTests
         Assert.Null(validator.DictionaryName);
         Assert.Null(validator.FilePath);
         Assert.False(validator.ShowMatchedWords);
-        Assert.Null(SensitiveWordValidator._lastMatchDetails.Value);
         Assert.NotNull(validator._errorMessageResourceAccessor);
         Assert.Equal("The field {0} contains sensitive or prohibited words.",
             validator._errorMessageResourceAccessor());
@@ -231,17 +230,16 @@ public class SensitiveWordValidatorTests
     public void FormatErrorMessage_ReturnOK()
     {
         var validator = new SensitiveWordValidator();
-        Assert.Equal("The field data contains sensitive or prohibited words.", validator.FormatErrorMessage("data"));
+        Assert.Equal("The field data contains sensitive or prohibited words.",
+            validator.FormatErrorMessage("data", null));
 
         var validator2 = new SensitiveWordValidator { ShowMatchedWords = true };
         Assert.Equal("The field data contains sensitive or prohibited words: .",
-            validator2.FormatErrorMessage("data"));
+            validator2.FormatErrorMessage("data", []));
 
         var validator3 = new SensitiveWordValidator { ShowMatchedWords = true };
-        SensitiveWordValidator._lastMatchDetails.Value = ["[敏感词] @ 5..10", "[TMD!] @ 5..8"];
         Assert.Equal("The field data contains sensitive or prohibited words: [敏感词] @ 5..10, [TMD!] @ 5..8.",
-            validator3.FormatErrorMessage("data"));
-        SensitiveWordValidator._lastMatchDetails.Value = null;
+            validator3.FormatErrorMessage("data", [new MatchResult("敏感词", 5, 10), new MatchResult("TMD!", 5, 8)]));
     }
 
     [Fact]

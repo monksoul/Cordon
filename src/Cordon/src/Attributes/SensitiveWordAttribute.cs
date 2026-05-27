@@ -15,18 +15,10 @@ namespace System.ComponentModel.DataAnnotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class SensitiveWordAttribute : ValidationBaseAttribute
 {
-    /// <inheritdoc cref="SensitiveWordValidator" />
-    internal readonly SensitiveWordValidator _validator;
-
     /// <summary>
     ///     <inheritdoc cref="SensitiveWordAttribute" />
     /// </summary>
-    public SensitiveWordAttribute()
-    {
-        _validator = new SensitiveWordValidator();
-
-        UseResourceKey(GetResourceKey);
-    }
+    public SensitiveWordAttribute() => UseResourceKey(GetResourceKey);
 
     /// <summary>
     ///     敏感词字典名称
@@ -35,15 +27,7 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
     ///     <para>用于从 <see cref="SensitiveWordSanitizerFactory.Get(string)" /> 中获取 <see cref="SensitiveWordSanitizer" /> 实例。</para>
     ///     <para>对应 <see cref="SensitiveWordSanitizerFactory" /> 中缓存的实例名称。与 <see cref="FilePath" /> 互斥，只能设置其中一个。</para>
     /// </remarks>
-    public string? DictionaryName
-    {
-        get;
-        set
-        {
-            field = value;
-            _validator.DictionaryName = value;
-        }
-    }
+    public string? DictionaryName { get; set; }
 
     /// <summary>
     ///     敏感词文件路径
@@ -52,42 +36,48 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
     ///     与 <see cref="DictionaryName" /> 互斥，只能设置其中一个。支持后续通过
     ///     <see cref="SensitiveWordSanitizerFactory.Refresh(string)" /> 进行刷新（热更新）。
     /// </remarks>
-    public string? FilePath
-    {
-        get;
-        set
-        {
-            field = value;
-            _validator.FilePath = value;
-        }
-    }
+    public string? FilePath { get; set; }
 
     /// <summary>
     ///     是否在错误信息中显示命中的敏感词详情
     /// </summary>
     /// <remarks>默认值为：<c>false</c>。</remarks>
-    public bool ShowMatchedWords
+    public bool ShowMatchedWords { get; set; }
+
+    /// <inheritdoc />
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        get;
-        set
+        // 检查值是否为字符串类型，且字符串不是由空白字符组成
+        if (value is not string text || string.IsNullOrWhiteSpace(text))
         {
-            field = value;
-            _validator.ShowMatchedWords = value;
+            return ValidationResult.Success;
         }
+
+        // 获取敏感词清理器实例
+        var sanitizer = GetSanitizer();
+
+        // 检查文本并返回所有命中词及精确位置
+        return sanitizer.FindMatches(text) is not { Length: > 0 } matches
+            ? ValidationResult.Success
+            : new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!, matches));
     }
 
-    /// <inheritdoc />
-    public override bool IsValid(object? value) => _validator.IsValid(value);
-
-    /// <inheritdoc />
-    public override string FormatErrorMessage(string name)
+    /// <summary>
+    ///     格式化错误信息
+    /// </summary>
+    /// <param name="name">显示名称</param>
+    /// <param name="matches"><see cref="MatchResult" />[]</param>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    public virtual string FormatErrorMessage(string name, MatchResult[]? matches)
     {
         var template = ErrorMessageString;
 
         // 空检查
         if (string.IsNullOrWhiteSpace(template))
         {
-            return base.FormatErrorMessage(name);
+            return null!;
         }
 
         // 检查是否在错误信息中显示命中的敏感词详情
@@ -97,7 +87,7 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
         }
 
         // 将验证命中的匹配结果详情组合成字符串
-        var wordsString = string.Join(", ", SensitiveWordValidator._lastMatchDetails.Value ?? []);
+        var wordsString = string.Join(", ", (matches ?? []).Select(u => u.ToString()));
 
         // 检查错误信息字符串是否包含 {1} 占位符
         if (template.Contains("{1}"))
@@ -106,6 +96,53 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
         }
 
         return string.Format(CultureInfo.CurrentCulture, template, name) + $" Matched: {wordsString}";
+    }
+
+    /// <summary>
+    ///     获取敏感词清理器实例
+    /// </summary>
+    /// <returns>
+    ///     <see cref="SensitiveWordSanitizer" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal SensitiveWordSanitizer GetSanitizer()
+    {
+        var dictionaryNameSet = !string.IsNullOrWhiteSpace(DictionaryName);
+        var filePathSet = !string.IsNullOrWhiteSpace(FilePath);
+
+        // 以下组合是非法的，会抛出 InvalidOperationException：
+        // 1) 没有任何数据源被配置
+        // ReSharper disable once ConvertIfStatementToSwitchStatement
+        if (!dictionaryNameSet && !filePathSet)
+        {
+            try
+            {
+                // 尝试使用默认的 SensitiveWordOptions.DefaultDictionaryName 回退
+                return SensitiveWordSanitizerFactory.Get(SensitiveWordOptions.DefaultDictionaryName);
+            }
+            catch (InvalidOperationException)
+            {
+                throw new InvalidOperationException(
+                    $"No dictionary source is configured for the {nameof(SensitiveWordAttribute)}, and the default dictionary '{SensitiveWordOptions.DefaultDictionaryName}' has not been registered. Please either set the '{nameof(DictionaryName)}' or '{nameof(FilePath)}' property, or register the default dictionary via `SensitiveWordSanitizerFactory.GetOrCreateFromPath` at application startup.");
+            }
+        }
+
+        // 2) 同时配置了多个数据源
+        if (dictionaryNameSet && filePathSet)
+        {
+            throw new InvalidOperationException(
+                $"Multiple dictionary sources are configured for the {nameof(SensitiveWordAttribute)}. Please set either '{nameof(DictionaryName)}' or '{nameof(FilePath)}'.");
+        }
+
+        // 如果设置了 DictionaryName，则从工厂缓存中获取
+        // ReSharper disable once ConvertIfStatementToReturnStatement
+        if (dictionaryNameSet)
+        {
+            return SensitiveWordSanitizerFactory.Get(DictionaryName!);
+        }
+
+        // 否则通过文件路径加载（工厂内部会自动规范化路径并作为键缓存）
+        return SensitiveWordSanitizerFactory.GetOrCreateFromPath(FilePath!);
     }
 
     /// <summary>

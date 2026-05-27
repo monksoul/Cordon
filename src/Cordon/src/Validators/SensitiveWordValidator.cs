@@ -15,11 +15,6 @@ namespace Cordon;
 public class SensitiveWordValidator : ValidatorBase
 {
     /// <summary>
-    ///     最近一次验证命中的匹配结果详情
-    /// </summary>
-    internal static readonly AsyncLocal<string[]?> _lastMatchDetails = new();
-
-    /// <summary>
     ///     <inheritdoc cref="SensitiveWordValidator" />
     /// </summary>
     public SensitiveWordValidator() => UseResourceKey(GetResourceKey);
@@ -96,9 +91,6 @@ public class SensitiveWordValidator : ValidatorBase
     /// <inheritdoc />
     public override bool IsValid(object? value, IValidationContext? validationContext)
     {
-        // 重置所有命中词及精确位置字符串
-        _lastMatchDetails.Value = null;
-
         // 检查值是否为字符串类型，且字符串不是由空白字符组成
         if (value is not string text || string.IsNullOrWhiteSpace(text))
         {
@@ -108,36 +100,68 @@ public class SensitiveWordValidator : ValidatorBase
         // 获取敏感词清理器实例
         var sanitizer = GetSanitizer();
 
-        // 检查是否在错误信息中显示命中的敏感词详情
-        if (!ShowMatchedWords)
-        {
-            return !sanitizer.Contains(text);
-        }
-
-        // 检查文本并返回所有命中词及精确位置
-        var matches = sanitizer.FindMatches(text);
-
-        // 空检查
-        if (matches.Length == 0)
-        {
-            return true;
-        }
-
-        // 存储所有命中词及精确位置字符串
-        _lastMatchDetails.Value = matches.Select(u => u.ToString()).ToArray();
-
-        return false;
+        return !sanitizer.Contains(text);
     }
 
     /// <inheritdoc />
-    public override string? FormatErrorMessage(string name)
+    public override List<ValidationResult>? GetValidationResults(object? value, IValidationContext? validationContext)
+    {
+        // 检查值是否为字符串类型，且字符串不是由空白字符组成
+        if (value is not string text || string.IsNullOrWhiteSpace(text))
+        {
+            return null;
+        }
+
+        // 获取敏感词清理器实例
+        var sanitizer = GetSanitizer();
+
+        // 检查文本并返回所有命中词及精确位置
+        return sanitizer.FindMatches(text) is not { Length: > 0 } matches
+            ? null
+            :
+            [
+                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!, matches),
+                    validationContext?.MemberNames)
+            ];
+    }
+
+    /// <inheritdoc />
+    public override void Validate(object? value, IValidationContext? validationContext)
+    {
+        // 检查值是否为字符串类型，且字符串不是由空白字符组成
+        if (value is not string text || string.IsNullOrWhiteSpace(text))
+        {
+            return;
+        }
+
+        // 获取敏感词清理器实例
+        var sanitizer = GetSanitizer();
+
+        // 检查文本并返回首个命中词及精确位置
+        if (sanitizer.FindFirst(text) is { } firstMatch)
+        {
+            throw new ValidationException(
+                new ValidationResult(FormatErrorMessage(validationContext?.DisplayName!, [firstMatch]),
+                    validationContext?.MemberNames), null, value);
+        }
+    }
+
+    /// <summary>
+    ///     格式化错误信息
+    /// </summary>
+    /// <param name="name">显示名称</param>
+    /// <param name="matches"><see cref="MatchResult" />[]</param>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    public virtual string? FormatErrorMessage(string name, MatchResult[]? matches)
     {
         var template = ErrorMessageString;
 
         // 空检查
         if (string.IsNullOrWhiteSpace(template))
         {
-            return null;
+            return base.FormatErrorMessage(name);
         }
 
         // 检查是否在错误信息中显示命中的敏感词详情
@@ -147,7 +171,7 @@ public class SensitiveWordValidator : ValidatorBase
         }
 
         // 将验证命中的匹配结果详情组合成字符串
-        var wordsString = string.Join(", ", _lastMatchDetails.Value ?? []);
+        var wordsString = string.Join(", ", (matches ?? []).Select(u => u.ToString()));
 
         // 检查错误信息字符串是否包含 {1} 占位符
         if (template.Contains("{1}"))
@@ -172,11 +196,12 @@ public class SensitiveWordValidator : ValidatorBase
         var filePathSet = !string.IsNullOrWhiteSpace(FilePath);
 
         // 以下组合是非法的，会抛出 InvalidOperationException：
-        // 1) 没有任何数据源被配置，使用默认的 SensitiveWordOptions.DefaultDictionaryName 回退
+        // 1) 没有任何数据源被配置
         if (!sanitizerSet && !dictionaryNameSet && !filePathSet)
         {
             try
             {
+                // 尝试使用默认的 SensitiveWordOptions.DefaultDictionaryName 回退
                 return SensitiveWordSanitizerFactory.Get(SensitiveWordOptions.DefaultDictionaryName);
             }
             catch (InvalidOperationException)

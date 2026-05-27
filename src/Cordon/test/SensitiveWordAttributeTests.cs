@@ -28,10 +28,6 @@ public class SensitiveWordAttributeTests
         Assert.Null(attribute.FilePath);
         Assert.False(attribute.ShowMatchedWords);
         Assert.Null(attribute.ErrorMessage);
-        Assert.NotNull(attribute._validator);
-        Assert.Null(attribute._validator.DictionaryName);
-        Assert.Null(attribute._validator.FilePath);
-        Assert.False(attribute._validator.ShowMatchedWords);
 
         var attribute2 = new SensitiveWordAttribute
         {
@@ -41,10 +37,6 @@ public class SensitiveWordAttributeTests
         Assert.Equal("sensitive_words.txt", attribute2.FilePath);
         Assert.True(attribute2.ShowMatchedWords);
         Assert.Null(attribute2.ErrorMessage);
-        Assert.NotNull(attribute2._validator);
-        Assert.Equal("attribute", attribute2._validator.DictionaryName);
-        Assert.Equal("sensitive_words.txt", attribute2._validator.FilePath);
-        Assert.True(attribute2._validator.ShowMatchedWords);
     }
 
     [Fact]
@@ -142,16 +134,61 @@ public class SensitiveWordAttributeTests
     public void FormatErrorMessage_ReturnOK()
     {
         var attribute = new SensitiveWordAttribute();
-        Assert.Equal("The field data contains sensitive or prohibited words.", attribute.FormatErrorMessage("data"));
+        Assert.Equal("The field data contains sensitive or prohibited words.",
+            attribute.FormatErrorMessage("data", null));
 
         var attribute2 = new SensitiveWordAttribute { ShowMatchedWords = true };
-        Assert.Equal("The field data contains sensitive or prohibited words: .", attribute2.FormatErrorMessage("data"));
+        Assert.Equal("The field data contains sensitive or prohibited words: .",
+            attribute2.FormatErrorMessage("data", []));
 
         var attribute3 = new SensitiveWordAttribute { ShowMatchedWords = true };
-        SensitiveWordValidator._lastMatchDetails.Value = ["[敏感词] @ 5..10", "[TMD!] @ 5..8"];
         Assert.Equal("The field data contains sensitive or prohibited words: [敏感词] @ 5..10, [TMD!] @ 5..8.",
-            attribute3.FormatErrorMessage("data"));
-        SensitiveWordValidator._lastMatchDetails.Value = null;
+            attribute3.FormatErrorMessage("data", [new MatchResult("敏感词", 5, 10), new MatchResult("TMD!", 5, 8)]));
+    }
+
+    [Fact]
+    public void GetSanitizer_Invalid_Parameters()
+    {
+        var validator = new SensitiveWordAttribute();
+        var exception = Assert.Throws<InvalidOperationException>(validator.GetSanitizer);
+        Assert.Equal(
+            "No dictionary source is configured for the SensitiveWordAttribute, and the default dictionary 'SensitiveWords:Default' has not been registered. Please either set the 'DictionaryName' or 'FilePath' property, or register the default dictionary via `SensitiveWordSanitizerFactory.GetOrCreateFromPath` at application startup.",
+            exception.Message);
+
+        validator.DictionaryName = "file-key";
+        validator.FilePath = "mock-file.txt";
+        var exception2 = Assert.Throws<InvalidOperationException>(validator.GetSanitizer);
+        Assert.Equal(
+            "Multiple dictionary sources are configured for the SensitiveWordAttribute. Please set either 'DictionaryName' or 'FilePath'.",
+            exception2.Message);
+    }
+
+    [Fact]
+    public void GetSanitizer_ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var normalizedPath = Path.GetFullPath(filePath);
+
+        var sensitiveWordSanitizer1 = SensitiveWordSanitizerFactory.GetOrCreateFromPath("validator_get", filePath);
+        var sensitiveWordAttribute = new SensitiveWordAttribute { DictionaryName = "validator_get" };
+        var sanitizer1 = sensitiveWordAttribute.GetSanitizer();
+        Assert.NotNull(sanitizer1);
+        Assert.Same(sensitiveWordSanitizer1, sanitizer1);
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove("validator_get"));
+
+        var sensitiveWordAttribute2 = new SensitiveWordAttribute { FilePath = filePath };
+        var sanitizer2 = sensitiveWordAttribute2.GetSanitizer();
+        Assert.NotNull(sanitizer2);
+        var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get(normalizedPath);
+        Assert.Same(sensitiveWordSanitizer3, sanitizer2);
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+
+        var sensitiveWordAttribute3 = new SensitiveWordAttribute();
+        var sensitiveWordSanitizer4 =
+            SensitiveWordSanitizerFactory.GetOrCreateFromPath(SensitiveWordOptions.DefaultDictionaryName, filePath);
+        var sanitizer4 = sensitiveWordAttribute3.GetSanitizer();
+        Assert.Same(sensitiveWordSanitizer4, sanitizer4);
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
     }
 
     [Fact]
