@@ -76,7 +76,6 @@ public class SensitiveWordValidatorTests
     public void GetValidationResults_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var normalizedPath = Path.GetFullPath(filePath);
         var validator = new SensitiveWordValidator { FilePath = filePath };
 
         Assert.Null(validator.GetValidationResults(null, "data"));
@@ -91,14 +90,13 @@ public class SensitiveWordValidatorTests
         Assert.NotNull(validationResults2);
         Assert.Single(validationResults2);
         Assert.Equal("数据无效", validationResults2.First().ErrorMessage);
-        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
     }
 
     [Fact]
     public void GetValidationResults_WithShowMatchedWords_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var normalizedPath = Path.GetFullPath(filePath);
         var validator = new SensitiveWordValidator { FilePath = filePath, ShowMatchedWords = true };
 
         Assert.Null(validator.GetValidationResults(null, "data"));
@@ -114,7 +112,7 @@ public class SensitiveWordValidatorTests
         Assert.NotNull(validationResults2);
         Assert.Single(validationResults2);
         Assert.Equal("数据无效 Matched: [敏感词] @ 4..7", validationResults2.First().ErrorMessage);
-        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
     }
 
     [Fact]
@@ -143,7 +141,6 @@ public class SensitiveWordValidatorTests
     public void Validate_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var normalizedPath = Path.GetFullPath(filePath);
         var validator = new SensitiveWordValidator { FilePath = filePath };
 
         validator.Validate(null, "data");
@@ -154,14 +151,13 @@ public class SensitiveWordValidatorTests
         validator.ErrorMessage = "数据无效";
         var exception2 = Assert.Throws<ValidationException>(() => validator.Validate("这里包含敏感词吗", "data"));
         Assert.Equal("数据无效", exception2.Message);
-        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
     }
 
     [Fact]
     public void Validate_WithShowMatchedWords_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var normalizedPath = Path.GetFullPath(filePath);
         var validator = new SensitiveWordValidator { FilePath = filePath, ShowMatchedWords = true };
 
         validator.Validate(null, "data");
@@ -172,7 +168,7 @@ public class SensitiveWordValidatorTests
         validator.ErrorMessage = "数据无效";
         var exception2 = Assert.Throws<ValidationException>(() => validator.Validate("这里包含敏感词吗", "data"));
         Assert.Equal("数据无效 Matched: [敏感词] @ 4..7", exception2.Message);
-        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
     }
 
     [Fact]
@@ -214,9 +210,9 @@ public class SensitiveWordValidatorTests
         var validator3 = new SensitiveWordValidator { FilePath = filePath };
         var sanitizer3 = validator3.GetSanitizer();
         Assert.NotNull(sanitizer3);
-        var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get(normalizedPath);
+        var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get(SensitiveWordOptions.DefaultDictionaryName);
         Assert.Same(sensitiveWordSanitizer3, sanitizer3);
-        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
 
         var validator4 = new SensitiveWordValidator();
         var sensitiveWordSanitizer4 =

@@ -231,7 +231,7 @@ public class SensitiveWordValidator : ValidatorBase
             return SensitiveWordSanitizerFactory.Get(DictionaryName!);
         }
 
-        // 否则通过文件路径加载（工厂内部会自动规范化路径并作为键缓存）
+        // 否则通过文件路径加载（使用 SensitiveWordOptions.DefaultDictionaryName 作为字典名称）
         return SensitiveWordSanitizerFactory.GetOrCreateFromPath(FilePath!);
     }
 

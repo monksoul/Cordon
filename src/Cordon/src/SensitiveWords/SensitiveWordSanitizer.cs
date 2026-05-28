@@ -10,14 +10,13 @@ namespace Cordon;
 /// <remarks>
 ///     <para>分隔符：支持 <c>|</c>、<c>,</c>、<c>\t</c>、<c>;</c> 任意混用，连续分隔符自动跳过。同时兼容一行一个词。</para>
 ///     <para>注释：以 <c>#</c> 开头的整行将被忽略；行内 <c>#</c> 之后的内容将被截断忽略。</para>
-///     <para>词库下载：https://github.com/konsheng/Sensitive-lexicon</para>
+///     <para>词库：https://github.com/konsheng/Sensitive-lexicon</para>
 /// </remarks>
 public sealed class SensitiveWordSanitizer
 {
     /// <summary>
     ///     预计算的符号跳过映射表
     /// </summary>
-    /// <remarks>65536 个 bool 仅占 64KB，换取极致扫描性能。</remarks>
     internal static readonly bool[] SkipMap = InitSkipMap();
 
     /// <summary>
@@ -185,6 +184,8 @@ public sealed class SensitiveWordSanitizer
             }
 
             var normalizedKey = coreBuilder.ToString();
+
+            // 空检查
             if (string.IsNullOrEmpty(normalizedKey))
             {
                 continue;
@@ -198,6 +199,7 @@ public sealed class SensitiveWordSanitizer
 
             // 初始化根节点
             var node = root;
+
             foreach (var c in normalizedKey)
             {
                 if (!node.Children.TryGetValue(c, out var next))
@@ -210,6 +212,7 @@ public sealed class SensitiveWordSanitizer
             }
 
             node.IsEnd = true;
+
             // 保留原始词及其核心长度（含分隔符）
             if (node.MatchedWordSet.Add(originalWord))
             {

@@ -180,9 +180,9 @@ public class SensitiveWordAttributeTests
         var sensitiveWordAttribute2 = new SensitiveWordAttribute { FilePath = filePath };
         var sanitizer2 = sensitiveWordAttribute2.GetSanitizer();
         Assert.NotNull(sanitizer2);
-        var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get(normalizedPath);
+        var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get(SensitiveWordOptions.DefaultDictionaryName);
         Assert.Same(sensitiveWordSanitizer3, sanitizer2);
-        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
 
         var sensitiveWordAttribute3 = new SensitiveWordAttribute();
         var sensitiveWordSanitizer4 =

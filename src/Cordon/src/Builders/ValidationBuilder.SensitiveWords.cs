@@ -10,13 +10,18 @@ public sealed partial class ValidationBuilder
     /// <summary>
     ///     添加敏感词词库
     /// </summary>
+    /// <remarks>使用 <see cref="SensitiveWordOptions.DefaultDictionaryName" /> 作为字典名称。</remarks>
     /// <param name="filePath">文件路径</param>
     /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <returns>
     ///     <see cref="ValidationBuilder" />
     /// </returns>
-    public ValidationBuilder AddSensitiveWords(string filePath, SensitiveWordOptions? options = null) =>
-        AddSensitiveWords(filePath, SensitiveWordOptions.DefaultDictionaryName, options);
+    public ValidationBuilder AddSensitiveWords(string filePath, SensitiveWordOptions? options = null)
+    {
+        SensitiveWordSanitizerFactory.GetOrCreateFromPath(filePath, options);
+
+        return this;
+    }
 
     /// <summary>
     ///     添加敏感词词库

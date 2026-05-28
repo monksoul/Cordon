@@ -75,11 +75,13 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
-    public void GetOrCreateFromPath_Default_Invalid_Parameters()
+    public void GetOrCreateFromPath_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(null!));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(string.Empty));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(" "));
+        Assert.Throws<ArgumentNullException>(() =>
+            SensitiveWordSanitizerFactory.GetOrCreateFromPath(null!, (string)null!));
+        Assert.Throws<ArgumentException>(() =>
+            SensitiveWordSanitizerFactory.GetOrCreateFromPath(string.Empty, (string)null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(" ", (string)null!));
         Assert.Throws<ArgumentNullException>(() =>
             SensitiveWordSanitizerFactory.GetOrCreateFromPath("file", (string)null!));
         Assert.Throws<FileNotFoundException>(() =>
@@ -87,7 +89,7 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
-    public void GetOrCreateFromPath_Default_ReturnOK()
+    public void GetOrCreateFromPath_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
 
@@ -106,7 +108,7 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
-    public void GetOrCreateFromPath_FilePathKey_Invalid_Parameters()
+    public void GetOrCreateFromPath_Unnamed_Invalid_Parameters()
     {
         Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(null!));
         Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.GetOrCreateFromPath(string.Empty));
@@ -115,15 +117,15 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
-    public void GetOrCreateFromPath_FilePathKey_ReturnOK()
+    public void GetOrCreateFromPath_Unnamed_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var normalizedPath = Path.GetFullPath(filePath);
 
         var sensitiveWordSanitizer = SensitiveWordSanitizerFactory.GetOrCreateFromPath(filePath);
         Assert.NotNull(sensitiveWordSanitizer);
         Assert.Single(SensitiveWordSanitizerFactory._instances);
-        Assert.Equal(normalizedPath, SensitiveWordSanitizerFactory._instances.Keys.FirstOrDefault());
+        Assert.Equal(SensitiveWordOptions.DefaultDictionaryName,
+            SensitiveWordSanitizerFactory._instances.Keys.FirstOrDefault());
 
         var sensitiveWordSanitizer2 = SensitiveWordSanitizerFactory.GetOrCreateFromPath(filePath);
         Assert.Single(SensitiveWordSanitizerFactory._instances);
@@ -131,7 +133,7 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(sensitiveWordSanitizer.Contains("这里包含敏感词吗"));
 
-        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -267,11 +269,12 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
-    public void RefreshFromPath_Default_Invalid_Parameters()
+    public void RefreshFromPath_Invalid_Parameters()
     {
-        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(null!));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(string.Empty));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(" "));
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(null!, (string)null!));
+        Assert.Throws<ArgumentException>(() =>
+            SensitiveWordSanitizerFactory.RefreshFromPath(string.Empty, (string)null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(" ", (string)null!));
         Assert.Throws<ArgumentNullException>(() =>
             SensitiveWordSanitizerFactory.RefreshFromPath("file", (string)null!));
         Assert.Throws<FileNotFoundException>(() =>
@@ -279,7 +282,7 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
-    public void RefreshFromPath_Default_ReturnOK()
+    public void RefreshFromPath_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
 
@@ -295,7 +298,7 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
-    public void RefreshFromPath_FilePathKey_Invalid_Parameters()
+    public void RefreshFromPath_Unnamed_Invalid_Parameters()
     {
         Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(null!));
         Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.RefreshFromPath(string.Empty));
@@ -305,19 +308,19 @@ public class SensitiveWordSanitizerFactoryTests
     }
 
     [Fact]
-    public void RefreshFromPath_FilePathKey_ReturnOK()
+    public void RefreshFromPath_Unnamed_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var normalizedPath = Path.GetFullPath(filePath);
 
         SensitiveWordSanitizerFactory.RefreshFromPath(filePath);
-        var sensitiveWordSanitizer = SensitiveWordSanitizerFactory._instances[normalizedPath];
+        var sensitiveWordSanitizer =
+            SensitiveWordSanitizerFactory._instances[SensitiveWordOptions.DefaultDictionaryName];
         Assert.NotNull(sensitiveWordSanitizer);
         Assert.Single(SensitiveWordSanitizerFactory._instances);
 
         Assert.True(sensitiveWordSanitizer.LazyInstance.Value.Contains("这里包含敏感词吗"));
 
-        Assert.True(SensitiveWordSanitizerFactory.TryRemove(normalizedPath));
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
     }
 
@@ -376,6 +379,19 @@ public class SensitiveWordSanitizerFactoryTests
 
         Assert.True(SensitiveWordSanitizerFactory.TryRemove("factory"));
         Assert.Empty(SensitiveWordSanitizerFactory._instances);
+    }
+
+    [Fact]
+    public void GetDictionaryNames_ReturnOK()
+    {
+        Assert.Empty(SensitiveWordSanitizerFactory.GetDictionaryNames());
+        SensitiveWordSanitizerFactory.GetOrCreateFromPath(SensitiveWordOptions.DefaultDictionaryName,
+            "sensitive_words.txt");
+
+        var dictionaryNames = SensitiveWordSanitizerFactory.GetDictionaryNames();
+        Assert.Single(dictionaryNames);
+        Assert.Equal(["SensitiveWords:Default"], dictionaryNames);
+        Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordOptions.DefaultDictionaryName));
     }
 
     [Fact]

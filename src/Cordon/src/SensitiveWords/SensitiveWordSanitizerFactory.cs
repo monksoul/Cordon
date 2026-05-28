@@ -63,7 +63,7 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <remarks>以规范化的文件路径作为缓存的键。</remarks>
+    /// <remarks>使用 <see cref="SensitiveWordOptions.DefaultDictionaryName" /> 作为字典名称。</remarks>
     /// <param name="filePath">文件路径</param>
     /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <returns>
@@ -78,7 +78,7 @@ public static class SensitiveWordSanitizerFactory
         // 解析（规范化）文件路径
         var resolvedPath = ResolveFilePath(filePath);
 
-        return GetOrCreate(resolvedPath,
+        return GetOrCreate(SensitiveWordOptions.DefaultDictionaryName,
             () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, options));
     }
 
@@ -209,7 +209,7 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     刷新 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <remarks>以规范化的文件路径作为缓存的键。</remarks>
+    /// <remarks>使用 <see cref="SensitiveWordOptions.DefaultDictionaryName" /> 作为字典名称。</remarks>
     /// <param name="filePath">文件路径</param>
     /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
     /// <exception cref="ArgumentException"></exception>
@@ -221,7 +221,8 @@ public static class SensitiveWordSanitizerFactory
         // 解析（规范化）文件路径
         var resolvedPath = ResolveFilePath(filePath);
 
-        Refresh(resolvedPath, () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, options));
+        Refresh(SensitiveWordOptions.DefaultDictionaryName,
+            () => SensitiveWordSanitizer.CreateFromPath(resolvedPath, options));
     }
 
     /// <summary>
@@ -281,6 +282,14 @@ public static class SensitiveWordSanitizerFactory
 
         _instances.AddOrUpdate(dictionaryName, newEntry, (_, _) => newEntry);
     }
+
+    /// <summary>
+    ///     获取所有敏感词字典名称
+    /// </summary>
+    /// <returns>
+    ///     <see cref="ICollection{T}" />
+    /// </returns>
+    public static ICollection<string> GetDictionaryNames() => _instances.Keys;
 
     /// <summary>
     ///     移除指定名称的 <see cref="SensitiveWordSanitizer" /> 实例

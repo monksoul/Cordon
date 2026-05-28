@@ -7,7 +7,7 @@ namespace Cordon.Tests;
 public class SensitiveWordSanitizerTests
 {
     private const string userText =
-        @"测试开始：加微信，加-wechat；兼职刷单：日结300元。QQ群123456，淘宝代刷。违规表述、暴恐、涉政。还有涉 政（带空格），涉-政，涉　政（全角空格），涉\t政（制表符）。敏感词测试：敏感 词、敏-感词、敏感词！test bad word 和 illegal term，八嘎耶鲁（无空格），你大爷，low high，hello-world! Hello World。abc*def。另外重叠匹配：low_high low high。最后去TMD!。";
+        @"测试开始：加微信，加-wechat；兼职刷单：日结300元。QQ群123456，淘宝代刷。违规表述、暴恐、涉政。还有涉 政（带空格），涉-政，涉　政（全角空格），涉\t政（制表符）。敏感词测试：敏感 词、敏-感词、敏感词！test bad word 和 illegal term，八嘎耶鲁（无空格），你大爷，low high，hello-world! Hello World。abc*def。另外重叠匹配：low_high low high。最后去TMD!。ｆｕｃｋ the bad words.";
 
     [Fact]
     public void New_ReturnOK()
@@ -51,7 +51,7 @@ public class SensitiveWordSanitizerTests
         Assert.True(sensitiveWordSanitizer._options.IgnoreSymbol);
         Assert.NotNull(sensitiveWordSanitizer._root);
         Assert.Equal('加', sensitiveWordSanitizer._root.Children.FirstOrDefault().Key);
-        Assert.Equal(15, sensitiveWordSanitizer._root.Children.Count);
+        Assert.Equal(16, sensitiveWordSanitizer._root.Children.Count);
 
         var sensitiveWordSanitizer2 = SensitiveWordSanitizer.CreateFromPath(filePath,
             new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
@@ -86,7 +86,7 @@ public class SensitiveWordSanitizerTests
         Assert.True(sensitiveWordSanitizer._options.IgnoreSymbol);
         Assert.NotNull(sensitiveWordSanitizer._root);
         Assert.Equal('加', sensitiveWordSanitizer._root.Children.FirstOrDefault().Key);
-        Assert.Equal(15, sensitiveWordSanitizer._root.Children.Count);
+        Assert.Equal(16, sensitiveWordSanitizer._root.Children.Count);
 
         var sensitiveWordSanitizer2 = SensitiveWordSanitizer.CreateFromStream(stream,
             new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
@@ -569,7 +569,7 @@ public class SensitiveWordSanitizerTests
 
         var newText = sensitiveWordSanitizer.Replace(userText);
         Assert.Equal(
-            "测试开始：***，加-wechat；****：日结300元。***123456，****。****、**、**。还有***（带空格），***，***（全角空格），涉\\t政（制表符）。***测试：****、****、***！************* 和 ************，****（无空格），***，********，***********! ***********。*******。另外重叠匹配：******** ********。最后去***!。",
+            "测试开始：***，加-wechat；****：日结300元。***123456，****。****、**、**。还有***（带空格），***，***（全角空格），涉\\t政（制表符）。***测试：****、****、***！************* 和 ************，****（无空格），***，********，***********! ***********。*******。另外重叠匹配：******** ********。最后去***!。ｆｕｃｋ the bad words.",
             newText);
     }
 
