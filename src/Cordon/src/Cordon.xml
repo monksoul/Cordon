@@ -6630,7 +6630,7 @@
             <summary>
                 默认选项
             </summary>
-            <remarks>忽略大小写、忽略符号。</remarks>
+            <remarks>忽略大小写、忽略符号、忽略全角/半角差异、忽略 Unicode 字母变体。</remarks>
         </member>
         <member name="P:Cordon.SensitiveWordOptions.IgnoreCase">
             <summary>
@@ -6650,6 +6650,15 @@
             </summary>
             <remarks>
                 <para>启用后，全角字母、数字、符号将视为与对应半角字符相同。例如 <c>ｆｕｃｋ</c> 等同于 <c>fuck</c>，<c>１２３</c> 等同于 <c>123</c>。</para>
+                <para>默认值为：<c>true</c>。</para>
+            </remarks>
+        </member>
+        <member name="P:Cordon.SensitiveWordOptions.IgnoreUnicodeVariants">
+            <summary>
+                是否忽略 Unicode 字母变体（带圈、带括号、数学粗体等），统一视为普通字母
+            </summary>
+            <remarks>
+                <para>启用后，<c>Ⓕⓤc⒦</c>、<c>𝐟𝐮𝐜𝐤</c> 等变体均等同于 <c>fuck</c>。</para>
                 <para>默认值为：<c>true</c>。</para>
             </remarks>
         </member>
@@ -6798,13 +6807,16 @@
                 <see cref="T:System.Boolean" />
             </returns>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizer.NormalizeFullwidthChar(System.Char)">
+        <member name="M:Cordon.SensitiveWordSanitizer.NormalizeChar(System.Char,Cordon.SensitiveWordOptions)">
             <summary>
-                将全角字母、数字、符号转换为半角
+                根据选项处理全角/半角及 Unicode 变体
             </summary>
             <param name="c">原始字符</param>
+            <param name="options">
+                <see cref="T:Cordon.SensitiveWordOptions" />
+            </param>
             <returns>
-                <see cref="!:c" />
+                <see cref="T:System.Char" />
             </returns>
         </member>
         <member name="M:Cordon.SensitiveWordSanitizer.InitSkipMap">

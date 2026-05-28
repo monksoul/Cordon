@@ -7,7 +7,7 @@ namespace Cordon.Tests;
 public class SensitiveWordSanitizerTests
 {
     private const string userText =
-        @"测试开始：加微信，加-wechat；兼职刷单：日结300元。QQ群123456，淘宝代刷。违规表述、暴恐、涉政。还有涉 政（带空格），涉-政，涉　政（全角空格），涉\t政（制表符）。敏感词测试：敏感 词、敏-感词、敏感词！test bad word 和 illegal term，八嘎耶鲁（无空格），你大爷，low high，hello-world! Hello World。abc*def。另外重叠匹配：low_high low high。最后去TMD!。ｆｕｃｋ the bad words.";
+        @"测试开始：加微信，加-wechat；兼职刷单：日结300元。QQ群123456，淘宝代刷。违规表述、暴恐、涉政。还有涉 政（带空格），涉-政，涉　政（全角空格），涉\t政（制表符）。敏感词测试：敏感 词、敏-感词、敏感词！test bad word 和 illegal term，八嘎耶鲁（无空格），你大爷，low high，hello-world! Hello World。abc*def。另外重叠匹配：low_high low high。最后去TMD!。ｆｕｃｋ the bad words。Ⓕⓤc⒦ the bad words。";
 
     [Fact]
     public void New_ReturnOK()
@@ -569,7 +569,7 @@ public class SensitiveWordSanitizerTests
 
         var newText = sensitiveWordSanitizer.Replace(userText);
         Assert.Equal(
-            "测试开始：***，加-wechat；****：日结300元。***123456，****。****、**、**。还有***（带空格），***，***（全角空格），涉\\t政（制表符）。***测试：****、****、***！************* 和 ************，****（无空格），***，********，***********! ***********。*******。另外重叠匹配：******** ********。最后去***!。**** the bad words.",
+            "测试开始：***，加-wechat；****：日结300元。***123456，****。****、**、**。还有***（带空格），***，***（全角空格），涉\\t政（制表符）。***测试：****、****、***！************* 和 ************，****（无空格），***，********，***********! ***********。*******。另外重叠匹配：******** ********。最后去***!。**** the bad words。Ⓕⓤc⒦ the bad words。",
             newText);
     }
 
@@ -624,10 +624,12 @@ public class SensitiveWordSanitizerTests
     [InlineData('ｕ', 'u')]
     [InlineData('１', '1')]
     [InlineData('２', '2')]
-    public void NormalizeFullwidthChar_ReturnOK(char c, char result)
-    {
-        Assert.Equal(result, SensitiveWordSanitizer.NormalizeFullwidthChar(c));
-    }
+    [InlineData('Ⓕ', 'F')]
+    [InlineData('ⓤ', 'u')]
+    [InlineData('c', 'c')]
+    [InlineData('⒦', 'k')]
+    public void NormalizeChar_ReturnOK(char c, char result) => Assert.Equal(result,
+        SensitiveWordSanitizer.NormalizeChar(c, SensitiveWordOptions.Default));
 
     [Fact]
     public void InitSkipMap_ReturnOK()

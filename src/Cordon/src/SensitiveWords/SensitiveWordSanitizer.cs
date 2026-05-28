@@ -179,8 +179,8 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
-                // 忽略全角与半角字符的差异（仅当选项启用时）
-                var normalized = options.IgnoreFullwidth ? NormalizeFullwidthChar(ch) : ch;
+                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+                var normalized = NormalizeChar(ch, options);
 
                 coreBuilder.Append(normalized);
                 coreLength++;
@@ -313,8 +313,8 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
-                // 忽略全角与半角字符的差异（仅当选项启用时）
-                var normalized = _options.IgnoreFullwidth ? NormalizeFullwidthChar(c) : c;
+                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+                var normalized = NormalizeChar(c, _options);
 
                 // 记录映射关系
                 realIndexMap[virtualIndex] = i;
@@ -404,8 +404,8 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
-                // 忽略全角与半角字符的差异（仅当选项启用时）
-                var normalized = _options.IgnoreFullwidth ? NormalizeFullwidthChar(c) : c;
+                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+                var normalized = NormalizeChar(c, _options);
 
                 // 记录映射关系
                 realIndexMap[virtualIndex] = i;
@@ -487,8 +487,8 @@ public sealed class SensitiveWordSanitizer
                 continue;
             }
 
-            // 忽略全角与半角字符的差异（仅当选项启用时）
-            var normalized = _options.IgnoreFullwidth ? NormalizeFullwidthChar(c) : c;
+            // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+            var normalized = NormalizeChar(c, _options);
             var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
 
             // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
@@ -677,21 +677,50 @@ public sealed class SensitiveWordSanitizer
     internal static bool ShouldSkip(char c) => SkipMap[c];
 
     /// <summary>
-    ///     将全角字母、数字、符号转换为半角
+    ///     根据选项处理全角/半角及 Unicode 变体
     /// </summary>
     /// <param name="c">原始字符</param>
+    /// <param name="options">
+    ///     <see cref="SensitiveWordOptions" />
+    /// </param>
     /// <returns>
-    ///     <see cref="c" />
+    ///     <see cref="char" />
     /// </returns>
-    internal static char NormalizeFullwidthChar(char c) =>
-        c switch
+    internal static char NormalizeChar(char c, SensitiveWordOptions options)
+    {
+        // 全角转半角（仅当选项启用时）
+        if (options.IgnoreFullwidth)
         {
-            // 全角 ASCII 范围（FF01-FF5E）转换为半角（21-7E）
-            >= '\uFF01' and <= '\uFF5E' => (char)(c - 0xFEE0),
-            // 全角空格（U+3000）转换为半角空格
-            '\u3000' => ' ',
-            _ => c
-        };
+            c = c switch
+            {
+                // 全角 ASCII 范围（FF01-FF5E）转换为半角（21-7E）
+                >= '\uFF01' and <= '\uFF5E' => (char)(c - 0xFEE0),
+                // 全角空格（U+3000）转换为半角空格
+                '\u3000' => ' ',
+                _ => c
+            };
+        }
+
+        // Unicode 变体规范化（仅当选项启用时）
+        // ReSharper disable once InvertIf
+        if (options.IgnoreUnicodeVariants)
+        {
+            switch (c)
+            {
+                // 带圈大写字母 A-Z (U+24B6 - U+24CF) -> A-Z
+                case >= '\u24B6' and <= '\u24CF':
+                    return (char)('A' + (c - '\u24B6'));
+                // 带圈小写字母 a-z (U+24D0 - U+24E9) -> a-z
+                case >= '\u24D0' and <= '\u24E9':
+                    return (char)('a' + (c - '\u24D0'));
+                // 带括号小写字母 a-z (U+249C - U+24B5) -> a-z
+                case >= '\u249C' and <= '\u24B5':
+                    return (char)('a' + (c - '\u249C'));
+            }
+        }
+
+        return c;
+    }
 
     /// <summary>
     ///     初始化符号跳过映射表

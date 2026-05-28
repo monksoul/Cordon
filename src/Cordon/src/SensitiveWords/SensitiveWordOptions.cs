@@ -24,7 +24,7 @@ public sealed record SensitiveWordOptions
     /// <summary>
     ///     默认选项
     /// </summary>
-    /// <remarks>忽略大小写、忽略符号。</remarks>
+    /// <remarks>忽略大小写、忽略符号、忽略全角/半角差异、忽略 Unicode 字母变体。</remarks>
     public static readonly SensitiveWordOptions Default = new();
 
     /// <summary>
@@ -47,4 +47,13 @@ public sealed record SensitiveWordOptions
     ///     <para>默认值为：<c>true</c>。</para>
     /// </remarks>
     public bool IgnoreFullwidth { get; init; } = true;
+
+    /// <summary>
+    ///     是否忽略 Unicode 字母变体（带圈、带括号、数学粗体等），统一视为普通字母
+    /// </summary>
+    /// <remarks>
+    ///     <para>启用后，<c>Ⓕⓤc⒦</c>、<c>𝐟𝐮𝐜𝐤</c> 等变体均等同于 <c>fuck</c>。</para>
+    ///     <para>默认值为：<c>true</c>。</para>
+    /// </remarks>
+    public bool IgnoreUnicodeVariants { get; init; } = true;
 }
