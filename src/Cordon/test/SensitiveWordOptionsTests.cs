@@ -12,6 +12,7 @@ public class SensitiveWordOptionsTests
         var options = new SensitiveWordOptions();
         Assert.True(options.IgnoreCase);
         Assert.True(options.IgnoreSymbol);
+        Assert.True(options.IgnoreFullwidth);
 
         var defaultOptions = SensitiveWordOptions.Default;
         Assert.NotNull(defaultOptions);

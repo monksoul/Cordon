@@ -179,7 +179,10 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
-                coreBuilder.Append(ch);
+                // 忽略全角与半角字符的差异（仅当选项启用时）
+                var normalized = options.IgnoreFullwidth ? NormalizeFullwidthChar(ch) : ch;
+
+                coreBuilder.Append(normalized);
                 coreLength++;
             }
 
@@ -310,9 +313,12 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
+                // 忽略全角与半角字符的差异（仅当选项启用时）
+                var normalized = _options.IgnoreFullwidth ? NormalizeFullwidthChar(c) : c;
+
                 // 记录映射关系
                 realIndexMap[virtualIndex] = i;
-                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(c) : c;
+                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
 
                 // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
                 TrieNode? next;
@@ -398,9 +404,12 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
+                // 忽略全角与半角字符的差异（仅当选项启用时）
+                var normalized = _options.IgnoreFullwidth ? NormalizeFullwidthChar(c) : c;
+
                 // 记录映射关系
                 realIndexMap[virtualIndex] = i;
-                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(c) : c;
+                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
 
                 // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
                 TrieNode? next;
@@ -478,7 +487,9 @@ public sealed class SensitiveWordSanitizer
                 continue;
             }
 
-            var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(c) : c;
+            // 忽略全角与半角字符的差异（仅当选项启用时）
+            var normalized = _options.IgnoreFullwidth ? NormalizeFullwidthChar(c) : c;
+            var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
 
             // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
             TrieNode? next;
@@ -664,6 +675,23 @@ public sealed class SensitiveWordSanitizer
     ///     <see cref="bool" />
     /// </returns>
     internal static bool ShouldSkip(char c) => SkipMap[c];
+
+    /// <summary>
+    ///     将全角字母、数字、符号转换为半角
+    /// </summary>
+    /// <param name="c">原始字符</param>
+    /// <returns>
+    ///     <see cref="c" />
+    /// </returns>
+    internal static char NormalizeFullwidthChar(char c) =>
+        c switch
+        {
+            // 全角 ASCII 范围（FF01-FF5E）转换为半角（21-7E）
+            >= '\uFF01' and <= '\uFF5E' => (char)(c - 0xFEE0),
+            // 全角空格（U+3000）转换为半角空格
+            '\u3000' => ' ',
+            _ => c
+        };
 
     /// <summary>
     ///     初始化符号跳过映射表

@@ -38,4 +38,13 @@ public sealed record SensitiveWordOptions
     /// </summary>
     /// <remarks>默认值为：<c>true</c>。</remarks>
     public bool IgnoreSymbol { get; init; } = true;
+
+    /// <summary>
+    ///     是否忽略全角与半角字符的差异
+    /// </summary>
+    /// <remarks>
+    ///     <para>启用后，全角字母、数字、符号将视为与对应半角字符相同。例如 <c>ｆｕｃｋ</c> 等同于 <c>fuck</c>，<c>１２３</c> 等同于 <c>123</c>。</para>
+    ///     <para>默认值为：<c>true</c>。</para>
+    /// </remarks>
+    public bool IgnoreFullwidth { get; init; } = true;
 }

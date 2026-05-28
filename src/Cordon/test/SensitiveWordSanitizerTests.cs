@@ -239,12 +239,12 @@ public class SensitiveWordSanitizerTests
         Assert.Empty(sensitiveWordSanitizer.FindMatches(string.Empty));
 
         var matchResults = sensitiveWordSanitizer.FindMatches(userText);
-        Assert.Equal(25, matchResults.Length);
+        Assert.Equal(26, matchResults.Length);
         Assert.Equal(
             [
                 "加微信", "兼职刷单", "QQ群", "淘宝代刷", "违规表述", "暴恐", "涉 政", "涉 政", "涉 政", "涉 政", "敏感词", "敏感词", "敏感词", "敏感词",
                 "test_bad_word", "illegal_term", "八 嘎 耶鲁", "你-大-爷", "low_high", "hello_world", "hello_world", "abc_def",
-                "low_high", "low_high", "TMD!"
+                "low_high", "low_high", "TMD!", "fuck"
             ],
             matchResults.Select(u => u.Word));
 
@@ -255,7 +255,7 @@ public class SensitiveWordSanitizerTests
                 "[敏感词] @ 91..94", "[敏感词] @ 97..101", "[敏感词] @ 102..106", "[敏感词] @ 107..110",
                 "[test_bad_word] @ 111..124", "[illegal_term] @ 127..139", "[八 嘎 耶鲁] @ 140..144", "[你-大-爷] @ 150..153",
                 "[low_high] @ 154..162", "[hello_world] @ 163..174", "[hello_world] @ 176..187", "[abc_def] @ 188..195",
-                "[low_high] @ 203..211", "[low_high] @ 212..220", "[TMD!] @ 224..227"
+                "[low_high] @ 203..211", "[low_high] @ 212..220", "[TMD!] @ 224..227", "[fuck] @ 229..233"
             ],
             matchResults.Select(u => u.ToString()));
 
@@ -569,7 +569,7 @@ public class SensitiveWordSanitizerTests
 
         var newText = sensitiveWordSanitizer.Replace(userText);
         Assert.Equal(
-            "测试开始：***，加-wechat；****：日结300元。***123456，****。****、**、**。还有***（带空格），***，***（全角空格），涉\\t政（制表符）。***测试：****、****、***！************* 和 ************，****（无空格），***，********，***********! ***********。*******。另外重叠匹配：******** ********。最后去***!。ｆｕｃｋ the bad words.",
+            "测试开始：***，加-wechat；****：日结300元。***123456，****。****、**、**。还有***（带空格），***，***（全角空格），涉\\t政（制表符）。***测试：****、****、***！************* 和 ************，****（无空格），***，********，***********! ***********。*******。另外重叠匹配：******** ********。最后去***!。**** the bad words.",
             newText);
     }
 
@@ -617,6 +617,16 @@ public class SensitiveWordSanitizerTests
 
         var newText5 = sensitiveWordSanitizer.Replace("这里面包含敏*感*词吗？");
         Assert.Equal("这里面包含敏*感*词吗？", newText5);
+    }
+
+    [Theory]
+    [InlineData('ｆ', 'f')]
+    [InlineData('ｕ', 'u')]
+    [InlineData('１', '1')]
+    [InlineData('２', '2')]
+    public void NormalizeFullwidthChar_ReturnOK(char c, char result)
+    {
+        Assert.Equal(result, SensitiveWordSanitizer.NormalizeFullwidthChar(c));
     }
 
     [Fact]
