@@ -17,6 +17,8 @@ cleansing heterogeneous data streams, Cordon enables enterprise-grade validation
 - **Dependency Injection Friendly**: Register directly into the .NET service container.
 - **Asynchronous Validation Support**: Validation logic can be executed asynchronously; both sync and async scenarios
   are fully supported.
+- **Sensitive Word Cleaning and Filtering**: Built-in sensitive word detection and filtering engine that automatically
+  identifies and cleanses prohibited sensitive words from text.
 - **Flexible Architecture**: Designed for ease of use, extension, and maintainability.
 - **Cross-platform and Dependency-free**: Runs on all major platforms with zero external dependencies.
 - **High-Quality Code Assurance**: Built under strict coding standards, with 98% unit and integration test coverage.
