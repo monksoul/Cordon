@@ -239,12 +239,12 @@ public class SensitiveWordSanitizerTests
         Assert.Empty(sensitiveWordSanitizer.FindMatches(string.Empty));
 
         var matchResults = sensitiveWordSanitizer.FindMatches(userText);
-        Assert.Equal(26, matchResults.Length);
+        Assert.Equal(27, matchResults.Length);
         Assert.Equal(
             [
                 "加微信", "兼职刷单", "QQ群", "淘宝代刷", "违规表述", "暴恐", "涉 政", "涉 政", "涉 政", "涉 政", "敏感词", "敏感词", "敏感词", "敏感词",
                 "test_bad_word", "illegal_term", "八 嘎 耶鲁", "你-大-爷", "low_high", "hello_world", "hello_world", "abc_def",
-                "low_high", "low_high", "TMD!", "fuck"
+                "low_high", "low_high", "TMD!", "fuck", "fuck"
             ],
             matchResults.Select(u => u.Word));
 
@@ -255,7 +255,8 @@ public class SensitiveWordSanitizerTests
                 "[敏感词] @ 91..94", "[敏感词] @ 97..101", "[敏感词] @ 102..106", "[敏感词] @ 107..110",
                 "[test_bad_word] @ 111..124", "[illegal_term] @ 127..139", "[八 嘎 耶鲁] @ 140..144", "[你-大-爷] @ 150..153",
                 "[low_high] @ 154..162", "[hello_world] @ 163..174", "[hello_world] @ 176..187", "[abc_def] @ 188..195",
-                "[low_high] @ 203..211", "[low_high] @ 212..220", "[TMD!] @ 224..227", "[fuck] @ 229..233"
+                "[low_high] @ 203..211", "[low_high] @ 212..220", "[TMD!] @ 224..227", "[fuck] @ 229..233",
+                "[fuck] @ 248..252"
             ],
             matchResults.Select(u => u.ToString()));
 
@@ -293,6 +294,16 @@ public class SensitiveWordSanitizerTests
         Assert.Single(matchResults8);
         Assert.Equal(["TMD!"], matchResults8.Select(u => u.Word));
         Assert.Equal(["[TMD!] @ 5..8"], matchResults8.Select(u => u.ToString()));
+
+        var matchResults9 = sensitiveWordSanitizer.FindMatches("ｆｕｃｋ the bad words。");
+        Assert.Single(matchResults9);
+        Assert.Equal(["fuck"], matchResults9.Select(u => u.Word));
+        Assert.Equal(["[fuck] @ 0..4"], matchResults9.Select(u => u.ToString()));
+
+        var matchResults10 = sensitiveWordSanitizer.FindMatches("Ⓕⓤc⒦ the bad words。");
+        Assert.Single(matchResults10);
+        Assert.Equal(["fuck"], matchResults10.Select(u => u.Word));
+        Assert.Equal(["[fuck] @ 0..4"], matchResults10.Select(u => u.ToString()));
     }
 
     [Fact]
@@ -370,6 +381,20 @@ public class SensitiveWordSanitizerTests
     }
 
     [Fact]
+    public void FindMatches_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse__ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
+            new SensitiveWordOptions { IgnoreFullwidth = false, IgnoreUnicodeVariants = false });
+
+        var matchResults = sensitiveWordSanitizer.FindMatches("ｆｕｃｋ the bad words。");
+        Assert.Empty(matchResults);
+
+        var matchResults2 = sensitiveWordSanitizer.FindMatches("Ⓕⓤc⒦ the bad words。");
+        Assert.Empty(matchResults2);
+    }
+
+    [Fact]
     public void FindFirst_ReturnOK()
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
@@ -417,6 +442,16 @@ public class SensitiveWordSanitizerTests
         Assert.NotNull(matchResult8);
         Assert.Equal("TMD!", matchResult8.Value.Word);
         Assert.Equal("[TMD!] @ 5..8", matchResult8.Value.ToString());
+
+        var matchResult9 = sensitiveWordSanitizer.FindFirst("ｆｕｃｋ the bad words。");
+        Assert.NotNull(matchResult9);
+        Assert.Equal("fuck", matchResult9.Value.Word);
+        Assert.Equal("[fuck] @ 0..4", matchResult9.Value.ToString());
+
+        var matchResult10 = sensitiveWordSanitizer.FindFirst("Ⓕⓤc⒦ the bad words。");
+        Assert.NotNull(matchResult10);
+        Assert.Equal("fuck", matchResult10.Value.Word);
+        Assert.Equal("[fuck] @ 0..4", matchResult10.Value.ToString());
     }
 
     [Fact]
@@ -493,6 +528,20 @@ public class SensitiveWordSanitizerTests
         Assert.Null(matchResult7);
     }
 
+    [Fact]
+    public void FindFirst_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse__ReturnOK()
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
+            new SensitiveWordOptions { IgnoreFullwidth = false, IgnoreUnicodeVariants = false });
+
+        var matchResult = sensitiveWordSanitizer.FindFirst("ｆｕｃｋ the bad words。");
+        Assert.Null(matchResult);
+
+        var matchResult2 = sensitiveWordSanitizer.FindFirst("Ⓕⓤc⒦ the bad words。");
+        Assert.Null(matchResult2);
+    }
+
     [Theory]
     [InlineData(null, false)]
     [InlineData("", false)]
@@ -507,6 +556,8 @@ public class SensitiveWordSanitizerTests
     [InlineData("这里面包含敏\t感\n词吗？", true)]
     [InlineData("这里面包含TMD吗？", true)]
     [InlineData("这里面包含tmd吗？", true)]
+    [InlineData("ｆｕｃｋ the bad words。", true)]
+    [InlineData("Ⓕⓤc⒦ the bad words。", true)]
     public void Contains_ReturnOK(string? text, bool result)
     {
         var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
@@ -561,6 +612,31 @@ public class SensitiveWordSanitizerTests
         Assert.Equal(result, sensitiveWordSanitizer.Contains(text));
     }
 
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData("", false)]
+    [InlineData("这是一个正常的字符串", false)]
+    [InlineData("有需要添加微信", true)]
+    [InlineData("你大爷的", true)]
+    [InlineData("low high", true)]
+    [InlineData("Low High", true)]
+    [InlineData("这里面包含敏*感*词吗？", true)]
+    [InlineData("这里呢，是否包含敏__感__词呢？", true)]
+    [InlineData("这里面包含敏\r感\n词吗？", true)]
+    [InlineData("这里面包含敏\t感\n词吗？", true)]
+    [InlineData("这里面包含TMD吗？", true)]
+    [InlineData("这里面包含tmd吗？", true)]
+    [InlineData("ｆｕｃｋ the bad words。", false)]
+    [InlineData("Ⓕⓤc⒦ the bad words。", false)]
+    public void Contains_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse__ReturnOK(string? text, bool result)
+    {
+        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
+        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
+            new SensitiveWordOptions { IgnoreFullwidth = false, IgnoreUnicodeVariants = false });
+
+        Assert.Equal(result, sensitiveWordSanitizer.Contains(text));
+    }
+
     [Fact]
     public void Replace_ReturnOK()
     {
@@ -569,7 +645,7 @@ public class SensitiveWordSanitizerTests
 
         var newText = sensitiveWordSanitizer.Replace(userText);
         Assert.Equal(
-            "测试开始：***，加-wechat；****：日结300元。***123456，****。****、**、**。还有***（带空格），***，***（全角空格），涉\\t政（制表符）。***测试：****、****、***！************* 和 ************，****（无空格），***，********，***********! ***********。*******。另外重叠匹配：******** ********。最后去***!。**** the bad words。Ⓕⓤc⒦ the bad words。",
+            "测试开始：***，加-wechat；****：日结300元。***123456，****。****、**、**。还有***（带空格），***，***（全角空格），涉\\t政（制表符）。***测试：****、****、***！************* 和 ************，****（无空格），***，********，***********! ***********。*******。另外重叠匹配：******** ********。最后去***!。**** the bad words。**** the bad words。",
             newText);
     }
 
@@ -630,6 +706,20 @@ public class SensitiveWordSanitizerTests
     [InlineData('⒦', 'k')]
     public void NormalizeChar_ReturnOK(char c, char result) => Assert.Equal(result,
         SensitiveWordSanitizer.NormalizeChar(c, SensitiveWordOptions.Default));
+
+    [Theory]
+    [InlineData('ｆ', 'ｆ')]
+    [InlineData('ｕ', 'ｕ')]
+    [InlineData('１', '１')]
+    [InlineData('２', '２')]
+    [InlineData('Ⓕ', 'Ⓕ')]
+    [InlineData('ⓤ', 'ⓤ')]
+    [InlineData('c', 'c')]
+    [InlineData('⒦', '⒦')]
+    public void NormalizeChar_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse_ReturnOK(char c, char result) =>
+        Assert.Equal(result,
+            SensitiveWordSanitizer.NormalizeChar(c,
+                new SensitiveWordOptions { IgnoreFullwidth = false, IgnoreUnicodeVariants = false }));
 
     [Fact]
     public void InitSkipMap_ReturnOK()

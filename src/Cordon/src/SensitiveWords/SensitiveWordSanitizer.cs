@@ -173,14 +173,14 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
+                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+                var normalized = NormalizeChar(ch, options);
+
                 // 符号过滤（仅当选项启用时）
-                if (options.IgnoreSymbol && ShouldSkip(ch))
+                if (options.IgnoreSymbol && ShouldSkip(normalized))
                 {
                     continue;
                 }
-
-                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
-                var normalized = NormalizeChar(ch, options);
 
                 coreBuilder.Append(normalized);
                 coreLength++;
@@ -307,14 +307,14 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
+                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+                var normalized = NormalizeChar(c, _options);
+
                 // 符号过滤：跳过但不增加虚拟索引（仅当选项启用时）
-                if (_options.IgnoreSymbol && ShouldSkip(c))
+                if (_options.IgnoreSymbol && ShouldSkip(normalized))
                 {
                     continue;
                 }
-
-                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
-                var normalized = NormalizeChar(c, _options);
 
                 // 记录映射关系
                 realIndexMap[virtualIndex] = i;
@@ -398,14 +398,14 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
+                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+                var normalized = NormalizeChar(c, _options);
+
                 // 符号过滤：跳过但不增加虚拟索引（仅当选项启用时）
-                if (_options.IgnoreSymbol && ShouldSkip(c))
+                if (_options.IgnoreSymbol && ShouldSkip(normalized))
                 {
                     continue;
                 }
-
-                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
-                var normalized = NormalizeChar(c, _options);
 
                 // 记录映射关系
                 realIndexMap[virtualIndex] = i;
@@ -481,14 +481,15 @@ public sealed class SensitiveWordSanitizer
                 continue;
             }
 
+            // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+            var normalized = NormalizeChar(c, _options);
+
             // 符号过滤（仅当选项启用时）
-            if (_options.IgnoreSymbol && ShouldSkip(c))
+            if (_options.IgnoreSymbol && ShouldSkip(normalized))
             {
                 continue;
             }
 
-            // 处理全角/半角及 Unicode 变体（仅当选项启用时）
-            var normalized = NormalizeChar(c, _options);
             var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
 
             // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯

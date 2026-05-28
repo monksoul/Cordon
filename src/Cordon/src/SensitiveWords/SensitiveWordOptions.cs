@@ -49,10 +49,10 @@ public sealed record SensitiveWordOptions
     public bool IgnoreFullwidth { get; init; } = true;
 
     /// <summary>
-    ///     是否忽略 Unicode 字母变体（带圈、带括号、数学粗体等），统一视为普通字母
+    ///     是否忽略 Unicode 字母变体
     /// </summary>
     /// <remarks>
-    ///     <para>启用后，<c>Ⓕⓤc⒦</c>、<c>𝐟𝐮𝐜𝐤</c> 等变体均等同于 <c>fuck</c>。</para>
+    ///     <para>启用后，（带圈、带括号、数学粗体等），统一视为普通字母。例如 <c>Ⓕⓤc⒦</c>、<c>𝐟𝐮𝐜𝐤</c> 等变体均等同于 <c>fuck</c>。</para>
     ///     <para>默认值为：<c>true</c>。</para>
     /// </remarks>
     public bool IgnoreUnicodeVariants { get; init; } = true;
