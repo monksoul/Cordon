@@ -56,32 +56,6 @@ public sealed class SensitiveWordSanitizer
     }
 
     /// <summary>
-    ///     从 <see cref="Stream" /> 加载词库并构建敏感词清理器
-    /// </summary>
-    /// <param name="stream">输入流</param>
-    /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
-    /// <returns>
-    ///     <see cref="SensitiveWordSanitizer" />
-    /// </returns>
-    /// <exception cref="ArgumentNullException"></exception>
-    /// <exception cref="ArgumentException"></exception>
-    public static SensitiveWordSanitizer CreateFromStream(Stream stream, SensitiveWordOptions? options = null) =>
-        new SensitiveWordSanitizerBuilder().AddStream(stream).ConfigureOptions(options).Build();
-
-    /// <summary>
-    ///     从文件路径加载词库并构建敏感词清理器
-    /// </summary>
-    /// <param name="filePath">文件路径</param>
-    /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
-    /// <returns>
-    ///     <see cref="SensitiveWordSanitizer" />
-    /// </returns>
-    /// <exception cref="ArgumentException"></exception>
-    /// <exception cref="FileNotFoundException"></exception>
-    public static SensitiveWordSanitizer CreateFromPath(string filePath, SensitiveWordOptions? options = null) =>
-        new SensitiveWordSanitizerBuilder().AddPath(filePath).ConfigureOptions(options).Build();
-
-    /// <summary>
     ///     从内存词表构建敏感词清理器
     /// </summary>
     /// <param name="words">敏感词集合</param>

@@ -24,7 +24,7 @@ public sealed class SensitiveWordSanitizerBuilder
     /// </summary>
     /// <param name="word">敏感词字符串</param>
     /// <returns>
-    ///     <see cref="SensitiveWordSanitizer" />
+    ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
     public SensitiveWordSanitizerBuilder AddWord(string word)
     {
@@ -42,7 +42,7 @@ public sealed class SensitiveWordSanitizerBuilder
     /// </summary>
     /// <param name="words">敏感词集合</param>
     /// <returns>
-    ///     <see cref="SensitiveWordSanitizer" />
+    ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
     public SensitiveWordSanitizerBuilder AddWords(IEnumerable<string> words)
     {
@@ -67,7 +67,7 @@ public sealed class SensitiveWordSanitizerBuilder
     /// </summary>
     /// <param name="line">待解析的一行文本</param>
     /// <returns>
-    ///     <see cref="SensitiveWordSanitizer" />
+    ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
     public SensitiveWordSanitizerBuilder AddLine(string line)
     {
@@ -81,7 +81,7 @@ public sealed class SensitiveWordSanitizerBuilder
     /// </summary>
     /// <param name="lines">待解析的行集合</param>
     /// <returns>
-    ///     <see cref="SensitiveWordSanitizer" />
+    ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
     public SensitiveWordSanitizerBuilder AddLines(IEnumerable<string> lines)
     {
@@ -147,14 +147,17 @@ public sealed class SensitiveWordSanitizerBuilder
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
+        // 解析（规范化）文件路径
+        var resolvedPath = ResolveFilePath(filePath);
+
         // 检查文件是否存在
-        if (!File.Exists(filePath))
+        if (!File.Exists(resolvedPath))
         {
-            throw new FileNotFoundException("Sensitive word file not found.", filePath);
+            throw new FileNotFoundException("Sensitive word file not found.", resolvedPath);
         }
 
         // 打开并读取文件流
-        using var fileStream = File.OpenRead(filePath);
+        using var fileStream = File.OpenRead(resolvedPath);
 
         return AddStream(fileStream);
     }
@@ -201,6 +204,7 @@ public sealed class SensitiveWordSanitizerBuilder
     /// </returns>
     public SensitiveWordSanitizerBuilder Clear()
     {
+        // 重置字典和配置选项
         _words.Clear();
         _options = SensitiveWordOptions.Default;
 
@@ -214,4 +218,25 @@ public sealed class SensitiveWordSanitizerBuilder
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
     public SensitiveWordSanitizer Build() => SensitiveWordSanitizer.Build(_words, _options);
+
+    /// <summary>
+    ///     解析文件路径
+    /// </summary>
+    /// <remarks>如果已是绝对路径，直接返回。如果是相对路径，基于 <see cref="AppContext.BaseDirectory" /> 解析。</remarks>
+    /// <param name="filePath">文件路径</param>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    internal static string ResolveFilePath(string filePath)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+
+        // 处理绝对和相对路径问题
+        var basePath = Path.IsPathRooted(filePath)
+            ? filePath
+            : Path.Combine(AppContext.BaseDirectory, filePath);
+
+        return Path.GetFullPath(basePath);
+    }
 }
