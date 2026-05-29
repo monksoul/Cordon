@@ -7,11 +7,6 @@ namespace Cordon;
 /// <summary>
 ///     敏感词验证器
 /// </summary>
-/// <remarks>
-///     <para>支持多种词库加载方式：直接注入实例、引用工厂缓存名称、指定文件路径或输入流。</para>
-///     <para>注意：<see cref="Sanitizer" />、<see cref="DictionaryName" />、<see cref="FilePath" /> 三者互斥，只能设置其中一个。</para>
-///     <para>若需注入 <see cref="SensitiveWordSanitizer" /> 实例，请通过 <see cref="SensitiveWordSanitizerFactory" /> 注册或手动构建。</para>
-/// </remarks>
 public class SensitiveWordValidator : ValidatorBase
 {
     /// <summary>
@@ -36,29 +31,9 @@ public class SensitiveWordValidator : ValidatorBase
     }
 
     /// <summary>
-    ///     <inheritdoc cref="SensitiveWordValidator" />
-    /// </summary>
-    /// <param name="stream">输入流</param>
-    /// <param name="dictionaryName">
-    ///     字典名称，默认值为：<c>null</c>。若提供，则利用 <see cref="SensitiveWordSanitizerFactory" />
-    ///     进行创建并缓存；否则直接读取流构建实例。
-    /// </param>
-    public SensitiveWordValidator(Stream stream, string? dictionaryName = null)
-        : this()
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(stream);
-
-        // 注意：dictionaryName 仅作为工厂缓存的键传入，不再赋值给公开的 DictionaryName 属性
-        Sanitizer = !string.IsNullOrWhiteSpace(dictionaryName)
-            ? SensitiveWordSanitizerFactory.GetOrCreateFromStream(dictionaryName, stream)
-            : SensitiveWordSanitizer.CreateFromStream(stream);
-    }
-
-    /// <summary>
     ///     敏感词清理器实例
     /// </summary>
-    /// <remarks>与 <see cref="DictionaryName" />、<see cref="FilePath" /> 互斥，只能设置其中一个。</remarks>
+    /// <remarks>直接注入的实例，优先级最高。设置后 <see cref="DictionaryName" /> 和 <see cref="ConfigureBuilder" /> 将作为备选。</remarks>
     public SensitiveWordSanitizer? Sanitizer { get; set; }
 
     /// <summary>
@@ -66,21 +41,24 @@ public class SensitiveWordValidator : ValidatorBase
     /// </summary>
     /// <remarks>
     ///     <para>用于从 <see cref="SensitiveWordSanitizerFactory.Get(string)" /> 中获取 <see cref="SensitiveWordSanitizer" /> 实例。</para>
-    ///     <para>
-    ///         对应 <see cref="SensitiveWordSanitizerFactory" /> 中缓存的字典名称。与 <see cref="Sanitizer" />、<see cref="FilePath" />
-    ///         互斥，只能设置其中一个。
-    ///     </para>
+    ///     <para>当 <see cref="Sanitizer" /> 未设置时，通过该名称从工厂获取已注册的实例。</para>
+    ///     <para>若同时提供了 <see cref="ConfigureBuilder" />，则使用该名称作为缓存键进行构建（若工厂中尚未缓存）。</para>
+    ///     <para>若未提供该名称且需要构建，将使用 <see cref="SensitiveWordOptions.DefaultDictionaryName" />。</para>
     /// </remarks>
     public string? DictionaryName { get; set; }
 
     /// <summary>
-    ///     敏感词文件路径
+    ///     构建器配置委托
     /// </summary>
     /// <remarks>
-    ///     与 <see cref="Sanitizer" />、<see cref="DictionaryName" /> 互斥，只能设置其中一个。支持后续通过
-    ///     <see cref="SensitiveWordSanitizerFactory.Refresh(string)" /> 进行刷新（热更新）。
+    ///     <para>当 <see cref="Sanitizer" /> 和 <see cref="DictionaryName" />（已缓存）均无法提供实例时，使用此委托构建敏感词清理器。</para>
+    ///     <para>
+    ///         构建后的实例将通过
+    ///         <see cref="SensitiveWordSanitizerFactory.GetOrCreate(string, Action{SensitiveWordSanitizerBuilder})" />
+    ///         进行缓存，缓存键为 <see cref="DictionaryName" /> 或 <see cref="SensitiveWordOptions.DefaultDictionaryName" />。
+    ///     </para>
     /// </remarks>
-    public string? FilePath { get; set; }
+    public Action<SensitiveWordSanitizerBuilder>? ConfigureBuilder { get; set; }
 
     /// <summary>
     ///     是否在错误信息中显示命中的敏感词详情
@@ -191,48 +169,50 @@ public class SensitiveWordValidator : ValidatorBase
     /// <exception cref="InvalidOperationException"></exception>
     internal SensitiveWordSanitizer GetSanitizer()
     {
-        var sanitizerSet = Sanitizer is not null;
-        var dictionaryNameSet = !string.IsNullOrWhiteSpace(DictionaryName);
-        var filePathSet = !string.IsNullOrWhiteSpace(FilePath);
+        // 尝试获取 Sanitizer 实例
+        if (Sanitizer is not null)
+        {
+            return Sanitizer;
+        }
 
-        // 以下组合是非法的，会抛出 InvalidOperationException：
-        // 1) 没有任何数据源被配置
-        if (!sanitizerSet && !dictionaryNameSet && !filePathSet)
+        // 尝试从工厂缓存获取
+        if (!string.IsNullOrWhiteSpace(DictionaryName))
         {
             try
             {
-                // 尝试使用默认的 SensitiveWordOptions.DefaultDictionaryName 回退
+                return SensitiveWordSanitizerFactory.Get(DictionaryName);
+            }
+            catch (InvalidOperationException) { }
+        }
+
+        // 尝试使用 ConfigureBuilder 构建
+        if (ConfigureBuilder is not null)
+        {
+            // 获取有效的字典名称
+            var effectiveName = !string.IsNullOrWhiteSpace(DictionaryName)
+                ? DictionaryName
+                : SensitiveWordOptions.DefaultDictionaryName;
+
+            return SensitiveWordSanitizerFactory.GetOrCreate(effectiveName, ConfigureBuilder);
+        }
+
+        // 回退到默认字典（当未指定 DictionaryName 且未提供 ConfigureBuilder）
+        if (string.IsNullOrWhiteSpace(DictionaryName))
+        {
+            try
+            {
                 return SensitiveWordSanitizerFactory.Get(SensitiveWordOptions.DefaultDictionaryName);
             }
             catch (InvalidOperationException)
             {
                 throw new InvalidOperationException(
-                    $"No dictionary source is configured for the {nameof(SensitiveWordValidator)}, and the default dictionary '{SensitiveWordOptions.DefaultDictionaryName}' has not been registered. Please either set the '{nameof(DictionaryName)}' or '{nameof(FilePath)}' property, or register the default dictionary via `SensitiveWordSanitizerFactory.GetOrCreateFromPath` at application startup.");
+                    $"No sensitive word source is configured for the {nameof(SensitiveWordValidator)}. Either set '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(ConfigureBuilder)}', or register the default dictionary '{SensitiveWordOptions.DefaultDictionaryName}' via `SensitiveWordSanitizerFactory.GetOrCreate`.");
             }
         }
 
-        // 2) 同时配置了多个数据源（任意两个同时为 true 即为非法）
-        if ((sanitizerSet && dictionaryNameSet) || (sanitizerSet && filePathSet) || (dictionaryNameSet && filePathSet))
-        {
-            throw new InvalidOperationException(
-                $"Multiple dictionary sources are configured for the {nameof(SensitiveWordValidator)}. Please set only one of '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(FilePath)}'.");
-        }
-
-        // 如果设置了 Sanitizer，则直接返回
-        if (sanitizerSet)
-        {
-            return Sanitizer!;
-        }
-
-        // 如果设置了 DictionaryName，则从工厂缓存中获取
-        // ReSharper disable once ConvertIfStatementToReturnStatement
-        if (dictionaryNameSet)
-        {
-            return SensitiveWordSanitizerFactory.Get(DictionaryName!);
-        }
-
-        // 否则通过文件路径加载（使用 SensitiveWordOptions.DefaultDictionaryName 作为字典名称）
-        return SensitiveWordSanitizerFactory.GetOrCreateFromPath(FilePath!);
+        // DictionaryName 指定了但无缓存且无 ConfigureBuilder
+        throw new InvalidOperationException(
+            $"The dictionary '{DictionaryName}' has not been registered in the factory. Please register it first, or provide a '{nameof(ConfigureBuilder)}' to build it.");
     }
 
     /// <summary>
