@@ -65,40 +65,8 @@ public sealed class SensitiveWordSanitizer
     /// </returns>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    public static SensitiveWordSanitizer CreateFromStream(Stream stream, SensitiveWordOptions? options = null)
-    {
-        // 空检查
-        ArgumentNullException.ThrowIfNull(stream);
-        options ??= SensitiveWordOptions.Default;
-
-        // 检查流是否可读
-        if (!stream.CanRead)
-        {
-            // ReSharper disable once LocalizableElement
-            throw new ArgumentException("Stream must be readable.", nameof(stream));
-        }
-
-        // 检查流是否支持查找
-        if (stream.CanSeek)
-        {
-            // 重置到起始位置
-            stream.Position = 0;
-        }
-
-        // 初始化 HashSet 实例
-        var words = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        // 初始化 StreamReader 实例
-        using var streamReader = new StreamReader(stream, Encoding.UTF8, leaveOpen: true, bufferSize: 81920);
-
-        // 循环读取流的每一行
-        while (streamReader.ReadLine() is { } line)
-        {
-            ParseLine(line, words);
-        }
-
-        return Build(words, options);
-    }
+    public static SensitiveWordSanitizer CreateFromStream(Stream stream, SensitiveWordOptions? options = null) =>
+        new SensitiveWordSanitizerBuilder().AddStream(stream).ConfigureOptions(options).Build();
 
     /// <summary>
     ///     从文件路径加载词库并构建敏感词清理器
@@ -110,23 +78,8 @@ public sealed class SensitiveWordSanitizer
     /// </returns>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="FileNotFoundException"></exception>
-    public static SensitiveWordSanitizer CreateFromPath(string filePath, SensitiveWordOptions? options = null)
-    {
-        // 空检查
-        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
-        options ??= SensitiveWordOptions.Default;
-
-        // 检查文件是否存在
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException("Sensitive word file not found.", filePath);
-        }
-
-        // 打开并读取文件流
-        using var fileStream = File.OpenRead(filePath);
-
-        return CreateFromStream(fileStream, options);
-    }
+    public static SensitiveWordSanitizer CreateFromPath(string filePath, SensitiveWordOptions? options = null) =>
+        new SensitiveWordSanitizerBuilder().AddPath(filePath).ConfigureOptions(options).Build();
 
     /// <summary>
     ///     从内存词表构建敏感词清理器
@@ -137,7 +90,7 @@ public sealed class SensitiveWordSanitizer
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static SensitiveWordSanitizer Build(IEnumerable<string> words, SensitiveWordOptions? options = null)
+    internal static SensitiveWordSanitizer Build(IEnumerable<string> words, SensitiveWordOptions? options = null)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(words);
