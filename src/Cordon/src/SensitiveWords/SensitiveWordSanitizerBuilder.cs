@@ -20,6 +20,12 @@ public sealed class SensitiveWordSanitizerBuilder
     internal SensitiveWordOptions _options = SensitiveWordOptions.Default;
 
     /// <summary>
+    ///     是否允许构建词集为空的 <see cref="SensitiveWordSanitizer" /> 实例
+    /// </summary>
+    /// <remarks>默认值为：<c>false</c>。启用后，即使未添加任何敏感词，<see cref="Build" /> 方法也不会抛出异常，而是返回一个空清理器（所有检测均返回 <c>false</c>）。</remarks>
+    public bool AllowEmptyWords { get; set; }
+
+    /// <summary>
     ///     添加一个已解析的敏感词
     /// </summary>
     /// <param name="word">敏感词</param>
@@ -225,7 +231,7 @@ public sealed class SensitiveWordSanitizerBuilder
     {
         // 空词集检查：敏感词清理器的核心用途是匹配敏感词，若词集为空则构建无意义。
         // 提前抛异常可避免用户误以为验证生效，而实际上所有输入都将被放行。
-        if (_words.Count == 0)
+        if (_words.Count == 0 && !AllowEmptyWords)
         {
             throw new InvalidOperationException(
                 $"Cannot build a {nameof(SensitiveWordSanitizer)} with an empty word list. Please add at least one sensitive word via {nameof(AddWord)}, {nameof(AddPath)}, {nameof(AddStream)}, etc.");

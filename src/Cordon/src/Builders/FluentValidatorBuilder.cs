@@ -941,7 +941,7 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加敏感词验证器
     /// </summary>
-    /// <param name="dictionaryName">字典名称，不区分大小写</param>
+    /// <param name="dictionaryName">敏感词字典名称，不区分大小写</param>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />

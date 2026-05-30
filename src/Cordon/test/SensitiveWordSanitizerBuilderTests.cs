@@ -10,6 +10,7 @@ public class SensitiveWordSanitizerBuilderTests
     public void New_ReturnOK()
     {
         var builder = new SensitiveWordSanitizerBuilder();
+        Assert.False(builder.AllowEmptyWords);
         Assert.NotNull(builder._words);
         Assert.Empty(builder._words);
         Assert.NotNull(builder._options);
@@ -216,6 +217,9 @@ public class SensitiveWordSanitizerBuilderTests
         builder.AddPath("sensitive_words.txt");
         var sensitiveWordSanitizer = builder.Build();
         Assert.True(sensitiveWordSanitizer.Contains("这里包含敏感词"));
+
+        var builder2 = new SensitiveWordSanitizerBuilder { AllowEmptyWords = true };
+        builder2.Build();
     }
 
     [Fact]

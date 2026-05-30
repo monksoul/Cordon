@@ -2883,7 +2883,7 @@
             <summary>
                 添加敏感词验证器
             </summary>
-            <param name="dictionaryName">字典名称，不区分大小写</param>
+            <param name="dictionaryName">敏感词字典名称，不区分大小写</param>
             <param name="configure">自定义配置委托</param>
             <returns>
                 <typeparamref name="TSelf" />
@@ -6803,6 +6803,12 @@
                 <see cref="T:Cordon.SensitiveWordOptions" />
             </summary>
         </member>
+        <member name="P:Cordon.SensitiveWordSanitizerBuilder.AllowEmptyWords">
+            <summary>
+                是否允许构建词集为空的 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
+            </summary>
+            <remarks>默认值为：<c>false</c>。启用后，即使未添加任何敏感词，<see cref="M:Cordon.SensitiveWordSanitizerBuilder.Build" /> 方法也不会抛出异常，而是返回一个空清理器（所有检测均返回 <c>false</c>）。</remarks>
+        </member>
         <member name="M:Cordon.SensitiveWordSanitizerBuilder.AddWord(System.String)">
             <summary>
                 添加一个已解析的敏感词
@@ -8005,7 +8011,7 @@
             <summary>
                 创建敏感词验证器
             </summary>
-            <param name="dictionaryName">字典名称，不区分大小写</param>
+            <param name="dictionaryName">敏感词字典名称，不区分大小写</param>
             <param name="configure">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordValidator" />
