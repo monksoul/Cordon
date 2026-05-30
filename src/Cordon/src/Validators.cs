@@ -963,15 +963,10 @@ public static class Validators
     /// <summary>
     ///     创建敏感词验证器
     /// </summary>
-    /// <remarks>
-    ///     若未配置 <paramref name="configure" />，那么用户需在应用启动时通过 <c>SensitiveWordSanitizerFactory.GetOrCreateFromPath</c> 等方式预注册
-    ///     <see cref="SensitiveWordOptions.DefaultDictionaryName" /> 名称的实例。
-    /// </remarks>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordValidator" />
     /// </returns>
-    /// <exception cref="ArgumentNullException"></exception>
     public static SensitiveWordValidator SensitiveWord(Action<SensitiveWordValidator>? configure = null)
     {
         // 初始化 SensitiveWordValidator 实例
@@ -986,16 +981,16 @@ public static class Validators
     /// <summary>
     ///     创建敏感词验证器
     /// </summary>
-    /// <param name="sanitizer">敏感词清理器实例</param>
+    /// <param name="dictionaryName">字典名称</param>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordValidator" />
     /// </returns>
-    public static SensitiveWordValidator SensitiveWord(SensitiveWordSanitizer sanitizer,
+    public static SensitiveWordValidator SensitiveWord(string dictionaryName,
         Action<SensitiveWordValidator>? configure = null)
     {
         // 初始化 SensitiveWordValidator 实例
-        var validator = new SensitiveWordValidator(sanitizer);
+        var validator = new SensitiveWordValidator(dictionaryName);
 
         // 调用自定义配置委托
         configure?.Invoke(validator);
@@ -1006,17 +1001,18 @@ public static class Validators
     /// <summary>
     ///     创建敏感词验证器
     /// </summary>
-    /// <param name="stream">输入流</param>
-    /// <param name="dictionaryName">字典名称，默认值为：<c>null</c></param>
+    /// <param name="sanitizer">
+    ///     <see cref="SensitiveWordSanitizer" />
+    /// </param>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordValidator" />
     /// </returns>
-    public static SensitiveWordValidator SensitiveWord(Stream stream, string? dictionaryName = null,
+    public static SensitiveWordValidator SensitiveWord(SensitiveWordSanitizer sanitizer,
         Action<SensitiveWordValidator>? configure = null)
     {
         // 初始化 SensitiveWordValidator 实例
-        var validator = new SensitiveWordValidator(stream, dictionaryName);
+        var validator = new SensitiveWordValidator(sanitizer);
 
         // 调用自定义配置委托
         configure?.Invoke(validator);

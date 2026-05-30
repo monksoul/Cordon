@@ -931,10 +931,6 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加敏感词验证器
     /// </summary>
-    /// <remarks>
-    ///     若未配置 <paramref name="configure" />，那么用户需在应用启动时通过 <c>SensitiveWordSanitizerFactory.GetOrCreateFromPath</c> 等方式预注册
-    ///     <see cref="SensitiveWordOptions.DefaultDictionaryName" /> 名称的实例。
-    /// </remarks>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
@@ -945,7 +941,20 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     /// <summary>
     ///     添加敏感词验证器
     /// </summary>
-    /// <param name="sanitizer">敏感词清理器实例</param>
+    /// <param name="dictionaryName">字典名称</param>
+    /// <param name="configure">自定义配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf SensitiveWord(string dictionaryName, Action<SensitiveWordValidator>? configure = null) =>
+        AddValidator(new SensitiveWordValidator(dictionaryName), configure);
+
+    /// <summary>
+    ///     添加敏感词验证器
+    /// </summary>
+    /// <param name="sanitizer">
+    ///     <see cref="SensitiveWordSanitizer" />
+    /// </param>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <typeparamref name="TSelf" />
@@ -953,19 +962,6 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf SensitiveWord(SensitiveWordSanitizer sanitizer,
         Action<SensitiveWordValidator>? configure = null) =>
         AddValidator(new SensitiveWordValidator(sanitizer), configure);
-
-    /// <summary>
-    ///     添加敏感词验证器
-    /// </summary>
-    /// <param name="stream">输入流</param>
-    /// <param name="dictionaryName">字典名称，默认值为：<c>null</c></param>
-    /// <param name="configure">自定义配置委托</param>
-    /// <returns>
-    ///     <typeparamref name="TSelf" />
-    /// </returns>
-    public virtual TSelf SensitiveWord(Stream stream, string? dictionaryName = null,
-        Action<SensitiveWordValidator>? configure = null) =>
-        AddValidator(new SensitiveWordValidator(stream, dictionaryName), configure);
 
     /// <summary>
     ///     添加单项验证器

@@ -17,6 +17,19 @@ public class SensitiveWordValidator : ValidatorBase
     /// <summary>
     ///     <inheritdoc cref="SensitiveWordValidator" />
     /// </summary>
+    /// <param name="dictionaryName">敏感词字典名称</param>
+    public SensitiveWordValidator(string dictionaryName)
+        : this()
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(dictionaryName);
+
+        DictionaryName = dictionaryName;
+    }
+
+    /// <summary>
+    ///     <inheritdoc cref="SensitiveWordValidator" />
+    /// </summary>
     /// <param name="sanitizer">
     ///     <see cref="SensitiveWordSanitizer" />
     /// </param>

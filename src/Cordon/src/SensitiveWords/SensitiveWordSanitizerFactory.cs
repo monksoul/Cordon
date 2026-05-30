@@ -70,13 +70,13 @@ public static class SensitiveWordSanitizerFactory
         return GetOrCreate(dictionaryName, () =>
         {
             // 初始化 SensitiveWordSanitizerBuilder 实例
-            var sensitiveWordSanitizerBuilder = new SensitiveWordSanitizerBuilder();
+            var builder = new SensitiveWordSanitizerBuilder();
 
             // 调用自定义配置委托
-            configure(sensitiveWordSanitizerBuilder);
+            configure(builder);
 
             // 构建 SensitiveWordSanitizer 实例
-            return sensitiveWordSanitizerBuilder.Build();
+            return builder.Build();
         });
     }
 
@@ -146,13 +146,13 @@ public static class SensitiveWordSanitizerFactory
             Refresh(dictionaryName, () =>
             {
                 // 初始化 SensitiveWordSanitizerBuilder 实例
-                var sensitiveWordSanitizerBuilder = new SensitiveWordSanitizerBuilder();
+                var builder = new SensitiveWordSanitizerBuilder();
 
                 // 调用自定义配置委托
-                configure(sensitiveWordSanitizerBuilder);
+                configure(builder);
 
                 // 构建 SensitiveWordSanitizer 实例
-                return sensitiveWordSanitizerBuilder.Build();
+                return builder.Build();
             });
         }
         else

@@ -10,15 +10,14 @@ public sealed partial class ValidationBuilder
     /// <summary>
     ///     添加敏感词词库
     /// </summary>
-    /// <remarks>使用 <see cref="SensitiveWordOptions.DefaultDictionaryName" /> 作为字典名称。</remarks>
-    /// <param name="filePath">文件路径</param>
-    /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
+    /// <remarks>使用默认字典名称：<see cref="SensitiveWordOptions.DefaultDictionaryName" />。</remarks>
+    /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ValidationBuilder" />
     /// </returns>
-    public ValidationBuilder AddSensitiveWords(string filePath, SensitiveWordOptions? options = null)
+    public ValidationBuilder AddSensitiveWords(Action<SensitiveWordSanitizerBuilder> configure)
     {
-        SensitiveWordSanitizerFactory.GetOrCreateFromPath(filePath, options);
+        SensitiveWordSanitizerFactory.GetOrCreate(configure);
 
         return this;
     }
@@ -26,50 +25,14 @@ public sealed partial class ValidationBuilder
     /// <summary>
     ///     添加敏感词词库
     /// </summary>
-    /// <param name="filePath">文件路径</param>
     /// <param name="dictionaryName">字典名称</param>
-    /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
+    /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ValidationBuilder" />
     /// </returns>
-    public ValidationBuilder AddSensitiveWords(string filePath, string dictionaryName,
-        SensitiveWordOptions? options = null)
+    public ValidationBuilder AddSensitiveWords(string dictionaryName, Action<SensitiveWordSanitizerBuilder> configure)
     {
-        SensitiveWordSanitizerFactory.GetOrCreateFromPath(dictionaryName, filePath, options);
-
-        return this;
-    }
-
-    /// <summary>
-    ///     添加敏感词词库
-    /// </summary>
-    /// <param name="words">敏感词集合</param>
-    /// <param name="dictionaryName">字典名称</param>
-    /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
-    /// <returns>
-    ///     <see cref="ValidationBuilder" />
-    /// </returns>
-    public ValidationBuilder AddSensitiveWords(IEnumerable<string> words, string dictionaryName,
-        SensitiveWordOptions? options = null)
-    {
-        SensitiveWordSanitizerFactory.GetOrCreate(dictionaryName, words, options);
-
-        return this;
-    }
-
-    /// <summary>
-    ///     添加敏感词词库
-    /// </summary>
-    /// <param name="stream">输入流</param>
-    /// <param name="dictionaryName">字典名称</param>
-    /// <param name="options"><see cref="SensitiveWordOptions" />，默认值为：<see cref="SensitiveWordOptions.Default" /></param>
-    /// <returns>
-    ///     <see cref="ValidationBuilder" />
-    /// </returns>
-    public ValidationBuilder AddSensitiveWords(Stream stream, string dictionaryName,
-        SensitiveWordOptions? options = null)
-    {
-        SensitiveWordSanitizerFactory.GetOrCreateFromStream(dictionaryName, stream, options);
+        SensitiveWordSanitizerFactory.GetOrCreate(dictionaryName, configure);
 
         return this;
     }
