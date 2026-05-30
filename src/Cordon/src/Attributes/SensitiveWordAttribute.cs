@@ -18,7 +18,7 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
     /// <summary>
     ///     <inheritdoc cref="SensitiveWordAttribute" />
     /// </summary>
-    /// <param name="dictionaryName">敏感词字典名称</param>
+    /// <param name="dictionaryName">敏感词字典名称，不区分大小写</param>
     public SensitiveWordAttribute(string dictionaryName)
         : this()
     {

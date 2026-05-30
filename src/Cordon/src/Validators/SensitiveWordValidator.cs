@@ -17,7 +17,7 @@ public class SensitiveWordValidator : ValidatorBase
     /// <summary>
     ///     <inheritdoc cref="SensitiveWordValidator" />
     /// </summary>
-    /// <param name="dictionaryName">敏感词字典名称</param>
+    /// <param name="dictionaryName">敏感词字典名称，不区分大小写</param>
     public SensitiveWordValidator(string dictionaryName)
         : this()
     {
@@ -44,9 +44,23 @@ public class SensitiveWordValidator : ValidatorBase
     }
 
     /// <summary>
-    ///     敏感词清理器实例
+    ///     <inheritdoc cref="SensitiveWordValidator" />
     /// </summary>
-    /// <remarks>直接注入的实例，优先级最高。设置后 <see cref="DictionaryName" /> 和 <see cref="ConfigureBuilder" /> 将作为备选。</remarks>
+    /// <param name="configure">构建器配置委托</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public SensitiveWordValidator(Action<SensitiveWordSanitizerBuilder> configure)
+        : this()
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(configure);
+
+        ConfigureBuilder = configure;
+    }
+
+    /// <summary>
+    ///     <see cref="SensitiveWordSanitizer" /> 实例
+    /// </summary>
+    /// <remarks>直接注入的实例，优先级最高。设置后 <see cref="DictionaryName" /> 和 <see cref="ConfigureBuilder" /> 将作为备选（直接跳过）。</remarks>
     public SensitiveWordSanitizer? Sanitizer { get; set; }
 
     /// <summary>
@@ -64,7 +78,10 @@ public class SensitiveWordValidator : ValidatorBase
     ///     构建器配置委托
     /// </summary>
     /// <remarks>
-    ///     <para>当 <see cref="Sanitizer" /> 和 <see cref="DictionaryName" />（已缓存）均无法提供实例时，使用此委托构建敏感词清理器。</para>
+    ///     <para>
+    ///         当 <see cref="Sanitizer" /> 和 <see cref="DictionaryName" />（已缓存）均无法提供实例时，使用此委托构建
+    ///         <see cref="SensitiveWordSanitizer" /> 实例。
+    ///     </para>
     ///     <para>
     ///         构建后的实例将通过
     ///         <see cref="SensitiveWordSanitizerFactory.GetOrCreate(string, Action{SensitiveWordSanitizerBuilder})" />
@@ -152,7 +169,7 @@ public class SensitiveWordValidator : ValidatorBase
         // 空检查
         if (string.IsNullOrWhiteSpace(template))
         {
-            return base.FormatErrorMessage(name);
+            return null;
         }
 
         // 检查是否在错误信息中显示命中的敏感词详情
@@ -195,7 +212,9 @@ public class SensitiveWordValidator : ValidatorBase
             {
                 return SensitiveWordSanitizerFactory.Get(DictionaryName);
             }
-            catch (InvalidOperationException) { }
+            catch (InvalidOperationException)
+            {
+            }
         }
 
         // 尝试使用 ConfigureBuilder 构建
@@ -219,7 +238,7 @@ public class SensitiveWordValidator : ValidatorBase
             catch (InvalidOperationException)
             {
                 throw new InvalidOperationException(
-                    $"No sensitive word source is configured for the {nameof(SensitiveWordValidator)}. Either set '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(ConfigureBuilder)}', or register the default dictionary '{SensitiveWordSanitizerFactory.DefaultName}' via `SensitiveWordSanitizerFactory.GetOrCreate`.");
+                    $"No sensitive word source is configured for the {nameof(SensitiveWordValidator)}. Either set '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(ConfigureBuilder)}', or register the default dictionary 'SensitiveWords:Default' via `SensitiveWordSanitizerFactory.GetOrCreate`.");
             }
         }
 

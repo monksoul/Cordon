@@ -980,7 +980,7 @@
             <summary>
                 <inheritdoc cref="T:System.ComponentModel.DataAnnotations.SensitiveWordAttribute" />
             </summary>
-            <param name="dictionaryName">敏感词字典名称</param>
+            <param name="dictionaryName">敏感词字典名称，不区分大小写</param>
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.SensitiveWordAttribute.DictionaryName">
             <summary>
@@ -10586,7 +10586,7 @@
             <summary>
                 <inheritdoc cref="T:Cordon.SensitiveWordValidator" />
             </summary>
-            <param name="dictionaryName">敏感词字典名称</param>
+            <param name="dictionaryName">敏感词字典名称，不区分大小写</param>
         </member>
         <member name="M:Cordon.SensitiveWordValidator.#ctor(Cordon.SensitiveWordSanitizer)">
             <summary>
@@ -10597,11 +10597,18 @@
             </param>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
+        <member name="M:Cordon.SensitiveWordValidator.#ctor(System.Action{Cordon.SensitiveWordSanitizerBuilder})">
+            <summary>
+                <inheritdoc cref="T:Cordon.SensitiveWordValidator" />
+            </summary>
+            <param name="configure">构建器配置委托</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
         <member name="P:Cordon.SensitiveWordValidator.Sanitizer">
             <summary>
-                敏感词清理器实例
+                <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <remarks>直接注入的实例，优先级最高。设置后 <see cref="P:Cordon.SensitiveWordValidator.DictionaryName" /> 和 <see cref="P:Cordon.SensitiveWordValidator.ConfigureBuilder" /> 将作为备选。</remarks>
+            <remarks>直接注入的实例，优先级最高。设置后 <see cref="P:Cordon.SensitiveWordValidator.DictionaryName" /> 和 <see cref="P:Cordon.SensitiveWordValidator.ConfigureBuilder" /> 将作为备选（直接跳过）。</remarks>
         </member>
         <member name="P:Cordon.SensitiveWordValidator.DictionaryName">
             <summary>
@@ -10619,7 +10626,10 @@
                 构建器配置委托
             </summary>
             <remarks>
-                <para>当 <see cref="P:Cordon.SensitiveWordValidator.Sanitizer" /> 和 <see cref="P:Cordon.SensitiveWordValidator.DictionaryName" />（已缓存）均无法提供实例时，使用此委托构建敏感词清理器。</para>
+                <para>
+                    当 <see cref="P:Cordon.SensitiveWordValidator.Sanitizer" /> 和 <see cref="P:Cordon.SensitiveWordValidator.DictionaryName" />（已缓存）均无法提供实例时，使用此委托构建
+                    <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例。
+                </para>
                 <para>
                     构建后的实例将通过
                     <see cref="M:Cordon.SensitiveWordSanitizerFactory.GetOrCreate(System.String,System.Action{Cordon.SensitiveWordSanitizerBuilder})" />
