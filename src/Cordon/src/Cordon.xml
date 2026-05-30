@@ -11632,10 +11632,3 @@
         </member>
     </members>
 </doc>
-m>
-            <returns>
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </returns>
-        </member>
-    </members>
-</doc>

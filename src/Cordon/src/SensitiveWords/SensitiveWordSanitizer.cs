@@ -122,9 +122,9 @@ public sealed class SensitiveWordSanitizer
                     // 收集匹配结果
                     if (node is { IsEnd: true, MatchedWords.Count: > 0 })
                     {
-                        foreach (var (word, coreLength) in node.MatchedWords)
+                        foreach (var (word, normalizedLength) in node.MatchedWords)
                         {
-                            var startVirtual = virtualIndex - coreLength + 1;
+                            var startVirtual = virtualIndex - normalizedLength + 1;
 
                             // 边界检查
                             if (startVirtual >= 0)
@@ -213,9 +213,9 @@ public sealed class SensitiveWordSanitizer
                     // 收集匹配结果
                     if (node is { IsEnd: true, MatchedWords.Count: > 0 })
                     {
-                        foreach (var (word, coreLength) in node.MatchedWords)
+                        foreach (var (word, normalizedLength) in node.MatchedWords)
                         {
-                            var startVirtual = virtualIndex - coreLength + 1;
+                            var startVirtual = virtualIndex - normalizedLength + 1;
 
                             // 边界检查
                             if (startVirtual >= 0)
@@ -467,7 +467,7 @@ public sealed class SensitiveWordSanitizer
 
             // 清空 StringBuilder
             stringBuilder.Clear();
-            var coreLength = 0;
+            var normalizedLength = 0;
 
             // 移除分隔符生成纯净匹配键，同时计算核心长度
             // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
@@ -489,7 +489,7 @@ public sealed class SensitiveWordSanitizer
                 }
 
                 stringBuilder.Append(normalized);
-                coreLength++;
+                normalizedLength++;
             }
 
             var normalizedKey = stringBuilder.ToString();
@@ -525,7 +525,7 @@ public sealed class SensitiveWordSanitizer
             // 保留原始词及其核心长度（含分隔符）
             if (node.MatchedWordSet.Add(originalWord))
             {
-                node.MatchedWords.Add((originalWord, coreLength));
+                node.MatchedWords.Add((originalWord, normalizedLength));
             }
         }
 
