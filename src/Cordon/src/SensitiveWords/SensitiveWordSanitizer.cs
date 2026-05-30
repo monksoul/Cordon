@@ -454,7 +454,7 @@ public sealed class SensitiveWordSanitizer
         root.Fail = root;
 
         // 初始化并复用 StringBuilder 实例
-        var coreBuilder = new StringBuilder();
+        var stringBuilder = new StringBuilder();
 
         // 构建 Trie 树
         foreach (var originalWord in words)
@@ -466,7 +466,7 @@ public sealed class SensitiveWordSanitizer
             }
 
             // 清空 StringBuilder
-            coreBuilder.Clear();
+            stringBuilder.Clear();
             var coreLength = 0;
 
             // 移除分隔符生成纯净匹配键，同时计算核心长度
@@ -488,11 +488,11 @@ public sealed class SensitiveWordSanitizer
                     continue;
                 }
 
-                coreBuilder.Append(normalized);
+                stringBuilder.Append(normalized);
                 coreLength++;
             }
 
-            var normalizedKey = coreBuilder.ToString();
+            var normalizedKey = stringBuilder.ToString();
 
             // 空检查
             if (string.IsNullOrEmpty(normalizedKey))
