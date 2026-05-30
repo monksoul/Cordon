@@ -46,15 +46,15 @@ public class SensitiveWordValidator : ValidatorBase
     /// <summary>
     ///     <inheritdoc cref="SensitiveWordValidator" />
     /// </summary>
-    /// <param name="configure">构建器配置委托</param>
+    /// <param name="buildSanitizer">构建器配置委托</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public SensitiveWordValidator(Action<SensitiveWordSanitizerBuilder> configure)
+    public SensitiveWordValidator(Action<SensitiveWordSanitizerBuilder> buildSanitizer)
         : this()
     {
         // 空检查
-        ArgumentNullException.ThrowIfNull(configure);
+        ArgumentNullException.ThrowIfNull(buildSanitizer);
 
-        ConfigureBuilder = configure;
+        ConfigureBuilder = buildSanitizer;
     }
 
     /// <summary>
