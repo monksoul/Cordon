@@ -699,6 +699,6 @@ public sealed class SensitiveWordSanitizer
         /// <summary>
         ///     辅助去重集合
         /// </summary>
-        internal HashSet<string> MatchedWordSet { get; set; } = new(2);
+        internal HashSet<string> MatchedWordSet { get; set; } = new(2, StringComparer.OrdinalIgnoreCase);
     }
 }

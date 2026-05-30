@@ -10,7 +10,7 @@ public sealed partial class ValidationBuilder
     /// <summary>
     ///     添加敏感词词库
     /// </summary>
-    /// <remarks>使用默认字典名称：<see cref="SensitiveWordOptions.DefaultDictionaryName" />。</remarks>
+    /// <remarks>使用默认字典名称：<see cref="SensitiveWordSanitizerFactory.DefaultName" />。</remarks>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ValidationBuilder" />

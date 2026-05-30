@@ -10,6 +10,11 @@ namespace Cordon;
 public static class SensitiveWordSanitizerFactory
 {
     /// <summary>
+    ///     默认字典名称
+    /// </summary>
+    public const string DefaultName = "SensitiveWords:Default";
+
+    /// <summary>
     ///     敏感词清理器缓存字典
     /// </summary>
     internal static readonly ConcurrentDictionary<string, SanitizerEntry> _instances =
@@ -42,13 +47,13 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <remarks>使用默认字典名称：<see cref="SensitiveWordOptions.DefaultDictionaryName" />。</remarks>
+    /// <remarks>使用默认字典名称：<see cref="SensitiveWordSanitizerFactory.DefaultName" />。</remarks>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
     public static SensitiveWordSanitizer GetOrCreate(Action<SensitiveWordSanitizerBuilder> configure) =>
-        GetOrCreate(SensitiveWordOptions.DefaultDictionaryName, configure);
+        GetOrCreate(DefaultName, configure);
 
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
@@ -116,13 +121,13 @@ public static class SensitiveWordSanitizerFactory
     ///     刷新 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
     /// <remarks>
-    ///     <para>使用默认字典名称：<see cref="SensitiveWordOptions.DefaultDictionaryName" />。</para>
+    ///     <para>使用默认字典名称：<see cref="SensitiveWordSanitizerFactory.DefaultName" />。</para>
     ///     <para>当 <paramref name="configure" /> 为 <c>null</c> 时，使用注册时的配置重新构建实例（热更新）。</para>
     ///     <para>当 <paramref name="configure" /> 不为 <c>null</c> 时，将用新配置替换原有构建逻辑并立即生效。</para>
     /// </remarks>
     /// <param name="configure">自定义配置委托</param>
     public static void Refresh(Action<SensitiveWordSanitizerBuilder>? configure = null) =>
-        Refresh(SensitiveWordOptions.DefaultDictionaryName, configure);
+        Refresh(DefaultName, configure);
 
     /// <summary>
     ///     刷新指定名称的 <see cref="SensitiveWordSanitizer" /> 实例

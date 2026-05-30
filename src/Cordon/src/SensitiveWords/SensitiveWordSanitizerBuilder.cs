@@ -22,16 +22,16 @@ public sealed class SensitiveWordSanitizerBuilder
     /// <summary>
     ///     添加一个已解析的敏感词
     /// </summary>
-    /// <param name="word">敏感词字符串</param>
+    /// <param name="word">敏感词</param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
-    public SensitiveWordSanitizerBuilder AddWord(string word)
+    public SensitiveWordSanitizerBuilder AddWord(string? word)
     {
         // 空检查
         if (!string.IsNullOrWhiteSpace(word))
         {
-            _words.Add(word);
+            _words.Add(word.Trim()); // 移除前后空格
         }
 
         return this;
@@ -44,7 +44,7 @@ public sealed class SensitiveWordSanitizerBuilder
     /// <returns>
     ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
-    public SensitiveWordSanitizerBuilder AddWords(IEnumerable<string> words)
+    public SensitiveWordSanitizerBuilder AddWords(IEnumerable<string?> words)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(words);
@@ -55,7 +55,7 @@ public sealed class SensitiveWordSanitizerBuilder
             // 空检查
             if (!string.IsNullOrWhiteSpace(word))
             {
-                _words.Add(word);
+                _words.Add(word.Trim()); // 移除前后空格
             }
         }
 
@@ -69,7 +69,7 @@ public sealed class SensitiveWordSanitizerBuilder
     /// <returns>
     ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
-    public SensitiveWordSanitizerBuilder AddLine(string line)
+    public SensitiveWordSanitizerBuilder AddLine(string? line)
     {
         SensitiveWordSanitizer.ParseLine(line, _words);
 
@@ -83,7 +83,7 @@ public sealed class SensitiveWordSanitizerBuilder
     /// <returns>
     ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
-    public SensitiveWordSanitizerBuilder AddLines(IEnumerable<string> lines)
+    public SensitiveWordSanitizerBuilder AddLines(IEnumerable<string?> lines)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(lines);
@@ -147,7 +147,7 @@ public sealed class SensitiveWordSanitizerBuilder
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        // 解析（规范化）文件路径
+        // 解析文件路径
         var resolvedPath = ResolveFilePath(filePath);
 
         // 检查文件是否存在
@@ -181,24 +181,27 @@ public sealed class SensitiveWordSanitizerBuilder
     /// <summary>
     ///     配置 <see cref="SensitiveWordOptions" />
     /// </summary>
+    /// <remarks>可通过 <c>options => options with { IgnoreCase = false }</c> 方式更改其属性。</remarks>
     /// <param name="configurator">自定义配置委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
-    public SensitiveWordSanitizerBuilder ConfigureOptions(Func<SensitiveWordOptions, SensitiveWordOptions> configurator)
+    public SensitiveWordSanitizerBuilder ConfigureOptions(
+        Func<SensitiveWordOptions, SensitiveWordOptions?> configurator)
     {
         // 空检查
         ArgumentNullException.ThrowIfNull(configurator);
 
         // 调用自定义配置委托
-        _options = configurator(_options);
+        _options = configurator(_options) ?? SensitiveWordOptions.Default;
 
         return this;
     }
 
     /// <summary>
-    ///     清空已添加的所有敏感词，并将选项恢复为默认值
+    ///     清空已添加的所有敏感词
     /// </summary>
+    /// <remarks>注意：选项也将恢复为默认值。</remarks>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizerBuilder" />
     /// </returns>
@@ -217,7 +220,19 @@ public sealed class SensitiveWordSanitizerBuilder
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
-    public SensitiveWordSanitizer Build() => SensitiveWordSanitizer.Build(_words, _options);
+    /// <exception cref="InvalidOperationException"></exception>
+    public SensitiveWordSanitizer Build()
+    {
+        // 空词集检查：敏感词清理器的核心用途是匹配敏感词，若词集为空则构建无意义。
+        // 提前抛异常可避免用户误以为验证生效，而实际上所有输入都将被放行。
+        if (_words.Count == 0)
+        {
+            throw new InvalidOperationException(
+                $"Cannot build a {nameof(SensitiveWordSanitizer)} with an empty word list. Please add at least one sensitive word via {nameof(AddWord)}, {nameof(AddPath)}, {nameof(AddStream)}, etc.");
+        }
+
+        return SensitiveWordSanitizer.Build(_words, _options);
+    }
 
     /// <summary>
     ///     解析文件路径
@@ -231,6 +246,9 @@ public sealed class SensitiveWordSanitizerBuilder
     {
         // 空检查
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+
+        // 移除前后空格
+        filePath = filePath.Trim();
 
         // 处理绝对和相对路径问题
         var basePath = Path.IsPathRooted(filePath)

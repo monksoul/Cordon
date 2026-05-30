@@ -509,6 +509,9 @@ public class SensitiveWordSanitizerTests
         SensitiveWordSanitizer.ParseLine("# 整行注释", hashSet);
         Assert.Empty(hashSet);
 
+        SensitiveWordSanitizer.ParseLine("#整行注释", hashSet);
+        Assert.Empty(hashSet);
+
         SensitiveWordSanitizer.ParseLine(string.Empty, hashSet);
         Assert.Empty(hashSet);
 
@@ -525,6 +528,10 @@ public class SensitiveWordSanitizerTests
         Assert.Empty(hashSet);
 
         SensitiveWordSanitizer.ParseLine("加微信 | 兼职刷单, QQ群 ; 淘宝代刷   # 行内注释", hashSet);
+        Assert.Equal(4, hashSet.Count);
+        Assert.Equal(["加微信", "兼职刷单", "QQ群", "淘宝代刷"], hashSet);
+
+        SensitiveWordSanitizer.ParseLine("加微信 | 兼职刷单, QQ群 ; 淘宝代刷   #行内注释", hashSet);
         Assert.Equal(4, hashSet.Count);
         Assert.Equal(["加微信", "兼职刷单", "QQ群", "淘宝代刷"], hashSet);
 

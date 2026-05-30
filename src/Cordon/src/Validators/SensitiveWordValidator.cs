@@ -56,7 +56,7 @@ public class SensitiveWordValidator : ValidatorBase
     ///     <para>用于从 <see cref="SensitiveWordSanitizerFactory.Get(string)" /> 中获取 <see cref="SensitiveWordSanitizer" /> 实例。</para>
     ///     <para>当 <see cref="Sanitizer" /> 未设置时，通过该名称从工厂获取已注册的实例。</para>
     ///     <para>若同时提供了 <see cref="ConfigureBuilder" />，则使用该名称作为缓存键进行构建（若工厂中尚未缓存）。</para>
-    ///     <para>若未提供该名称且需要构建，将使用 <see cref="SensitiveWordOptions.DefaultDictionaryName" />。</para>
+    ///     <para>若未提供该名称且需要构建，将使用 <see cref="SensitiveWordSanitizerFactory.DefaultName" />。</para>
     /// </remarks>
     public string? DictionaryName { get; set; }
 
@@ -68,7 +68,7 @@ public class SensitiveWordValidator : ValidatorBase
     ///     <para>
     ///         构建后的实例将通过
     ///         <see cref="SensitiveWordSanitizerFactory.GetOrCreate(string, Action{SensitiveWordSanitizerBuilder})" />
-    ///         进行缓存，缓存键为 <see cref="DictionaryName" /> 或 <see cref="SensitiveWordOptions.DefaultDictionaryName" />。
+    ///         进行缓存，缓存键为 <see cref="DictionaryName" /> 或 <see cref="SensitiveWordSanitizerFactory.DefaultName" />。
     ///     </para>
     /// </remarks>
     public Action<SensitiveWordSanitizerBuilder>? ConfigureBuilder { get; set; }
@@ -204,7 +204,7 @@ public class SensitiveWordValidator : ValidatorBase
             // 获取有效的字典名称
             var effectiveName = !string.IsNullOrWhiteSpace(DictionaryName)
                 ? DictionaryName
-                : SensitiveWordOptions.DefaultDictionaryName;
+                : SensitiveWordSanitizerFactory.DefaultName;
 
             return SensitiveWordSanitizerFactory.GetOrCreate(effectiveName, ConfigureBuilder);
         }
@@ -214,12 +214,12 @@ public class SensitiveWordValidator : ValidatorBase
         {
             try
             {
-                return SensitiveWordSanitizerFactory.Get(SensitiveWordOptions.DefaultDictionaryName);
+                return SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
             }
             catch (InvalidOperationException)
             {
                 throw new InvalidOperationException(
-                    $"No sensitive word source is configured for the {nameof(SensitiveWordValidator)}. Either set '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(ConfigureBuilder)}', or register the default dictionary '{SensitiveWordOptions.DefaultDictionaryName}' via `SensitiveWordSanitizerFactory.GetOrCreate`.");
+                    $"No sensitive word source is configured for the {nameof(SensitiveWordValidator)}. Either set '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(ConfigureBuilder)}', or register the default dictionary '{SensitiveWordSanitizerFactory.DefaultName}' via `SensitiveWordSanitizerFactory.GetOrCreate`.");
             }
         }
 

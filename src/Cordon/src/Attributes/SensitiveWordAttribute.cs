@@ -37,7 +37,7 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
     ///         该名称需已在应用启动时通过
     ///         <see cref="SensitiveWordSanitizerFactory.GetOrCreate(string, Action{SensitiveWordSanitizerBuilder})" /> 注册。
     ///     </para>
-    ///     <para>若未提供该名称且需要构建，将使用 <see cref="SensitiveWordOptions.DefaultDictionaryName" />。</para>
+    ///     <para>若未提供该名称且需要构建，将使用 <see cref="SensitiveWordSanitizerFactory.DefaultName" />。</para>
     /// </remarks>
     public string? DictionaryName { get; set; }
 
@@ -127,12 +127,12 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
         // 回退到默认字典（当未指定 DictionaryName）
         try
         {
-            return SensitiveWordSanitizerFactory.Get(SensitiveWordOptions.DefaultDictionaryName);
+            return SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
         }
         catch (InvalidOperationException)
         {
             throw new InvalidOperationException(
-                $"No dictionary name is configured for the {nameof(SensitiveWordAttribute)}, and the default dictionary '{SensitiveWordOptions.DefaultDictionaryName}' has not been registered. Either set the '{nameof(DictionaryName)}' property, or register the default dictionary via `SensitiveWordSanitizerFactory.GetOrCreate`.");
+                $"No dictionary name is configured for the {nameof(SensitiveWordAttribute)}, and the default dictionary '{SensitiveWordSanitizerFactory.DefaultName}' has not been registered. Either set the '{nameof(DictionaryName)}' property, or register the default dictionary via `SensitiveWordSanitizerFactory.GetOrCreate`.");
         }
     }
 
