@@ -12,6 +12,9 @@ public class SensitiveWordSanitizerTests
     [Fact]
     public void New_ReturnOK()
     {
+        Assert.NotNull(SensitiveWordSanitizer.SkipMap);
+        Assert.Equal(65536, SensitiveWordSanitizer.SkipMap.Length);
+
         Assert.All([
             '_',
             '-',
@@ -21,219 +24,12 @@ public class SensitiveWordSanitizerTests
             '\r',
             '\n'
         ], c => Assert.True(SensitiveWordSanitizer.IgnoredSeparators.Contains(c)));
-
-        Assert.NotNull(SensitiveWordSanitizer.SkipMap);
-        Assert.Equal(65536, SensitiveWordSanitizer.SkipMap.Length);
-    }
-
-    [Fact]
-    public void CreateFromPath_Invalid_Parameters()
-    {
-        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizer.CreateFromPath(null!));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizer.CreateFromPath(string.Empty));
-        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizer.CreateFromPath("  "));
-
-        var exception =
-            Assert.Throws<FileNotFoundException>(() => SensitiveWordSanitizer.CreateFromPath("/user/not-found.txt"));
-        Assert.Equal("Sensitive word file not found.", exception.Message);
-        Assert.Equal("/user/not-found.txt", exception.FileName);
-    }
-
-    [Fact]
-    public void CreateFromPath_ReturnOK()
-    {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath);
-        Assert.NotNull(sensitiveWordSanitizer);
-
-        Assert.NotNull(sensitiveWordSanitizer._options);
-        Assert.True(sensitiveWordSanitizer._options.IgnoreCase);
-        Assert.True(sensitiveWordSanitizer._options.IgnoreSymbol);
-        Assert.NotNull(sensitiveWordSanitizer._root);
-        Assert.Equal('加', sensitiveWordSanitizer._root.Children.FirstOrDefault().Key);
-        Assert.Equal(16, sensitiveWordSanitizer._root.Children.Count);
-
-        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.CreateFromPath(filePath,
-            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
-        Assert.NotNull(sensitiveWordSanitizer2._options);
-        Assert.False(sensitiveWordSanitizer2._options.IgnoreCase);
-        Assert.False(sensitiveWordSanitizer2._options.IgnoreSymbol);
-    }
-
-    [Fact]
-    public void CreateFromStream_Invalid_Parameters()
-    {
-        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizer.CreateFromStream(null!));
-
-        var stream = new MemoryStream();
-        stream.Dispose();
-
-        var exception =
-            Assert.Throws<ArgumentException>(() => SensitiveWordSanitizer.CreateFromStream(stream));
-        Assert.Equal("Stream must be readable. (Parameter 'stream')", exception.Message);
-    }
-
-    [Fact]
-    public void CreateFromStream_ReturnOK()
-    {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        using var stream = File.OpenRead(filePath);
-
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromStream(stream);
-        Assert.NotNull(sensitiveWordSanitizer);
-
-        Assert.True(sensitiveWordSanitizer._options.IgnoreCase);
-        Assert.True(sensitiveWordSanitizer._options.IgnoreSymbol);
-        Assert.NotNull(sensitiveWordSanitizer._root);
-        Assert.Equal('加', sensitiveWordSanitizer._root.Children.FirstOrDefault().Key);
-        Assert.Equal(16, sensitiveWordSanitizer._root.Children.Count);
-
-        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.CreateFromStream(stream,
-            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
-        Assert.False(sensitiveWordSanitizer2._options.IgnoreCase);
-        Assert.False(sensitiveWordSanitizer2._options.IgnoreSymbol);
-    }
-
-    [Fact]
-    public void Build_Invalid_Parameters() =>
-        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizer.Build(null!));
-
-    [Fact]
-    public void Build_ReturnOK()
-    {
-        List<string> words = ["敏感词", "违规表述", "涉政", "暴恐"];
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.Build(words);
-
-        Assert.True(sensitiveWordSanitizer._options.IgnoreCase);
-        Assert.True(sensitiveWordSanitizer._options.IgnoreSymbol);
-        Assert.NotNull(sensitiveWordSanitizer._root);
-        Assert.Equal('敏', sensitiveWordSanitizer._root.Children.FirstOrDefault().Key);
-
-        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.Build(words,
-            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
-        Assert.False(sensitiveWordSanitizer2._options.IgnoreCase);
-        Assert.False(sensitiveWordSanitizer2._options.IgnoreSymbol);
-    }
-
-    [Fact]
-    public void AddWord_ReturnOK()
-    {
-        var hashSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        SensitiveWordSanitizer.AddWord("敏感词", hashSet);
-        Assert.Single(hashSet);
-        Assert.Equal("敏感词", hashSet.ElementAt(0));
-
-        SensitiveWordSanitizer.AddWord(" 敏感词 ", hashSet);
-        Assert.Single(hashSet);
-        Assert.Equal("敏感词", hashSet.ElementAt(0));
-
-        SensitiveWordSanitizer.AddWord(string.Empty, hashSet);
-        Assert.Single(hashSet);
-        Assert.Equal("敏感词", hashSet.ElementAt(0));
-
-        SensitiveWordSanitizer.AddWord("  ", hashSet);
-        Assert.Single(hashSet);
-        Assert.Equal("敏感词", hashSet.ElementAt(0));
-
-        SensitiveWordSanitizer.AddWord("低俗", hashSet);
-        Assert.Equal(2, hashSet.Count);
-        Assert.Equal("低俗", hashSet.ElementAt(1));
-    }
-
-    [Fact]
-    public void ParseLine_ReturnOK()
-    {
-        var hashSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        SensitiveWordSanitizer.ParseLine("# 整行注释", hashSet);
-        Assert.Empty(hashSet);
-
-        SensitiveWordSanitizer.ParseLine("", hashSet);
-        Assert.Empty(hashSet);
-
-        SensitiveWordSanitizer.ParseLine("\n", hashSet);
-        Assert.Empty(hashSet);
-
-        SensitiveWordSanitizer.ParseLine("\r\n", hashSet);
-        Assert.Empty(hashSet);
-
-        SensitiveWordSanitizer.ParseLine("# 广告类（使用多种分隔符：竖线、逗号、制表符、分号）", hashSet);
-        Assert.Empty(hashSet);
-
-        SensitiveWordSanitizer.ParseLine("加微信 | 兼职刷单, QQ群 ; 淘宝代刷   # 行内注释", hashSet);
-        Assert.Equal(4, hashSet.Count);
-        Assert.Equal(["加微信", "兼职刷单", "QQ群", "淘宝代刷"], hashSet);
-
-        SensitiveWordSanitizer.ParseLine("敏感词, 违规表述\t暴恐\t涉 政", hashSet);
-        Assert.Equal(8, hashSet.Count);
-        Assert.Equal(["加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政"], hashSet);
-
-        SensitiveWordSanitizer.ParseLine("test_bad_word\tillegal_term", hashSet);
-        Assert.Equal(10, hashSet.Count);
-        Assert.Equal(["加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term"],
-            hashSet);
-
-        SensitiveWordSanitizer.ParseLine("八 嘎 耶鲁", hashSet);
-        Assert.Equal(11, hashSet.Count);
-        Assert.Equal(
-            ["加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁"],
-            hashSet);
-
-        SensitiveWordSanitizer.ParseLine("你-大-爷", hashSet);
-        Assert.Equal(12, hashSet.Count);
-        Assert.Equal(
-        [
-            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁", "你-大-爷"
-        ], hashSet);
-
-        SensitiveWordSanitizer.ParseLine("low_high", hashSet);
-        Assert.Equal(13, hashSet.Count);
-        Assert.Equal(
-        [
-            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
-            "你-大-爷", "low_high"
-        ], hashSet);
-
-        SensitiveWordSanitizer.ParseLine("hello_world", hashSet);
-        Assert.Equal(14, hashSet.Count);
-        Assert.Equal(
-        [
-            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
-            "你-大-爷", "low_high", "hello_world"
-        ], hashSet);
-
-        SensitiveWordSanitizer.ParseLine("abc_def", hashSet);
-        Assert.Equal(15, hashSet.Count);
-        Assert.Equal(
-        [
-            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
-            "你-大-爷", "low_high", "hello_world", "abc_def"
-        ], hashSet);
-
-        SensitiveWordSanitizer.ParseLine("TMD!", hashSet);
-        Assert.Equal(16, hashSet.Count);
-        Assert.Equal(
-        [
-            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
-            "你-大-爷", "low_high", "hello_world", "abc_def", "TMD!"
-        ], hashSet);
-    }
-
-    [Fact]
-    public void ShouldSkip_ReturnOK()
-    {
-        Assert.True(SensitiveWordSanitizer.ShouldSkip(' '));
-        Assert.True(SensitiveWordSanitizer.ShouldSkip('。'));
-        Assert.True(SensitiveWordSanitizer.ShouldSkip('，'));
-        Assert.True(SensitiveWordSanitizer.ShouldSkip('|'));
     }
 
     [Fact]
     public void FindMatches_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath);
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt").Build();
 
         Assert.Empty(sensitiveWordSanitizer.FindMatches(null));
         Assert.Empty(sensitiveWordSanitizer.FindMatches(string.Empty));
@@ -309,9 +105,8 @@ public class SensitiveWordSanitizerTests
     [Fact]
     public void FindMatches_SetIgnoreCaseFalse_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer =
-            SensitiveWordSanitizer.CreateFromPath(filePath, new SensitiveWordOptions { IgnoreCase = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreCase = false }).Build();
 
         var matchResults1 = sensitiveWordSanitizer.FindMatches("这里呢，是否包含敏__感__词呢？");
         Assert.Single(matchResults1);
@@ -348,9 +143,8 @@ public class SensitiveWordSanitizerTests
     [Fact]
     public void FindMatches_SetIgnoreCaseFalse_And_SetIgnoreSymbolFalse_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
-            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreCase = false, IgnoreSymbol = false }).Build();
 
         var matchResults1 = sensitiveWordSanitizer.FindMatches("这里呢，是否包含敏__感__词呢？");
         Assert.Single(matchResults1);
@@ -381,11 +175,11 @@ public class SensitiveWordSanitizerTests
     }
 
     [Fact]
-    public void FindMatches_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse__ReturnOK()
+    public void FindMatches_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
-            new SensitiveWordOptions { IgnoreFullwidth = false, IgnoreUnicodeVariants = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreFullwidth = false, IgnoreUnicodeVariants = false })
+            .Build();
 
         var matchResults = sensitiveWordSanitizer.FindMatches("ｆｕｃｋ the bad words。");
         Assert.Empty(matchResults);
@@ -397,8 +191,7 @@ public class SensitiveWordSanitizerTests
     [Fact]
     public void FindFirst_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath);
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt").Build();
 
         Assert.Null(sensitiveWordSanitizer.FindFirst(null));
         Assert.Null(sensitiveWordSanitizer.FindFirst(string.Empty));
@@ -457,9 +250,8 @@ public class SensitiveWordSanitizerTests
     [Fact]
     public void FindFirst_SetIgnoreCaseFalse_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer =
-            SensitiveWordSanitizer.CreateFromPath(filePath, new SensitiveWordOptions { IgnoreCase = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreCase = false }).Build();
 
         var matchResult1 = sensitiveWordSanitizer.FindFirst("这里呢，是否包含敏__感__词呢？");
         Assert.NotNull(matchResult1);
@@ -496,9 +288,8 @@ public class SensitiveWordSanitizerTests
     [Fact]
     public void FindFirst_SetIgnoreCaseFalse_And_SetIgnoreSymbolFalse_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
-            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreCase = false, IgnoreSymbol = false }).Build();
 
         var matchResult1 = sensitiveWordSanitizer.FindFirst("这里呢，是否包含敏__感__词呢？");
         Assert.NotNull(matchResult1);
@@ -529,11 +320,11 @@ public class SensitiveWordSanitizerTests
     }
 
     [Fact]
-    public void FindFirst_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse__ReturnOK()
+    public void FindFirst_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
-            new SensitiveWordOptions { IgnoreFullwidth = false, IgnoreUnicodeVariants = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreFullwidth = false, IgnoreUnicodeVariants = false })
+            .Build();
 
         var matchResult = sensitiveWordSanitizer.FindFirst("ｆｕｃｋ the bad words。");
         Assert.Null(matchResult);
@@ -560,8 +351,7 @@ public class SensitiveWordSanitizerTests
     [InlineData("Ⓕⓤc⒦ the bad words。", true)]
     public void Contains_ReturnOK(string? text, bool result)
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath);
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt").Build();
 
         Assert.Equal(result, sensitiveWordSanitizer.Contains(text));
     }
@@ -582,9 +372,8 @@ public class SensitiveWordSanitizerTests
     [InlineData("这里面包含tmd吗？", false)]
     public void Contains_SetIgnoreCaseFalse_ReturnOK(string? text, bool result)
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer =
-            SensitiveWordSanitizer.CreateFromPath(filePath, new SensitiveWordOptions { IgnoreCase = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreCase = false }).Build();
 
         Assert.Equal(result, sensitiveWordSanitizer.Contains(text));
     }
@@ -605,9 +394,8 @@ public class SensitiveWordSanitizerTests
     [InlineData("这里面包含tmd吗？", false)]
     public void Contains_SetIgnoreCaseFalse_And_SetIgnoreSymbolFalse_ReturnOK(string? text, bool result)
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
-            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreCase = false, IgnoreSymbol = false }).Build();
 
         Assert.Equal(result, sensitiveWordSanitizer.Contains(text));
     }
@@ -628,11 +416,11 @@ public class SensitiveWordSanitizerTests
     [InlineData("这里面包含tmd吗？", true)]
     [InlineData("ｆｕｃｋ the bad words。", false)]
     [InlineData("Ⓕⓤc⒦ the bad words。", false)]
-    public void Contains_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse__ReturnOK(string? text, bool result)
+    public void Contains_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse_ReturnOK(string? text, bool result)
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
-            new SensitiveWordOptions { IgnoreFullwidth = false, IgnoreUnicodeVariants = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreFullwidth = false, IgnoreUnicodeVariants = false })
+            .Build();
 
         Assert.Equal(result, sensitiveWordSanitizer.Contains(text));
     }
@@ -640,8 +428,7 @@ public class SensitiveWordSanitizerTests
     [Fact]
     public void Replace_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath);
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt").Build();
 
         var newText = sensitiveWordSanitizer.Replace(userText);
         Assert.Equal(
@@ -652,9 +439,8 @@ public class SensitiveWordSanitizerTests
     [Fact]
     public void Replace_SetIgnoreCaseFalse_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer =
-            SensitiveWordSanitizer.CreateFromPath(filePath, new SensitiveWordOptions { IgnoreCase = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreCase = false }).Build();
 
         var newText1 = sensitiveWordSanitizer.Replace("这里呢，是否包含敏__感__词呢？");
         Assert.Equal("这里呢，是否包含*******呢？", newText1);
@@ -675,9 +461,8 @@ public class SensitiveWordSanitizerTests
     [Fact]
     public void Replace_SetIgnoreCaseFalse_And_SetIgnoreSymbolFalse_ReturnOK()
     {
-        var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-        var sensitiveWordSanitizer = SensitiveWordSanitizer.CreateFromPath(filePath,
-            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreCase = false, IgnoreSymbol = false }).Build();
 
         var newText1 = sensitiveWordSanitizer.Replace("这里呢，是否包含敏__感__词呢？");
         Assert.Equal("这里呢，是否包含*******呢？", newText1);
@@ -693,6 +478,165 @@ public class SensitiveWordSanitizerTests
 
         var newText5 = sensitiveWordSanitizer.Replace("这里面包含敏*感*词吗？");
         Assert.Equal("这里面包含敏*感*词吗？", newText5);
+    }
+
+    [Fact]
+    public void Replace_SetIgnoreFullwidthFalse_And_SetIgnoreUnicodeVariantsFalse_ReturnOK()
+    {
+        var sensitiveWordSanitizer = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt")
+            .ConfigureOptions(options => options with { IgnoreFullwidth = false, IgnoreUnicodeVariants = false })
+            .Build();
+
+        var newText1 = sensitiveWordSanitizer.Replace("ｆｕｃｋ the bad words。");
+        Assert.Equal("ｆｕｃｋ the bad words。", newText1);
+
+        var newText2 = sensitiveWordSanitizer.Replace("Ⓕⓤc⒦ the bad words。");
+        Assert.Equal("Ⓕⓤc⒦ the bad words。", newText2);
+    }
+
+    [Fact]
+    public void ParseLine_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizer.ParseLine("敏感词", null!));
+
+    [Fact]
+    public void ParseLine_ReturnOK()
+    {
+        var hashSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        SensitiveWordSanitizer.ParseLine(null, hashSet);
+        Assert.Empty(hashSet);
+
+        SensitiveWordSanitizer.ParseLine("# 整行注释", hashSet);
+        Assert.Empty(hashSet);
+
+        SensitiveWordSanitizer.ParseLine(string.Empty, hashSet);
+        Assert.Empty(hashSet);
+
+        SensitiveWordSanitizer.ParseLine(" ", hashSet);
+        Assert.Empty(hashSet);
+
+        SensitiveWordSanitizer.ParseLine("\n", hashSet);
+        Assert.Empty(hashSet);
+
+        SensitiveWordSanitizer.ParseLine("\r\n", hashSet);
+        Assert.Empty(hashSet);
+
+        SensitiveWordSanitizer.ParseLine("# 广告类（使用多种分隔符：竖线、逗号、制表符、分号）", hashSet);
+        Assert.Empty(hashSet);
+
+        SensitiveWordSanitizer.ParseLine("加微信 | 兼职刷单, QQ群 ; 淘宝代刷   # 行内注释", hashSet);
+        Assert.Equal(4, hashSet.Count);
+        Assert.Equal(["加微信", "兼职刷单", "QQ群", "淘宝代刷"], hashSet);
+
+        SensitiveWordSanitizer.ParseLine("敏感词, 违规表述\t暴恐\t涉 政", hashSet);
+        Assert.Equal(8, hashSet.Count);
+        Assert.Equal(["加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政"], hashSet);
+
+        SensitiveWordSanitizer.ParseLine("test_bad_word\tillegal_term", hashSet);
+        Assert.Equal(10, hashSet.Count);
+        Assert.Equal(["加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term"],
+            hashSet);
+
+        SensitiveWordSanitizer.ParseLine("八 嘎 耶鲁", hashSet);
+        Assert.Equal(11, hashSet.Count);
+        Assert.Equal(
+            ["加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁"],
+            hashSet);
+
+        SensitiveWordSanitizer.ParseLine("你-大-爷", hashSet);
+        Assert.Equal(12, hashSet.Count);
+        Assert.Equal(
+        [
+            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁", "你-大-爷"
+        ], hashSet);
+
+        SensitiveWordSanitizer.ParseLine("low_high", hashSet);
+        Assert.Equal(13, hashSet.Count);
+        Assert.Equal(
+        [
+            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
+            "你-大-爷", "low_high"
+        ], hashSet);
+
+        SensitiveWordSanitizer.ParseLine("hello_world", hashSet);
+        Assert.Equal(14, hashSet.Count);
+        Assert.Equal(
+        [
+            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
+            "你-大-爷", "low_high", "hello_world"
+        ], hashSet);
+
+        SensitiveWordSanitizer.ParseLine("abc_def", hashSet);
+        Assert.Equal(15, hashSet.Count);
+        Assert.Equal(
+        [
+            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
+            "你-大-爷", "low_high", "hello_world", "abc_def"
+        ], hashSet);
+
+        SensitiveWordSanitizer.ParseLine("TMD!", hashSet);
+        Assert.Equal(16, hashSet.Count);
+        Assert.Equal(
+        [
+            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
+            "你-大-爷", "low_high", "hello_world", "abc_def", "TMD!"
+        ], hashSet);
+    }
+
+    [Fact]
+    public void Build_Invalid_Parameters() =>
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizer.Build(null!));
+
+    [Fact]
+    public void Build_ReturnOK()
+    {
+        List<string> words = ["敏感词", "违规表述", "涉政", "暴恐"];
+        var sensitiveWordSanitizer = SensitiveWordSanitizer.Build(words);
+
+        Assert.True(sensitiveWordSanitizer._options.IgnoreCase);
+        Assert.True(sensitiveWordSanitizer._options.IgnoreSymbol);
+        Assert.NotNull(sensitiveWordSanitizer._root);
+        Assert.Equal('敏', sensitiveWordSanitizer._root.Children.FirstOrDefault().Key);
+
+        var sensitiveWordSanitizer2 = SensitiveWordSanitizer.Build(words,
+            new SensitiveWordOptions { IgnoreCase = false, IgnoreSymbol = false });
+        Assert.False(sensitiveWordSanitizer2._options.IgnoreCase);
+        Assert.False(sensitiveWordSanitizer2._options.IgnoreSymbol);
+    }
+
+    [Fact]
+    public void AddWord_ReturnOK()
+    {
+        var hashSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        SensitiveWordSanitizer.AddWord("敏感词", hashSet);
+        Assert.Single(hashSet);
+        Assert.Equal("敏感词", hashSet.ElementAt(0));
+
+        SensitiveWordSanitizer.AddWord(" 敏感词 ", hashSet);
+        Assert.Single(hashSet);
+        Assert.Equal("敏感词", hashSet.ElementAt(0));
+
+        SensitiveWordSanitizer.AddWord(string.Empty, hashSet);
+        Assert.Single(hashSet);
+        Assert.Equal("敏感词", hashSet.ElementAt(0));
+
+        SensitiveWordSanitizer.AddWord("  ", hashSet);
+        Assert.Single(hashSet);
+        Assert.Equal("敏感词", hashSet.ElementAt(0));
+
+        SensitiveWordSanitizer.AddWord("低俗", hashSet);
+        Assert.Equal(2, hashSet.Count);
+        Assert.Equal("低俗", hashSet.ElementAt(1));
+    }
+
+    [Fact]
+    public void ShouldSkip_ReturnOK()
+    {
+        Assert.True(SensitiveWordSanitizer.ShouldSkip(' '));
+        Assert.True(SensitiveWordSanitizer.ShouldSkip('。'));
+        Assert.True(SensitiveWordSanitizer.ShouldSkip('，'));
+        Assert.True(SensitiveWordSanitizer.ShouldSkip('|'));
     }
 
     [Theory]

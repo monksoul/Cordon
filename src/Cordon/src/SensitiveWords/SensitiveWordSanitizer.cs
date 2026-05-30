@@ -56,6 +56,385 @@ public sealed class SensitiveWordSanitizer
     }
 
     /// <summary>
+    ///     检查文本并返回所有命中词及精确位置
+    /// </summary>
+    /// <param name="text">待检测文本</param>
+    /// <returns><see cref="MatchResult" />[]</returns>
+    public MatchResult[] FindMatches(string? text)
+    {
+        // 空检查
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return [];
+        }
+
+        // 初始化匹配结果集合
+        var matches = new List<MatchResult>(32);
+
+        var node = _root;
+        var virtualIndex = 0;
+
+        // 记录 虚拟索引 -> 真实索引 的映射
+        var realIndexMap = ArrayPool<int>.Shared.Rent(text.Length);
+
+        try
+        {
+            // 遍历文本每一个字符
+            for (var i = 0; i < text.Length; i++)
+            {
+                var c = text[i];
+
+                // 始终跳过分隔符（_/-/空格/全角空格/制表符/回车/换行），使输入流与 Trie 结构对齐
+                if (IgnoredSeparators.Contains(c))
+                {
+                    continue;
+                }
+
+                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+                var normalized = NormalizeChar(c, _options);
+
+                // 符号过滤（仅当选项启用时）
+                if (_options.IgnoreSymbol && ShouldSkip(normalized))
+                {
+                    continue;
+                }
+
+                // 记录映射关系
+                realIndexMap[virtualIndex] = i;
+                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
+
+                // 当前节点无匹配时，沿 Fail 指针回溯
+                TrieNode? next;
+                while (!node.Children.TryGetValue(matchChar, out next))
+                {
+                    if (node == _root)
+                    {
+                        break;
+                    }
+
+                    node = node.Fail ?? _root;
+                }
+
+                if (next != null)
+                {
+                    node = next;
+
+                    // 收集匹配结果
+                    if (node is { IsEnd: true, MatchedWords.Count: > 0 })
+                    {
+                        foreach (var (word, coreLength) in node.MatchedWords)
+                        {
+                            var startVirtual = virtualIndex - coreLength + 1;
+
+                            // 边界检查
+                            if (startVirtual >= 0)
+                            {
+                                matches.Add(new MatchResult(word, realIndexMap[startVirtual],
+                                    realIndexMap[virtualIndex] + 1));
+                            }
+                        }
+                    }
+                }
+
+                virtualIndex++;
+            }
+
+            return matches.ToArray();
+        }
+        finally
+        {
+            ArrayPool<int>.Shared.Return(realIndexMap);
+        }
+    }
+
+    /// <summary>
+    ///     检查文本并返回首个命中词及精确位置
+    /// </summary>
+    /// <param name="text">待检测文本</param>
+    /// <returns>
+    ///     <see cref="MatchResult" />
+    /// </returns>
+    public MatchResult? FindFirst(string? text)
+    {
+        // 空检查
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return null;
+        }
+
+        var node = _root;
+        var virtualIndex = 0;
+
+        // 记录 虚拟索引 -> 真实索引 的映射
+        var realIndexMap = ArrayPool<int>.Shared.Rent(text.Length);
+
+        try
+        {
+            // 遍历文本每一个字符
+            for (var i = 0; i < text.Length; i++)
+            {
+                var c = text[i];
+
+                // 始终跳过分隔符（_/-/空格/全角空格/制表符/回车/换行），使输入流与 Trie 结构对齐
+                if (IgnoredSeparators.Contains(c))
+                {
+                    continue;
+                }
+
+                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+                var normalized = NormalizeChar(c, _options);
+
+                // 符号过滤（仅当选项启用时）
+                if (_options.IgnoreSymbol && ShouldSkip(normalized))
+                {
+                    continue;
+                }
+
+                // 记录映射关系
+                realIndexMap[virtualIndex] = i;
+                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
+
+                // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
+                TrieNode? next;
+                while (!node.Children.TryGetValue(matchChar, out next))
+                {
+                    if (node == _root)
+                    {
+                        break;
+                    }
+
+                    node = node.Fail ?? _root;
+                }
+
+                if (next != null)
+                {
+                    node = next;
+
+                    // 收集匹配结果
+                    if (node is { IsEnd: true, MatchedWords.Count: > 0 })
+                    {
+                        foreach (var (word, coreLength) in node.MatchedWords)
+                        {
+                            var startVirtual = virtualIndex - coreLength + 1;
+
+                            // 边界检查
+                            if (startVirtual >= 0)
+                            {
+                                return new MatchResult(word, realIndexMap[startVirtual],
+                                    realIndexMap[virtualIndex] + 1);
+                            }
+                        }
+                    }
+                }
+
+                virtualIndex++;
+            }
+
+            return null;
+        }
+        finally
+        {
+            ArrayPool<int>.Shared.Return(realIndexMap);
+        }
+    }
+
+    /// <summary>
+    ///     快速检查是否包含敏感词
+    /// </summary>
+    /// <param name="text">待检测文本</param>
+    /// <returns>
+    ///     <see cref="bool" />
+    /// </returns>
+    public bool Contains(string? text)
+    {
+        // 空检查
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return false;
+        }
+
+        var node = _root;
+
+        // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
+        foreach (var c in text)
+        {
+            // 始终跳过分隔符
+            if (IgnoredSeparators.Contains(c))
+            {
+                continue;
+            }
+
+            // 处理全角/半角及 Unicode 变体（仅当选项启用时）
+            var normalized = NormalizeChar(c, _options);
+
+            // 符号过滤（仅当选项启用时）
+            if (_options.IgnoreSymbol && ShouldSkip(normalized))
+            {
+                continue;
+            }
+
+            var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
+
+            // 当前节点无匹配时，沿 Fail 指针回溯
+            TrieNode? next;
+            while (!node.Children.TryGetValue(matchChar, out next))
+            {
+                if (node == _root)
+                {
+                    break;
+                }
+
+                node = node.Fail ?? _root;
+            }
+
+            // ReSharper disable once InvertIf
+            if (next != null)
+            {
+                node = next;
+                if (node.IsEnd)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     替换敏感词为指定字符
+    /// </summary>
+    /// <remarks>保留原文本符号与空格结构。</remarks>
+    /// <param name="text">原始文本</param>
+    /// <param name="replaceChar">替换字符，默认值为：<c>*</c>）</param>
+    /// <returns>
+    ///     <see cref="string" />
+    /// </returns>
+    public string Replace(string text, char replaceChar = '*')
+    {
+        // 空检查
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return text;
+        }
+
+        // 检查文本并返回所有命中词及精确位置
+        var matches = FindMatches(text);
+
+        // 空检查
+        if (matches.Length == 0)
+        {
+            return text;
+        }
+
+        // 初始化 StringBuilder 实例
+        var stringBuilder = new StringBuilder(text.Length);
+        var lastEnd = 0;
+
+        // 按起始位置排序，若起始位置相同则按长度降序
+        Array.Sort(matches, (a, b) =>
+        {
+            var cmp = a.StartIndex.CompareTo(b.StartIndex);
+            return cmp != 0 ? cmp : b.EndIndex.CompareTo(a.EndIndex);
+        });
+
+        // 遍历所有匹配结果
+        foreach (var m in matches)
+        {
+            // 跳过被前面匹配覆盖的重叠部分
+            if (m.StartIndex < lastEnd)
+            {
+                continue;
+            }
+
+            // 追加未匹配部分
+            stringBuilder.Append(text, lastEnd, m.StartIndex - lastEnd);
+            // 替换敏感词
+            stringBuilder.Append(replaceChar, m.EndIndex - m.StartIndex);
+
+            lastEnd = m.EndIndex;
+        }
+
+        // 追加剩余部分
+        stringBuilder.Append(text, lastEnd, text.Length - lastEnd);
+
+        return stringBuilder.ToString();
+    }
+
+    /// <summary>
+    ///     解析单行词库
+    /// </summary>
+    /// <remarks>
+    ///     <para>分隔符：支持 <c>|</c>、<c>,</c>、<c>\t</c>、<c>;</c> 任意混用，连续分隔符自动跳过。同时兼容一行一个词。</para>
+    ///     <para>注释：以 <c>#</c> 开头的整行将被忽略；行内 <c>#</c> 之后的内容将被截断忽略。</para>
+    ///     <para>公开此方法，方便后续用户解析并获取敏感词词库列表。</para>
+    /// </remarks>
+    /// <param name="line">词库中的一行原始文本</param>
+    /// <param name="words">用于收集解析结果的 <see cref="HashSet{T}" /> 集合</param>
+    public static void ParseLine(string? line, HashSet<string> words)
+    {
+        // 空检查
+        ArgumentNullException.ThrowIfNull(words);
+
+        // 空检查
+        if (string.IsNullOrWhiteSpace(line))
+        {
+            return;
+        }
+
+        // 移除前后空格
+        var trimmed = line.Trim();
+
+        // 处理 # 字符开头的注释
+        if (trimmed.Length == 0 || trimmed[0] == '#')
+        {
+            return;
+        }
+
+        // 处理行内注释
+        var commentIdx = trimmed.IndexOf('#');
+        if (commentIdx > 0)
+        {
+            trimmed = trimmed[..commentIdx].TrimEnd();
+        }
+
+        // 空检查
+        if (string.IsNullOrWhiteSpace(trimmed))
+        {
+            return;
+        }
+
+        var span = trimmed.AsSpan();
+        var start = 0;
+
+        // 处理 | , \t ; 分隔符
+        for (var i = 0; i < span.Length; i++)
+        {
+            var c = span[i];
+
+            // ReSharper disable once InvertIf
+            if (c is '|' or ',' or '\t' or ';')
+            {
+                if (i > start)
+                {
+                    // 将单词片段添加到词集
+                    AddWord(span.Slice(start, i - start), words);
+                }
+
+                start = i + 1;
+            }
+        }
+
+        // 处理最后一个词
+        if (start < span.Length)
+        {
+            // 将单词片段添加到词集
+            AddWord(span[start..], words);
+        }
+    }
+
+
+    /// <summary>
     ///     从内存词表构建敏感词清理器
     /// </summary>
     /// <param name="words">敏感词集合</param>
@@ -200,381 +579,6 @@ public sealed class SensitiveWordSanitizer
     }
 
     /// <summary>
-    ///     检查文本并返回所有命中词及精确位置
-    /// </summary>
-    /// <param name="text">待检测文本</param>
-    /// <returns><see cref="MatchResult" />[]</returns>
-    public MatchResult[] FindMatches(string? text)
-    {
-        // 空检查
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return [];
-        }
-
-        // 初始化匹配结果集合
-        var matches = new List<MatchResult>(32);
-
-        var node = _root;
-        var virtualIndex = 0;
-
-        // 记录 虚拟索引 -> 真实索引 的映射
-        var realIndexMap = ArrayPool<int>.Shared.Rent(text.Length);
-
-        try
-        {
-            // 遍历文本每一个字符
-            for (var i = 0; i < text.Length; i++)
-            {
-                var c = text[i];
-
-                // 始终跳过分隔符（_/-/空格/全角空格/制表符/回车/换行），使输入流与 Trie 结构对齐
-                if (IgnoredSeparators.Contains(c))
-                {
-                    continue;
-                }
-
-                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
-                var normalized = NormalizeChar(c, _options);
-
-                // 符号过滤：跳过但不增加虚拟索引（仅当选项启用时）
-                if (_options.IgnoreSymbol && ShouldSkip(normalized))
-                {
-                    continue;
-                }
-
-                // 记录映射关系
-                realIndexMap[virtualIndex] = i;
-                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
-
-                // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
-                TrieNode? next;
-                while (!node.Children.TryGetValue(matchChar, out next))
-                {
-                    if (node == _root)
-                    {
-                        break;
-                    }
-
-                    node = node.Fail ?? _root;
-                }
-
-                if (next != null)
-                {
-                    node = next;
-
-                    // 收集匹配结果
-                    if (node is { IsEnd: true, MatchedWords.Count: > 0 })
-                    {
-                        foreach (var (word, coreLength) in node.MatchedWords)
-                        {
-                            var startVirtual = virtualIndex - coreLength + 1;
-
-                            // 边界检查
-                            if (startVirtual >= 0)
-                            {
-                                matches.Add(new MatchResult(word, realIndexMap[startVirtual],
-                                    realIndexMap[virtualIndex] + 1));
-                            }
-                        }
-                    }
-                }
-
-                virtualIndex++;
-            }
-
-            return matches.ToArray();
-        }
-        finally
-        {
-            ArrayPool<int>.Shared.Return(realIndexMap);
-        }
-    }
-
-    /// <summary>
-    ///     检查文本并返回首个命中词及精确位置
-    /// </summary>
-    /// <param name="text">待检测文本</param>
-    /// <returns>
-    ///     <see cref="MatchResult" />
-    /// </returns>
-    public MatchResult? FindFirst(string? text)
-    {
-        // 空检查
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return null;
-        }
-
-        var node = _root;
-        var virtualIndex = 0;
-
-        // 记录 虚拟索引 -> 真实索引 的映射
-        var realIndexMap = ArrayPool<int>.Shared.Rent(text.Length);
-
-        try
-        {
-            // 遍历文本每一个字符
-            for (var i = 0; i < text.Length; i++)
-            {
-                var c = text[i];
-
-                // 始终跳过分隔符（_/-/空格/全角空格/制表符/回车/换行），使输入流与 Trie 结构对齐
-                if (IgnoredSeparators.Contains(c))
-                {
-                    continue;
-                }
-
-                // 处理全角/半角及 Unicode 变体（仅当选项启用时）
-                var normalized = NormalizeChar(c, _options);
-
-                // 符号过滤：跳过但不增加虚拟索引（仅当选项启用时）
-                if (_options.IgnoreSymbol && ShouldSkip(normalized))
-                {
-                    continue;
-                }
-
-                // 记录映射关系
-                realIndexMap[virtualIndex] = i;
-                var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
-
-                // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
-                TrieNode? next;
-                while (!node.Children.TryGetValue(matchChar, out next))
-                {
-                    if (node == _root)
-                    {
-                        break;
-                    }
-
-                    node = node.Fail ?? _root;
-                }
-
-                if (next != null)
-                {
-                    node = next;
-
-                    // 收集匹配结果
-                    if (node is { IsEnd: true, MatchedWords.Count: > 0 })
-                    {
-                        foreach (var (word, coreLength) in node.MatchedWords)
-                        {
-                            var startVirtual = virtualIndex - coreLength + 1;
-
-                            // 边界检查
-                            if (startVirtual >= 0)
-                            {
-                                return new MatchResult(word, realIndexMap[startVirtual],
-                                    realIndexMap[virtualIndex] + 1);
-                            }
-                        }
-                    }
-                }
-
-                virtualIndex++;
-            }
-
-            return null;
-        }
-        finally
-        {
-            ArrayPool<int>.Shared.Return(realIndexMap);
-        }
-    }
-
-    /// <summary>
-    ///     快速检查是否包含敏感词
-    /// </summary>
-    /// <param name="text">待检测文本</param>
-    /// <returns>
-    ///     <see cref="bool" />
-    /// </returns>
-    public bool Contains(string? text)
-    {
-        // 空检查
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return false;
-        }
-
-        var node = _root;
-
-        // ReSharper disable once ForeachCanBePartlyConvertedToQueryUsingAnotherGetEnumerator
-        foreach (var c in text)
-        {
-            // 始终跳过分隔符
-            if (IgnoredSeparators.Contains(c))
-            {
-                continue;
-            }
-
-            // 处理全角/半角及 Unicode 变体（仅当选项启用时）
-            var normalized = NormalizeChar(c, _options);
-
-            // 符号过滤（仅当选项启用时）
-            if (_options.IgnoreSymbol && ShouldSkip(normalized))
-            {
-                continue;
-            }
-
-            var matchChar = _options.IgnoreCase ? char.ToLowerInvariant(normalized) : normalized;
-
-            // AC 状态跳转：当前节点无匹配时，沿 Fail 指针回溯
-            TrieNode? next;
-            while (!node.Children.TryGetValue(matchChar, out next))
-            {
-                if (node == _root)
-                {
-                    break;
-                }
-
-                node = node.Fail ?? _root;
-            }
-
-            // ReSharper disable once InvertIf
-            if (next != null)
-            {
-                node = next;
-                if (node.IsEnd)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    ///     替换敏感词为指定字符
-    /// </summary>
-    /// <remarks>保留原文本符号与空格结构。</remarks>
-    /// <param name="text">原始文本</param>
-    /// <param name="replaceChar">替换字符，默认值为：<c>*</c>）</param>
-    /// <returns>
-    ///     <see cref="string" />
-    /// </returns>
-    public string Replace(string text, char replaceChar = '*')
-    {
-        // 空检查
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            return text;
-        }
-
-        // 检查文本并返回所有命中词及精确位置
-        var matches = FindMatches(text);
-
-        // 空检查
-        if (matches.Length == 0)
-        {
-            return text;
-        }
-
-        // 初始化 StringBuilder 实例
-        var stringBuilder = new StringBuilder(text.Length);
-        var lastEnd = 0;
-
-        // 按起始位置排序，若起始位置相同则按长度降序
-        Array.Sort(matches, (a, b) =>
-        {
-            var cmp = a.StartIndex.CompareTo(b.StartIndex);
-            return cmp != 0 ? cmp : b.EndIndex.CompareTo(a.EndIndex);
-        });
-
-        // 遍历所有匹配结果
-        foreach (var m in matches)
-        {
-            // 跳过被前面匹配覆盖的重叠部分
-            if (m.StartIndex < lastEnd)
-            {
-                continue;
-            }
-
-            // 追加未匹配部分
-            stringBuilder.Append(text, lastEnd, m.StartIndex - lastEnd);
-            // 替换敏感词
-            stringBuilder.Append(replaceChar, m.EndIndex - m.StartIndex);
-
-            lastEnd = m.EndIndex;
-        }
-
-        // 追加剩余部分
-        stringBuilder.Append(text, lastEnd, text.Length - lastEnd);
-
-        return stringBuilder.ToString();
-    }
-
-    /// <summary>
-    ///     解析单行词库
-    /// </summary>
-    /// <remarks>
-    ///     <para>分隔符：支持 <c>|</c>、<c>,</c>、<c>\t</c>、<c>;</c> 任意混用，连续分隔符自动跳过。同时兼容一行一个词。</para>
-    ///     <para>注释：以 <c>#</c> 开头的整行将被忽略；行内 <c>#</c> 之后的内容将被截断忽略。</para>
-    ///     <para>公开此方法，方便后续用户解析并获取敏感词词库列表。</para>
-    /// </remarks>
-    /// <param name="line">词库中的一行原始文本</param>
-    /// <param name="words">用于收集解析结果的 <see cref="HashSet{T}" /> 集合</param>
-    public static void ParseLine(string line, HashSet<string> words)
-    {
-        // 空检查
-        if (string.IsNullOrWhiteSpace(line))
-        {
-            return;
-        }
-
-        // 移除前后空格
-        var trimmed = line.Trim();
-
-        // 处理 # 字符开头的注释
-        if (trimmed.Length == 0 || trimmed[0] == '#')
-        {
-            return;
-        }
-
-        // 处理行内注释
-        var commentIdx = trimmed.IndexOf('#');
-        if (commentIdx > 0)
-        {
-            trimmed = trimmed[..commentIdx].TrimEnd();
-        }
-
-        // 空检查
-        if (string.IsNullOrWhiteSpace(trimmed))
-        {
-            return;
-        }
-
-        var span = trimmed.AsSpan();
-        var start = 0;
-
-        // 处理 | , \t ; 分隔符
-        for (var i = 0; i < span.Length; i++)
-        {
-            var c = span[i];
-
-            // ReSharper disable once InvertIf
-            if (c is '|' or ',' or '\t' or ';')
-            {
-                if (i > start)
-                {
-                    // 将单词片段添加到词集
-                    AddWord(span.Slice(start, i - start), words);
-                }
-
-                start = i + 1;
-            }
-        }
-
-        // 处理最后一个词
-        if (start < span.Length)
-        {
-            // 将单词片段添加到词集
-            AddWord(span[start..], words);
-        }
-    }
-
-    /// <summary>
     ///     将单词片段添加到词集
     /// </summary>
     /// <param name="span">单词片段</param>
@@ -657,6 +661,7 @@ public sealed class SensitiveWordSanitizer
     internal static bool[] InitSkipMap()
     {
         var map = new bool[65536];
+
         for (var i = 0; i < 65536; i++)
         {
             var c = (char)i;
