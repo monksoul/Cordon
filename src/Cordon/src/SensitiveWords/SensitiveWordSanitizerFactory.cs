@@ -23,7 +23,7 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     获取已缓存的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="dictionaryName">字典名称</param>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
@@ -58,7 +58,7 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="dictionaryName">字典名称</param>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
@@ -88,7 +88,7 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="dictionaryName">字典名称</param>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
     /// <param name="factory">构建敏感词清理器的工厂委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
@@ -136,7 +136,7 @@ public static class SensitiveWordSanitizerFactory
     ///     <para>当 <paramref name="configure" /> 为 <c>null</c> 时，使用注册时的配置重新构建实例（热更新）。</para>
     ///     <para>当 <paramref name="configure" /> 不为 <c>null</c> 时，将用新配置替换原有构建逻辑并立即生效。</para>
     /// </remarks>
-    /// <param name="dictionaryName">字典名称</param>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
     /// <param name="configure">自定义配置委托</param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="InvalidOperationException"></exception>
@@ -176,7 +176,7 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     刷新指定名称的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="dictionaryName">字典名称</param>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
     /// <param name="factory">构建敏感词清理器的工厂委托</param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
@@ -200,12 +200,12 @@ public static class SensitiveWordSanitizerFactory
     /// <returns>
     ///     <see cref="ICollection{T}" />
     /// </returns>
-    public static ICollection<string> GetDictionaryNames() => _instances.Keys;
+    public static ICollection<string> GetNames() => _instances.Keys;
 
     /// <summary>
     ///     移除指定名称的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
-    /// <param name="dictionaryName">字典名称</param>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
     /// <returns>
     ///     <see cref="bool" />
     /// </returns>

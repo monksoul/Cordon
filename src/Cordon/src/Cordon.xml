@@ -984,7 +984,7 @@
         </member>
         <member name="P:System.ComponentModel.DataAnnotations.SensitiveWordAttribute.DictionaryName">
             <summary>
-                敏感词字典名称
+                敏感词字典名称，不区分大小写
             </summary>
             <remarks>
                 <para>用于从 <see cref="M:Cordon.SensitiveWordSanitizerFactory.Get(System.String)" /> 中获取 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例。</para>
@@ -2883,7 +2883,7 @@
             <summary>
                 添加敏感词验证器
             </summary>
-            <param name="dictionaryName">字典名称</param>
+            <param name="dictionaryName">字典名称，不区分大小写</param>
             <param name="configure">自定义配置委托</param>
             <returns>
                 <typeparamref name="TSelf" />
@@ -3233,7 +3233,7 @@
             <summary>
                 添加敏感词词库
             </summary>
-            <param name="dictionaryName">字典名称</param>
+            <param name="dictionaryName">字典名称，不区分大小写</param>
             <param name="configure">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.ValidationBuilder" />
@@ -6925,7 +6925,7 @@
             <summary>
                 获取已缓存的 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <param name="dictionaryName">字典名称</param>
+            <param name="dictionaryName">字典名称，不区分大小写</param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
             </returns>
@@ -6946,7 +6946,7 @@
             <summary>
                 获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <param name="dictionaryName">字典名称</param>
+            <param name="dictionaryName">字典名称，不区分大小写</param>
             <param name="configure">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
@@ -6958,7 +6958,7 @@
             <summary>
                 获取或创建 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <param name="dictionaryName">字典名称</param>
+            <param name="dictionaryName">字典名称，不区分大小写</param>
             <param name="factory">构建敏感词清理器的工厂委托</param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordSanitizer" />
@@ -6983,7 +6983,7 @@
                 <para>当 <paramref name="configure" /> 为 <c>null</c> 时，使用注册时的配置重新构建实例（热更新）。</para>
                 <para>当 <paramref name="configure" /> 不为 <c>null</c> 时，将用新配置替换原有构建逻辑并立即生效。</para>
             </remarks>
-            <param name="dictionaryName">字典名称</param>
+            <param name="dictionaryName">字典名称，不区分大小写</param>
             <param name="configure">自定义配置委托</param>
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.InvalidOperationException"></exception>
@@ -6992,12 +6992,12 @@
             <summary>
                 刷新指定名称的 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <param name="dictionaryName">字典名称</param>
+            <param name="dictionaryName">字典名称，不区分大小写</param>
             <param name="factory">构建敏感词清理器的工厂委托</param>
             <exception cref="T:System.ArgumentException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetDictionaryNames">
+        <member name="M:Cordon.SensitiveWordSanitizerFactory.GetNames">
             <summary>
                 获取所有已注册的字典名称
             </summary>
@@ -7009,7 +7009,7 @@
             <summary>
                 移除指定名称的 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例
             </summary>
-            <param name="dictionaryName">字典名称</param>
+            <param name="dictionaryName">字典名称，不区分大小写</param>
             <returns>
                 <see cref="T:System.Boolean" />
             </returns>
@@ -8005,7 +8005,7 @@
             <summary>
                 创建敏感词验证器
             </summary>
-            <param name="dictionaryName">字典名称</param>
+            <param name="dictionaryName">字典名称，不区分大小写</param>
             <param name="configure">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.SensitiveWordValidator" />
@@ -10605,7 +10605,7 @@
         </member>
         <member name="P:Cordon.SensitiveWordValidator.DictionaryName">
             <summary>
-                敏感词字典名称
+                敏感词字典名称，不区分大小写
             </summary>
             <remarks>
                 <para>用于从 <see cref="M:Cordon.SensitiveWordSanitizerFactory.Get(System.String)" /> 中获取 <see cref="T:Cordon.SensitiveWordSanitizer" /> 实例。</para>

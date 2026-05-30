@@ -981,7 +981,7 @@ public static class Validators
     /// <summary>
     ///     创建敏感词验证器
     /// </summary>
-    /// <param name="dictionaryName">字典名称</param>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
     /// <param name="configure">自定义配置委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordValidator" />

@@ -29,7 +29,7 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
     }
 
     /// <summary>
-    ///     敏感词字典名称
+    ///     敏感词字典名称，不区分大小写
     /// </summary>
     /// <remarks>
     ///     <para>用于从 <see cref="SensitiveWordSanitizerFactory.Get(string)" /> 中获取 <see cref="SensitiveWordSanitizer" /> 实例。</para>
