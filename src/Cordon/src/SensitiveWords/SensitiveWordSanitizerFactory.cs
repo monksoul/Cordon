@@ -89,7 +89,7 @@ public static class SensitiveWordSanitizerFactory
     ///     获取或创建 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
     /// <param name="dictionaryName">字典名称，不区分大小写</param>
-    /// <param name="factory">构建敏感词清理器的工厂委托</param>
+    /// <param name="factory">构建 <see cref="SensitiveWordSanitizer" /> 的工厂委托</param>
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
@@ -177,7 +177,7 @@ public static class SensitiveWordSanitizerFactory
     ///     刷新指定名称的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
     /// <param name="dictionaryName">字典名称，不区分大小写</param>
-    /// <param name="factory">构建敏感词清理器的工厂委托</param>
+    /// <param name="factory">构建 <see cref="SensitiveWordSanitizer" /> 的工厂委托</param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
     public static void Refresh(string dictionaryName, Func<SensitiveWordSanitizer> factory)
@@ -228,6 +228,11 @@ public static class SensitiveWordSanitizerFactory
     /// </summary>
     internal sealed class SanitizerEntry
     {
+        /// <summary>
+        ///     <inheritdoc cref="SanitizerEntry" />
+        /// </summary>
+        /// <param name="factory">原始的构建委托</param>
+        /// <param name="lazyInstance">线程安全的延迟初始化实例</param>
         internal SanitizerEntry(Func<SensitiveWordSanitizer> factory, Lazy<SensitiveWordSanitizer> lazyInstance)
         {
             Factory = factory;

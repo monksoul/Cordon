@@ -36,4 +36,19 @@ public sealed partial class ValidationBuilder
 
         return this;
     }
+
+    /// <summary>
+    ///     添加敏感词词库
+    /// </summary>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
+    /// <param name="factory">构建 <see cref="SensitiveWordSanitizer" /> 的工厂委托</param>
+    /// <returns>
+    ///     <see cref="ValidationBuilder" />
+    /// </returns>
+    public ValidationBuilder AddSensitiveWords(string dictionaryName, Func<SensitiveWordSanitizer> factory)
+    {
+        SensitiveWordSanitizerFactory.GetOrCreate(dictionaryName, factory);
+
+        return this;
+    }
 }

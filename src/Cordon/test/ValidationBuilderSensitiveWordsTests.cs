@@ -7,28 +7,19 @@ namespace Cordon.Tests;
 [Collection("SensitiveWordTests")]
 public class ValidationBuilderSensitiveWordsTests
 {
-    // [Fact]
-    // public void AddSensitiveWords_ReturnOK()
-    // {
-    //     var builder = new ValidationBuilder();
-    //     builder.AddSensitiveWords("sensitive_words.txt");
-    //     Assert.NotNull(SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName));
-    //
-    //     builder.AddSensitiveWords("sensitive_words.txt", "from_builder");
-    //     Assert.NotNull(SensitiveWordSanitizerFactory.Get("from_builder"));
-    //
-    //     builder.AddSensitiveWords(["敏感词"], "from_words");
-    //     Assert.NotNull(SensitiveWordSanitizerFactory.Get("from_words"));
-    //
-    //     var filePath = Path.Combine(AppContext.BaseDirectory, "sensitive_words.txt");
-    //     using var stream = File.OpenRead(filePath);
-    //
-    //     builder.AddSensitiveWords(stream, "from_stream");
-    //     Assert.NotNull(SensitiveWordSanitizerFactory.Get("from_stream"));
-    //
-    //     Assert.True(SensitiveWordSanitizerFactory.TryRemove(SensitiveWordSanitizerFactory.DefaultName));
-    //     Assert.NotNull(SensitiveWordSanitizerFactory.Get("from_builder"));
-    //     Assert.NotNull(SensitiveWordSanitizerFactory.Get("from_words"));
-    //     Assert.NotNull(SensitiveWordSanitizerFactory.Get("from_stream"));
-    // }
+    [Fact]
+    public void AddSensitiveWords_ReturnOK()
+    {
+        var builder = new ValidationBuilder();
+        builder.AddSensitiveWords(u => u.AddPath("sensitive_words.txt"));
+        Assert.NotNull(SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName));
+
+        builder.AddSensitiveWords("builder", u => u.AddPath("sensitive_words.txt"));
+        Assert.NotNull(SensitiveWordSanitizerFactory.Get("builder"));
+
+        builder.AddSensitiveWords("custom", () => SensitiveWordSanitizer.Build(["敏感词"]));
+        Assert.NotNull(SensitiveWordSanitizerFactory.Get("custom"));
+
+        SensitiveWordSanitizerFactory.Clear();
+    }
 }
