@@ -303,7 +303,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <summary>
     ///     在指定规则集上下文中配置验证规则
     /// </summary>
-    /// <param name="ruleSet">规则集</param>
+    /// <param name="ruleSet">规则集。（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <param name="setAction">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ValueValidator{T}" />
@@ -335,7 +335,7 @@ public class ValueValidator<T> : FluentValidatorBuilder<T, ValueValidator<T>>, I
     /// <summary>
     ///     在指定规则集上下文中配置验证规则
     /// </summary>
-    /// <param name="ruleSet">规则集</param>
+    /// <param name="ruleSet">规则集。（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
     /// <param name="setAction">自定义配置委托</param>
     /// <returns>
     ///     <see cref="ValueValidator{T}" />

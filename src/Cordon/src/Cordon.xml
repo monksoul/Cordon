@@ -4622,7 +4622,7 @@
             <summary>
                 在指定规则集上下文中为指定属性配置验证规则
             </summary>
-            <param name="ruleSet">规则集</param>
+            <param name="ruleSet">规则集。（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
             <param name="setAction">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.ObjectValidator`1" />
@@ -4642,7 +4642,7 @@
             <summary>
                 在指定规则集上下文中为指定属性配置验证规则
             </summary>
-            <param name="ruleSet">规则集</param>
+            <param name="ruleSet">规则集。（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
             <param name="setAction">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.ObjectValidator`1" />
@@ -5477,7 +5477,7 @@
             <summary>
                 在指定规则集上下文中为指定属性配置验证规则
             </summary>
-            <param name="ruleSet">规则集</param>
+            <param name="ruleSet">规则集。（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
             <param name="setAction">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.ObjectValidator`1" />
@@ -5497,7 +5497,7 @@
             <summary>
                 在指定规则集上下文中为指定属性配置验证规则
             </summary>
-            <param name="ruleSet">规则集</param>
+            <param name="ruleSet">规则集。（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
             <param name="setAction">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.ObjectValidator`1" />
@@ -5667,7 +5667,7 @@
             <summary>
                 在指定规则集上下文中配置验证规则
             </summary>
-            <param name="ruleSet">规则集</param>
+            <param name="ruleSet">规则集。（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
             <param name="setAction">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
@@ -5687,7 +5687,7 @@
             <summary>
                 在指定规则集上下文中配置验证规则
             </summary>
-            <param name="ruleSet">规则集</param>
+            <param name="ruleSet">规则集。（匹配默认规则集请使用 <c>null</c>，空字符串无效）</param>
             <param name="setAction">自定义配置委托</param>
             <returns>
                 <see cref="T:Cordon.ValueValidator`1" />
@@ -11694,16 +11694,7 @@
         </member>
     </members>
 </doc>
-ection.CordonServiceCollectionExtensions.AddCordon(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
-            <summary>
-                添加数据验证服务
-            </summary>
-            <param name="services">
-                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
-            </param>
-            <param name="validationBuilder">
-                <see cref="T:Cordon.ValidationBuilder" />
-            </param>
+m>
             <returns>
                 <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
             </returns>
