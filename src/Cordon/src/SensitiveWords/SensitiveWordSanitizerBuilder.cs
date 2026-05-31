@@ -169,6 +169,44 @@ public sealed class SensitiveWordSanitizerBuilder
     }
 
     /// <summary>
+    ///     从嵌入资源加载并添加敏感词
+    /// </summary>
+    /// <remarks>
+    ///     资源名称默认取决于项目的根命名空间和文件路径。若程序集名称或根命名空间可能变更，建议在 <c>.csproj</c> 文件中为 <c>EmbeddedResource</c> 设置 <c>LogicalName</c>，
+    ///     以固定逻辑名称，例如 <c>&lt;EmbeddedResource Include="sensitive-words.txt" LogicalName="SensitiveWords.txt" /&gt;</c>。
+    ///     调用时直接使用该固定名称即可，无需担心配置变化。
+    /// </remarks>
+    /// <param name="resourceName">
+    ///     嵌入资源逻辑名称。可以是默认格式的完整名称（例如 <c>"Furion.Web.Entry.sensitive-words.txt"</c>），
+    ///     也可以是项目文件中通过 <c>LogicalName</c> 配置的固定名称（例如 <c>"SensitiveWords.txt"</c>）。
+    /// </param>
+    /// <param name="assembly">包含嵌入资源的程序集</param>
+    /// <returns>
+    ///     <see cref="SensitiveWordSanitizerBuilder" />
+    /// </returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="FileNotFoundException"></exception>
+    public SensitiveWordSanitizerBuilder AddEmbedded(string resourceName, Assembly assembly)
+    {
+        // 空检查
+        ArgumentException.ThrowIfNullOrWhiteSpace(resourceName);
+        ArgumentNullException.ThrowIfNull(assembly);
+
+        // 尝试获取嵌入资源流
+        var resourceStream = assembly.GetManifestResourceStream(resourceName);
+
+        // 空检查
+        if (resourceStream is null)
+        {
+            throw new FileNotFoundException(
+                $"Embedded resource '{resourceName}' not found in assembly '{assembly.FullName}'.", resourceName);
+        }
+
+        return AddStream(resourceStream);
+    }
+
+
+    /// <summary>
     ///     配置 <see cref="SensitiveWordOptions" />
     /// </summary>
     /// <param name="options">

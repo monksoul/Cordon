@@ -162,6 +162,53 @@ public class SensitiveWordSanitizerBuilderTests
     }
 
     [Fact]
+    public void AddEmbedded_Invalid_Parameters()
+    {
+        var builder = new SensitiveWordSanitizerBuilder();
+        Assert.Throws<ArgumentNullException>(() => builder.AddEmbedded(null!, null!));
+        Assert.Throws<ArgumentException>(() => builder.AddEmbedded(string.Empty, null!));
+        Assert.Throws<ArgumentException>(() => builder.AddEmbedded("  ", null!));
+
+        var exception =
+            Assert.Throws<FileNotFoundException>(() =>
+                builder.AddEmbedded("Furion.Web.Entry.sensitive-words.txt", GetType().Assembly));
+        Assert.Equal(
+            $"Embedded resource 'Furion.Web.Entry.sensitive-words.txt' not found in assembly '{GetType().Assembly.FullName}'.",
+            exception.Message);
+        Assert.Equal("Furion.Web.Entry.sensitive-words.txt", exception.FileName);
+    }
+
+    [Fact]
+    public void AddEmbedded_ReturnOK()
+    {
+        var builder = new SensitiveWordSanitizerBuilder();
+        builder.AddEmbedded("Cordon.Tests.sensitive_words_embedded.txt", GetType().Assembly);
+
+        Assert.Equal(17, builder._words.Count);
+        Assert.Equal(
+        [
+            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
+            "你-大-爷", "low_high", "hello_world", "abc_def", "TMD!", "fuck"
+        ], builder._words);
+
+        builder.AddEmbedded("Cordon.Tests.sensitive_words_embedded.txt", GetType().Assembly);
+        Assert.Equal(17, builder._words.Count);
+
+        var builder2 = new SensitiveWordSanitizerBuilder();
+        builder2.AddEmbedded("SensitiveWords.txt", GetType().Assembly);
+
+        Assert.Equal(17, builder2._words.Count);
+        Assert.Equal(
+        [
+            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
+            "你-大-爷", "low_high", "hello_world", "abc_def", "TMD!", "fuck"
+        ], builder2._words);
+
+        builder2.AddEmbedded("SensitiveWords.txt", GetType().Assembly);
+        Assert.Equal(17, builder._words.Count);
+    }
+
+    [Fact]
     public void ConfigureOptions_Invalid_Parameters()
     {
         var builder = new SensitiveWordSanitizerBuilder();

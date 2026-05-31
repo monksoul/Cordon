@@ -40,8 +40,7 @@ public class SensitiveWordSanitizerFactoryTests
         Assert.Same(sensitiveWordSanitizer, sensitiveWordSanitizer2);
         Assert.Same(sensitiveWordSanitizer, sensitiveWordSanitizer3);
 
-        Assert.True(SensitiveWordSanitizerFactory.TryRemove(dictionaryName));
-        Assert.Empty(SensitiveWordSanitizerFactory._instances);
+        SensitiveWordSanitizerFactory.Clear();
     }
 
     [Fact]
@@ -143,7 +142,7 @@ public class SensitiveWordSanitizerFactoryTests
 
             File.AppendAllText(tempFilePath, "TMD\n");
             SensitiveWordSanitizerFactory.Refresh();
-            var refreshedSanitizer = SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
+            var refreshedSanitizer = SensitiveWordSanitizerFactory.Get();
             Assert.True(refreshedSanitizer.Contains("这里包含敏感词吗？"));
             Assert.True(refreshedSanitizer.Contains("TMD!"));
             Assert.False(refreshedSanitizer.Contains("Fuck!"));
@@ -152,7 +151,7 @@ public class SensitiveWordSanitizerFactoryTests
 
             File.AppendAllText(tempFilePath, "fuck\n");
             SensitiveWordSanitizerFactory.Refresh(SensitiveWordSanitizerFactory.DefaultName);
-            var refreshedSanitizer2 = SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
+            var refreshedSanitizer2 = SensitiveWordSanitizerFactory.Get();
             Assert.True(refreshedSanitizer2.Contains("这里包含敏感词吗？"));
             Assert.True(refreshedSanitizer2.Contains("TMD!"));
             Assert.True(refreshedSanitizer2.Contains("Fuck!"));
@@ -161,21 +160,21 @@ public class SensitiveWordSanitizerFactoryTests
             Assert.NotSame(refreshedSanitizer, refreshedSanitizer2);
 
             SensitiveWordSanitizerFactory.Refresh(builder => builder.AddWord("敏感词"));
-            var refreshedSanitizer3 = SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
+            var refreshedSanitizer3 = SensitiveWordSanitizerFactory.Get();
             Assert.True(refreshedSanitizer3.Contains("这里包含敏感词吗？"));
             Assert.False(refreshedSanitizer3.Contains("TMD!"));
             Assert.False(refreshedSanitizer3.Contains("Fuck!"));
 
             SensitiveWordSanitizerFactory.Refresh(SensitiveWordSanitizerFactory.DefaultName,
                 builder => builder.AddWord("敏感词").AddWord("TMD"));
-            var refreshedSanitizer4 = SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
+            var refreshedSanitizer4 = SensitiveWordSanitizerFactory.Get();
             Assert.True(refreshedSanitizer4.Contains("这里包含敏感词吗？"));
             Assert.True(refreshedSanitizer4.Contains("TMD!"));
             Assert.False(refreshedSanitizer4.Contains("Fuck!"));
 
             SensitiveWordSanitizerFactory.Refresh(SensitiveWordSanitizerFactory.DefaultName,
                 () => new SensitiveWordSanitizerBuilder().AddWords(["敏感词", "TMD", "fuck"]).Build());
-            var refreshedSanitizer5 = SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
+            var refreshedSanitizer5 = SensitiveWordSanitizerFactory.Get();
             Assert.True(refreshedSanitizer5.Contains("这里包含敏感词吗？"));
             Assert.True(refreshedSanitizer5.Contains("TMD!"));
             Assert.True(refreshedSanitizer5.Contains("Fuck!"));

@@ -233,7 +233,7 @@ public class SensitiveWordValidator : ValidatorBase
         {
             try
             {
-                return SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
+                return SensitiveWordSanitizerFactory.Get();
             }
             catch (InvalidOperationException)
             {

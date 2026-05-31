@@ -127,7 +127,7 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
         // 回退到默认字典（当未指定 DictionaryName）
         try
         {
-            return SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
+            return SensitiveWordSanitizerFactory.Get();
         }
         catch (InvalidOperationException)
         {

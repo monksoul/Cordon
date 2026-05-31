@@ -21,6 +21,15 @@ public static class SensitiveWordSanitizerFactory
         new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
+    ///     获取已缓存的默认 <see cref="SensitiveWordSanitizer" /> 实例
+    /// </summary>
+    /// <remarks>使用默认字典名称：<see cref="SensitiveWordSanitizerFactory.DefaultName" />。</remarks>
+    /// <returns>
+    ///     <see cref="SensitiveWordSanitizer" />
+    /// </returns>
+    public static SensitiveWordSanitizer Get() => Get(DefaultName);
+
+    /// <summary>
     ///     获取已缓存的 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
     /// <param name="dictionaryName">字典名称，不区分大小写</param>

@@ -198,7 +198,7 @@ public class SensitiveWordValidatorTests
 
         var validator3 = new SensitiveWordValidator(builder => builder.AddWord("敏感词"));
         var sanitizer3 = validator3.GetSanitizer();
-        var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get(SensitiveWordSanitizerFactory.DefaultName);
+        var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get();
         Assert.NotNull(sanitizer3);
         Assert.Same(sensitiveWordSanitizer3, sanitizer3);
         SensitiveWordSanitizerFactory.Clear();

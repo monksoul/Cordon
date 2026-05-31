@@ -37,4 +37,18 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Remove="sensitive_words_embedded.txt"/>
+        <EmbeddedResource Include="sensitive_words_embedded.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Remove="sensitive_words_embedded2.txt"/>
+        <EmbeddedResource Include="sensitive_words_embedded2.txt" LogicalName="SensitiveWords.txt">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </EmbeddedResource>
+    </ItemGroup>
+
 </Project>
