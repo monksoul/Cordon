@@ -120,7 +120,7 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
             catch (InvalidOperationException)
             {
                 throw new InvalidOperationException(
-                    $"The dictionary '{DictionaryName}' has not been registered. Please register it first using `SensitiveWordSanitizerFactory.GetOrCreate`.");
+                    $"The dictionary '{DictionaryName}' has not been registered. Please register it first using `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate`.");
             }
         }
 
@@ -132,7 +132,7 @@ public class SensitiveWordAttribute : ValidationBaseAttribute
         catch (InvalidOperationException)
         {
             throw new InvalidOperationException(
-                $"No dictionary name is configured for the {nameof(SensitiveWordAttribute)}, and the default dictionary '{SensitiveWordSanitizerFactory.DefaultName}' has not been registered. Either set the '{nameof(DictionaryName)}' property, or register the default dictionary via `SensitiveWordSanitizerFactory.GetOrCreate`.");
+                $"No dictionary name is configured for the {nameof(SensitiveWordAttribute)}, and the default dictionary '{SensitiveWordSanitizerFactory.DefaultName}' has not been registered. Either set the '{nameof(DictionaryName)}' property, or register the default dictionary via `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate`.");
         }
     }
 

@@ -24,8 +24,79 @@ public class SensitiveWordSanitizerFactoryTests
 
         var exception = Assert.Throws<InvalidOperationException>(() => SensitiveWordSanitizerFactory.Get("not-found"));
         Assert.Equal(
-            "The sensitive word dictionary 'not-found' has not been registered. Please register it using `SensitiveWordSanitizerFactory.GetOrCreate` at application startup.",
+            "The sensitive word dictionary 'not-found' has not been registered. Please register it using `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate` at application startup.",
             exception.Message);
+    }
+
+    [Fact]
+    public void Register_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.Register(null!));
+
+        Assert.Throws<ArgumentNullException>(() => SensitiveWordSanitizerFactory.Register(null!, null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.Register(string.Empty, null!));
+        Assert.Throws<ArgumentException>(() => SensitiveWordSanitizerFactory.Register(" ", null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            SensitiveWordSanitizerFactory.Register(nameof(SensitiveWordSanitizerFactory.Register), null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            SensitiveWordSanitizerFactory.Register(null!, (Action<SensitiveWordSanitizerBuilder>)null!));
+        Assert.Throws<ArgumentException>(() =>
+            SensitiveWordSanitizerFactory.Register(string.Empty, (Action<SensitiveWordSanitizerBuilder>)null!));
+        Assert.Throws<ArgumentException>(() =>
+            SensitiveWordSanitizerFactory.Register(" ", (Action<SensitiveWordSanitizerBuilder>)null!));
+        Assert.Throws<ArgumentNullException>(() =>
+            SensitiveWordSanitizerFactory.Register(nameof(SensitiveWordSanitizerFactory.Register),
+                (Action<SensitiveWordSanitizerBuilder>)null!));
+
+        var exception = Assert.Throws<Exception>(() =>
+            SensitiveWordSanitizerFactory.Register("exception", () => throw new Exception("出错了")));
+        Assert.Equal("出错了", exception.Message);
+        Assert.False(SensitiveWordSanitizerFactory._instances.ContainsKey("exception"));
+    }
+
+    [Fact]
+    public void Register_ReturnOK()
+    {
+        SensitiveWordSanitizerFactory.Register(builder => builder.AddWord("敏感词"));
+        var sensitiveWordSanitizer = SensitiveWordSanitizerFactory.Get();
+        Assert.NotNull(sensitiveWordSanitizer);
+        Assert.True(SensitiveWordSanitizerFactory._instances.ContainsKey(SensitiveWordSanitizerFactory.DefaultName));
+
+        const string dictionaryName = nameof(SensitiveWordSanitizerFactory.Register);
+
+        SensitiveWordSanitizerFactory.Register(dictionaryName, builder => builder.AddWord("敏感词"));
+        var sensitiveWordSanitizer2 = SensitiveWordSanitizerFactory.Get(dictionaryName);
+        Assert.NotNull(sensitiveWordSanitizer2);
+        Assert.True(SensitiveWordSanitizerFactory._instances.ContainsKey(dictionaryName));
+
+        SensitiveWordSanitizerFactory.Register("factory",
+            () => new SensitiveWordSanitizerBuilder().AddWord("敏感词").Build());
+        var sensitiveWordSanitizer3 = SensitiveWordSanitizerFactory.Get("factory");
+        Assert.NotNull(sensitiveWordSanitizer3);
+
+        SensitiveWordSanitizerFactory.Clear();
+    }
+
+    [Fact]
+    public void Register_FromService_ReturnOK()
+    {
+        var builder = WebApplication.CreateBuilder();
+        builder.Services.AddTransient<ISomeService, SomeService>();
+        var app = builder.Build();
+
+        SensitiveWordSanitizerFactory.Register("service", () =>
+        {
+            var someService = app.Services.GetRequiredService<ISomeService>();
+            var words = someService.GetWords();
+
+            return new SensitiveWordSanitizerBuilder().AddWords(words).Build();
+        });
+
+        var sanitizer = SensitiveWordSanitizerFactory.Get("service");
+        Assert.True(sanitizer.Contains("这里包含敏感词"));
+
+        SensitiveWordSanitizerFactory.Clear();
     }
 
     [Fact]
@@ -237,5 +308,16 @@ public class SensitiveWordSanitizerFactoryTests
         Assert.NotNull(entry.LazyInstance);
         Assert.Same(sensitiveWordSanitizer, entry.Factory());
         Assert.Same(sensitiveWordSanitizer, entry.LazyInstance.Value);
+    }
+
+    public interface ISomeService
+    {
+        string[] GetWords();
+    }
+
+    public class SomeService : ISomeService
+    {
+        /// <inheritdoc />
+        public string[] GetWords() => ["敏感词"];
     }
 }

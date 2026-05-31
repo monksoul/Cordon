@@ -170,13 +170,13 @@ public class SensitiveWordValidatorTests
         var validator = new SensitiveWordValidator();
         var exception = Assert.Throws<InvalidOperationException>(validator.GetSanitizer);
         Assert.Equal(
-            "No sensitive word source is configured for the SensitiveWordValidator. Either set 'Sanitizer', 'DictionaryName', or 'ConfigureBuilder', or register the default dictionary 'SensitiveWords:Default' via `SensitiveWordSanitizerFactory.GetOrCreate`.",
+            "No sensitive word source is configured for the SensitiveWordValidator. Either set 'Sanitizer', 'DictionaryName', or 'ConfigureBuilder', or register the default dictionary 'SensitiveWords:Default' via `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate`.",
             exception.Message);
 
         validator.DictionaryName = "not-found";
         var exception2 = Assert.Throws<InvalidOperationException>(validator.GetSanitizer);
         Assert.Equal(
-            "The dictionary 'not-found' has not been registered in the factory. Please register it first, or provide a 'ConfigureBuilder' to build it.",
+            "The dictionary 'not-found' has not been registered in the factory. Please register it first using `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate`, or provide a 'ConfigureBuilder' to build it.",
             exception2.Message);
     }
 

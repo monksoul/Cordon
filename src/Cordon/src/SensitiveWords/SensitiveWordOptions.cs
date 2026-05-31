@@ -19,13 +19,13 @@ public sealed record SensitiveWordOptions
     ///     是否忽略大小写
     /// </summary>
     /// <remarks>默认值为：<c>true</c>。</remarks>
-    public bool IgnoreCase { get; init; } = true;
+    public bool IgnoreCase { get; set; } = true;
 
     /// <summary>
     ///     是否跳过标点/空格/符号进行匹配
     /// </summary>
     /// <remarks>默认值为：<c>true</c>。</remarks>
-    public bool IgnoreSymbol { get; init; } = true;
+    public bool IgnoreSymbol { get; set; } = true;
 
     /// <summary>
     ///     是否忽略全角与半角字符的差异
@@ -34,7 +34,7 @@ public sealed record SensitiveWordOptions
     ///     <para>启用后，全角字母、数字、符号将视为与对应半角字符相同。例如 <c>ｆｕｃｋ</c> 等同于 <c>fuck</c>，<c>１２３</c> 等同于 <c>123</c>。</para>
     ///     <para>默认值为：<c>true</c>。</para>
     /// </remarks>
-    public bool IgnoreFullwidth { get; init; } = true;
+    public bool IgnoreFullwidth { get; set; } = true;
 
     /// <summary>
     ///     是否忽略 Unicode 字母变体
@@ -43,5 +43,5 @@ public sealed record SensitiveWordOptions
     ///     <para>启用后，（带圈、带括号、数学粗体等），统一视为普通字母。例如 <c>Ⓕⓤc⒦</c>、<c>𝐟𝐮𝐜𝐤</c> 等变体均等同于 <c>fuck</c>。</para>
     ///     <para>默认值为：<c>true</c>。</para>
     /// </remarks>
-    public bool IgnoreUnicodeVariants { get; init; } = true;
+    public bool IgnoreUnicodeVariants { get; set; } = true;
 }

@@ -238,13 +238,13 @@ public class SensitiveWordValidator : ValidatorBase
             catch (InvalidOperationException)
             {
                 throw new InvalidOperationException(
-                    $"No sensitive word source is configured for the {nameof(SensitiveWordValidator)}. Either set '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(ConfigureBuilder)}', or register the default dictionary 'SensitiveWords:Default' via `SensitiveWordSanitizerFactory.GetOrCreate`.");
+                    $"No sensitive word source is configured for the {nameof(SensitiveWordValidator)}. Either set '{nameof(Sanitizer)}', '{nameof(DictionaryName)}', or '{nameof(ConfigureBuilder)}', or register the default dictionary '{SensitiveWordSanitizerFactory.DefaultName}' via `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate`.");
             }
         }
 
         // DictionaryName 指定了但无缓存且无 ConfigureBuilder
         throw new InvalidOperationException(
-            $"The dictionary '{DictionaryName}' has not been registered in the factory. Please register it first, or provide a '{nameof(ConfigureBuilder)}' to build it.");
+            $"The dictionary '{DictionaryName}' has not been registered in the factory. Please register it first using `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate`, or provide a '{nameof(ConfigureBuilder)}' to build it.");
     }
 
     /// <summary>

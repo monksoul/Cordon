@@ -226,11 +226,19 @@ public class SensitiveWordSanitizerBuilderTests
         builder.ConfigureOptions(new SensitiveWordOptions { IgnoreCase = false });
         Assert.False(builder._options.IgnoreCase);
 
-        builder.ConfigureOptions(o => null);
+        builder.ConfigureOptions(_ => null);
         Assert.Same(SensitiveWordOptions.Default, builder._options);
 
         builder.ConfigureOptions(o => o with { IgnoreFullwidth = false });
         Assert.False(builder._options.IgnoreFullwidth);
+
+        builder.ConfigureOptions(o =>
+        {
+            o.IgnoreFullwidth = false;
+            return o;
+        });
+        Assert.False(builder._options.IgnoreFullwidth);
+        Assert.True(SensitiveWordOptions.Default.IgnoreFullwidth);
     }
 
     [Fact]

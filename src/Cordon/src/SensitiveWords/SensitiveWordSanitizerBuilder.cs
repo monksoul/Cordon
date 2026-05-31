@@ -236,8 +236,11 @@ public sealed class SensitiveWordSanitizerBuilder
         // 空检查
         ArgumentNullException.ThrowIfNull(configurator);
 
+        // 克隆一份副本，避免直接修改 SensitiveWordOptions.Default 属性
+        var clonedOptions = _options with { };
+
         // 调用自定义配置委托
-        _options = configurator(_options) ?? SensitiveWordOptions.Default;
+        _options = configurator(clonedOptions) ?? SensitiveWordOptions.Default;
 
         return this;
     }
@@ -267,8 +270,7 @@ public sealed class SensitiveWordSanitizerBuilder
     /// <exception cref="InvalidOperationException"></exception>
     public SensitiveWordSanitizer Build()
     {
-        // 空词集检查：敏感词清理器的核心用途是匹配敏感词，若词集为空则构建无意义。
-        // 提前抛异常可避免用户误以为验证生效，而实际上所有输入都将被放行。
+        // 词集为空时主动抛异常，避免敏感词验证静默失效导致安全风险
         if (_words.Count == 0 && !AllowEmptyWords)
         {
             throw new InvalidOperationException(

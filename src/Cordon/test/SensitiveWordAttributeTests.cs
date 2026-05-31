@@ -145,13 +145,13 @@ public class SensitiveWordAttributeTests
         var validator = new SensitiveWordAttribute();
         var exception = Assert.Throws<InvalidOperationException>(validator.GetSanitizer);
         Assert.Equal(
-            "No dictionary name is configured for the SensitiveWordAttribute, and the default dictionary 'SensitiveWords:Default' has not been registered. Either set the 'DictionaryName' property, or register the default dictionary via `SensitiveWordSanitizerFactory.GetOrCreate`.",
+            "No dictionary name is configured for the SensitiveWordAttribute, and the default dictionary 'SensitiveWords:Default' has not been registered. Either set the 'DictionaryName' property, or register the default dictionary via `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate`.",
             exception.Message);
 
         validator.DictionaryName = "not-found";
         var exception2 = Assert.Throws<InvalidOperationException>(validator.GetSanitizer);
         Assert.Equal(
-            "The dictionary 'not-found' has not been registered. Please register it first using `SensitiveWordSanitizerFactory.GetOrCreate`.",
+            "The dictionary 'not-found' has not been registered. Please register it first using `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate`.",
             exception2.Message);
     }
 

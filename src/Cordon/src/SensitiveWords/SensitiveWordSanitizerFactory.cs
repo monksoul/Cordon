@@ -21,6 +21,35 @@ public static class SensitiveWordSanitizerFactory
         new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
+    ///     注册敏感词字典
+    /// </summary>
+    /// <remarks>
+    ///     <para>使用默认字典名称：<see cref="SensitiveWordSanitizerFactory.DefaultName" />。</para>
+    ///     <para>若该名称已注册，则不会执行配置委托，也不会覆盖已有实例。</para>
+    /// </remarks>
+    /// <param name="configure">自定义配置委托</param>
+    public static void Register(Action<SensitiveWordSanitizerBuilder> configure) =>
+        GetOrCreate(DefaultName, configure);
+
+    /// <summary>
+    ///     注册敏感词字典
+    /// </summary>
+    /// <remarks>若该名称已注册，则不会执行配置委托，也不会覆盖已有实例。</remarks>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
+    /// <param name="configure">自定义配置委托</param>
+    public static void Register(string dictionaryName, Action<SensitiveWordSanitizerBuilder> configure) =>
+        GetOrCreate(dictionaryName, configure);
+
+    /// <summary>
+    ///     注册敏感词字典
+    /// </summary>
+    /// <remarks>若该名称已注册，则不会执行配置委托，也不会覆盖已有实例。</remarks>
+    /// <param name="dictionaryName">字典名称，不区分大小写</param>
+    /// <param name="factory">构建 <see cref="SensitiveWordSanitizer" /> 的工厂委托</param>
+    public static void Register(string dictionaryName, Func<SensitiveWordSanitizer> factory) =>
+        GetOrCreate(dictionaryName, factory);
+
+    /// <summary>
     ///     获取已缓存的默认 <see cref="SensitiveWordSanitizer" /> 实例
     /// </summary>
     /// <remarks>使用默认字典名称：<see cref="SensitiveWordSanitizerFactory.DefaultName" />。</remarks>
@@ -50,7 +79,7 @@ public static class SensitiveWordSanitizerFactory
         }
 
         throw new InvalidOperationException(
-            $"The sensitive word dictionary '{dictionaryName}' has not been registered. Please register it using `SensitiveWordSanitizerFactory.GetOrCreate` at application startup.");
+            $"The sensitive word dictionary '{dictionaryName}' has not been registered. Please register it using `SensitiveWordSanitizerFactory.Register` or `SensitiveWordSanitizerFactory.GetOrCreate` at application startup.");
     }
 
     /// <summary>
@@ -102,6 +131,8 @@ public static class SensitiveWordSanitizerFactory
     /// <returns>
     ///     <see cref="SensitiveWordSanitizer" />
     /// </returns>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentNullException"></exception>
     public static SensitiveWordSanitizer GetOrCreate(string dictionaryName, Func<SensitiveWordSanitizer> factory)
     {
         // 空检查
