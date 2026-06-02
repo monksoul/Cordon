@@ -526,6 +526,16 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void Not_ReturnOK()
+    {
+        var validator = Validators.Not<string>(u => u.ChineseName().AllowedValues("百签", "百小僧"));
+        Assert.Equal(2, validator._validators.Count);
+
+        var validator2 = Validators.Not<string>([new ChineseNameValidator(), new AllowedValuesValidator("百签", "百小僧")]);
+        Assert.Equal(2, validator2._validators.Count);
+    }
+
+    [Fact]
     public void Null_ReturnOK()
     {
         var validator = Validators.Null();

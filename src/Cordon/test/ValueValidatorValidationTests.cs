@@ -1135,6 +1135,45 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void Not_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<object>().Not((Action<FluentValidatorBuilder<object>>)null!));
+
+        Assert.Throws<ArgumentNullException>(() =>
+            new ValueValidator<object>().Not((ValidatorBase[])null!));
+    }
+
+    [Fact]
+    public void Not_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().Not(u => u.Chinese().Required());
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as NotValidator<object>;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(2, addedValidator._validators.Count);
+
+        Assert.True(valueValidator.IsValid(null));
+        Assert.False(valueValidator.IsValid("中文"));
+        Assert.True(valueValidator.IsValid("Furion"));
+
+        var valueValidator2 =
+            new ValueValidator<object>().Not([new ChineseValidator(), new RequiredValidator()]);
+
+        Assert.Single(valueValidator2.Validators);
+
+        var addedValidator3 = valueValidator2._lastAddedValidator as NotValidator<object>;
+        Assert.NotNull(addedValidator3);
+        Assert.Equal(2, addedValidator3._validators.Count);
+
+        Assert.True(valueValidator.IsValid(null));
+        Assert.False(valueValidator.IsValid("中文"));
+        Assert.True(valueValidator.IsValid("Furion"));
+    }
+
+    [Fact]
     public void Null_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().Null();

@@ -1592,6 +1592,47 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void Not_Invalid_Parameters()
+    {
+        Assert.Throws<ArgumentNullException>(() => new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1).Not((Action<FluentValidatorBuilder<object>>)null!));
+        Assert.Throws<ArgumentNullException>(() => new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1).Not((ValidatorBase[])null!));
+    }
+
+    [Fact]
+    public void Not_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Not(u => u.Chinese().Required());
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as NotValidator<object>;
+        Assert.NotNull(addedValidator);
+        Assert.Equal(2, addedValidator._validators.Count);
+
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = null }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "中文" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "Furion" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .Not([new ChineseValidator(), new RequiredValidator()]);
+
+        Assert.Single(propertyValidator2.Validators);
+
+        var addedValidator3 = propertyValidator2._lastAddedValidator as NotValidator<object>;
+        Assert.NotNull(addedValidator3);
+        Assert.Equal(2, addedValidator3._validators.Count);
+
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = null }));
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = "中文" }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "Furion" }));
+    }
+
+    [Fact]
     public void Null_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()

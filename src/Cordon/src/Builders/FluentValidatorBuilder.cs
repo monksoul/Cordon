@@ -782,6 +782,26 @@ public abstract class FluentValidatorBuilder<T, TSelf> : IValidatorInitializer
     public virtual TSelf NotNull() => AddValidator(new NotNullValidator());
 
     /// <summary>
+    ///     添加取反验证器
+    /// </summary>
+    /// <param name="validators">验证器列表</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Not(ValidatorBase[] validators) =>
+        AddValidator(new NotValidator<T>(validators));
+
+    /// <summary>
+    ///     添加取反验证器
+    /// </summary>
+    /// <param name="configure">验证器配置委托</param>
+    /// <returns>
+    ///     <typeparamref name="TSelf" />
+    /// </returns>
+    public virtual TSelf Not(Action<FluentValidatorBuilder<T>> configure) =>
+        AddValidator(new NotValidator<T>(configure));
+
+    /// <summary>
     ///     添加 null 验证器
     /// </summary>
     /// <returns>

@@ -744,6 +744,26 @@ public static class Validators
     public static NotNullValidator NotNull() => new();
 
     /// <summary>
+    ///     创建取反验证器
+    /// </summary>
+    /// <param name="validators">验证器列表</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="NotValidator{T}" />
+    /// </returns>
+    public static NotValidator<T> Not<T>(ValidatorBase[] validators) => new(validators);
+
+    /// <summary>
+    ///     创建取反验证器
+    /// </summary>
+    /// <param name="configure">验证器配置委托</param>
+    /// <typeparam name="T">对象类型</typeparam>
+    /// <returns>
+    ///     <see cref="NotValidator{T}" />
+    /// </returns>
+    public static NotValidator<T> Not<T>(Action<FluentValidatorBuilder<T>> configure) => new(configure);
+
+    /// <summary>
     ///     创建 null 验证器
     /// </summary>
     /// <returns>
