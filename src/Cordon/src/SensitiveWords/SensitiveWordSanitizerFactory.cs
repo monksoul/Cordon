@@ -266,27 +266,9 @@ public static class SensitiveWordSanitizerFactory
     /// <summary>
     ///     敏感词清理器缓存条目
     /// </summary>
-    internal sealed class SanitizerEntry
-    {
-        /// <summary>
-        ///     <inheritdoc cref="SanitizerEntry" />
-        /// </summary>
-        /// <param name="factory">原始的构建委托</param>
-        /// <param name="lazyInstance">线程安全的延迟初始化实例</param>
-        internal SanitizerEntry(Func<SensitiveWordSanitizer> factory, Lazy<SensitiveWordSanitizer> lazyInstance)
-        {
-            Factory = factory;
-            LazyInstance = lazyInstance;
-        }
-
-        /// <summary>
-        ///     原始的构建委托
-        /// </summary>
-        internal Func<SensitiveWordSanitizer> Factory { get; }
-
-        /// <summary>
-        ///     线程安全的延迟初始化实例
-        /// </summary>
-        internal Lazy<SensitiveWordSanitizer> LazyInstance { get; }
-    }
+    /// <param name="Factory">原始的构建委托</param>
+    /// <param name="LazyInstance">线程安全的延迟初始化实例</param>
+    internal sealed record SanitizerEntry(
+        Func<SensitiveWordSanitizer> Factory,
+        Lazy<SensitiveWordSanitizer> LazyInstance);
 }
