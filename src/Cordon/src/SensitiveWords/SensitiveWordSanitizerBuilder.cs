@@ -246,6 +246,14 @@ public sealed class SensitiveWordSanitizerBuilder
     }
 
     /// <summary>
+    ///     获取已添加的所有敏感词
+    /// </summary>
+    /// <returns>
+    ///     <see cref="IReadOnlyCollection{T}" />
+    /// </returns>
+    public IReadOnlyCollection<string> GetWords() => _words.ToArray();
+
+    /// <summary>
     ///     清空已添加的所有敏感词
     /// </summary>
     /// <remarks>注意：选项也将恢复为默认值。</remarks>

@@ -242,6 +242,22 @@ public class SensitiveWordSanitizerBuilderTests
     }
 
     [Fact]
+    public void GetWords_ReturnOK()
+    {
+        var builder = new SensitiveWordSanitizerBuilder().AddPath("sensitive_words.txt");
+        var words = builder.GetWords();
+        Assert.NotNull(words);
+        Assert.NotEmpty(words);
+
+        Assert.Equal(17, words.Count);
+        Assert.Equal(
+        [
+            "加微信", "兼职刷单", "QQ群", "淘宝代刷", "敏感词", "违规表述", "暴恐", "涉 政", "test_bad_word", "illegal_term", "八 嘎 耶鲁",
+            "你-大-爷", "low_high", "hello_world", "abc_def", "TMD!", "fuck"
+        ], words);
+    }
+
+    [Fact]
     public void Clear_ReturnOK()
     {
         var builder = new SensitiveWordSanitizerBuilder();
