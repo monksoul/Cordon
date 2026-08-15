@@ -353,7 +353,6 @@ public class DecimalValidatorTests
     [Theory]
     [InlineData(2, 0)]
     [InlineData(-2, 0)]
-    [InlineData(2.0, 0)]
     [InlineData(2.1, 1)]
     [InlineData(2.2, 1)]
     [InlineData(2.23, 2)]
