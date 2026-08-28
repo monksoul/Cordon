@@ -875,6 +875,16 @@ public class ValidatorsTests
     }
 
     [Fact]
+    public void UnifiedSocialCreditCode_ReturnOK()
+    {
+        var validator = Validators.UnifiedSocialCreditCode();
+        Assert.False(validator.AllowLooseMatch);
+
+        var validator2 = Validators.UnifiedSocialCreditCode(true);
+        Assert.True(validator2.AllowLooseMatch);
+    }
+
+    [Fact]
     public void Url_ReturnOK()
     {
         var validator = Validators.Url();

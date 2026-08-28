@@ -1639,6 +1639,34 @@ public class ValueValidatorValidationTests
     }
 
     [Fact]
+    public void UnifiedSocialCreditCode_ReturnOK()
+    {
+        var valueValidator = new ValueValidator<object>().UnifiedSocialCreditCode();
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator = valueValidator._lastAddedValidator as UnifiedSocialCreditCodeValidator;
+        Assert.NotNull(addedValidator);
+        Assert.False(addedValidator.AllowLooseMatch);
+
+        Assert.False(valueValidator.IsValid(123456789012345));
+        Assert.False(valueValidator.IsValid("ABC123456789012345"));
+        Assert.True(valueValidator.IsValid("91350100M000100Y43"));
+
+        var valueValidator2 = new ValueValidator<object>().UnifiedSocialCreditCode(true);
+
+        Assert.Single(valueValidator.Validators);
+
+        var addedValidator2 = valueValidator2._lastAddedValidator as UnifiedSocialCreditCodeValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.True(addedValidator2.AllowLooseMatch);
+
+        Assert.False(valueValidator2.IsValid(123456789012345));
+        Assert.True(valueValidator2.IsValid("ABC123456789012345"));
+        Assert.True(valueValidator2.IsValid("91350100M000100Y43"));
+    }
+
+    [Fact]
     public void Url_ReturnOK()
     {
         var valueValidator = new ValueValidator<object>().Url();

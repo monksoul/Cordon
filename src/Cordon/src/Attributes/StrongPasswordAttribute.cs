@@ -7,9 +7,7 @@ namespace System.ComponentModel.DataAnnotations;
 /// <summary>
 ///     强密码模式验证特性
 /// </summary>
-/// <remarks>
-///     密码长度为 12-64 位，必须包含大小写字母、数字、特殊字符（如 <![CDATA[!@#$%^&*]]>）。
-/// </remarks>
+/// <remarks>密码长度为 12-64 位，必须包含大小写字母、数字、任意非空白特殊字符。</remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class StrongPasswordAttribute : PasswordAttribute
 {

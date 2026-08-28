@@ -905,7 +905,7 @@
             <remarks>
                 支持普通和强密码两种模式：
                 普通模式：密码长度为 8-64 位，包含至少一个字母和一个数字。
-                强密码模式：密码长度为 12-64 位，必须包含大小写字母、数字、特殊字符（如 <![CDATA[!@#$%^&*]]>）。
+                强密码模式：密码长度为 12-64 位，必须包含大小写字母、数字、任意非空白特殊字符。
             </remarks>
         </member>
         <member name="F:System.ComponentModel.DataAnnotations.PasswordAttribute._validator">
@@ -1162,9 +1162,7 @@
             <summary>
                 强密码模式验证特性
             </summary>
-            <remarks>
-                密码长度为 12-64 位，必须包含大小写字母、数字、特殊字符（如 <![CDATA[!@#$%^&*]]>）。
-            </remarks>
+            <remarks>密码长度为 12-64 位，必须包含大小写字母、数字、任意非空白特殊字符。</remarks>
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.StrongPasswordAttribute.#ctor">
             <summary>
@@ -1235,6 +1233,36 @@
             <inheritdoc />
         </member>
         <member name="M:System.ComponentModel.DataAnnotations.TimeOnlyAttribute.GetResourceKey">
+            <summary>
+                获取错误信息对应的资源键
+            </summary>
+            <returns>
+                <see cref="T:System.String" />
+            </returns>
+        </member>
+        <member name="T:System.ComponentModel.DataAnnotations.UnifiedSocialCreditCodeAttribute">
+            <summary>
+                统一社会信用代码验证特性
+            </summary>
+        </member>
+        <member name="F:System.ComponentModel.DataAnnotations.UnifiedSocialCreditCodeAttribute._validator">
+            <inheritdoc cref="T:Cordon.UnifiedSocialCreditCodeValidator" />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.UnifiedSocialCreditCodeAttribute.#ctor">
+            <summary>
+                <inheritdoc cref="T:System.ComponentModel.DataAnnotations.UnifiedSocialCreditCodeAttribute" />
+            </summary>
+        </member>
+        <member name="P:System.ComponentModel.DataAnnotations.UnifiedSocialCreditCodeAttribute.AllowLooseMatch">
+            <summary>
+                是否使用宽松匹配模式
+            </summary>
+            <remarks>允许 15/18/20 位数字或字母。默认值为：<c>false</c>。</remarks>
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.UnifiedSocialCreditCodeAttribute.IsValid(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:System.ComponentModel.DataAnnotations.UnifiedSocialCreditCodeAttribute.GetResourceKey">
             <summary>
                 获取错误信息对应的资源键
             </summary>
@@ -1804,34 +1832,98 @@
             <param name="inputSpan">The text being scanned by the regular expression.</param>
             <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
         </member>
-        <member name="T:System.Text.RegularExpressions.Generated.Regex_16">
-            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the Regex method.</summary>
+        <member name="T:System.Text.RegularExpressions.Generated.StrictRegex_16">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the StrictRegex method.</summary>
         </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Regex_16.Instance">
+        <member name="F:System.Text.RegularExpressions.Generated.StrictRegex_16.Instance">
             <summary>Cached, thread-safe singleton instance.</summary>
         </member>
-        <member name="M:System.Text.RegularExpressions.Generated.Regex_16.#ctor">
+        <member name="M:System.Text.RegularExpressions.Generated.StrictRegex_16.#ctor">
             <summary>Initializes the instance.</summary>
         </member>
-        <member name="T:System.Text.RegularExpressions.Generated.Regex_16.RunnerFactory">
+        <member name="T:System.Text.RegularExpressions.Generated.StrictRegex_16.RunnerFactory">
             <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
         </member>
-        <member name="M:System.Text.RegularExpressions.Generated.Regex_16.RunnerFactory.CreateInstance">
+        <member name="M:System.Text.RegularExpressions.Generated.StrictRegex_16.RunnerFactory.CreateInstance">
             <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
         </member>
-        <member name="T:System.Text.RegularExpressions.Generated.Regex_16.RunnerFactory.Runner">
+        <member name="T:System.Text.RegularExpressions.Generated.StrictRegex_16.RunnerFactory.Runner">
             <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
         </member>
-        <member name="M:System.Text.RegularExpressions.Generated.Regex_16.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+        <member name="M:System.Text.RegularExpressions.Generated.StrictRegex_16.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
             <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
             <param name="inputSpan">The text being scanned by the regular expression.</param>
         </member>
-        <member name="M:System.Text.RegularExpressions.Generated.Regex_16.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+        <member name="M:System.Text.RegularExpressions.Generated.StrictRegex_16.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
             <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
             <param name="inputSpan">The text being scanned by the regular expression.</param>
             <returns>true if a possible match was found; false if no more matches are possible.</returns>
         </member>
-        <member name="M:System.Text.RegularExpressions.Generated.Regex_16.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+        <member name="M:System.Text.RegularExpressions.Generated.StrictRegex_16.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.LooseRegex_17">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the LooseRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.LooseRegex_17.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LooseRegex_17.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.LooseRegex_17.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LooseRegex_17.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.LooseRegex_17.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LooseRegex_17.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LooseRegex_17.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.LooseRegex_17.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Regex_18">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the Regex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Regex_18.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.Regex_18.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Regex_18.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.Regex_18.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Regex_18.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.Regex_18.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.Regex_18.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.Regex_18.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
             <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
             <param name="inputSpan">The text being scanned by the regular expression.</param>
             <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
@@ -1871,9 +1963,6 @@
         </member>
         <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigitsAndDash">
             <summary>Supports searching for characters in or not in "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
-        </member>
-        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_ascii_7A0400000100004000000000">
-            <summary>Supports searching for characters in or not in "!#$%&amp;*@^".</summary>
         </member>
         <member name="T:Cordon.ValidationBaseAttribute">
             <summary>
@@ -3008,6 +3097,15 @@
             <param name="formats">允许的时间格式列表（如 "HH:mm:ss"）</param>
             <param name="provider">格式提供器</param>
             <param name="style">时间解析样式，需与 <paramref name="formats" /> 搭配使用。默认值为：<see cref="F:System.Globalization.DateTimeStyles.None" /></param>
+            <returns>
+                <typeparamref name="TSelf" />
+            </returns>
+        </member>
+        <member name="M:Cordon.FluentValidatorBuilder`2.UnifiedSocialCreditCode(System.Boolean)">
+            <summary>
+                添加统一社会信用代码验证器
+            </summary>
+            <param name="allowLooseMatch">是否使用宽松匹配模式，允许 15/18/20 位数字或字母。默认值为：<c>false</c>。</param>
             <returns>
                 <typeparamref name="TSelf" />
             </returns>
@@ -6560,6 +6658,16 @@
               Looks up a localized string similar to The field {0} must be a valid time in the following format(s): {1}..
             </summary>
         </member>
+        <member name="P:Cordon.Resources.ValidationMessages.UnifiedSocialCreditCodeValidator_ValidationError">
+            <summary>
+              Looks up a localized string similar to The field {0} is not a valid unified social credit code..
+            </summary>
+        </member>
+        <member name="P:Cordon.Resources.ValidationMessages.UnifiedSocialCreditCodeValidator_ValidationError_AllowLooseMatch">
+            <summary>
+              Looks up a localized string similar to The field {0} is not a valid unified social credit code (loose match)..
+            </summary>
+        </member>
         <member name="P:Cordon.Resources.ValidationMessages.UrlValidator_ValidationError">
             <summary>
               Looks up a localized string similar to The {0} field is not a valid fully-qualified http, https URL..
@@ -8245,6 +8353,15 @@
                 <see cref="T:Cordon.TimeOnlyValidator" />
             </returns>
         </member>
+        <member name="M:Cordon.Validators.UnifiedSocialCreditCode(System.Boolean)">
+            <summary>
+                创建统一社会信用代码验证器
+            </summary>
+            <param name="allowLooseMatch">是否使用宽松匹配模式，允许 15/18/20 位数字或字母。默认值为：<c>false</c>。</param>
+            <returns>
+                <see cref="T:Cordon.UnifiedSocialCreditCodeValidator" />
+            </returns>
+        </member>
         <member name="M:Cordon.Validators.Url(System.Boolean)">
             <summary>
                 创建 URL 地址验证器
@@ -8571,7 +8688,7 @@
         <member name="M:Cordon.BankCardValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^[1-9]\d{11,18}$</code><br/>
+            <code>^[1-9]\\d{11,18}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8610,7 +8727,7 @@
         <member name="M:Cordon.ChineseNameValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:[\u4e00-\u9fa5·]{2,16})$</code><br/>
+            <code>^(?:[\\u4e00-\\u9fa5·]{2,16})$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8635,7 +8752,7 @@
         <member name="M:Cordon.ChineseValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:[\u3400-\u4DB5\u4E00-\u9FEA\uFA0E\uFA0F\uFA11\uFA13\uFA14\uFA1F\uFA21\uFA23\uFA24\uFA27-\uFA29]|[\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879][\uDC00-\uDFFF]|\uD869[\uDC00-\uDED6\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF34\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0])+$</code><br/>
+            <code>^(?:[\\u3400-\\u4DB5\\u4E00-\\u9FEA\\uFA0E\\uFA0F\\uFA11\\uFA13\\uFA14\\uFA1F\\uFA21\\uFA23\\uFA24\\uFA27-\\uFA29]|[\\uD840-\\uD868\\uD86A-\\uD86C\\uD86F-\\uD872\\uD874-\\uD879][\\uDC00-\\uDFFF]|\\uD869[\\uDC00-\\uDED6\\uDF00-\\uDFFF]|\\uD86D[\\uDC00-\\uDF34\\uDF40-\\uDFFF]|\\uD86E[\\uDC00-\\uDC1D\\uDC20-\\uDFFF]|\\uD873[\\uDC00-\\uDEA1\\uDEB0-\\uDFFF]|\\uD87A[\\uDC00-\\uDFE0])+$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -8686,7 +8803,7 @@
         <member name="M:Cordon.ColorValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:#(?:(?:[0-9a-fA-F]{3}){1,2}|[0-9a-fA-F]{8})|rgba?\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*(?:,\s*[0-9.]+\s*)?)?\)|hsla?\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*(?:,\s*[0-9.]+\s*)?)?\)|hwb\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|lch\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|oklch\((?:\s*\d+\%?\s*,){2}\s*(?:\d+\%?\s*)?\)|lab\((?:\s*[-+]?\d+\%?\s*,){2}\s*[-+]?\d+\%?\s*\)|oklab\((?:\s*[-+]?\d+\%?\s*,){2}\s*[-+]?\d+\%?\s*\))$</code><br/>
+            <code>^(?:#(?:(?:[0-9a-fA-F]{3}){1,2}|[0-9a-fA-F]{8})|rgba?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hsla?\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*(?:,\\s*[0-9.]+\\s*)?)?\\)|hwb\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|oklch\\((?:\\s*\\d+\\%?\\s*,){2}\\s*(?:\\d+\\%?\\s*)?\\)|lab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\)|oklab\\((?:\\s*[-+]?\\d+\\%?\\s*,){2}\\s*[-+]?\\d+\\%?\\s*\\))$</code><br/>
             Options:<br/>
             <code>RegexOptions.IgnoreCase</code><br/>
             Explanation:<br/>
@@ -8844,7 +8961,7 @@
         <member name="M:Cordon.ColorValidator.StandardRegex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:#(?:[0-9a-fA-F]{3}){1,2}|rgba?\((?:\s*(?:\d+%?)\s*,){2}\s*(?:\d+%?)\s*(?:,\s*(?:\d+(?:\.\d+)?|\.\d+))?\))$</code><br/>
+            <code>^(?:#(?:[0-9a-fA-F]{3}){1,2}|rgba?\\((?:\\s*(?:\\d+%?)\\s*,){2}\\s*(?:\\d+%?)\\s*(?:,\\s*(?:\\d+(?:\\.\\d+)?|\\.\\d+))?\\))$</code><br/>
             Options:<br/>
             <code>RegexOptions.IgnoreCase</code><br/>
             Explanation:<br/>
@@ -9380,7 +9497,7 @@
         <member name="M:Cordon.DomainValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$</code><br/>
+            <code>^([a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9412,7 +9529,7 @@
         <member name="M:Cordon.EmailAddressValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(([^&lt;&gt;()\$$\].,;:\s@"]+(\.[^&lt;&gt;()\$$\].,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$</code><br/>
+            <code>^(([^&lt;&gt;()\\$$\\].,;:\\s@"]+(\\.[^&lt;&gt;()\\$$\\].,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9706,7 +9823,7 @@
         <member name="M:Cordon.IDCardValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^\d{6}((((((19|20)\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|(((19|20)\d{2})(0[13578]|1[02])31)|((19|20)\d{2})02(0[1-9]|1\d|2[0-8])|((((19|20)([13579][26]|[2468][048]|0[48]))|(2000))0229))\d{3})|((((\d{2})(0[13-9]|1[012])(0[1-9]|[12]\d|30))|((\d{2})(0[13578]|1[02])31)|((\d{2})02(0[1-9]|1\d|2[0-8]))|(([13579][26]|[2468][048]|0[048])0229))\d{2}))(\d|X|x)$</code><br/>
+            <code>^\\d{6}((((((19|20)\\d{2})(0[13-9]|1[012])(0[1-9]|[12]\\d|30))|(((19|20)\\d{2})(0[13578]|1[02])31)|((19|20)\\d{2})02(0[1-9]|1\\d|2[0-8])|((((19|20)([13579][26]|[2468][048]|0[48]))|(2000))0229))\\d{3})|((((\\d{2})(0[13-9]|1[012])(0[1-9]|[12]\\d|30))|((\\d{2})(0[13578]|1[02])31)|((\\d{2})02(0[1-9]|1\\d|2[0-8]))|(([13579][26]|[2468][048]|0[048])0229))\\d{2}))(\\d|X|x)$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -9908,7 +10025,7 @@
         <member name="M:Cordon.IpAddressValidator.StrictIPv4Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:\d{1,3}\.){3}\d{1,3}$</code><br/>
+            <code>^(?:\\d{1,3}\\.){3}\\d{1,3}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10383,7 +10500,7 @@
             <remarks>
                 支持普通和强密码两种模式：
                 普通模式：密码长度为 8-64 位，包含至少一个字母和一个数字。
-                强密码模式：密码长度为 12-64 位，必须包含大小写字母、数字、特殊字符（如 <![CDATA[!@#$%^&*]]>）。
+                强密码模式：密码长度为 12-64 位，必须包含大小写字母、数字、任意非空白特殊字符。
             </remarks>
         </member>
         <member name="M:Cordon.PasswordValidator.#ctor">
@@ -10411,7 +10528,7 @@
         <member name="M:Cordon.PasswordValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>\A(?=.*[a-zA-Z])(?=.*\d).{8,64}\z</code><br/>
+            <code>\\A(?=.*[a-zA-Z])(?=.*\\d).{8,64}\\z</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10429,7 +10546,7 @@
         <member name="M:Cordon.PasswordValidator.StrongRegex">
             <remarks>
             Pattern:<br/>
-            <code>\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&amp;*]).{12,64}\z</code><br/>
+            <code>\\A(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z0-9\\s]).{12,64}\\z</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10444,7 +10561,7 @@
                 ○ Match a Unicode digit.<br/>
             ○ Zero-width positive lookahead.<br/>
                 ○ Match a character other than '\n' greedily any number of times.<br/>
-                ○ Match a character in the set [!#-&amp;*@^].<br/>
+                ○ Match a character in the set [^0-9A-Za-z\s].<br/>
             ○ Match a character other than '\n' atomically at least 12 and at most 64 times.<br/>
             ○ Match if at the end of the string.<br/>
             </code>
@@ -10467,7 +10584,7 @@
         <member name="M:Cordon.PhoneNumberValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:(?:\+|00)86)?1(?:3\d|4[579]|5[0-35-9]|6[6-8]|7[0-8]|8\d|9[0-35-9])\d{8}$</code><br/>
+            <code>^(?:(?:\\+|00)86)?1(?:3\\d|4[579]|5[0-35-9]|6[6-8]|7[0-8]|8\\d|9[0-35-9])\\d{8}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -10520,7 +10637,7 @@
         <member name="M:Cordon.PostalCodeValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(0[1-7]|1[0-356]|2[0-7]|3[0-6]|4[0-7]|5[1-7]|6[1-7]|7[0-5]|8[013-6])\d{4}$</code><br/>
+            <code>^(0[1-7]|1[0-356]|2[0-7]|3[0-6]|4[0-7]|5[1-7]|6[1-7]|7[0-5]|8[013-6])\\d{4}$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -11010,9 +11127,7 @@
             <summary>
                 强密码模式验证器
             </summary>
-            <remarks>
-                密码长度为 12-64 位，必须包含大小写字母、数字、特殊字符（如 <![CDATA[!@#$%^&*]]>）。
-            </remarks>
+            <remarks>密码长度为 12-64 位，必须包含大小写字母、数字、任意非空白特殊字符。</remarks>
         </member>
         <member name="M:Cordon.StrongPasswordValidator.#ctor">
             <summary>
@@ -11035,7 +11150,7 @@
         <member name="M:Cordon.TelephoneValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^(?:(?:\d{3}-)?\d{8}|(?:\d{4}-)?\d{7,8})(?:-\d+)?$</code><br/>
+            <code>^(?:(?:\\d{3}-)?\\d{8}|(?:\\d{4}-)?\\d{7,8})(?:-\\d+)?$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -11113,6 +11228,66 @@
                 <see cref="T:System.String" />
             </returns>
         </member>
+        <member name="T:Cordon.UnifiedSocialCreditCodeValidator">
+            <summary>
+                统一社会信用代码验证器
+            </summary>
+        </member>
+        <member name="M:Cordon.UnifiedSocialCreditCodeValidator.#ctor">
+            <summary>
+                <inheritdoc cref="T:Cordon.UnifiedSocialCreditCodeValidator" />
+            </summary>
+        </member>
+        <member name="P:Cordon.UnifiedSocialCreditCodeValidator.AllowLooseMatch">
+            <summary>
+                是否使用宽松匹配模式
+            </summary>
+            <remarks>允许 15/18/20 位数字或字母。默认值为：<c>false</c>。</remarks>
+        </member>
+        <member name="M:Cordon.UnifiedSocialCreditCodeValidator.IsValid(System.Object,Cordon.IValidationContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Cordon.UnifiedSocialCreditCodeValidator.GetResourceKey">
+            <summary>
+                获取错误信息对应的资源键
+            </summary>
+            <returns>
+                <see cref="T:System.String" />
+            </returns>
+        </member>
+        <member name="M:Cordon.UnifiedSocialCreditCodeValidator.StrictRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[0-9A-HJ-NPQRTUWXY]{2}\\d{6}[0-9A-HJ-NPQRTUWXY]{10}$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-HJ-NP-RTUW-Y] exactly 2 times.<br/>
+            ○ Match a Unicode digit exactly 6 times.<br/>
+            ○ Match a character in the set [0-9A-HJ-NP-RTUW-Y] exactly 10 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:Cordon.UnifiedSocialCreditCodeValidator.LooseRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^(([0-9A-Za-z]{15})|([0-9A-Za-z]{18})|([0-9A-Za-z]{20}))$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ 1st capture group.<br/>
+                ○ Match with 3 alternative expressions.<br/>
+                    ○ 2nd capture group.<br/>
+                        ○ Match an ASCII letter or digit exactly 15 times.<br/>
+                    ○ 3rd capture group.<br/>
+                        ○ Match an ASCII letter or digit exactly 18 times.<br/>
+                    ○ 4th capture group.<br/>
+                        ○ Match an ASCII letter or digit exactly 20 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
         <member name="T:Cordon.UrlValidator">
             <summary>
                 URL 地址验证器
@@ -11169,7 +11344,7 @@
         <member name="M:Cordon.UserNameValidator.Regex">
             <remarks>
             Pattern:<br/>
-            <code>^[a-zA-Z](?!.*[_-]{2})[\w-]{2,14}[a-zA-Z0-9]$</code><br/>
+            <code>^[a-zA-Z](?!.*[_-]{2})[\\w-]{2,14}[a-zA-Z0-9]$</code><br/>
             Explanation:<br/>
             <code>
             ○ Match if at the beginning of the string.<br/>
@@ -11766,6 +11941,21 @@
         </member>
         <member name="M:Microsoft.Extensions.DependencyInjection.CordonServiceCollectionExtensions.AddCordon(Microsoft.Extensions.DependencyInjection.IServiceCollection,Cordon.ValidationBuilder)">
             <summary>
+                添加数据验证服务
+            </summary>
+            <param name="services">
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </param>
+            <param name="validationBuilder">
+                <see cref="T:Cordon.ValidationBuilder" />
+            </param>
+            <returns>
+                <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection" />
+            </returns>
+        </member>
+    </members>
+</doc>
+ry>
                 添加数据验证服务
             </summary>
             <param name="services">

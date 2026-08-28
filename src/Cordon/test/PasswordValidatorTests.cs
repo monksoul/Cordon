@@ -52,6 +52,7 @@ public class PasswordValidatorTests
     [InlineData("cln9987*_Q", false)]
     [InlineData("cln99871433*_Q", true)]
     [InlineData("TxyFxy1398*#13", true)]
+    [InlineData("1Wz}28512002", true)]
     public void IsValid_WithStrong_ReturnOK(object? value, bool expected)
     {
         var validator = new PasswordValidator { Strong = true };

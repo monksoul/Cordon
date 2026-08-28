@@ -654,6 +654,24 @@ namespace Cordon.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The field {0} is not a valid unified social credit code..
+        /// </summary>
+        internal static string UnifiedSocialCreditCodeValidator_ValidationError {
+            get {
+                return ResourceManager.GetString("UnifiedSocialCreditCodeValidator_ValidationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The field {0} is not a valid unified social credit code (loose match)..
+        /// </summary>
+        internal static string UnifiedSocialCreditCodeValidator_ValidationError_AllowLooseMatch {
+            get {
+                return ResourceManager.GetString("UnifiedSocialCreditCodeValidator_ValidationError_AllowLooseMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The {0} field is not a valid fully-qualified http, https URL..
         /// </summary>
         internal static string UrlValidator_ValidationError {

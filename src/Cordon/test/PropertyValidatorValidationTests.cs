@@ -2165,6 +2165,38 @@ public class PropertyValidatorValidationTests
     }
 
     [Fact]
+    public void UnifiedSocialCreditCode_ReturnOK()
+    {
+        var propertyValidator = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .UnifiedSocialCreditCode();
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator = propertyValidator._lastAddedValidator as UnifiedSocialCreditCodeValidator;
+        Assert.NotNull(addedValidator);
+        Assert.False(addedValidator.AllowLooseMatch);
+
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = 123456789012345 }));
+        Assert.False(propertyValidator.IsValid(new ValidationModel { Data1 = "ABC123456789012345" }));
+        Assert.True(propertyValidator.IsValid(new ValidationModel { Data1 = "91350100M000100Y43" }));
+
+        var propertyValidator2 = new ObjectValidator<ValidationModel>()
+            .RuleFor(u => u.Data1)
+            .UnifiedSocialCreditCode(true);
+
+        Assert.Single(propertyValidator.Validators);
+
+        var addedValidator2 = propertyValidator2._lastAddedValidator as UnifiedSocialCreditCodeValidator;
+        Assert.NotNull(addedValidator2);
+        Assert.True(addedValidator2.AllowLooseMatch);
+
+        Assert.False(propertyValidator2.IsValid(new ValidationModel { Data1 = 123456789012345 }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "ABC123456789012345" }));
+        Assert.True(propertyValidator2.IsValid(new ValidationModel { Data1 = "91350100M000100Y43" }));
+    }
+
+    [Fact]
     public void Url_ReturnOK()
     {
         var propertyValidator = new ObjectValidator<ValidationModel>()
