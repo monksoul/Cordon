@@ -150,4 +150,22 @@ public class UnifiedSocialCreditCodeValidatorTests
         var validator2 = new UnifiedSocialCreditCodeValidator { AllowLooseMatch = true };
         Assert.Equal("UnifiedSocialCreditCodeValidator_ValidationError_AllowLooseMatch", validator2.GetResourceKey());
     }
+
+    [Theory]
+    [InlineData(null, false)]
+    [InlineData("91350100M000100Y43", true)]
+    [InlineData("123456789012345678", true)]
+    [InlineData("ABC123456789012", false)]
+    [InlineData("ABC1234567890123456789", false)]
+    [InlineData("91350100S000100Y43", false)]
+    [InlineData("91350100V000100Y43", false)]
+    [InlineData("91350100I000100Y43", false)]
+    [InlineData("91350100O000100Y43", false)]
+    [InlineData("91350100Z000100Y43", false)]
+    [InlineData("91350100M000100Y4", false)]
+    [InlineData("91350100M000100Y433", false)]
+    [InlineData("", false)]
+    [InlineData("91350100M000100y43", false)]
+    public void ValidateChecksum_ReturnOK(string? code, bool result) =>
+        Assert.Equal(result, UnifiedSocialCreditCodeValidator.ValidateChecksum(code!));
 }
